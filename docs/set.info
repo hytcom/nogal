@@ -1,0 +1,16 @@
+[checksum]
+md5 = "315c7dc9c414ed0e1ee3d8f2ddfdb104"
+sha1 = "2804e8896fdf6bc0f65b16b03e28eaaec4e99950"
+
+[documentation]
+url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/set.md"
+
+[arguments]
+data = "Cadena de valores separados por splitter"
+index = "Indice del elemento activo"
+item = "Elemento activo del set"
+needle = "Valor de un elemento a buscar utilizando find"
+place = "Nueva posicion para el item, (first|before|after|last)"
+referer = "Posición de referencia en relación a place cuando este es: before ó after"
+regex = "Indica si needle es ó no una expresión regular"
+splitter = "Separador utilizado en data"

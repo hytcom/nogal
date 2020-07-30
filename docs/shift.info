@@ -1,0 +1,14 @@
+[checksum]
+md5 = "6e588affe96aac41cfcad9824aaa4462"
+sha1 = "3ba829e80584d71a484dde2c969dfb5e810054c9"
+
+[documentation]
+url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/shift.md"
+
+[errors]
+1001 = "JSON - profundidad máxima de pila excedida"
+1002 = "JSON - desbordamiento o los modos no coinciden"
+1003 = "JSON - carácter de control inesperado encontrado"
+1004 = "JSON - error de sintáxis en la estructura JSON"
+1005 = "JSON - error enlos caracteres UTF-8, posiblemente mal codificados"
+1006 = "JSON - error desconocido"

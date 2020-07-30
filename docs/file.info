@@ -1,0 +1,23 @@
+[checksum]
+md5 = "0805bd31f8eac0387a9c23f94b230305"
+sha1 = "2043e863fc0a4d417374f4c69318b42ee44c4426"
+
+[documentation]
+url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/file.md"
+
+[arguments]
+content = "Contenido del archivo"
+curl_options = "Opciones CURL para este tipo de conexiones, http://php.net/manual/en/function.curl-setopt.php"
+downname = "Nombre que se asignará al archivo en caso de download"
+filepath = "Ruta del archivo o directorio relativa a NGL_SANDBOX"
+hugefile = "Establece si el archivo es un archivo grande, en los métodos de lectura y escritura"
+length = "Tamaño máximo en bytes del archivo contemplado para lectura o escritura"
+mimetype = "MimeType del archivo"
+outtype = "MimeType de salida para el método view"
+reload = "Determina si se aplicará nuevamente el método nglFile::load sobre el archivo para actualizar la información"
+saveaspath = "Ruta de destino del método saveass relativa a NGL_SANDBOX"
+
+[errors]
+1001 = "No se puede leer el archivo"
+1002 = "No hay un archivo cargado"
+1003 = "No se puede escribir el archivo"

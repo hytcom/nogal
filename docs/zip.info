@@ -1,0 +1,20 @@
+[checksum]
+md5 = "0a13bc47cad95c2c84a3fb8c39f01f5a"
+sha1 = "62253517e6c6265dfcf5c903af3c9718cc25fca0"
+
+[documentation]
+url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/zip.md"
+
+[arguments]
+content = "Contenido dinámico para filepath"
+downname = "Nombre del archivo generado para descarga directa"
+extract = "Entradas a extraer. Acepta un nombre o un array de nombres"
+extract_to = "Directorio de destino para el método unzip"
+filepath = "Ruta del archivo o directorio a zipear relativa a NGL_SANDBOX ó una cadena cuando sean contenidos dinámicos"
+mode = "Modo de apertura, create, overwrite u open"
+zipfile = "Ruta del archivo zip relativa a NGL_SANDBOX ó al directorio /tmp del OS"
+
+[errors]
+1001 = "No se pudo hallar el objeto ZIP"
+1002 = "No se pudo cargar el archivo .zip"
+1003 = "No se pudo agregar la entrada al archivo"

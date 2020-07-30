@@ -1,0 +1,15 @@
+[checksum]
+md5 = "999348e05d07a098866528948c79b145"
+sha1 = "e0fbc9c197a995c7ebd9695bd644a45b44e4f29a"
+
+[documentation]
+url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/validate.md"
+
+[request]
+proccess = "Determina si se procesa o no la variable $_REQUEST. Valores posibles 0 ó 1"
+from = "Origen de la solicitud (HTTP_REFERER):\
+	LOCAL = Mismo dominio\
+	ALL = Cualquier origen\
+	Listados de HOSTS separados por , (coma)\
+	Listados de IPS separadas por , (coma)\
+"

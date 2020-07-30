@@ -1,0 +1,26 @@
+[checksum]
+md5 = "c9948ae24ccd27ad1838d500e321995a"
+sha1 = "db520e85d4a637425b948f8073ad847ae4259940"
+
+[documentation]
+url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/files.md"
+
+[errors]
+1001 = "Acceso denegado"
+1002 = "Falló al crear el archivo o directorio"
+1003 = "No se pudo encontrar el archivo"
+1004 = "No hay un archivo cargado"
+1005 = "El tamaño del archivo excede el tamaño máximo"
+1006 = "No se pudo leer el archivo remoto (allow_url_fopen=off)"
+1007 = "No se pudo leer el archivo"
+1008 = "Falló al leer la sesión remota"
+1009 = "Falló al escribir la sesión remota"
+1010 = "El archivo cargado excede el valor de la directiva upload_max_filesize en php.ini"
+1011 = "El archivo cargado excede la directiva MAX_FILE_SIZE especificada"
+1012 = "El archivo cargado fue subido parcialmente"
+1013 = "No se pudo subir el archivo"
+1014 = "Falta definir una carpeta temporal"
+1015 = "Falló al escribir el archivo"
+1016 = "Error desconocido"
+1017 = "Tamaño de archivo excedido"
+1018 = "El archivo no puede ser movido"

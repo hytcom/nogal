@@ -1,0 +1,25 @@
+[checksum]
+md5 = "139719f22828f389b68d202081f68dca"
+sha1 = "f3e13f4a79b017b08dd154429aac968eee51d94b"
+
+[documentation]
+url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/mysqlq.md"
+
+[arguments]
+column = "Nombre de una columna del grupo de resultados.\
+	En el método getAll, cuando el nombre este presedido de un #, el valor de la columna será utilizado como indice asociativo.\
+	Cuando el nombre este presedido de un @, el resultado será tratado con nglfn::arrayGroup y el valor de la columna será utilizado como indice asociativo.\
+"
+get_group = "Estructura de agrupamiento de nglfn::arrayGroup utilizada en el método getAll cuando column está precedido por una @"
+get_mode = "Formato de salida de los datos, los valores posibles son:\
+	both = los valores serán retornados con indices númericos y asociativos\
+	num = valores retornados con índices numéricos comenzando por el 0\
+	assoc = valores retornados con índices asociativos\
+	3 = igual a both\
+	2 = igual a num\
+	1 = igual a assoc\
+"
+link = "Puntero del driver de base de datos"
+query = "Resultado de la última consulta ejecutada"
+query_time = "Tiempo que tomó la última consulta ejecutada"
+sentence = "Última consulta ejecutada"

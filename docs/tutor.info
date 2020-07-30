@@ -1,0 +1,10 @@
+[checksum]
+md5 = "251922cfb7ba6c68fd17ab35a015391e"
+sha1 = "4c9b679452915264a115853283b0ad39996a918f"
+
+[documentation]
+url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/tutor.md"
+
+[errors]
+1001 = "Los tutores no pueden tener métodos públicos"
+1002 = "Tutor inexistente"

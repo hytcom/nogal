@@ -1,0 +1,68 @@
+[checksum]
+md5 = "108916c33988ea98b4cb59f5b3035017"
+sha1 = "0d3f75f59ef1c51d34f05bb63d5d4c2d21784f39"
+
+[documentation]
+url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/image.md"
+
+[arguments]
+alpha = "Determina si la siguiente copia tendra fondo transparente"
+canvas_color = "Valor hexadecimal del color del canvas"
+canvas_height = "Alto del canvas"
+canvas_width = "Ancho del canvas"
+filepath = "Ruta del archivo de imagen, puntero o null"
+filter_args = "Argumento solicitado por algunos de los filtros\
+	brightness = Nivel de brillo, rango: -255 a 255\
+	colorize = Color hexadecimal con canal alpha: #RRGGBBAA\
+	contrast = Nivel de contraste\
+	pixelate = Tamaño de bloque de pixelación\
+	smooth = Nivel de suavidad\
+"
+filter_name = "Filtro que se aplicará sobre la imagen
+Los filtros disponibles son:\
+	blur = Pone borrosa la imagen\
+	brightness = Cambia el brillo de la imagen\
+	colorize = Como grayscale, excepto que se puede especificar el color\
+	contrast = Cambia el contraste de la imagen\
+	emboss = Pone en relieve la imagen\
+	gaussian_blur = Pone borrosa la imagen usando el método Gaussiano\
+	grayscale = Convierte la imagen a escala de grises\
+	negative = Invierte todos los colores de la imagen\
+	pixelate = grayscale\
+	sharpe = Utiliza detección de borde para resaltar los bordes de la imagen\
+	sketch = Utiliza eliminación media para lograr un efecto superficial\
+	smooth = Suaviza la imagen\
+"
+height = "Alto que se aplicará en la próxima copia de la imagen actual"
+merge_alpha = "Determina si la imagen merge_image será incorporada en modo de transparencia"
+merge_image = "Puntero de la imagen que se incorporará a la imagen actual"
+merge_position = "Posición de la imagen merge_image en el canvas actual"
+position = "Posición de la imagen en el canvas, este valor puede ser un par ordenado de coordenadas \
+TOP y LEFT separados por ; (punto y coma) ó , (coma) ó alguna de las siguientes combinaciones:\
+	top left\
+	top center\
+	top right\
+	center left\
+	center center\
+	center right\
+	bottom left\
+	bottom center\
+	bottom right\
+"
+quality = "Calidad de la imagen en el método de salida write"
+rc_find = "Valor hexadecimal del color que se desea reemplazar en la imagen"
+rc_replace = "Valor hexadecimal del color con el que será reemplazado rc_find"
+rc_tolerance = "Grado de tolerancia (0-255) aplicado a la hora reemplazar colores"
+text_angle = "Angulo de escritura"
+text_color = "Color del texto"
+text_content = "Texto que se escribirá sobre la imagen actual"
+text_font = "Ruta del archivo TTF con la que se escribirá el texto"
+text_margin = "Margin aplicado al texto, valor entero o dos enteros separados por un espacio"
+text_position = "Posición del texto dentro del canvas, en igual formato que argument::position"
+text_size = "Tamaño del texto"
+type = "Tipo de imagen. Pueden ser: jpeg, jpg, png o gif"
+width = "Ancho que se aplicará en la próxima copia de la imagen actual"
+
+[errors]
+1001 = "Archivo de imágen inválido"
+1002 = "Tipografía indefinida o inexistente"

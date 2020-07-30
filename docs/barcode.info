@@ -1,0 +1,45 @@
+[checksum]
+md5 = "be87d4e6264fa5c340e66890ec9ae6b8"
+sha1 = "19b74399b35557182f56cc5ba9f3c097fe0cb0d2"
+
+[documentation]
+url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/barcode.md"
+
+[arguments]
+color = "Color de las barras en formato #RRGGBB"
+content = "Contenido del código"
+margin = "Margen de la imagen generada"
+height = "Altura máxima de la imagen del código"
+size = "Tamaño de la tipografía en el código"
+type = "Algoritmo utilizado para generar el código. Códigos soportados:\
+	CODE_39\
+	CODE_39_CHECKSUM\
+	CODE_39E\
+	CODE_39E_CHECKSUM\
+	CODE_93\
+	STANDARD_2_5\
+	STANDARD_2_5_CHECKSUM\
+	INTERLEAVED_2_5\
+	INTERLEAVED_2_5_CHECKSUM\
+	CODE_128\
+	CODE_128_A\
+	CODE_128_B\
+	CODE_128_C\
+	EAN_2\
+	EAN_5\
+	EAN_8\
+	EAN_13\
+	UPC_A\
+	UPC_E\
+	MSI\
+	MSI_CHECKSUM\
+	POSTNET\
+	PLANET\
+	RMS4CC\
+	KIX\
+	IMB\
+	CODABAR\
+	CODE_11\
+	PHARMA_CODE\
+	PHARMA_CODE_TWO_TRACKS\
+"

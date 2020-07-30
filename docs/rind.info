@@ -1,0 +1,64 @@
+[checksum]
+md5 = "a90d89bb4ceed7478242d877115f0f89"
+sha1 = "9d2790e5cfbc845cf1326d283ac90696275015bb"
+
+[documentation]
+url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/rind.md"
+
+[arguments]
+cache = "Path del directorio CACHE"
+cache_file = "Nombre del archivo en el directorio cache"
+cache_mode = "Estable el modo en el que trabajará el cache\
+	none: se leen todas las plantillas cada vez que son llamadas y procesan en caso de no existir o de haber sufrido cambios\
+	use: se leen y procesan sólo las nuevas, las ya generadas simplemente se invocan\
+	cache: sólo se invocan las ya generadas, no se leen ni procesan nuevas\
+"
+clear_utf8_bom = "Elimina la marca BOM de los archivos UTF-8"
+constants = "Listado separado por comas, de constantes PHP permitidas en las plantillas"
+curdir = "Path simulado del archivo PHP que llamó a la plantilla, si no se especifica se utilizará el path real"
+debug = "Retorna el código fuente de mergefile en lugar de evaluarlo"
+fill_urls = "Activa el autocompletar del fullpath de las url en los href, src y background"
+gui = "Path del repositorio de plantillas"
+http_support = "Admite urls en los paths de archivos"
+include_support = "Habilita el uso de mergefile"
+loops_limit = "Limite para loops numéricos"
+php_code = "Sentencias PHP que serán incluidas al principio del archivo generado. Este código no será procesado, simplemente será incluído"
+php_functions = "Listado separado por comas de las funciones PHP permitidas en las plantillas"
+root = "Path principal de la aplicación"
+scheme = "Protocolo http o https"
+set_index = "Nombre del indice a setear"
+set_request_index = "Nombre del indice de la variable global $_REQUEST utilizado en nglRind::setSET"
+set_value = "Valor a guardar en set_index"
+source = "Contenido del template en el método strstamp"
+template = "Nombre del archivo plantilla"
+trim_stamp = "Aplica TRIM antes de retornar el contenido"
+var_needle = "Base para el nombre de una variable dinámica"
+vars_allow = "Variables PHP permitidas en las plantillas"
+vars_deny = "Variables PHP denegadas en las plantillas"
+
+[includes]
+_help = "Habilita el uso del comando incfile en las plantillas\
+use = 1\
+	foo = file/path/relative/to/sandbox/foobar.php\
+"
+
+[variables]
+_help = "Predefine variables dentro de la variable $_SET. Ej:\
+	year = 2020\
+"
+
+[request]
+_help = "Predefine variables dentro de la variable $_SET intentando leer su valor de $_REQUEST\
+si el índice no existiese en $_REQUEST ó $_REQUEST[values], se utilizará el valor seteado aquí\
+Las configuraciones request sobreescriben las de variables. Ej:\
+	year = 2020\
+"
+
+[errors]
+1001 = "Lectura de URL desactivada, ver http_support"
+1002 = "PHP allow_url_fopen está desactivado"
+1003 = "No se puede leer la plantilla"
+1004 = "Comando Rind inválido"
+1005 = "Estructura JSON inválida"
+1006 = "No se pudo escribir el archivo cache. Permiso denegado"
+1007 = "Nombre de Loop inválido"

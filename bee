@@ -1,0 +1,44 @@
+<?php
+
+/** bee for shell --------------------------------------------------------------
+Para activar la consola se deberá definir la constante NGL_BEE como true y
+configurar la ruta del arrancador del framework
+------------------------------------------------------------------------------*/
+
+// config
+define("NGL_BEE", false);
+$FRAMEWORKPATH = "nogal.php";
+
+// run
+if(file_exists($FRAMEWORKPATH)) {
+	require_once($FRAMEWORKPATH);
+	$sBee = array_shift($argv);
+	if(NGL_TERMINAL && $bee = $ngl("bee")) {
+		if($sBee=="bee" && !count($argv)) {
+			$aBuffer = [];
+			while(true) {
+				$sInput = readline();
+				if($sInput=="bzzz") { break; }
+				$aBuffer[] = $sInput;
+			}
+			$sCommand = implode("\n",$aBuffer);
+		} else {
+			$sCommand = implode(" ",$argv);
+		}
+
+		$sResponse = $bee->dump(true)->bzzz($sCommand);
+		if($bee->error()) {
+			$ngl()->out("\n".$sResponse."\n", "error");
+		} else {
+			$ngl()->out("\nRunned", "success");
+			$ngl()->out("\n".$sResponse."\n");
+		}
+		exit();
+	} else {
+		$ngl()->out("\nBee only bzzz on Terminal\n", "error");
+	}
+} else {
+	exit("\nFile could not be found: ".$FRAMEWORKPATH."\n");
+}
+
+?>

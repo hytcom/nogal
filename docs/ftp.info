@@ -1,0 +1,50 @@
+[checksum]
+md5 = "9ba8fc126d045c66d04999461891f3f2"
+sha1 = "7995911fce8063b0109265c8f0d94e9c0b927c0d"
+
+[documentation]
+url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/ftp.md"
+
+[arguments]
+filepath = "Nombre del archivo o directorio activo en el servidor remoto"
+force_create = "Fuerza la creación de directorios en los métodos CD y MAKEDIR"
+host = "IP o dominio del servidor remoto"
+local = "Nombre del archivo o directorio en el servidor local"
+ls_mode = "Modo en el que se ejecutará el método LS:\
+	single: array con los paths completos de los archivos y directorios listados\
+	signed: idem anterior pero con un * antepuesto cuando el path corresponda a un directorio\
+	info: información detallada de los archivos y directorios listados, sujeto a la disponibilidad del dato\
+		basename: nombre del archivo\
+		bytes: tamaño en bytes\
+		chmod: permisos\
+		date: fecha en formato Y-m-d H:i:s\
+		extension: extensión del archivo\
+		filename: nombre del archivo sin extensión\
+		image: true o false\
+		path: path completo desde $sPath\
+		protocol: protocolo del archivo\
+		size: tamaño en la unidad de medida mas grande\
+		timestamp: fecha UNIX\
+		type: file o dir\
+"
+mask = "Regex utilizada para filtrar el resultado del método LS"
+newname = "Nombre de archivo o directorio para el método REN"
+pass = "Contraseña"
+passive_mode = "Establese la conexión en modo pasivo"
+port = "Puerto del servidor remoto"
+recursive = "Ejecuta LS en modo recursivo"
+transfer = "Establese el modo de transferencia de archivos\
+	1 = ASCII\
+	2 = BINARY\
+"
+user = "Nombre de usuario"
+
+[errors]
+1001 = "Conexión fallida"
+1002 = "Login incorrecto"
+1003 = "No se pudo cambiar de directorio en el servidor remoto"
+1004 = "No se pudo crear de directorio en el servidor local"
+1005 = "Falló la descarga"
+1006 = "Falló la carga del archivo. Chequee los permisos de escritura en el servidor remoto y el nombre del archivo de destino"
+1007 = "Falló al renombrar el archivo"
+1008 = "Falló al intentar eliminar el archivo. Chequee los permisos de escritura en el servidor remoto"

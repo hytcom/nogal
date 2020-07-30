@@ -1,0 +1,28 @@
+[checksum]
+md5 = "a4d6f2311ad8d258ef83b1485083502b"
+sha1 = "c6042643b3b0ae9fc8f59532ed856a9fa8eebe2e"
+
+[documentation]
+url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/dbase.md"
+
+[arguments]
+autoconn = "Establece la autoconexión"
+base = "Ruta relativa a NGL_SANDBOX del archivo .dbf"
+debug = "Activa el modo debug"
+deleted = "Determina si debe conservarse la clave interna deleted"
+get_mode = "Formato de salida de los datos, los valores posibles son:\
+	both = los valores serán retornados con indices númericos y asociativos\
+	num = valores retornados con índices numéricos comenzando por el 0\
+	assoc = valores retornados con índices asociativos\
+	3 = igual a both\
+	2 = igual a num\
+	1 = igual a assoc\
+"
+mode = "Modo de lectura de la db:\
+	0 = sólo lectura\
+	1 = escritura\
+	2 = lectura y escritura\
+"
+sql = "Sentencia SQL por defecto"
+table = "Nombre de la tabla"
+utf8 = "Activa la conversión UTF-8 en la lectura de datos"

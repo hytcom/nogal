@@ -1,0 +1,12 @@
+[checksum]
+md5 = "24343da47e0c564598aa3d4dd325405d"
+sha1 = "49b348079580fcdea45bf619106054869f01515e"
+
+[documentation]
+url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/md.md"
+
+[arguments]
+content = "Contenido del documento"
+html = "Activa el uso de código HTML"
+links = "Activa los links en las URL"
+nl2br = "Activa la conversión de saltos de línea en <br>"

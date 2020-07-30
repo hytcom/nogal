@@ -1,0 +1,15 @@
+[checksum]
+md5 = "cb5bf15fa9e2abc4318ffe2cc3fd53d2"
+sha1 = "ca2be16d76dbd03dde8b52da2051efc2d7a8cc13"
+
+[documentation]
+url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/ocr.md"
+
+[arguments]
+dictionary = "Ruta relativa a NGL_SANDBOX de un archivo con el diccionario de palabras normales"
+digits = "Prepara la lectura para identificar dígitos"
+filepath = "Ruta de la imagen a escanear relativa a NGL_SANDBOX"
+langs = "Lenguaje o lenguajes separador por , (coma)"
+patterns = "Ruta relativa a NGL_SANDBOX de un archivo con expresiones regulares que ayudan a la lectura"
+savefile = "Ruta del archivo con el resultado de la lectura, relativa a NGL_SANDBOX"
+whitelist = "Array de caracteres admitidos en la lectura"

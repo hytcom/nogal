@@ -1,0 +1,22 @@
+[checksum]
+md5 = "df2b0a73b8d0547ffa9da8193e02d47d"
+sha1 = "078e1afc14cadc9a050c41842bc8c88b6f674f11"
+
+[documentation]
+url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/excel.md"
+
+[arguments]
+calculate = "Activa y desactiva el cálculo de fórmulas"
+colnames = "Habilita el uso de la primer fila del rango como claves del array en el método getall"
+colref = "Indica si debe utilizarse la letra de la columna como índice"
+content = "Contenido para un nuevo documento Excel"
+empty = "Valor utilizado en las celdas nulas"
+filename = "Nombre del archivo relativo a NGL_SANDBOX"
+fontfamily = "Nombre de la tipografía en un nuevo archivo"
+fontsize = "Tamaño de la tipografía"
+format = "Aplica el formato a las celdas"
+index = "Número que identifica a una fila dentro de un rango"
+sheet = "Crea o selecciona una hoja dentro del documento"
+styles = "Array de estilos CSS del rango"
+title = "Nombre de la hoga activa"
+unmergefill = "Descombina las celdas agrupadas, colocando el mismo valor en todas"

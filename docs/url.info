@@ -1,0 +1,11 @@
+[checksum]
+md5 = "e9dea63fa7f1c986c048e357f8d006d8"
+sha1 = "0b2b96f2edf02a1b2f53045a66549c3119b04181"
+
+[documentation]
+url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/url.md"
+
+[arguments]
+argument = "Argumento que desea modificarse"
+url = "URL"
+value = "Nuevo valor para Argument"

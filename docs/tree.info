@@ -1,0 +1,17 @@
+[checksum]
+md5 = "8569b701dcba11dcd5d794216a0d434b"
+sha1 = "2c350bdcbb173c020f985b4bca64686be94fc041"
+
+[documentation]
+url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/tree.md"
+
+[arguments]
+children = "Nombre de la clave en la que se anidarán las dependencias"
+colid = "Nombre de la clave con el ID principal"
+column = "Columna seleccionada"
+colparent = "Nombre de la clave con el ID del padre"
+id = "ID del nodo actual"
+nodedata = "Array con los datos del nodo que se quiere agregar ó modificar"
+separator = "Separador utilizado en el método path"
+source = "Array de origen de datos"
+

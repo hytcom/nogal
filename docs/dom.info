@@ -1,0 +1,16 @@
+[checksum]
+md5 = "1277439604758e9f8bcdb39244f5bd49"
+sha1 = "c89e5cef206c0364afde6772463acd0b54d2340a"
+
+[documentation]
+url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/dom.md"
+
+[arguments]
+brtext = "Texto utilizado para reemplazar las etiquetas <br> al retornar texto"
+charset = "Juego de caracteres del contenido HTML"
+content = "Código HTML"
+index = "Indice del selector utilizado en el método get"
+lowercase = "Fuerza a que los selectores esten en minúscula"
+selector = "Selector del objetos, similiar a jQuery"
+spantext = "Texto utilizado para reemplazar las etiquetas <span> al retornar texto"
+tagsclosed = "Verifica que el texto HTML sea válido"

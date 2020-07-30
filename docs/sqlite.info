@@ -1,0 +1,45 @@
+[checksum]
+md5 = "8fb14ed3b7971f38ba47ddbba8e91c01"
+sha1 = "b24703fb96079a7a72f0b55b5fbbc566e5886289"
+
+[documentation]
+url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/sqlite.md"
+
+[arguments]
+autoconn = "Cuando es TRUE, ejecuta el método connect luego de cargar las configuraciones"
+base = "Ruta del archivo de base de datos"
+check_colnames = "Activa el chequeo de los nombre de las columnas en la tabla activa"
+debug = "Cuando es TRUE él método retorna la sentencia SQL en lugar de ejecutarla"
+do = "Cuando es TRUE el método query ejecuta la sentencia pero no retorna resultado"
+error_description = "Ante un error mostrará la descripción del mismo"
+error_query = "Ante un error mostrará la consulta que le dió origen"
+flags = "Banderas opcionales para determinar cómo abrir la base de datos SQLite"
+insert_mode = "Tipo de modo INSERT. Valores admitidos:\
+	INSERT inserta nuevos registros\
+	REPLACE si el nuevo registro duplica un valor PRIMARY KEY o UNIQUE, el antiguo registro es eliminado\
+	IGNORE el comando no aborta incluso si ocurren errores durante la ejecución\
+"
+jsql = "Sentencia SQL en formato JSON o Array, donde los índices son:\
+	columns\
+	tables\
+	where\
+	group\
+	having\
+	order\
+	offset\
+	limit\
+"
+jsql_eol = "Salto de linea luego de cada parte de la sentencia"
+pass = "Clave de encriptación opcional usada cuando se encripta o desencripta una base de datos"
+sql = "Ultima sentencia SQL ejecutada o próxima a ejecutarse"
+table = "Nombre de la tabla activa en los métodos INSERT y UPDATE"
+update_mode = "Tipo de modo UPDATE. Valores admitidos:\
+	UPDATE actualiza los registros especificados\
+	REPLACE crea un nuevo registro en caso de no hallar el registro especificados\
+	IGNORE el comando no aborta incluso si ocurren errores durante la ejecución\
+"
+values = "Datos enviados a los métodos INSERT y UPDATE. Valores admitidos:\
+	array asociativo donde cada clave es el nombre del campo en la tabla\
+	cadena de variables con el mismo formato que las pasadas por medio de una URL. El valor será analizado utilizando parse_str\
+"
+where = "Cadena que representa una condición SQL WHERE"

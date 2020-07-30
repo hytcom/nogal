@@ -1,0 +1,13 @@
+[checksum]
+md5 = "3e5c83e6554e13a4a4b53df23c626a00"
+sha1 = "d1424d50929d0adc3eb32acf1ee7e8b5d20e6c84"
+
+[documentation]
+url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/alvin.md"
+
+[errors]
+1001 = "Clave de encriptación indefinida"
+1002 = "Token inválido o vacío"
+1003 = "Clave grants duplicada"
+1004 = "Clave grants indefinida"
+1005 = "No se pudieron salvar las claves. Permiso denegado"

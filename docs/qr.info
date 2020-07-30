@@ -1,0 +1,17 @@
+[checksum]
+md5 = "a6a3749a70976c72ba4c3810d703f237"
+sha1 = "6212b9be38f4961a13330feb632d6e788737e7da"
+
+[documentation]
+url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/qr.md"
+
+[arguments]
+content = "Contenido del código"
+eclevel = "Nivel de corrección de errores:\
+	L = baja\
+	M = media\
+	Q = alta\
+	H = máxima\
+"
+margin = "Margen entre el borde de la imagen y el contenido del código"
+size = "Cantidad de pixels por punto"

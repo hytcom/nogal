@@ -1,0 +1,3 @@
+[errors]
+1001 = "No se pudieron hallar los archivos libraries.php y graftslibs.php"
+1002 = "Tipo de objeto inexistente, por favor chequee los archivos libraries.php y graftslibs.php"
