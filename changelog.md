@@ -1,3 +1,5 @@
-# 20200730
+# START
+v2.5-20200730
+
 ## general
-- START
+- Primera versión pública
