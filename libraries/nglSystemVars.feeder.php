@@ -35,6 +35,9 @@ namespace nogal;
 } **/
 class nglSystemVars extends nglTrunk {
 
+	protected $class		= "nglSystemVars";
+	protected $me			= "sysvar";
+	protected $object		= "sysvar";
 	private $VARS;
 	private $SETTINGS;
 
@@ -247,8 +250,7 @@ class nglSystemVars extends nglTrunk {
 		$vVersion					= array();
 		$vVersion["name"]			= "nogal";
 		$vVersion["description"]	= "the most simple PHP Framework";
-		$vVersion["version"]		= "2.5";
-		$vVersion["release"]		= file_get_contents(NGL_PATH_FRAMEWORK.NGL_DIR_SLASH."release.txt");
+		$vVersion["version"]		= file_get_contents(NGL_PATH_FRAMEWORK.NGL_DIR_SLASH."version.txt");
 		$vVersion["author"]			= "hytcom";
 		$vVersion["site"]			= "https://hytcom.net";
 		$vVersion["documentation"]	= "https://github.com/hytcom/wiki/tree/master/nogal";

@@ -27,11 +27,10 @@ namespace nogal;
 } **/
 class nglShift extends nglTrunk {
 
-	private $class	= "nglShift";
-	private $me		= "shift";
-	private $object	= "shift"; 
-	private $xpath	= null; 
-
+	protected $class	= "nglShift";
+	protected $me		= "shift";
+	protected $object	= "shift"; 
+	private $xpath		= null; 
 	private $vCSV;
 
 	function __builder__() {

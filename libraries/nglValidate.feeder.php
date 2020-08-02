@@ -55,7 +55,10 @@ namespace nogal;
 } **/
 class nglValidate extends nglTrunk {
 
-	private $bCheckError = false;
+	protected $class		= "nglValidate";
+	protected $me			= "validate";
+	protected $object		= "validate";
+	private $bCheckError 	= false;
 	private $mVariables;
 	private $vVariables;
 	private $vRegex;

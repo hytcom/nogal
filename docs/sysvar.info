@@ -1,6 +1,6 @@
 [checksum]
-md5 = "5e4eb3633db8584d298c22e71fb4f008"
-sha1 = "d87c9e4060aa48dd89dc1d4ffaef913beb5ee6ec"
+md5 = "6d592d2f0a63b1ee71c9ccc0e7f8d5b5"
+sha1 = "31e9b1aec76c87d9cd93326e87b9e890fea0ce92"
 
 [documentation]
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/sysvar.md"

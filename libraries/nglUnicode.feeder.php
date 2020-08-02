@@ -22,8 +22,11 @@ namespace nogal;
 } **/
 class nglUnicode extends nglTrunk {
 
-	private $bDisable = false;
-	private $vUTF8Groups = array();
+	protected $class		= "nglUnicode";
+	protected $me			= "unicode";
+	protected $object		= "unicode";
+	private $bDisable 		= false;
+	private $vUTF8Groups 	= array();
 
 	public function __builder__() {
 		$this->bDisable = (strtoupper(NGL_CHARSET)=="UTF-8") ? false : true;

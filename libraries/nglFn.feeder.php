@@ -27,6 +27,9 @@ namespace nogal;
 } **/
 class nglFn extends nglTrunk {
 	
+	protected $class			= "nglFn";
+	protected $me				= "fn";
+	protected $object			= "fn";
 	private $vMimeTypes = null;
 
 	public function __builder__() {

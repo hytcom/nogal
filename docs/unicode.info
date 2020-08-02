@@ -1,6 +1,6 @@
 [checksum]
-md5 = "547dd9c3fdf7cae07d3126ae3db19ee4"
-sha1 = "1955e9702ada0750e3f058d9fa9eba7be2728726"
+md5 = "f0596c05b3cedfaf7621a6161a9031fc"
+sha1 = "39c19cc8f6197370adf79016fd30fc748b979943"
 
 [documentation]
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/unicode.md"

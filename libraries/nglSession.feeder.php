@@ -45,6 +45,9 @@ namespace nogal;
 } **/
 class nglSession extends nglTrunk {
 
+	protected $class	= "nglSession";
+	protected $me		= "session";
+	protected $object	= "session";
 	private $sMode		= "php";
 	private $db			= null;
 	private $sPath		= null;
