@@ -130,7 +130,7 @@ class nglFile extends nglBranch implements inglBranch {
 				}
 			}
 			fclose($hFw);
-			chmod($sFilePath, NGL_CHMOD_FILE);
+			@chmod($sFilePath, NGL_CHMOD_FILE);
 
 			$this->load($sFilePath);
 			return $this;
@@ -444,7 +444,7 @@ class nglFile extends nglBranch implements inglBranch {
 
 			if($this->attribute("protocol")=="filesystem") {
 				if($handler = @fopen($sFilePath, $sMode)) {
-					if(!file_exists($sFilePath)) { chmod($sFilePath, NGL_CHMOD_FILE); }
+					if(!file_exists($sFilePath)) { @chmod($sFilePath, NGL_CHMOD_FILE); }
 					fwrite($handler, $sContent);
 					
 					if(!$this->argument("hugefile")) {

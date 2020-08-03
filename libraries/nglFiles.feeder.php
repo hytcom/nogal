@@ -215,12 +215,12 @@ class nglFiles extends nglFeeder implements inglFeeder {
 			
 			if(!$nDir) {
 				copy($sSourceFile, $sDestineFile);
-				chmod($sDestineFile, NGL_CHMOD_FILE);
+				@chmod($sDestineFile, NGL_CHMOD_FILE);
 				$sLog = "copy\t".$sSourceFile." => ".$sDestineFile."\n";
 			} else {
 				if(is_dir($sDestineFile)) { continue; }
 				if(@mkdir($sDestineFile)) {
-					chmod($sDestineFile, NGL_CHMOD_FOLDER);
+					@chmod($sDestineFile, NGL_CHMOD_FOLDER);
 					$sLog = "mkdir\t".$sDestineFile."\n";
 				} else {
 					self::errorMessage($this->object, 1003, dirname($sDestineFile));
@@ -519,7 +519,7 @@ class nglFiles extends nglFeeder implements inglFeeder {
 				if(!@mkdir($sPath, 0777, true)) {
 					return self::errorMessage($this->object, 1001, $sPath);
 				}
-				chmod($sPath, NGL_CHMOD_FOLDER);
+				@chmod($sPath, NGL_CHMOD_FOLDER);
 			}
 		} else {
 			if(!@mkdir($sPath)) {
@@ -538,13 +538,13 @@ class nglFiles extends nglFeeder implements inglFeeder {
 				while(1) {
 					$sDirToCreateForced = $sDirname."_".$x;
 					if(@mkdir($sDirPath.NGL_DIR_SLASH.$sDirToCreateForced)) {
-						chmod($sDirPath.NGL_DIR_SLASH.$sDirToCreateForced, NGL_CHMOD_FOLDER);
+						@chmod($sDirPath.NGL_DIR_SLASH.$sDirToCreateForced, NGL_CHMOD_FOLDER);
 						break;
 					}
 					$x++;
 				}
 			}
-			chmod($sPath, NGL_CHMOD_FOLDER);
+			@chmod($sPath, NGL_CHMOD_FOLDER);
 		}
 		
 		return true;
@@ -760,9 +760,9 @@ class nglFiles extends nglFeeder implements inglFeeder {
 					$sDestineFilePath = self::call()->sandboxPath($sDestine.NGL_DIR_SLASH.$sFilename);
 					$bIsImage = self::call()->isImage($vFile["tmp_name"]);
 					if(move_uploaded_file($vFile["tmp_name"], $sDestineFilePath)) {
-						chmod($sDestineFilePath, NGL_CHMOD_FILE);
+						@chmod($sDestineFilePath, NGL_CHMOD_FILE);
 						unset($vFile["error"], $vFile["tmp_name"]);
-						chmod($sDestineFilePath, NGL_CHMOD_FILE);
+						@chmod($sDestineFilePath, NGL_CHMOD_FILE);
 						$vFile["path"]					= $sDestineFilePath;
 						$vFile["filename"]				= $vFile["name"];
 						$vFile["realname"]				= $sFilename;

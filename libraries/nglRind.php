@@ -724,8 +724,8 @@ namespace nogal {
 						if($sDir!="") {
 							$sFolders .= $sDir.NGL_DIR_SLASH;
 							if(!is_dir($sCachePath.NGL_DIR_SLASH.$sFolders)) {
-								mkdir($sCachePath.NGL_DIR_SLASH.$sFolders);
-								chmod($sCachePath.NGL_DIR_SLASH.$sFolders, NGL_CHMOD_FOLDER);
+								@mkdir($sCachePath.NGL_DIR_SLASH.$sFolders);
+								@chmod($sCachePath.NGL_DIR_SLASH.$sFolders, NGL_CHMOD_FOLDER);
 							}
 						}
 					}
@@ -737,7 +737,7 @@ namespace nogal {
 				if(!self::call("file.".$this->RIND_UID)->write($sSourceCode)) {
 					self::errorMessage($this->object, 1006, $sCacheFile);
 				} else {
-					chmod($sCacheFile, NGL_CHMOD_FILE);
+					@chmod($sCacheFile, NGL_CHMOD_FILE);
 				}
 			}
 
@@ -1271,8 +1271,8 @@ namespace nogal {
 					if($sDir!="") {
 						$sFolders .= $sDir.NGL_DIR_SLASH;
 						if(!is_dir($sCachePath.NGL_DIR_SLASH.$sFolders)) {
-							mkdir($sCachePath.NGL_DIR_SLASH.$sFolders);
-							chmod($sCachePath.NGL_DIR_SLASH.$sFolders, NGL_CHMOD_FOLDER);
+							@mkdir($sCachePath.NGL_DIR_SLASH.$sFolders);
+							@chmod($sCachePath.NGL_DIR_SLASH.$sFolders, NGL_CHMOD_FOLDER);
 						}
 					}
 				}
@@ -1296,7 +1296,7 @@ namespace nogal {
 			if(!self::call("file.".$this->RIND_UID)->write($sSourceCode)) {
 				self::errorMessage($this->object, 1006, $sCacheFile);
 			} else {
-				chmod($sCacheFile, NGL_CHMOD_FILE);
+				@chmod($sCacheFile, NGL_CHMOD_FILE);
 			}
 
 			$sSourceCode = null;

@@ -1,6 +1,6 @@
 [checksum]
-md5 = "a90d89bb4ceed7478242d877115f0f89"
-sha1 = "9d2790e5cfbc845cf1326d283ac90696275015bb"
+md5 = "c4b9cade7a2a870bb463d9f34f8b1d71"
+sha1 = "cf76d1bee1bbf798f107828280790ae74ff60234"
 
 [documentation]
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/rind.md"
