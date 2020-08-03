@@ -396,6 +396,7 @@ class nglShift extends nglTrunk {
 		if(!is_array($aData)) { return ""; }
 		
 		if($aColnames) {
+			if(!is_array($aColnames) && self::call()->isTrue($aColnames)) { $aColnames = array_keys(array_shift($aData)); }
 			foreach($aColnames as $mColumnKey => $sColumn) {
 				$sColumn = str_replace($sEnclosed, $sEscaped.$sEnclosed, $sColumn);
 				$sColumn = str_replace($sJoiner, $sEscaped.$sJoiner, $sColumn);

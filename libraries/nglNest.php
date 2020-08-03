@@ -1380,6 +1380,7 @@ CREATE TABLE `__ngl_sentences__` (
 	`name` VARCHAR(128) NOT NULL DEFAULT '',
 	`type` ENUM('function','procedure','query','structure','trigger','view') NOT NULL,
 	`sentence` MEDIUMTEXT NOT NULL,
+	`dependencies` MEDIUMTEXT NOT NULL,
 	`notes` VARCHAR(255) NOT NULL DEFAULT '',
 	PRIMARY KEY (`name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

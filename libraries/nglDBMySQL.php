@@ -210,7 +210,9 @@ class nglDBMySQL extends nglBranch implements iNglDataBase {
 			LINES TERMINATED BY '".$sEOL."' 
 		";
 
-		return ($this->query($sInput)===null) ? false : true;
+		$bLoad = ($this->query($sInput)===null) ? false : true;
+		if($bLoad===true && !$nChk) { $this->query("DELETE FROM `".$sTable."` LIMIT 1"); }
+		return $bLoad;
 	}
 
 	public function insert() {
