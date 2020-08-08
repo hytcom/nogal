@@ -107,6 +107,7 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 	}
 
 	final public function __init__() {
+		self::errorMode("return");
 		if($this->argument("autoconn")) {
 			$this->connect();
 		}
@@ -136,6 +137,7 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 	public function connect() {
 		list($sBase, $sPass, $nFlags) = $this->getarguments("base,pass,flags", func_get_args());
 		$sPass = self::passwd($sPass, true);
+		$sBase = self::call()->sandboxPath($sBase);
 		$this->link = new \SQLite3($sBase, $nFlags, $sPass);
 		return $this;
 	}
@@ -166,7 +168,7 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 			}
 		}
 
-		self::errorMessage("SQLite", $this->link->lastErrorCode(), $sMsgError);
+		return self::errorMessage("SQLite", $this->link->lastErrorCode(), $sMsgError);
 	}
 
 	/** FUNCTION {
@@ -224,8 +226,7 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 		list($sQuery) = $this->getarguments("sql", func_get_args());
 		if($this->argument("debug")) { return $sQuery; }
 		if(!$query = @$this->link->query($sQuery)) {
-			$this->Error();
-			return null;
+			return $this->Error();
 		}
 		return $query;
 	}
@@ -566,9 +567,8 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 		if($this->argument("debug")) { return $sQuery; }
 
 		$nTimeIni = microtime(true);
-		if(!$query = $this->link->query($sQuery)) {
-			$this->Error();
-			return null;
+		if(!$query = @$this->link->query($sQuery)) {
+			return $this->Error();
 		}
 		
 		if($bDO) {

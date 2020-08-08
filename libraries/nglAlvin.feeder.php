@@ -497,8 +497,11 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 	}
 
 	public function raw($sIndex=null, $aKeyVals=false) {
+		$mRaw = null;
 		if(!is_array($this->aToken)) { self::errorMessage($this->object, 1002); return false; }
-		$mRaw = self::call()->arrayFlatIndex($this->aToken["raw"], $sIndex, true);
+		if(array_key_exists("raw", $this->aToken)) {
+			$mRaw = self::call()->arrayFlatIndex($this->aToken["raw"], $sIndex, true);
+		}
 
 		if(is_array($aKeyVals)) {
 			$mRaw = $this->RawKeywords($mRaw, $aKeyVals);

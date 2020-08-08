@@ -6,10 +6,13 @@ sha1 = "b0993c8bb1ff535994d53e569b1cd6b18e1d0859"
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/validate.md"
 
 [request]
-proccess = "Determina si se procesa o no la variable $_REQUEST. Valores posibles 0 ó 1"
-from = "Origen de la solicitud (HTTP_REFERER):\
+_help = "Determina si se procesa o no la variable $_REQUEST. Valores posibles 0 ó 1\
+proccess = 1\
+\
+Origen de la solicitud (HTTP_REFERER):\
 	LOCAL = Mismo dominio\
 	ALL = Cualquier origen\
 	Listados de HOSTS separados por , (coma)\
 	Listados de IPS separadas por , (coma)\
+from = LOCAL\
 "

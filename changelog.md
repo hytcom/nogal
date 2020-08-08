@@ -1,3 +1,24 @@
+# 2.5.3 - 202008081430
+## bee(cmd)
+- se incorporó el argumento **-m** que permite ejecutar multiples comandos en el modo directo
+- se incorporó el argumento **-s** que ejecuta los comandos en modo silecioso, sin generar output
+
+## mysql
+- cambios en el retorno de errores
+- se mejoró el método **mquery**
+
+## nest
+- cambio en la validación de los argumentos **der** y **core**
+- se añadió la funcionalidad de normalización automática al momento de crear un nuevo objeto
+- se modificó la salida del log
+
+## root
+- fix error al escribir logs
+
+## sqlite
+- se aplicó **sandboxPath** a la ruta de la base de datos
+
+________________________________________________________________________________
 # 2.5.2 - 202008032030
 ## mysql
 - mejora en **import**, cuando la tabla no existe, la primer línea del **CSV** es utilizada como nombres de las columnas y eliminada del contenido

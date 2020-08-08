@@ -32,14 +32,16 @@ class nglNest extends nglBranch {
 	private $aAlterTable;
 	private $aAlterField;
 	private $bRegenerate;
+	private $aAutoNormalize;
+	private $bAutoNormalize;
 
 	final protected function __declareArguments__() {
 		$vArguments							= array();
 		$vArguments["about"]				= array('$mValue', null);
 		$vArguments["after"]				= array('$mValue', true);
-		$vArguments["core"]					= array('$mValue', false);
+		$vArguments["core"]					= array('self::call()->istrue($mValue)', false);
 		$vArguments["db"]					= array('$mValue', null);
-		$vArguments["der"]					= array('$mValue', false);
+		$vArguments["der"]					= array('self::call()->istrue($mValue)', false); 
 		$vArguments["structure"]			= array('$mValue', null);
 		$vArguments["newname"]				= array('$mValue', null);
 		$vArguments["select"]				= array('$this->SetObject($mValue)', null);
@@ -59,6 +61,8 @@ class nglNest extends nglBranch {
 		$vArguments["canvas_width"]			= array('(int)$mValue', 1800);
 		$vArguments["canvas_height"]		= array('(int)$mValue', 900);
 		$vArguments["gui_part"]				= array('$mValue', "table");
+		$vArguments["normalize_code"]		= array('$mValue', "Code");
+		$vArguments["normalize_name"]		= array('$mValue', "Name");
 		
 		return $vArguments;
 	}
@@ -110,6 +114,8 @@ class nglNest extends nglBranch {
 		$this->aLoadDataIndex	= array();
 		$this->aNormalize		= array();
 		$this->aStarred			= array();
+		$this->aAutoNormalize	= array();
+		$this->bAutoNormalize	= false;
 	}
 
 	final public function __init__() {
@@ -174,9 +180,8 @@ class nglNest extends nglBranch {
 				}
 			} else {
 				$this->DefJoins($sObject, $sField);
-
 				if(isset($mType["type"]) && $mType["type"][0]=="@") { // @tabla OR @tabla-padre cuando es pid
-					$this->DefJoins($sObject, $sField, $mType["type"]);
+					$this->DefJoins($sObject, $sField, $mType["type"], $mType["label"]);
 					$mType = array_merge($mType, $this->aFields["fk"]);
 				}
 			}
@@ -210,7 +215,8 @@ class nglNest extends nglBranch {
 
 		if(is_array($mType)) {
 			if(array_key_exists("type", $mType) && $mType["type"][0]=="@") { // @tabla OR @tabla-padre cuando es pid
-				$this->DefJoins($sObject, $sField, $mType["type"]);
+				if(!isset($mType["label"])) { $mType["label"] = $mType["name"]; }
+				$this->DefJoins($sObject, $sField, $mType["type"], $mType["label"]);
 				$aType = $this->aFields["fk"];
 			} else {
 				if(array_key_exists("default", $mType)) {
@@ -562,6 +568,16 @@ class nglNest extends nglBranch {
 		$db->check_colnames = false;
 		$db->connect();
 
+		// automaticas
+		if(count($this->aAutoNormalize)) {
+			$this->bAutoNormalize = true;
+			foreach($this->aAutoNormalize as $aToNorm) {
+				$this->normalize(...$aToNorm);
+			}
+			$this->bAutoNormalize = false;
+		}
+
+		// owl data
 		$aOWL = $this->owl;
 
 		// fix campos
@@ -682,8 +698,6 @@ class nglNest extends nglBranch {
 		$sSQL .= $db->insert("__ngl_sentences__", array("name"=>"owl", "type"=>"structure", "sentence"=>$sJSONCompact)).";\n";
 		$sSQL .= "\n\n";
 
-		$sLogSQL = $sSQLStructure."\n\n".$sSQL;
-		
 		$sSQL .= "-- EMPTIES THE TABLE `__ngl_owl_structure__`;\n";
 		$sSQL .= "TRUNCATE TABLE `__ngl_owl_structure__`;\n\n";
 		
@@ -823,19 +837,25 @@ class nglNest extends nglBranch {
 			// normalizaciones
 			if(count($this->aNormalize)) {
 				$owl = self::call("owl")->connect($db);
+				$sSQL .= "-- BEGIN NORMALIZATION --\n";
 				foreach($this->aNormalize as $sNewObject => $aNormalize) {
+					if(isset($this->aAutoNormalize[$sNewObject])) { continue; }
 					$vals = $db->query("SELECT DISTINCT `".$aNormalize[1]."_".$aNormalize[2]."` FROM `".$aNormalize[0]."` ORDER BY 1");
 					if($vals->rows()) {
 						$owl->select($sNewObject);
 						while($sVal = $vals->get($aNormalize[1]."_".$aNormalize[2])) {
 							$nId = $owl->insert(array("nombre"=>$sVal));
-							$db->query("UPDATE `".$aNormalize[0]."` SET `".$aNormalize[1]."` = '".$nId."' WHERE `".$aNormalize[1]."_".$aNormalize[2]."` = '".$sVal."'");
+							$sSQLUpdate = "UPDATE `".$aNormalize[0]."` SET `".$aNormalize[1]."` = '".$nId."' WHERE `".$aNormalize[1]."_".$aNormalize[2]."` = '".$sVal."'";
+							$db->query($sSQLUpdate);
+							$sSQL .= $sSQLUpdate."\n";
 						}
 					}
 				}
+				$sSQL .= "-- END NORMALIZATION --\n";
 			}
 
-			self::log("nest.log", "-- ".date("Y-m-d H:i:s")." ---------------------------------------------------------\n".$sLogSQL);
+			// log
+			self::log("nest.log", "-- ".date("Y-m-d H:i:s")." ---------------------------------------------------------\n".$sSQLStructure."\n\n".$sSQL);
 
 			return "ok";
 		} else {
@@ -1288,20 +1308,27 @@ class nglNest extends nglBranch {
 		$sField = $this->FormatName($sField);
 		$sNewObject = $this->FormatName($sNewObject);
 
+		$sCodeField = $this->argument("normalize_code");
+		$sNameField = $this->argument("normalize_name");
 		$aColumns = array(
-			"codigo" => array("alias"=>"code", "label"=>"Código"),
-			"nombre" => array("alias"=>"name", "label"=>"Nombre")
+			"codigo" => array("alias"=>"code", "label"=>$sCodeField),
+			"nombre" => array("alias"=>"name", "label"=>$sNameField)
 		);
 
 		$sHash = self::call()->unique(8);
 		$this->aNormalize[$sNewObject] = array($sObject, $sField, $sHash);
 
-		$sLabel = $this->owl["tables"][$sObject][$sField];
-		$this->select($sObject)
-			->alter($sField, array("name"=>$sField."_".$sHash, "label"=>$sLabel."_source"))
-			->add($sField, array("type"=>"@".$sNewObject, "label"=>$sLabel))
-		;
-		return $this->create($sNewObject, $sTitle, $aColumns);
+		if(!$this->bAutoNormalize) {
+			$sLabel = $this->owl["tables"][$sObject][$sField];
+			$this->select($sObject)
+				->alter($sField, array("name"=>$sField."_".$sHash, "label"=>$sLabel."_source"))
+				->add($sField, array("type"=>"@".$sNewObject, "label"=>$sLabel))
+			;
+		}
+
+		$create = $this->create($sNewObject, $sTitle, $aColumns);
+		$this->SetObject($sObject);
+		return $create;
 	}
 
 	public function presetfields() {
@@ -1380,8 +1407,8 @@ CREATE TABLE `__ngl_sentences__` (
 	`name` VARCHAR(128) NOT NULL DEFAULT '',
 	`type` ENUM('function','procedure','query','structure','trigger','view') NOT NULL,
 	`sentence` MEDIUMTEXT NOT NULL,
-	`dependencies` MEDIUMTEXT NOT NULL,
-	`notes` VARCHAR(255) NOT NULL DEFAULT '',
+	`dependencies` MEDIUMTEXT NULL,
+	`notes` VARCHAR(255) NULL,
 	PRIMARY KEY (`name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -1470,10 +1497,17 @@ SQL;
 		return $sSQLStructure;
 	}
 
-	private function DefJoins($sObject, $sField, $sType=null) {
+	private function DefJoins($sObject, $sField, $sType=null, $sLabel=null) {
 		if($sType!==null) {
 			$aJoin = explode(":", substr($sType,1));
 			if($sField!="pid") {
+				if(!isset($this->owl["tables"][$aJoin[0]])) {
+					$sTitle = $this->FormatTitle($sLabel ? $sLabel : $sField);
+					$sNewObject = $this->FormatName($aJoin[0]);
+					if(!isset($this->aAutoNormalize[$sNewObject])) {
+						$this->aAutoNormalize[$sNewObject] = [$sField, $sNewObject, $sTitle];
+					}
+				}
 				if(!isset($this->owl["joins"][$sObject])) { $this->owl["joins"][$sObject] = array(); }
 				$this->owl["joins"][$sObject][] = $sField.":".$aJoin[0];
 			} else {
@@ -1512,6 +1546,12 @@ SQL;
 		$sName = strtolower($sName);
 		$sName = str_replace(" ", "_", $sName);
 		return preg_replace("/[^a-z-0-9\_]/is", "", $sName);
+	}
+
+	private function FormatTitle($sName) {
+		$sName = trim($sName);
+		$sName = str_replace("_", " ", $sName);
+		return ucwords($sName);
 	}
 
 	private function FieldDef($sField, $aField, $bAdd=false) {

@@ -3,17 +3,31 @@
 /** bee for shell --------------------------------------------------------------
 Para activar la consola se deberá definir la constante NGL_BEE como true y
 configurar la ruta del arrancador del framework
+
+$ php bee <COMMAND>						modo inline
+$ php bee -s <COMMAND>					modo inline silencioso
+$ php bee -r <COMMAND>					modo inline retorno (valor crudo)
+$ php bee -m "<COMMAND>|<COMMAND>"		modo multiple
+$ php bee -m@ "<COMMAND>@<COMMAND>"		modo multiple con @ como separador
+$ php bee -s -m "<COMMAND>|<COMMAND>"	modo multiple silencioso
+$ php bee -r -m "<COMMAND>|<COMMAND>"	modo multiple retorno (valor crudo)
+$ php bee								modo consola
+$ php bee -s							modo consola silencioso
 ------------------------------------------------------------------------------*/
 
 // config
-define("NGL_BEE", false);
+define("NGL_BEE", true);
 $FRAMEWORKPATH = "nogal.php";
 
 // run
 if(file_exists($FRAMEWORKPATH)) {
 	require_once($FRAMEWORKPATH);
+	$bSilent = $bReturn = false;
 	$sBee = array_shift($argv);
+
 	if(NGL_TERMINAL && $bee = $ngl("bee")) {
+		if(count($argv) && $argv[0]=="-s") { $bSilent = true; array_shift($argv); }
+		if(count($argv) && $argv[0]=="-r") { $bReturn = true; array_shift($argv); }
 		if($sBee=="bee" && !count($argv)) {
 			$aBuffer = [];
 			while(true) {
@@ -23,15 +37,33 @@ if(file_exists($FRAMEWORKPATH)) {
 			}
 			$sCommand = implode("\n",$aBuffer);
 		} else {
-			$sCommand = implode(" ",$argv);
+			if(substr($argv[0],0,2)=="-m") {
+				$sSplitter = array_shift($argv);
+				$sSplitter = substr($sSplitter,2);
+				if($sSplitter=="") { $sSplitter = "|"; }
+				$sBuffer = $argv[0];
+				$aBuffer = explode($sSplitter, $sBuffer);
+				$sCommand = implode("\n",$aBuffer);
+			} else {
+				$sCommand = implode(" ",$argv);
+			}
 		}
 
 		$sResponse = $bee->dump(true)->bzzz($sCommand);
 		if($bee->error()) {
-			$ngl()->out("\n".$sResponse."\n", "error");
+			if(!$bReturn) {
+				$ngl()->out("\n".$sResponse."\n", "error");
+			} else {
+				exit("NULL");
+			}
 		} else {
-			$ngl()->out("\nRunned", "success");
-			$ngl()->out("\n".$sResponse."\n");
+			if(!$bSilent) {
+				if(!$bReturn) {
+					$ngl()->out($sResponse, "success");
+				} else {
+					exit($sResponse);
+				}
+			}
 		}
 		exit();
 	} else {

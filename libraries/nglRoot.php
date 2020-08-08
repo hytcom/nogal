@@ -861,9 +861,8 @@ class nglRoot {
 		if(is_dir(NGL_PATH_LOGS) && is_writable(NGL_PATH_LOGS)) {
 			$sFileName = self::call()->sandboxPath(NGL_PATH_LOGS.NGL_DIR_SLASH.$sFileName);
 			$sFileName = self::call()->clearPath($sFileName);
-			if(is_writable($sFileName)) {
-				file_put_contents($sFileName, $sContent, FILE_APPEND);
-			}
+			if(file_exists($sFileName) && !is_writable($sFileName)) { return false; }
+			file_put_contents($sFileName, $sContent, FILE_APPEND);
 		}
 	}
 

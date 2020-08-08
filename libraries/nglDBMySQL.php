@@ -70,6 +70,7 @@ class nglDBMySQL extends nglBranch implements iNglDataBase {
 	}
 
 	final public function __init__() {
+		self::errorMode("return");
 		if($this->argument("autoconn")) {
 			$this->connect();
 		}
@@ -377,33 +378,39 @@ class nglDBMySQL extends nglBranch implements iNglDataBase {
 	}
 
 	public function mquery() {
-		list($sQuery,$bDO) = $this->getarguments("sql,do", func_get_args());
-		$sQuery = preg_replace("/^--(.*?)$/m", "", $sQuery);
-		$aQueries = explode(";", $sQuery);
-		if($this->argument("debug")) { return $aQueries; }
+		list($sQuery) = $this->getarguments("sql", func_get_args());
+		$sQuery = preg_replace(array("/^--.*$/m", "/^\/\*(.*?)\*\//m"), "", $sQuery);
+		$aCode = explode(PHP_EOL, $sQuery);
 
-		$aResults = array();
-		foreach($aQueries as $sQuery) {
-			$sQuery = trim($sQuery);
-			if(!empty($sQuery)) {
-				$nTimeIni = microtime(true);
-				if(!$query = @$this->link->query($sQuery)) {
-					if(!$bDO) { $aResults[] = $this->Error(); }
-				} else {
-					if($bDO) {
-						if(method_exists($query, "free")) { $query->free(); }
-						$aResults = true;
-					} else {
-						$nQueryTime	= self::call("dates")->microtimer($nTimeIni);
-						$sQueryName = "mysqlq".strstr($this->me, ".")."_".self::call()->unique();
-						$this->aQueries[] = $sQueryName;
-						$aResults[] = self::call($sQueryName)->load($this->link, $query, $sQuery, $nQueryTime);
-					}
-				}
+		$sDelimiter = ";";
+		$nDelimiter = 1;
+		$sQuery = "";
+		$aQueries = array();
+		foreach($aCode as $sLine) {
+			$sLine = trim($sLine);
+			if(strtoupper(substr($sLine, 0, 9))=="DELIMITER") {
+				$sDelimiter = trim(str_replace("DELIMITER", "", $sLine));
+				$nDelimiter = strlen($sDelimiter);
+				continue;
+			}
+			$sLast = substr($sLine, ($nDelimiter*-1));
+			$sQuery .= $sLine;
+			if($sLast==$sDelimiter) {
+				if($sQuery!=$sDelimiter && $sDelimiter==";") { $aQueries[] = $sQuery; }
+				$sQuery = "";
 			}
 		}
 
-		return $aResults;
+		if($this->argument("debug")) { return $sMultiQuery; }
+
+		$aErrors = array();
+		foreach($aQueries as $sQuery) {
+			if(!$query = $this->query($sQuery, true)) {
+				$aErrors[] = $this->Error();
+			}
+		}
+
+		return (count($aErrors)) ? $aErrors : true;
 	}
 
 	public function query() {
@@ -420,8 +427,7 @@ class nglDBMySQL extends nglBranch implements iNglDataBase {
 		$nTimeIni = microtime(true);
 		$this->attribute("last_query", $sQuery);
 		if(!$query = $this->link->query($sQuery)) {
-			$this->Error();
-			return null;
+			return $this->Error();
 		}
 
 		if($bDO) {
@@ -464,8 +470,7 @@ class nglDBMySQL extends nglBranch implements iNglDataBase {
 		}
 
 		$nError = ($this->link->connect_error) ? 1049 : $this->link->errno;
-		self::errorMessage("MySQL", $nError, $sMsgError);
-		return false;
+		return self::errorMessage("MySQL", $nError, $sMsgError);
 	}
 
 	private function PrepareValues($sType, $sTable, $mValues, $bCheckColumns) {

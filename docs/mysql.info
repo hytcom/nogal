@@ -1,6 +1,6 @@
 [checksum]
-md5 = "6f9e3c3831778245f771b0c2c11b3d0c"
-sha1 = "8eba307d4675909f423146ed895e5990022122d4"
+md5 = "8dd1cc88217b14ad3d7db91a65dbda99"
+sha1 = "a42437986a025d63bb34e94748fcfc5b8cb00725"
 
 [documentation]
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/mysql.md"
