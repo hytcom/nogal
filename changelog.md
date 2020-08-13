@@ -1,3 +1,18 @@
+# 2.5.4 - 202008131630
+## alvin
+- se añadió Passhrase al encriptado del fuente de los permisos
+- se redefinieron errores
+
+## nest
+- cambio de motor InnoDB por MyISAM en las tablas __ngl
+
+## rind
+- fix error en el submetodo **ifempty**
+
+## root
+- cambio en el manejo de errores
+
+________________________________________________________________________________
 # 2.5.3 - 202008081430
 ## bee(cmd)
 - se incorporó el argumento **-m** que permite ejecutar multiples comandos en el modo directo

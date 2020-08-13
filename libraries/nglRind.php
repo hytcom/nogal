@@ -4000,6 +4000,7 @@ namespace {
 		}
 
 		public static function ifempty($sCondition, $bReturn) {
+			global $ngl;
 			return (!strlen($sCondition)) ? $bReturn : eval($ngl()->EvalCode("?><?php return (".$sCondition.") ? true : false; ?>"));
 		}
 

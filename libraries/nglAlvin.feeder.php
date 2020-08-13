@@ -13,17 +13,17 @@ Mas que un objeto es un concepto que atraviesa transversalmente todo el framewor
 https://github.com/hytcom/wiki/blob/master/nogal/docs/alvin.md
 https://github.com/hytcom/wiki/blob/master/nogal/docs/alvinuso.md
 
-# error codes
-1001 = Crypt object not found
-1002 = Invalid or empty token
-1003 = Duplicate grants key
-1004 = Undefined grants key
-1005 = Malformed JSON grants, check if the public key is correct
-1006 = Alvin filepath error
-1007 = Undefined Public Key
-1008 = Undefined Private Key
-1009 = Wrong Token Username
-1010 = Invalid keys directory
+#errors
+1001 = "Clave de encriptación indefinida"
+1002 = "Token inválido o vacío"
+1003 = "Clave grants duplicada"
+1004 = "Clave grants indefinida"
+1005 = "No se pudieron salvar las claves. Permiso denegado"
+1006 = "Error en la ruta"
+1007 = Clave pública indefinida
+1008 = Clave privada indefinida
+1009 = Nombre de usuario incorrecto para el TOKEN
+1010 = Passhrase indefinida
 
 */
 namespace nogal;
@@ -35,6 +35,7 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 	private $sKeysPath;
 	private $sCryptKey;
 	private $sPrivateKey;
+	private $sPasshrase;
 	private $sGrantsFile;
 	private $aGrants;
 	private $crypt;
@@ -44,6 +45,7 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 		$this->aGeneratedKeys = array();
 		$this->sCryptKey = NGL_ALVIN;
 		$this->sPrivateKey = null;
+		$this->sPasshrase = null;
 		$this->aGrants = array();
 		$this->sGrantsFile = null;
 		$this->crypt = (self::call()->exists("crypt")) ? self::call("crypt") : null;
@@ -62,7 +64,7 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 			}
 			return ($bReturnKeys) ? $this->aGeneratedKeys : $this;
 		}
-		self::errorMessage($this->object, 1006);
+		self::errorMessage($this->object, 1001);
 	}
 
 	public function saveKeys() {
@@ -105,16 +107,14 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 
 	// ADMIN GRANTS ------------------------------------------------------------
 	// carga o crea los permisos
-	public function loadGrants($sFilePath) {
+	public function loadGrants($sFilePath, $sPasshrase=null) {
 		$grants = self::call("file")->load($sFilePath);
 		if($grants->size) {
 			$this->sGrantsFile = $sFilePath;
-			if(!$this->crypt) { self::errorMessage($this->object, 1001); }
-			if(!$this->sCryptKey) { self::errorMessage($this->object, 1007); }
-			$this->crypt->key($this->sCryptKey);
+			if(!$sPasshrase) { self::errorMessage($this->object, 1010); }
 			$sGrants = $grants->read();
 			$grants->close();
-			$sGrants = $this->crypt->decrypt($sGrants);
+			$sGrants = $sGrants = self::call("crypt")->type("aes")->key($sPasshrase)->base64(true)->decrypt($sGrants);
 		} else {
 			$sGrants = '{"GRANTS":[],"RAW":[]}';
 		}
@@ -122,10 +122,9 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 	}
 
 	// escribe el archivo con los permisos
-	public function save($sFilePath=null) {
-		if(!$this->crypt) { self::errorMessage($this->object, 1001); }
-		if(!$this->sPrivateKey) { self::errorMessage($this->object, 1008); }
-		if($sFilePath===null) {
+	public function save($sFilePath=null, $sPasshrase=null) {
+		if(!$sPasshrase) { self::errorMessage($this->object, 1010); }
+			if($sFilePath===null) {
 			if($this->sGrantsFile!==null) {
 				$sFilePath = $this->sGrantsFile;
 			} else {
@@ -133,9 +132,8 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 			}
 		}
 
-		$this->crypt->key($this->sCryptKey);
 		$sGrants = json_encode(array("GRANTS"=>$this->aGrants, "RAW"=>$this->aRAW));
-		$sGrants = $this->crypt->encrypt($sGrants);
+		$sGrants = self::call("crypt")->type("aes")->key($sPasshrase)->base64(true)->encrypt($sGrants);
 
 		$save = self::call("file")->load($sFilePath);
 		if($save->write($sGrants)!==false) {
@@ -266,7 +264,7 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 		if(is_array($aRaw) && count($aRaw)) { $aToken["raw"] = $aRaw; }
 
 		if($this->crypt) {
-			if(!$this->sPrivateKey) { self::errorMessage($this->object, 1007); }
+			if(!$this->sPrivateKey) { self::errorMessage($this->object, 1008); }
 			$sTokenContent = $this->crypt->type("rsa")->key($this->sPrivateKey)->encrypt(serialize($aToken));
 		} else {
 			$sTokenContent = serialize($aToken);

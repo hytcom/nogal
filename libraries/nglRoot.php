@@ -482,7 +482,7 @@ class nglRoot {
 
 		if(self::$bErrorReport) {
 			if(strpos($sFile, "eval()'d")) {
-				self::$vLastError["aditional"] = "\nEVAL-CODE[".implode("", self::$sLastEval)."]\n";
+				self::$vLastError["aditional"] = "\nEVAL-CODE:base64[".self::$sLastEval."]\n";
 			}
 
 			if(error_reporting()) {
@@ -650,7 +650,7 @@ class nglRoot {
 			$sDescription .= $sAditionalText;
 		}
 		
-		if(!empty($sDescription)) {
+		if(!empty($sDescription) && $sDescription!=$sCode) {
 			$sMsgText .= $sTitle." - ";
 			$sMsgText .= $sDescription;
 		} else {

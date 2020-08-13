@@ -1,6 +1,6 @@
 [checksum]
-md5 = "eed485ee4ae8c94d19fbd9652f32c45f"
-sha1 = "219c1e494db43d16cbb21eaf77f1a483be38bc7a"
+md5 = "b2ec8ae699c586138a1b9131affd55ec"
+sha1 = "38d8cedc30a633f631514071716d25961e92f459"
 
 [documentation]
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/alvin.md"
@@ -11,3 +11,8 @@ url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/alvin.md"
 1003 = "Clave grants duplicada"
 1004 = "Clave grants indefinida"
 1005 = "No se pudieron salvar las claves. Permiso denegado"
+1006 = "Error en la ruta"
+1007 = Clave pública indefinida
+1008 = Clave privada indefinida
+1009 = Nombre de usuario incorrecto para el TOKEN
+1010 = Passhrase indefinida

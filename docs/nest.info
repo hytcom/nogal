@@ -1,6 +1,6 @@
 [checksum]
-md5 = "aed611ba3abf5b4100975c74de6d7c0e"
-sha1 = "f90161bfb91de2305d43d8f813c49b368ed260d8"
+md5 = "4ac8087e5b7f78e87aa989e8a1e8068c"
+sha1 = "de488dd064862de9e6a0790e9009aeedba7047a4"
 
 [documentation]
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/nest.md"

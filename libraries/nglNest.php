@@ -1368,7 +1368,7 @@ CREATE TABLE `__ngl_owl_log__` (
 	`ip` CHAR(45) NOT NULL DEFAULT '',
 	`changelog` MEDIUMTEXT NULL DEFAULT NULL,
 	PRIMARY KEY (`id`) 
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 CREATE INDEX `table_idx` ON `__ngl_owl_log__` (`table`);
 CREATE INDEX `row_idx` ON `__ngl_owl_log__` (`row`);
 CREATE INDEX `user_idx` ON `__ngl_owl_log__` (`user`);
@@ -1396,7 +1396,7 @@ CREATE TABLE `__ngl_owl_index__` (
 	`imya` CHAR(32) NOT NULL DEFAULT '',
 	`alvin` CHAR(32) NULL DEFAULT NULL,
 	PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 CREATE INDEX `table_idx` ON `__ngl_owl_index__` (`table`);
 CREATE INDEX `row_idx` ON `__ngl_owl_index__` (`row`);
 CREATE INDEX `imya_idx` ON `__ngl_owl_index__` (`imya`);
