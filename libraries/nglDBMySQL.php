@@ -394,14 +394,14 @@ class nglDBMySQL extends nglBranch implements iNglDataBase {
 				continue;
 			}
 			$sLast = substr($sLine, ($nDelimiter*-1));
-			$sQuery .= $sLine;
+			$sQuery .= " ".$sLine;
 			if($sLast==$sDelimiter) {
 				if($sQuery!=$sDelimiter && $sDelimiter==";") { $aQueries[] = $sQuery; }
 				$sQuery = "";
 			}
 		}
 
-		if($this->argument("debug")) { return $sMultiQuery; }
+		if($this->argument("debug")) { return implode(PHP_EOL, $aQueries); }
 
 		$aErrors = array();
 		foreach($aQueries as $sQuery) {

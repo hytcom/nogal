@@ -52,13 +52,14 @@ class nglFn extends nglTrunk {
 
 		$vMimeTypes = array();
 		if(!$bGetOnlineData) {
-			$sConfigFile = self::clearPath(NGL_PATH_DATA.NGL_DIR_SLASH."mime_types.conf");
+			$sConfigFile = $this->sandboxPath(NGL_PATH_DATA.NGL_DIR_SLASH."mime_types.conf");
+			$sConfigFile = self::clearPath($sConfigFile);
 			if(!$vMimeTypes = self::parseConfigFile($sConfigFile, true)) {
 				$vMimeTypes = $this->apacheMimeTypes(true);
 			}
 		} else {
 			$sURL = "http://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types";
-			if(!$sBuffer = @file_get_contents($sURL)) {
+			if(!$sBuffer = file_get_contents($sURL)) {
 				self::errorMode("die");
 				self::errorMessage("NOGAL", 1016, "URL: ".$sURL);
 			} else {

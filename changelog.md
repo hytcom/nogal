@@ -3,6 +3,12 @@
 - se añadió Passhrase al encriptado del fuente de los permisos
 - se redefinieron errores
 
+## fn
+- sandbox en **apacheMimeTypes**
+
+## msqyl
+- fix error en **mquery**
+
 ## nest
 - cambio de motor InnoDB por MyISAM en las tablas __ngl
 
