@@ -1,6 +1,6 @@
 [checksum]
-md5 = "7248cdd55129151de606a3272679f233"
-sha1 = "e5270ebbb2c839831b992fa6d65b566a22d51cfa"
+md5 = "4613d7408a3b427bafade696bc6f43b5"
+sha1 = "644786b44dd4b03188a9dd797799581d5be6487b"
 
 [documentation]
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/fn.md"

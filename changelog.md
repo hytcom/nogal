@@ -1,3 +1,38 @@
+# 2.6.0 - 202008181200
+## dbase
+- cambió la manera de leer los registros en el método **Fetch**
+- nuevo método **handler**, que retorna el puntero de la conexión
+
+## fn
+- nuevo método **strToArray**
+
+## mysql
+- actualización de **mquery** y **mexec** por el cambio de **strToArray**
+- nuevo método **handler**, que retorna el puntero de la conexión
+
+## nest
+- vuelta a MyISAM del motor en las tablas __ngl
+
+## pgsql
+- nuevo controlador para PostgreSQL
+
+## pgsqlq
+- nuevo controlador de resultados de PostgreSQL
+
+## qparser
+- se quitaron los slash para indicar el namespace global
+
+## shift
+- actualización de **fixedExplode** por el cambio de **strToArray**
+
+## sqlite
+- actualización de **mquery** y **mexec** por el cambio de **strToArray**
+- nuevo método **handler**, que retorna el puntero de la conexión
+
+## validate
+- cambio en **RequestFrom** de **strToArray** por **explodeTrim**
+
+________________________________________________________________________________
 # 2.5.4 - 202008131630
 ## alvin
 - se añadió Passhrase al encriptado del fuente de los permisos

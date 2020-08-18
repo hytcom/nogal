@@ -6,15 +6,15 @@ GitHub @hytcom
 ___
   
 # mysql
-## nglDBMySQLQuery *extends* nglBranch *implements* iNglDBQuery [2018-08-21]
+## nglDBPostgreSQLQuery *extends* nglBranch *implements* iNglDBQuery [2018-08-21]
 Controla los resultados generados por consultas a la bases de datos MySQL
 
-https://github.com/hytcom/wiki/blob/master/nogal/docs/mysqlq.md
+https://github.com/hytcom/wiki/blob/master/nogal/docs/pgsqlq.md
 
 */
 namespace nogal;
 
-class nglDBMySQLQuery extends nglBranch implements iNglDBQuery {
+class nglDBPostgreSQLQuery extends nglBranch implements iNglDBQuery {
 
 	private $db		= null;
 	private $cursor = null;
@@ -23,7 +23,7 @@ class nglDBMySQLQuery extends nglBranch implements iNglDBQuery {
 		$vArguments							= array();
 
 		$vArguments["column"]				= array('$mValue', null);
-		$vArguments["get_mode"]				= array('$this->GetMode($mValue)', MYSQLI_ASSOC);
+		$vArguments["get_mode"]				= array('$this->GetMode($mValue)', PGSQL_ASSOC);
 		$vArguments["link"]					= array('$mValue', null);
 		$vArguments["query"]				= array('$mValue', null);
 		$vArguments["sentence"]				= array('(string)$mValue', null);
@@ -58,25 +58,17 @@ class nglDBMySQLQuery extends nglBranch implements iNglDBQuery {
 			$sSQL = $sSQLCheck = $this->attribute("sql");
 			$sSQLCheck = preg_replace("/(\t|\n|\r)/i", "", $sSQLCheck);
 			$sSQLCheck = preg_replace("/(\"(.*?)\"|'(.*?)'|`(.*?)`)/", "", $sSQLCheck);
-			if(preg_match("/(FOUND_ROWS)/i", $sSQLCheck)) { return null; }
+			if(preg_match("/OVER\(\)/i", $sSQLCheck)) { return null; }
 
 			$sSQL = trim($sSQL);
-			if(preg_match("/LIMIT *[0-9]+ *,? *[0-9]*$/i", $sSQL)) {
-				$sSQL = preg_replace("/LIMIT *[0-9]+ *,? *[0-9]*$/i", "", $sSQL);
-				$sSQL = preg_replace("/SELECT/i", "SELECT SQL_CALC_FOUND_ROWS", $sSQL, 1);
-				$foundrows = $this->db->query($sSQL);
-			
-				$sRowsAlias = self::call()->unique();
-				$sSQL = "
-					SELECT FOUND_ROWS() AS '".$sRowsAlias."'
-				";
-				$getrows = $this->db->query($sSQL);
-				
-				$aRows = $getrows->fetch_array(MYSQLI_ASSOC);
+			if(preg_match("/LIMIT *[0-9]+/i", $sSQL)) {
+				$sRowsAlias = strtolower(self::call()->unique());
+				$sOver = "SELECT COUNT(*) OVER() AS ".$sRowsAlias.", "; //"
+				$sSQL = preg_replace("/^SELECT/i", $sOver, $sSQL, 1);
+				$getrows = pg_query($this->db, $sSQL);
+				$aRows = pg_fetch_array($getrows, null, PGSQL_ASSOC);
 				$nRows = (int)$aRows[$sRowsAlias];
-
-				$foundrows->free();
-				$getrows->free();
+				pg_free_result($getrows);
 			} else {
 				$nRows = (int)$this->rows();
 			}
@@ -90,9 +82,9 @@ class nglDBMySQLQuery extends nglBranch implements iNglDBQuery {
 		if($this->attribute("_columns")!==null) { return $this->attribute("_columns"); }
 
 		$aGetColumns = array();
-		$aCols = $this->cursor->fetch_fields();
-		foreach($aCols as $column) {
-			$aGetColumns[] = $column->name;
+		$nCols = pg_num_fields($this->cursor);
+		for($x=0; $x<$nCols; $x++) {
+			$aGetColumns[] = pg_field_name($this->cursor, $x);
 		}
 		
 		$this->attribute("_columns", $aGetColumns);
@@ -101,16 +93,16 @@ class nglDBMySQLQuery extends nglBranch implements iNglDBQuery {
 
 	public function count() {
 		if($this->attribute("_rows")!==null) { return $this->attribute("_rows"); }
-		if(in_array($this->attribute("crud"), array("INSERT", "UPDATE", "REPLACE", "DELETE"))) {
-			$nRows = $this->db->affected_rows;
+		if(in_array($this->attribute("crud"), array("INSERT", "UPDATE", "DELETE"))) {
+			$nRows = pg_affected_rows($this->cursor);
 		} else {
-			$nRows = $this->cursor->num_rows;
+			$nRows = pg_num_rows($this->cursor);
 		}
 		
 		$this->attribute("_rows", $nRows);
 		return $nRows;
 	}
-
+	
 	public function destroy() {
 		if(!is_bool($this->cursor)) { $this->free(); }
 		$this->db = null;
@@ -119,13 +111,13 @@ class nglDBMySQLQuery extends nglBranch implements iNglDBQuery {
 	}
 
 	public function free() {
-		$this->cursor->free_result();
+		pg_free_result($this->cursor);
 		return $this;
 	}
 
 	public function get() {
 		list($sColumn,$nMode) = $this->getarguments("column,get_mode", func_get_args());
-		$aRow = $this->cursor->fetch_array($nMode);
+		$aRow = pg_fetch_array($this->cursor, null, $nMode);
 		if($sColumn[0]=="#") { $sColumn = substr($sColumn, 1); }
 		return ($sColumn!==null && $aRow!==false && $aRow!==null && array_key_exists($sColumn, $aRow)) ? $aRow[$sColumn] : $aRow;
 	}
@@ -153,7 +145,7 @@ class nglDBMySQLQuery extends nglBranch implements iNglDBQuery {
 		}
 
 		$this->reset();
-		$aRow = $this->cursor->fetch_array($nMode);
+		$aRow = pg_fetch_array($this->cursor, null, $nMode);
 
 		$aGetAll = array();
 		if($sColumn!==null && $aRow!==false && $aRow!==null && !array_key_exists($sColumn, $aRow)) { return $aGetAll; }
@@ -162,7 +154,7 @@ class nglDBMySQLQuery extends nglBranch implements iNglDBQuery {
 		if($sColumn!==null) {
 			if($bIndexMode) {
 				$aMultiple = array();
-				while($aRow = $this->cursor->fetch_array($nMode)) {
+				while($aRow = pg_fetch_array($this->cursor, null, $nMode)) {
 					if(isset($aGetAll[$aRow[$sColumn]])) {
 						if(!isset($aMultiple[$aRow[$sColumn]])) {
 							$aGetAll[$aRow[$sColumn]] = array($aGetAll[$aRow[$sColumn]]);
@@ -174,16 +166,16 @@ class nglDBMySQLQuery extends nglBranch implements iNglDBQuery {
 					}
 				}
 			} else if($bKeyValue) {
-				while($aRow = $this->cursor->fetch_array($nMode)) {
+				while($aRow = pg_fetch_array($this->cursor, null, $nMode)) {
 					$aGetAll[$aRow[$sColumn]] = $aRow[$sValue];
 				}			
 			} else {
-				while($aRow = $this->cursor->fetch_array($nMode)) {
+				while($aRow = pg_fetch_array($this->cursor, null, $nMode)) {
 					$aGetAll[] = $aRow[$sColumn];
 				}			
 			}
 		} else {
-			while($aRow = $this->cursor->fetch_array($nMode)) {
+			while($aRow = pg_fetch_array($this->cursor, null, $nMode)) {
 				$aGetAll[] = $aRow;
 			}
 		}
@@ -197,12 +189,12 @@ class nglDBMySQLQuery extends nglBranch implements iNglDBQuery {
 	}
 
 	public function getobj() {
-		return $this->cursor->fetch_object();
+		return pg_fetch_object($this->cursor);
 	}
 
 	public function lastid() {
-		if($this->attribute("crud")=="INSERT" || $this->attribute("crud")=="REPLACE") {
-			return $this->db->insert_id;
+		if($this->attribute("crud")=="INSERT") {
+			return pg_last_oid($this->cursor);
 		} else {
 			return null;
 		}
@@ -231,7 +223,7 @@ class nglDBMySQLQuery extends nglBranch implements iNglDBQuery {
 	}
 
 	public function reset() {
-		$this->cursor->data_seek(0);
+		pg_result_seek($this->cursor, 0);
 		return $this;
 	}
 
@@ -242,24 +234,24 @@ class nglDBMySQLQuery extends nglBranch implements iNglDBQuery {
 	public function toArray() {
 		$this->reset();
 		$aGetAll = array();
-		while($aRow = $this->cursor->fetch_array(MYSQLI_ASSOC)) {
+		while($aRow = pg_fetch_array($this->cursor, null, PGSQL_ASSOC)) {
 			$aGetAll[] = $aRow;
 		}
 		$this->reset();
 		return $aGetAll;
 	}
 
-	protected function GetMode($nMode) {
+	protected function GetMode($sMode) {
 		$aModes 				= array();
-		$aModes["both"] 		= MYSQLI_BOTH;
-		$aModes["num"] 			= MYSQLI_NUM;
-		$aModes["assoc"] 		= MYSQLI_ASSOC;
-		$aModes[3] 				= MYSQLI_BOTH;
-		$aModes[2] 				= MYSQLI_NUM;
-		$aModes[1] 				= MYSQLI_ASSOC;
+		$aModes["both"] 		= PGSQL_BOTH;
+		$aModes["num"] 			= PGSQL_NUM;
+		$aModes["assoc"] 		= PGSQL_ASSOC;
+		$aModes[3] 				= PGSQL_BOTH;
+		$aModes[2] 				= PGSQL_NUM;
+		$aModes[1] 				= PGSQL_ASSOC;
 
-		$nMode = strtolower($nMode);
-		return (isset($aModes[$nMode])) ? $aModes[$nMode] : MYSQLI_ASSOC;
+		$sMode = strtolower($sMode);
+		return (isset($aModes[$sMode])) ? (int)$aModes[$sMode] : PGSQL_ASSOC;
 	}
 }
 

@@ -1,18 +1,27 @@
 [checksum]
-md5 = "bc7dbed8c1abd029c69ebcaf9743c465"
-sha1 = "d6e814a149ae6e17e84981363b349c54f6197fa1"
+md5 = "a820ac1f03fdc3855c2b9748e5f6bb88"
+sha1 = "cedebf44872d33c185e6d2ce4d6ea92a0c6efbc3"
 
 [documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/mysql.md"
+url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/pgsql.md"
 
 [arguments]
 autoconn = "Cuando es TRUE, ejecuta el método connect luego de cargar las configuraciones"
 base = "Nombre de la base de datos"
 charset = "Juego de caracteres con el que se ejecutarán las consultas"
 check_colnames = "Activa el chequeo de los nombre de las columnas en la tabla activa"
+conflict_action = "Acción a ejecutar en caso de conflicto en los INSERT cuando el modo de insersión es CONFLICT\
+	NOTHING\
+	UPDATE ....\
+"
+conflict_target = "Target del conflicto en los INSERT cuando el modo de insersión es CONFLICT\
+	(column_name)\
+	constraint_name\
+	WHERE...\
+"
 debug = "Cuando es TRUE el método retorna la sentencia SQL en lugar de ejecutarla"
 do = "Cuando es TRUE el método query ejecuta la sentencia pero no retorna resultado"
-error_description = "Ante un error mostrará la descripción del mismo"
+coontype = "Tipo de conexión"
 error_query = "Ante un error mostrará la consulta que le dió origen"
 file = "Ruta del archivo a exportar ó importar"
 file_eol = "Caracter de fin de línea en los métodos export e import"
@@ -21,8 +30,7 @@ file_enclosed = "Encierra los datos en los métodos export e import"
 host = "Puede ser o un nombre de host o una dirección IP. Pasando el valor NULL o la cadena localhost se asumirá el host local"
 insert_mode = "Tipo de modo INSERT. Valores admitidos:\
 	INSERT inserta nuevos registros\
-	REPLACE si el nuevo registro duplica un valor PRIMARY KEY o UNIQUE, el antiguo registro es eliminado\
-	IGNORE el comando no aborta incluso si ocurren errores durante la ejecución\
+	CONFLICT en caso de conflictos con conflict_target, ejecuta conflict_action\
 "
 jsql = "Sentencia SQL en formato JSON o Array, donde los índices son:\
 	columns\
@@ -37,13 +45,12 @@ jsql = "Sentencia SQL en formato JSON o Array, donde los índices son:\
 jsql_eol = "Salto de linea luego de cada parte de la sentencia"
 pass = "Contraseña para acceder a la base de datos"
 port = "Puerto donde escucha el servidor MySQL"
-socket = "Especifica el socket o la tubería con nombre que debería usarse"
+schema = "Esquema activo"
 sql = "Ultima sentencia SQL ejecutada o próxima a ejecutarse"
 table = "Nombre de la tabla activa en los métodos INSERT y UPDATE"
 update_mode = "Tipo de modo UPDATE. Valores admitidos:\
 	UPDATE actualiza los registros especificados\
-	REPLACE crea un nuevo registro en caso de no hallar el registro especificados\
-	IGNORE el comando no aborta incluso si ocurren errores durante la ejecución\
+	UPDATE ONLY actualiza unicamente la tabla indicada, en caso de ser una tabla heredada\
 "
 user = "Nombre de usuario para acceder a la base de datos"
 values = "Datos enviados a los métodos INSERT y UPDATE. Valores admitidos:\

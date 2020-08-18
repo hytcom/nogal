@@ -623,7 +623,7 @@ class nglShift extends nglTrunk {
 		}
 		
 		$sEOL = (isset($vOptions["eol"])) ? $vOptions["eol"] : false;
-		$aString = ($sEOL) ? explode($sEOL, $sString) : array($sString);
+		$aString = ($sEOL) ? self::call()->strToArray($sString, $sEOL) : array($sString);
 
 		$aExplode = array();
 		$bTrim = (isset($vOptions["trim"]) && $vOptions["trim"]);

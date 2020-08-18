@@ -19,8 +19,12 @@ class nglDBase extends nglBranch implements iNglDataBase {
 	private $link;
 	private $vModes;
 	private $sTable;
+	private $aFields;
+	private $aFieldsUnset;
 	private $aResult;
 	private $nResult;
+	private $nRows;
+	private $bUTF8;
 
 	final protected function __declareArguments__() {
 		$vArguments							= array();
@@ -28,7 +32,7 @@ class nglDBase extends nglBranch implements iNglDataBase {
 		$vArguments["base"]					= array('(string)$mValue', null);
 		$vArguments["table"]				= array('(string)$mValue', null);
 		$vArguments["get_mode"]				= array('$this->GetMode($mValue)', 3);
-		$vArguments["utf8"]					= array('self::call()->istrue($mValue)', true);
+		$vArguments["utf8"]					= array('$this->UTF8($mValue)', true);
 		$vArguments["deleted"]				= array('self::call()->istrue($mValue)', false);
 		
 		
@@ -50,6 +54,8 @@ class nglDBase extends nglBranch implements iNglDataBase {
 	final public function __init__() {
 		$this->aResult = null;
 		$this->nResult = 0;
+		$this->aFields = array();
+		$this->aFieldsUnset = array();
 		if($this->argument("autoconn")) {
 			$this->connect();
 		}
@@ -94,6 +100,10 @@ class nglDBase extends nglBranch implements iNglDataBase {
 		return parent::__destroy__();
 	}	
 
+	public function handler() {
+		return $this->link;
+	}
+
 	public function query() {
 		list($sQuery) = $this->getarguments("sql", func_get_args());
 		$aQuery = self::call("qparser")->query($sQuery);
@@ -101,6 +111,7 @@ class nglDBase extends nglBranch implements iNglDataBase {
 			switch($aQuery[0]) {
 				case "SELECT":
 					$this->Select($aQuery[1]);
+					$this->nRows = count($this->aResult);
 					break;
 
 				case "DESCRIBE":
@@ -108,19 +119,15 @@ class nglDBase extends nglBranch implements iNglDataBase {
 					break;
 			}
 		}
-
 		return $this;
 	}
 
 	public function get() {
 		list($sColumn,$nMode) = $this->getarguments("column,get_mode", func_get_args());
 		if(@$aRow = $this->Fetch($nMode)) {
-			if(!$this->argument("deleted")) { unset($aRow["deleted"]); }
-			$this->nResult++;
 			if($sColumn[0]=="#") { $sColumn = substr($sColumn, 1); }
 			return ($sColumn!==null && array_key_exists($sColumn, $aRow)) ? $aRow[$sColumn] : $aRow;
 		} else {
-			$this->nResult = 0;
 			return false;
 		}
 	}
@@ -196,16 +203,16 @@ class nglDBase extends nglBranch implements iNglDataBase {
 		return dbase_numrecords($this->link);
 	}
 
+	public function rows() {
+		return $this->nRows;
+	}
+
 	public function reset() {
 		$this->nResult = 0;
 	}
 
 	public function columns() {
-		if(@$aColumns = $this->aResult[0]) {
-			if(!$this->argument("deleted")) { unset($aColumns["deleted"]); }
-			return array_keys($aColumns);
-		}
-		return array();
+		return $this->aFields;
 	}
 
 	public function escape() {
@@ -233,13 +240,14 @@ class nglDBase extends nglBranch implements iNglDataBase {
 	}
 
 	private function Fetch($nMode) {
-		if(@$aRow = $this->aResult[$this->nResult]) {
-			if(!$this->argument("deleted")) { unset($aRow["deleted"]); }
+		if(@$aRow = dbase_get_record_with_names($this->link, $this->aResult[$this->nResult])) {
+			foreach($this->aFieldsUnset as $sUnset) { unset($aRow[$sUnset]); }
 			if($nMode===2) { $aRow = array_values($aRow); }
 			if($nMode===1) { $aRow = array_merge($aRow, array_values($aRow)); }
 			$this->nResult++;
-			return ($this->argument("utf8")) ? array_map("utf8_encode", $aRow) : $aRow;
+			return ($this->bUTF8) ? array_map("utf8_encode", $aRow) : $aRow;
 		} else {
+			$this->nResult = 0;
 			return false;
 		}
 	}
@@ -247,46 +255,53 @@ class nglDBase extends nglBranch implements iNglDataBase {
 	private function Select($aQuery) {
 		$aReturn = array();
 
-		if($aQuery["FIELDS"][0]=="*") {
-			$aFields = array_keys(dbase_get_record_with_names($this->link, 1));
-			if($aFields===false) { return $aReturn; }
-		} else {
+		$aNames = @dbase_get_record_with_names($this->link, 1);
+		$aFields = $aColumns = ($aNames!==false) ? array_keys($aNames) : false;
+		if($aFields===false) {
+			$this->aResult = $aReturn;
+			$this->nRows = 0;
+			return false;
+		}
+		if($aQuery["FIELDS"][0]!="*") {
 			$aFields = self::call()->arrayColumn($aQuery["FIELDS"], 1);
 		}
+		if(!$this->argument("deleted")) {
+			if($nDeleted = array_search("deleted", $aColumns)) { unset($aColumns[$nDeleted]); }
+		}
+		$this->aFields = $aFields;
+		$this->aFieldsUnset = array_diff($aFields, $aColumns);
 
 		$nFrom = $n = 1;
-		$nLimit = $y = dbase_numrecords($this->link);
+		$this->nRows = $y = dbase_numrecords($this->link);
 		if(isset($aQuery["LIMIT"])) {
 			if(isset($aQuery["LIMIT"][1])) {
 				$nFrom = (int)$aQuery["LIMIT"][0] + 1;
-				$nLimit = (int)$aQuery["LIMIT"][1];
+				$this->nRows = (int)$aQuery["LIMIT"][1];
 			} else {
-				$nLimit = (int)$aQuery["LIMIT"][0] + 1;
+				$this->nRows = (int)$aQuery["LIMIT"][0] + 1;
 			}
 		}
 
-		$sTable = $aQuery["FROM"][0];
-		if($sTable===1) { $sTable = $this->sTable; }
-		for($x=$nFrom; $x<=$y; $x++) {
-			$$sTable = dbase_get_record_with_names($this->link, $x);
-			if($$sTable===false) { break; }
-			
-			$n++;
-			if(isset($aQuery["WHERE"])) {
+		if(isset($aQuery["WHERE"])) {
+			$sTable = $aQuery["FROM"][0];
+			if($sTable===1) { $sTable = $this->sTable; }
+			for($x=$nFrom; $x<=$y; $x++) {
+				$$sTable = dbase_get_record_with_names($this->link, $x);
+				if($$sTable===false) { break; }
+
+				$n++;
 				eval(self::call()->EvalCode("if(".$aQuery["WHERE"].") { \$bEval = true; } else { \$bEval = false; }"));
 				if(!$bEval) { $n--; continue; }
-			}
 
-			foreach($aFields as $sField) {
-				$aRow[$sField] = $$sTable[$sField];
+				$aReturn[] = $x;
+				if($n==$this->nRows) { break; }
 			}
-			
-			$aReturn[] = $aRow;
-			if($n==$nLimit) { break; }
+		} else {
+			$aReturn = range(1, $this->nRows);
 		}
 
-		$this->nResult = 0;
-		return $this->aResult = $aReturn;
+		$this->aResult = $aReturn;
+		return true;
 	}
 
 	/** FUNCTION {
@@ -307,6 +322,11 @@ class nglDBase extends nglBranch implements iNglDataBase {
 
 		$sMode = strtolower($sMode);
 		return (isset($aModes[$sMode])) ? $aModes[$sMode] : 3;
+	}
+
+	protected function UTF8($bVal) {
+		$this->bUTF8 = self::call()->istrue($bVal);
+		return $bVal;
 	}
 
 	private function Describe($aQuery) {

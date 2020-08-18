@@ -340,7 +340,7 @@ class nglValidate extends nglTrunk {
 			$sFrom = strtoupper($sFrom);
 			$sFrom = trim($sFrom);
 			if($sFrom!="ALL" && $sFrom!="LOCAL") {
-				$aRequestsFroms = self::call("shift")->strToArray($sFrom, "," , '"', true);
+				$aRequestsFroms = self::call()->explodeTrim(",", $sFrom);
 			} else {
 				$aRequestsFroms = array($sFrom => true);
 			}

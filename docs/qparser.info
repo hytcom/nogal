@@ -1,6 +1,6 @@
 [checksum]
-md5 = "5d3045f6ac8c649d8941c0395d673e65"
-sha1 = "cc38fc0ed5867c7e93ddc0099c0048cc8b9d702b"
+md5 = "5ce6212d024b0aefa6ea293923a2fa36"
+sha1 = "8f25c6af2ad5b812c2488ae8df90c2417334eb8d"
 
 [documentation]
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/qparser.md"

@@ -1,6 +1,6 @@
 [checksum]
-md5 = "8b0e5189eec30a8b7faf643422de08e9"
-sha1 = "71f03182b6487ee7db7ff74153ce72e9b19fab37"
+md5 = "02ffc67b065055586df478665bd00d42"
+sha1 = "9a8f7eaedc3db5f47c2f64f8bac02479abbc2804"
 
 [documentation]
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/sqlite.md"

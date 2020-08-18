@@ -5,16 +5,16 @@
 GitHub @hytcom
 ___
   
-# mysql
-## nglDBMySQL *extends* nglBranch *implements* iNglDataBase [2018-08-21]
-Gestor de conexciones con bases de datos MySQL
+# potsgresql
+## nglDBPostgreSQL *extends* nglBranch *implements* iNglDataBase [2018-08-21]
+Gestor de conexciones con bases de datos PostgreSQL
 
-https://github.com/hytcom/wiki/blob/master/nogal/docs/mysql.md
+https://github.com/hytcom/wiki/blob/master/nogal/docs/potsgresql.md
 
 */
 namespace nogal;
 
-class nglDBMySQL extends nglBranch implements iNglDataBase {
+class nglDBPostgreSQL extends nglBranch implements iNglDataBase {
 
 	private $link;
 	private $vModes;
@@ -23,30 +23,30 @@ class nglDBMySQL extends nglBranch implements iNglDataBase {
 	final protected function __declareArguments__() {
 		$vArguments							= array();
 		$vArguments["autoconn"]				= array('self::call()->istrue($mValue)', false);
-		$vArguments["base"]					= array('$mValue', "test");
+		$vArguments["base"]					= array('$mValue', "postgres");
 		$vArguments["charset"]				= array('$mValue', "utf8");
 		$vArguments["check_colnames"]		= array('self::call()->istrue($mValue)', true);
+		$vArguments["conflict_action"]		= array('$mValue', "NOTHING"); // NOTHING | UPDATE///
+		$vArguments["conflict_target"]		= array('$mValue', "(id)"); // (column_name) | constraint_name | WHERE... 
 		$vArguments["debug"]				= array('self::call()->istrue($mValue)', false);
 		$vArguments["do"]					= array('self::call()->istrue($mValue)', false);
-		$vArguments["engine"]				= array('$mValue', "MyISAM");
-		$vArguments["error_description"]	= array('self::call()->istrue($mValue)', false);
+		$vArguments["coontype"]				= array('$mValue', PGSQL_CONNECT_FORCE_NEW);
 		$vArguments["error_query"]			= array('self::call()->istrue($mValue)', false);
 		$vArguments["file"]					= array('$mValue', null);
-		$vArguments["file_eol"]				= array('$mValue', "\\r\\n");
-		$vArguments["file_local"]			= array('self::call()->istrue($mValue)', true);
-		$vArguments["file_separator"]		= array('$mValue', "\\t");
-		$vArguments["file_enclosed"]		= array('$mValue', '"');
+		$vArguments["file_eol"]				= array('$mValue', "\n");
+		$vArguments["file_separator"]		= array('$mValue', "\t");
+		$vArguments["file_enclosed"]		= array('$mValue', "");
 		$vArguments["host"]					= array('$mValue', "localhost");
-		$vArguments["insert_mode"]			= array('$mValue', "INSERT");
+		$vArguments["insert_mode"]			= array('$mValue', "INSERT"); // INSERT | CONFLICT
 		$vArguments["jsql"]					= array('$mValue', null);
 		$vArguments["jsql_eol"]				= array('$mValue', "");
 		$vArguments["pass"]					= array('$mValue', "root");
-		$vArguments["port"]					= array('(int)$mValue', null);
-		$vArguments["socket"]				= array('$mValue', null);
+		$vArguments["port"]					= array('(int)$mValue', 5432);
+		$vArguments["schema"]				= array('(string)$mValue', "public");
 		$vArguments["sql"]					= array('$mValue', null);
 		$vArguments["table"]				= array('(string)$mValue', null);
-		$vArguments["update_mode"]			= array('strtoupper($mValue)', "UPDATE");
 		$vArguments["user"]					= array('$mValue', "root");
+		$vArguments["update_mode"]			= array('strtoupper($mValue)', "UPDATE"); // UPDATE | UPDATE ONLY
 		$vArguments["values"]				= array('$mValue', null);
 		$vArguments["where"]				= array('$mValue', null);
 
@@ -62,15 +62,15 @@ class nglDBMySQL extends nglBranch implements iNglDataBase {
 	final protected function __declareVariables__() {
 		$vModes 				= array();
 		$vModes["INSERT"] 		= "INSERT";
+		$vModes["CONFLICT"] 	= "INSERT";
 		$vModes["UPDATE"] 		= "UPDATE";
-		$vModes["REPLACE"] 		= "REPLACE";
-		$vModes["IGNORE"] 		= "IGNORE";
+		$vModes["ONLY"] 		= "UPDATE ONLY";
 		$this->vModes 			= $vModes;
 		$this->aQueries			= array();
 	}
 
 	final public function __init__() {
-		self::errorMode("return");
+		self::errorMode("echo");
 		if($this->argument("autoconn")) {
 			$this->connect();
 		}
@@ -81,26 +81,44 @@ class nglDBMySQL extends nglBranch implements iNglDataBase {
 	}
 
 	public function connect() {
-		list($sHost, $sUser, $sPass, $sBase, $nPort, $sSocket) = $this->getarguments("host,user,pass,base,port,socket", func_get_args());
-		$sPass = self::passwd($sPass, true);
-		$this->link = @new \mysqli($sHost, $sUser, $sPass, $sBase, $nPort, $sSocket);
-		if($this->link->connect_error) {
+		list($sHost, $sUser, $sPass, $sBase, $nPort, $sOptions) = $this->getarguments("host,user,pass,base,port,options", func_get_args());
+
+		$aParams = array();
+		$aParams[] = "host=".$sHost;
+		$aParams[] = "user=".$sUser;
+		$aParams[] = "password=".self::passwd($sPass, true);
+		if(!empty($sBase)) { $aParams[] = "dbname=".$sBase; }
+		if(!empty($nPort)) { $aParams[] = "port=".$nPort; }
+
+		$this->link = @pg_connect(implode(" ", $aParams), $this->argument("coontype"));
+		if($this->link===false) {
+			$this->Error(true);
+			return false;
+		}
+
+		if(!pg_query($this->link, "SET search_path TO ".$this->argument("schema"))) {
 			$this->Error();
 			return false;
 		}
-		
 		return $this;
 	}
 
 	public function chkgrants() {
-		return $this->query("SHOW GRANTS FOR CURRENT_USER")->getall();
+		return $this->query("
+			SELECT 
+				r.usename as grantor, e.usename as grantee, nspname, privilege_type, is_grantable
+			FROM pg_namespace, ACLEXPLODE(nspacl) a 
+				JOIN pg_user e on a.grantee = e.usesysid
+				JOIN pg_user r on a.grantor = r.usesysid 
+			WHERE e.usename = '".$this->argument("user")."'
+		")->getall();
 	}
 
 	public function destroy() {
 		foreach($this->aQueries as $query) {
 			self::call($query)->destroy();
 		}
-		$this->link->close();
+		pg_close($this->link);
 		return parent::__destroy__();
 	}	
 	
@@ -116,7 +134,7 @@ class nglDBMySQL extends nglBranch implements iNglDataBase {
 					if(is_array($mValue)) {
 						$mEscapedValues[$sField] = $this->escape($mValue);
 					} else {
-						$mEscapedValues[$sField] = $this->link->real_escape_string($mValue);
+						$mEscapedValues[$sField] = pg_escape_string($this->link, $mValue);
 					}
 				}
 			}
@@ -128,7 +146,7 @@ class nglDBMySQL extends nglBranch implements iNglDataBase {
 				if(is_array($mEscapedValues)) {
 					$mEscapedValues = $this->escape($mEscapedValues);
 				} else {
-					$mEscapedValues = $this->link->real_escape_string($mEscapedValues);
+					$mEscapedValues = pg_escape_string($this->link, $mEscapedValues);
 				}
 			}
 		}
@@ -139,7 +157,7 @@ class nglDBMySQL extends nglBranch implements iNglDataBase {
 	public function exec() {
 		list($sQuery) = $this->getarguments("sql", func_get_args());
 		if($this->argument("debug")) { return $sQuery; }
-		if(!$query = @$this->link->query($sQuery)) {
+		if(!$query = pg_query($this->link, $sQuery)) {
 			$this->Error();
 			return null;
 		}
@@ -148,25 +166,32 @@ class nglDBMySQL extends nglBranch implements iNglDataBase {
 
 	public function export() {
 		list($sQuery,$sFilePath) = $this->getarguments("sql,file", func_get_args());
-
 		if($sFilePath===null) { $sFilePath = NGL_PATH_TMP."/export_".date("YmdHis").".csv"; }
 		$sFilePath = self::call()->sandboxPath($sFilePath);
-		
+
 		$sSeparator	= $this->argument("file_separator");
 		$sEOL		= $this->argument("file_eol");
-		$sEnclosed	= addslashes($this->argument("file_enclosed"));
-		$sCharset	= $this->argument("charset");
+		$sEnclosed	= $this->argument("file_enclosed");
+		$sEscaped	= '\\';
+	
+		$bError = true;
+		if($data = pg_query($this->link, $sQuery)) {
+			if($csv = @fopen($sFilePath, "w")) {
+				$bError = false;
+				while($aRow = pg_fetch_array($data, null, PGSQL_NUM)) {
+					$aLine = array();
+					foreach($aRow as $sColumn) {
+						$sColumn = str_replace($sEnclosed, $sEscaped.$sEnclosed, $sColumn);
+						$sColumn = str_replace($sSeparator, $sEscaped.$sSeparator, $sColumn);
+						$aLine[] = $sEnclosed.$sColumn.$sEnclosed;
+					}
+					fwrite($csv, implode($sSeparator, $aLine).$sEOL);
+				}
+				fclose($csv);
+			}
+		}
 
-		$sOutput = " 
-			INTO OUTFILE '".$sFilePath."' 
-			CHARACTER SET ".$sCharset." 
-			FIELDS TERMINATED BY '".$sSeparator."' OPTIONALLY ENCLOSED BY '".$sEnclosed."' ESCAPED BY '\\\\\\'
-			LINES TERMINATED BY '".$sEOL."' 
-			FROM 
-		";
-
-		$sQuery = preg_replace("/FROM/i", $sOutput, $sQuery, 1);
-		return ($this->query($sQuery)) ? $sFilePath : false;
+		return (!$bError) ? $sFilePath : false;
 	}
 
 	public function handler() {
@@ -179,44 +204,52 @@ class nglDBMySQL extends nglBranch implements iNglDataBase {
 		$sFilePath = self::call()->sandboxPath($sFilePath);
 		if(!file_exists($sFilePath)) { return false; }
 
-		$sEOL		= $this->argument("file_eol");
-		$sEnclosed	= addslashes($this->argument("file_enclosed"));
-		$sLocal		= ($this->argument("file_local")==true) ? "LOCAL" : "";
 		$sSeparator	= $this->argument("file_separator");
-		$sCharset	= $this->argument("charset");
-		$sEngine	= $this->argument("engine");
-
-		$nChk = $this->query("SHOW TABLES LIKE '".$sTable."'")->rows();
-		if(!$nChk) {
-			if(($fp=@fopen($sFilePath, "r"))!==FALSE) {
+		$sEnclosed	= $this->argument("file_enclosed");
+		$sSchema	= $this->argument("schema");
+		
+		$sChk = pg_fetch_result(pg_query($this->link, "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE table_schema = '".$sSchema."' AND table_name = '".$sTable."'"),0,0);
+		if($sChk==="0") {
+			if(($fp=@fopen($sFilePath, "r"))!==false) {
 				if(strlen($sSeparator)>1) { $sSeparator = self::call()->unescape($sSeparator); }
 				while(($aColumns = fgetcsv($fp, 5000, $sSeparator))!==FALSE) {
 					$aColumns; break;
 				}
 				fclose($fp);
-
+				
 				$aColsChecker = array();
 				foreach($aColumns as &$sColumn) {
 					$sColumn = self::call()->secureName($sColumn);
 					if(isset($aColsChecker[$sColumn]) || empty($sColumn)) { $sColumn .= "_".self::call()->unique(); }
 					$aColsChecker[$sColumn] = true;
 				}
-				$sCreate = "CREATE TABLE `".$sTable."` (`".implode("` TEXT NULL, `", $aColumns)."` TEXT NULL) ENGINE=".$sEngine." DEFAULT CHARSET=".$sCharset.";";
-
+				$sCreate = "CREATE TABLE ".$sTable." (".implode(" TEXT NULL, ", $aColumns)." TEXT NULL);";
+				
 				if($this->query($sCreate)===null) { return false; }
 			}
 		}
 
-		$sInput = " 
-			LOAD DATA ".$sLocal." INFILE '".$sFilePath."' 
-			INTO TABLE `".$sTable."`  
-			CHARACTER SET ".$sCharset." 
-			FIELDS TERMINATED BY '".$sSeparator."' OPTIONALLY ENCLOSED BY '".$sEnclosed."' ESCAPED BY '\\\\' 
-			LINES TERMINATED BY '".$sEOL."' 
-		";
+		$bLoad = false;
+		if($csv = @fopen($sFilePath, "r")) {
+			$bLoad = true;
+			pg_query($this->link, "COPY ".$sTable." FROM STDIN");
+			if($sSeparator=="\t" && $sEnclosed=="") {
+				while($sRow = fgets($csv)) {
+					$sRow = trim($sRow, "\r\n");
+					pg_put_line($this->link, $sRow."\n");
+				}
+			} else {
+				while($aRow = fgetcsv($csv, 0, $sSeparator, $sEnclosed)) {
+					$sRow = implode("\t", $aRow);
+					pg_put_line($this->link, $sRow."\n");
+				}
+			}
+			fclose($csv);
+			pg_put_line($this->link, "\\.\n");
+			pg_end_copy($this->link);
+		}
 
-		$bLoad = ($this->query($sInput)===null) ? false : true;
-		if($bLoad===true && !$nChk) { $this->query("DELETE FROM `".$sTable."` LIMIT 1"); }
+		if($bLoad===true && $sChk==="0") { $this->query("DELETE FROM ".$sTable." LIMIT 1"); }
 		return $bLoad;
 	}
 
@@ -225,12 +258,20 @@ class nglDBMySQL extends nglBranch implements iNglDataBase {
 		if(!empty($sTable)) {
 			$aToInsert = $this->PrepareValues("INSERT", $sTable, $mValues, $bCheckColumns);
 			if(is_array($aToInsert) && count($aToInsert)) {
-				$sMode = strtoupper($sMode);
-				$sInsertMode = (isset($this->vModes[$sMode])) ? $this->vModes[$sMode] : "INSERT";
-				if($sInsertMode=="IGNORE") { $sInsertMode = "INSERT IGNORE"; }
-				$sSQL  = $sInsertMode." INTO `".$sTable."` ";
-				$sSQL .= "(`".implode("`, `", array_keys($aToInsert))."`) ";
+				$sSQL  = "INSERT INTO ".$sTable." ";
+				$sSQL .= "(".implode(", ", array_keys($aToInsert)).") ";
 				$sSQL .= "VALUES (".implode(",", $aToInsert).")";
+				
+				if(strtoupper($sMode)=="CONFLICT") {
+					$sTarget = $this->argument("conflict_target");
+					if($sTarget[0]=="(") {
+						$sTarget = "ON ".$sTarget;
+					} else if(strtoupper(substr($sTarget,0,5))!="WHERE") {
+						$sTarget = "ON CONSTRAINT ".$sTarget;
+					}
+					$sSQL .= " ON CONFLICT ".$sTarget." DO ".$this->argument("conflict_action");
+				}
+
 				return $this->query($sSQL, $bDO);
 			}
 		}
@@ -326,7 +367,7 @@ class nglDBMySQL extends nglBranch implements iNglDataBase {
 		if(isset($aJSQL["order"])) {
 			$aOrder = array();
 			foreach($aJSQL["order"] as $sField) {
-				if($sField==="RANDOM") { $aOrder[] = "RAND()"; break; }
+				if($sField==="RANDOM") { $aOrder[] = "RANDOM()"; break; }
 				$aField = explode(":", $sField);
 				$sOrder = (is_numeric($aField[0])) ? $aField[0] : self::call("jsql")->column($aField[0]);
 				if(isset($aField[1])) { $sOrder .= " ".$aField[1]; }
@@ -337,7 +378,7 @@ class nglDBMySQL extends nglBranch implements iNglDataBase {
 		
 		if(isset($aJSQL["limit"])) {
 			if(isset($aJSQL["offset"])) {
-				$vSQL["limit"] = "LIMIT ".(int)$aJSQL["offset"].", ".(int)$aJSQL["limit"];
+				$vSQL["limit"] = "LIMIT ".(int)$aJSQL["limit"]." OFFSET ".(int)$aJSQL["offset"];
 			} else {
 				$vSQL["limit"] = "LIMIT ".(int)$aJSQL["limit"];
 			}
@@ -402,25 +443,24 @@ class nglDBMySQL extends nglBranch implements iNglDataBase {
 		if($this->argument("debug")) { return $sQuery; }
 
 		// juego de caracteres
-		$sCharSet = $this->argument("charset");
-		$this->link->query("SET NAMES ".$sCharSet);
+		pg_set_client_encoding($this->link, $this->argument("charset"));
 
 		$sQuery = trim($sQuery);
 		if(empty($sQuery)) { return null; }
 
 		$nTimeIni = microtime(true);
 		$this->attribute("last_query", $sQuery);
-		if(!$query = $this->link->query($sQuery)) {
+		if(!$query = pg_query($this->link, $sQuery)) {
 			return $this->Error();
 		}
 
 		if($bDO) {
-			if(method_exists($query, "free")) { $query->free(); }
+			pg_free_result($query);
 			return true;
 		}
 
 		$nQueryTime = self::call("dates")->microtimer($nTimeIni);
-		$sQueryName = "mysqlq".strstr($this->me, ".")."_".self::call()->unique();
+		$sQueryName = "pgsqlq".strstr($this->me, ".")."_".self::call()->unique();
 		$this->aQueries[] = $sQueryName;
 		return self::call($sQueryName)->load($this->link, $query, $sQuery, $nQueryTime);
 	}
@@ -432,8 +472,8 @@ class nglDBMySQL extends nglBranch implements iNglDataBase {
 			$aToUpdate = $this->PrepareValues("UPDATE", $sTable, $mValues, $bCheckColumns);
 			if(is_array($aToUpdate) && count($aToUpdate)) {
 				$sMode = strtoupper($sMode);
-				$sUpdateMode = (isset($this->vModes[$sMode])) ? $this->vModes[$sMode] : "";
-				$sSQL = $sUpdateMode." `".$sTable."` SET ".implode(", ", $aToUpdate)." WHERE ".$sWhere;
+				$sUpdateMode = (isset($this->vModes[$sMode])) ? $this->vModes[$sMode] : "UPDATE";
+				$sSQL = $sUpdateMode." ".$sTable." SET ".implode(", ", $aToUpdate)." WHERE ".$sWhere;
 				return $this->query($sSQL, $bDO);
 			}
 		}
@@ -441,20 +481,14 @@ class nglDBMySQL extends nglBranch implements iNglDataBase {
 		return null;
 	}
 
-	private function Error() {
-		$sMsgError = "";
-		if(!$this->link->connect_error && $this->argument("error_description")) {
-			$sMsgError = $this->link->error;
-		} else if($this->link->connect_error && $this->argument("error_description")) {
-			$sMsgError = "unknown database ".$this->argument("base");
-		}
-
-		if(!$this->link->connect_error && $this->argument("error_query")) {
+	private function Error($bConnect=false) {
+		pg_set_error_verbosity($this->link, PGSQL_ERRORS_DEFAULT); // PGSQL_ERRORS_TERSE, PGSQL_ERRORS_DEFAULT or PGSQL_ERRORS_VERBOSE
+		$sMsgError = ($bConnect) ? "Could not connect" : pg_last_error($this->link);
+		if($sMsgError && $this->argument("error_query")) {
 			$sMsgError .= " -> ". $this->attribute("last_query");
 		}
 
-		$nError = ($this->link->connect_error) ? 1049 : $this->link->errno;
-		return self::errorMessage("MySQL", $nError, $sMsgError);
+		return self::errorMessage("PostgreSQL", $sMsgError);
 	}
 
 	private function PrepareValues($sType, $sTable, $mValues, $bCheckColumns) {
@@ -470,12 +504,13 @@ class nglDBMySQL extends nglBranch implements iNglDataBase {
 		// campos validos
 		$aFields = array_keys($aValues);
 		if($bCheckColumns) {
-			$columns = $this->link->query("DESCRIBE `".$sTable."`");
+			$sSchema = $this->argument("schema");
+			$columns = pg_query($this->link, "SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE table_schema = '".$sSchema."' AND table_name = '".$sTable."'");
 			$aFields = array();
-			while($aGetColumn = $columns->fetch_array(MYSQLI_ASSOC)) {
-				$aFields[] = $aGetColumn["Field"];
+			while($aGetColumn = pg_fetch_array($columns, null, PGSQL_ASSOC)) {
+				$aFields[] = $aGetColumn["column_name"];
 			}
-			$columns->free();
+			pg_free_result($columns);
 			$columns = null;
 			unset($columns);
 		}
@@ -495,7 +530,7 @@ class nglDBMySQL extends nglBranch implements iNglDataBase {
 				foreach($aValues as $sField => $mValue) {
 					if($bCheckColumns && !in_array($sField, $aFields)) { unset($aValues[$sField]); continue; }
 					$mValue = ($mValue===null) ? "NULL" : "'".$mValue."'";
-					$aNewValues[] = "`".$sField."` = ".$mValue."";
+					$aNewValues[] = $sField." = ".$mValue."";
 				}
 			}
 		}

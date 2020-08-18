@@ -54,24 +54,24 @@ class nglQParser extends nglFeeder implements inglFeeder {
 	}
 
 	public function query($sSQL) {
-		$sSQL = \trim($sSQL);
-		$sSQLCase = (strstr($sSQL, " ")) ? \strtoupper(\substr($sSQL, 0, \strpos($sSQL, " "))) : $sSQL;
+		$sSQL = trim($sSQL);
+		$sSQLCase = (strstr($sSQL, " ")) ? strtoupper(substr($sSQL, 0, strpos($sSQL, " "))) : $sSQL;
 
 		switch($sSQLCase) {
 			case "DESCRIBE":
-				return array("DESCRIBE", array(\substr($sSQL, 8)));
+				return array("DESCRIBE", array(substr($sSQL, 8)));
 			
 			case "CREATE":
 				preg_match("/(create table )(.*?)\((.*?)\)$/is", $sSQL, $aMatchs);
 				return array("CREATE", array($aMatchs[2], self::call()->explodeTrim(",", $aMatchs[3])));
 			
 			case "TRUNCATE":
-				return array("TRUNCATE", array(\substr($sSQL, 8)));
+				return array("TRUNCATE", array(substr($sSQL, 8)));
 				break;
 				
 			case "SELECT":
 				$aReturn = array();
-				\preg_replace_callback(array(
+				preg_replace_callback(array(
 						"/(SELECT)(.+?)(?=FROM)/is",
 						"/(FROM)(.+?)(?=(WHERE|ORDER BY|LIMIT|$))/is",
 						"/(WHERE)(.+?)(?=(ORDER BY|LIMIT|$))/is",
@@ -79,7 +79,7 @@ class nglQParser extends nglFeeder implements inglFeeder {
 						"/(LIMIT)(.+[^ ]$)/is"
 					),
 					function($aMatchs) use (&$aReturn) {
-						return $aReturn[\strtoupper($aMatchs[1])] = \trim($aMatchs[2]);
+						return $aReturn[strtoupper($aMatchs[1])] = trim($aMatchs[2]);
 					},
 					$sSQL
 				);
@@ -99,13 +99,13 @@ class nglQParser extends nglFeeder implements inglFeeder {
 			
 			case "INSERT":
 				$aReturn = $aParse = array();
-				\preg_replace_callback(array(
+				preg_replace_callback(array(
 						"/(INSERT INTO)(.+?)(?=\()/is",
 						"/(\()(.+?)(?=\)) ?(?=\) *VALUES)/is",
 						"/(VALUES) *\((.+?)(?=\) *$)/is"
 					),
 					function($aMatchs) use (&$aParse) {
-						return $aParse[\strtoupper($aMatchs[1])] = \trim($aMatchs[2]);
+						return $aParse[strtoupper($aMatchs[1])] = trim($aMatchs[2]);
 					},
 					$sSQL
 				);
@@ -118,13 +118,13 @@ class nglQParser extends nglFeeder implements inglFeeder {
 				
 			case "UPDATE":
 				$aReturn = $aParse = array();
-				\preg_replace_callback(array(
+				preg_replace_callback(array(
 						"/(UPDATE)(.+?)(?=SET)/is",
 						"/(SET)(.+?)(?=WHERE|$)/is",
 						"/(WHERE)(.+)/is"
 					),
 					function($aMatchs) use (&$aParse) {
-						return $aParse[\strtoupper($aMatchs[1])] = \trim($aMatchs[2]);
+						return $aParse[strtoupper($aMatchs[1])] = trim($aMatchs[2]);
 					},
 					$sSQL
 				);
@@ -147,12 +147,12 @@ class nglQParser extends nglFeeder implements inglFeeder {
 	
 			case "DELETE":
 				$aReturn = $aParse = array();
-				\preg_replace_callback(array(
+				preg_replace_callback(array(
 						"/(DELETE FROM)(.+?)(?=WHERE|$)/is",
 						"/(WHERE)(.+)/is"
 					),
 					function($aMatchs) use (&$aParse) {
-						return $aParse[\strtoupper($aMatchs[1])] = \trim($aMatchs[2]);
+						return $aParse[strtoupper($aMatchs[1])] = trim($aMatchs[2]);
 					},
 					$sSQL
 				);
@@ -173,7 +173,7 @@ class nglQParser extends nglFeeder implements inglFeeder {
 
 	private function ParseWhere($sWhere, $sTableName=null, &$aWhere) {
 		$sReturn = "";
-		\preg_replace_callback(
+		preg_replace_callback(
 			"/([\( ]*)((\'|\").*?(\'|\")|(\`?[0-9a-z\_\-]+\`?)(\.\`?[0-9a-z\_\-]+\`?)?) ?(=|!=|<|>|<=|>=) ?((\'|\").*?(\'|\")|(\`?[0-9a-z\_\-]+\`?)(\.\`?[0-9a-z\_\-]+\`?)?)?([\) ]*)(AND|OR)?/is",
 			function($aMatchs) use (&$sReturn, $sTableName, &$aWhere) {
 				$mField1 = $this->Keyword($aMatchs[2], $sTableName);
@@ -185,9 +185,9 @@ class nglQParser extends nglFeeder implements inglFeeder {
 				$aConditionParts[] = $mField1;
 				$aConditionParts[] = $aCondition[1];
 				$aConditionParts[] = $mField2;
-				if(\trim($aMatchs[1])!="") { \array_unshift($aCondition, "("); \array_unshift($aConditionParts, "("); }
-				if(\trim($aMatchs[13])!="") { $aCondition[] = \trim(")");  $aConditionParts[] = \trim(")"); }
-				if(isset($aMatchs[14])) { $aCondition[] = " ".\trim($aMatchs[14])." "; $aConditionParts[] = " ".\trim($aMatchs[14])." "; }
+				if(trim($aMatchs[1])!="") { array_unshift($aCondition, "("); array_unshift($aConditionParts, "("); }
+				if(trim($aMatchs[13])!="") { $aCondition[] = trim(")");  $aConditionParts[] = trim(")"); }
+				if(isset($aMatchs[14])) { $aCondition[] = " ".trim($aMatchs[14])." "; $aConditionParts[] = " ".trim($aMatchs[14])." "; }
 				$aWhere = array_merge($aWhere, $aConditionParts);
 				$sReturn .= implode("", $aCondition);
 				return $sReturn;
@@ -200,12 +200,12 @@ class nglQParser extends nglFeeder implements inglFeeder {
 	}
 
 	private function ParseTables($sTables) {
-		$sTables = \str_replace("`", "", $sTables);
+		$sTables = str_replace("`", "", $sTables);
 		return self::call()->explodeTrim(",", $sTables);
 	}
 
 	private function ParseFields($sFields, $sTableName=null) {
-		if($sFields!="*" && \strtoupper($sFields)!="ALL") {
+		if($sFields!="*" && strtoupper($sFields)!="ALL") {
 			$aFields = self::call()->explodeTrim(",", $sFields);
 			foreach($aFields as &$sField) {
 				$sField = $this->Keyword($sField, $sTableName);
@@ -218,35 +218,35 @@ class nglQParser extends nglFeeder implements inglFeeder {
 	}
 
 	private function Operator($sOperator) {
-		$sSing = \trim($sOperator);
+		$sSing = trim($sOperator);
 		if($sSing=="=") { $sSing = "=="; }
 		return $sSing;
 	}
 
 	private function Keyword($sKeyword, $sTableName=null) {
 		if($sKeyword[0]=="'" || $sKeyword[0]=='"') {
-			return '"'.\substr($sKeyword, 1, -1).'"';
+			return '"'.substr($sKeyword, 1, -1).'"';
 		} else {
-			if(\strpos($sKeyword, ".")) {
-				$aKeyword = \explode(".", $sKeyword);
+			if(strpos($sKeyword, ".")) {
+				$aKeyword = explode(".", $sKeyword);
 				$sTableName = $aKeyword[0];
 				$sKeyword = $aKeyword[1];
 			}
 
 			if($sTableName===false) {
-				$sKeyword = \str_replace("`", "", $sKeyword);
-				return \trim($sKeyword);
+				$sKeyword = str_replace("`", "", $sKeyword);
+				return trim($sKeyword);
 			} else {
-				if(\strpos($sTableName, ",")) {
-					$sTableName = \substr($sTableName, 0, \strpos($sTableName, ","));
+				if(strpos($sTableName, ",")) {
+					$sTableName = substr($sTableName, 0, strpos($sTableName, ","));
 				}
 			}
 
-			$sTableName = \str_replace("`", "", $sTableName);
-			$sKeyword = \str_replace("`", "", $sKeyword);
+			$sTableName = str_replace("`", "", $sTableName);
+			$sKeyword = str_replace("`", "", $sKeyword);
 
-			// return '$'.$sTableName.'["'.\trim($sKeyword).'"]';
-			return array(\trim($sTableName), \trim($sKeyword));
+			// return '$'.$sTableName.'["'.trim($sKeyword).'"]';
+			return array(trim($sTableName), trim($sKeyword));
 		}
 	}
 }

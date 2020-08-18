@@ -231,6 +231,10 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 		return $query;
 	}
 
+	public function handler() {
+		return $this->link;
+	}
+
 	/** FUNCTION {
 		"name" : "jsqlParser",
 		"type" : "public",
@@ -376,7 +380,7 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 	} **/
 	public function mexec() {
 		list($sQuery) = $this->getarguments("sql", func_get_args());
-		$aQueries = self::call("shift")->strToArray($sQuery, ";");
+		$aQueries = self::call()->strToArray($sQuery, ";");
 		if($this->argument("debug")) { return $aQueries; }
 		
 		$aResults = array();
@@ -408,7 +412,7 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 	public function mquery() {
 		list($sQuery,$bDO) = $this->getarguments("sql,do", func_get_args());
 		$sQuery = preg_replace("/^--(.*?)$/m", "", $sQuery);
-		$aQueries = explode(";", $sQuery);
+		$aQueries = self::call()->strToArray($sQuery, ";");
 		if($this->argument("debug")) { return $aQueries; }
 
 		$aResults = array();

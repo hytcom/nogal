@@ -2126,6 +2126,31 @@ class nglFn extends nglTrunk {
 		return $this->strSizeEncode(memory_get_usage($bRealUsage), $nDecimal);
 	}
 
+	/**
+	transforma una cadena multilinea en un array, utilizando $sDelimiter como separador de entrada
+	ej: multilples queries SQL terminadas en ;
+	si no se especifica $sDelimiter, se utilizará PHP_EOL
+	*/
+	public function strToArray($sSource, $sDelimiter=null) {
+		$aSource = explode(PHP_EOL, $sSource);
+		if($sDelimiter===null) { return $aSource; }
+
+		$nDelimiter = strlen($sDelimiter);
+		$sLine = "";
+		$aString = array();
+		foreach($aSource as $sBuffer) {
+			$sBuffer = rtrim($sBuffer);
+			$sLast = substr($sBuffer, ($nDelimiter*-1));
+			$sLine .= $sBuffer;
+			if($sLast==$sDelimiter) {
+				if($sLine!=$sDelimiter) { $aString[] = $sLine; }
+				$sLine = "";
+			}
+		}
+
+		return $aString;
+	}
+
 	/** FUNCTION {
 		"name" : "mimeType", 
 		"type" : "public",
