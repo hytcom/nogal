@@ -9,45 +9,40 @@ namespace nogal;
 	"description" : "	tutor.action
 	"
 } **/
-// static call
-function call($sObjectName=null, $aArguments=array()) {
-	return \nogal\nglRoot::call($sObjectName, $aArguments);
-}
-
 class nglRoot {
 
-	const me									= "nogal";
+	const me										= "nogal";
 
-	private static		$fn						= null;
-	private static		$session				= null;
-	private static		$shift					= null;
-	private static		$nut					= null;
-	private static		$tutor					= null;
-	private static		$unicode				= null;
-	private static		$val					= null;
-	private static		$var					= null;
-	
-	private static		$nStarTime				= null;
-	private static		$vErrorCodes			= array();
-	private static		$vLastError				= array();
-	private static		$bErrorReport			= true;
-	private static		$bErrorReportPrevius	= true;
-	private static		$sErrorMode				= "print";
-	private static		$sErrorModePrevius		= "print";
-	private static		$vCurrentPath			= array();
-	private static		$vCoreLibs				= array();
-	private static		$vLibraries				= array();
-	private static		$vFeederInits			= array();
-	protected static 	$aObjects				= array();
-	protected static	$bLoadAllowed			= false;
-	private static 		$aNuts					= array();
-	protected static 	$aNutsLoaded			= array();
-	private static 		$aTutors				= array();
-	protected static 	$aTutorsLoaded			= array();
-	protected static 	$sLastEval				= array();
-	private static		$aObjectsByClass		= array();
-	private static		$vPaths					= array();
-	private static		$vLastOf				= array();
+	private static			$fn						= null;
+	private static			$session				= null;
+	private static			$shift					= null;
+	private static			$nut					= null;
+	private static			$tutor					= null;
+	private static			$unicode				= null;
+	private static			$val					= null;
+	private static			$var					= null;
+
+	private static			$nStarTime				= null;
+	private static			$vErrorCodes			= array();
+	private static			$vLastError				= array();
+	private static			$bErrorReport			= true;
+	private static			$bErrorReportPrevius	= true;
+	private static			$aErrorModes			= array();
+	private static			$bErrorForceReturn		= false;
+	private static			$vCurrentPath			= array();
+	private static			$vCoreLibs				= array();
+	private static			$vLibraries				= array();
+	private static			$vFeederInits			= array();
+	protected static		$aObjects				= array();
+	protected static		$bLoadAllowed			= false;
+	private static 			$aNuts					= array();
+	protected static 		$aNutsLoaded			= array();
+	private static 			$aTutors				= array();
+	protected static 		$aTutorsLoaded			= array();
+	protected static 		$sLastEval				= array();
+	private static			$aObjectsByClass		= array();
+	private static			$vPaths					= array();
+	private static			$vLastOf				= array();
 
 
 	// METODOS PUBLICOS --------------------------------------------------------
@@ -194,8 +189,7 @@ class nglRoot {
 				if(!isset($sConfFile)) { $sConfFile = $sObjectType; }
 				self::loadObject($mClassName, $bFeeder, $sConfFile, $sObjectName, $aArguments);
 			} else {
-				self::errorMode("die");
-				self::errorMessage("nogal", "1002", $sObjectType);				
+				self::errorMessage("nogal", "1002", $sObjectType, "die");				
 				return false;
 			}
 		}
@@ -516,19 +510,19 @@ class nglRoot {
 		return self::$bErrorReport;
 	}
 
-	public static function errorMode($sMode=null) {
+	// retorna el modo previo
+	public static function errorMode($sObject, $sMode=null) {
+		$sCurrent = (isset(self::$aErrorModes[$sObject])) ? self::$aErrorModes[$sObject] : NGL_HANDLING_ERRORS_MODE;
 		if($sMode!==null) {
-			self::$sErrorMode = self::$sErrorModePrevius;
 			$sMode = strtolower($sMode);
-			if(!in_array($sMode, array("boolean","code","die","print","return","shell"))) { $sMode = NGL_HANDLING_ERRORS_MODE; }
-			self::$sErrorMode = $sMode;
+			if(!in_array($sMode, array("boolean","code","die","print","return"))) { $sMode = NGL_HANDLING_ERRORS_MODE; }
+			self::$aErrorModes[$sObject] = $sMode;
 		}
-		return self::$sErrorMode;
+		return $sCurrent;
 	}
 
-	public static function errorModeRestore() {
-		self::$sErrorMode = self::$sErrorModePrevius;
-		return self::$sErrorMode;
+	public static function errorForceReturn($bForce) {
+		self::$bErrorForceReturn = ($bForce===true) ? true : false;
 	}
 
 	public static function errorPages($nCode) {
@@ -612,7 +606,7 @@ class nglRoot {
 		return (isset(self::$vErrorCodes[$sObject], self::$vErrorCodes[$sObject][$nCode])) ? self::$vErrorCodes[$sObject][$nCode] : $nCode;
 	}
 
-	public static function errorMessage($sObject=null, $sCode=null, $sAditionalText=null) {
+	public static function errorMessage($sObject=null, $sCode=null, $sAditionalText=null, $sMode=null) {
 		$sMsgText = "NOGAL ERROR ";
 		$sDescription = $sDescriptionPure = "";
 
@@ -629,9 +623,9 @@ class nglRoot {
 			}
 		}
 
-		$sTitle		= ($sCode!==null) ? "@".$sObject."#".$sCode : $sObject;
-		$sObject	= strtolower($sObject);
-		$sMode		= self::errorMode();
+		$sTitle = ($sCode!==null) ? "@".$sObject."#".$sCode : $sObject;
+		$sObject = strtolower($sObject);
+		if($sMode===null) { $sMode = self::errorMode($sObject); }
 
 		if($sMode=="boolean") { return false; }
 		if($sMode=="code") { return $sCode; }
@@ -688,6 +682,7 @@ class nglRoot {
 		self::log("errors.log", $sErrRow);
 		
 		$sMsg = $sMsgText;
+		if(self::$bErrorForceReturn) { return $sMsg; }
 
 		// html format
 		if($EOL=="<br />") {
@@ -731,11 +726,8 @@ class nglRoot {
 			"message" => $sMsgText
 		);
 
+		if(PHP_SAPI=="cli") { $sMsg = self::out("\n".$sMsg."\n", "error"); }
 		switch($sMode) {
-			case "shell":
-				die(self::out("\n".$sMsg."\n", "error"));
-				break;
-
 			case "die":
 				die($sMsg);
 				break;
@@ -743,7 +735,6 @@ class nglRoot {
 			case "return":
 				return $sMsg;
 
-			case "echo":
 			case "print":
 				print($sMsg);
 				break;
@@ -785,8 +776,7 @@ class nglRoot {
 				require_once(self::$vPaths["grafts"].$sClassFile);
 				self::$aObjectsByClass[$sClassName] = array();
 			} else {
-				self::errorMode("die");
-				self::errorMessage("nogal", "1001", self::$vPaths["libraries"].$sClassFile." (".$sClassName.")");
+				self::errorMessage("nogal", "1001", self::$vPaths["libraries"].$sClassFile." (".$sClassName.")", "die");
 			}
 		}
 
@@ -846,6 +836,22 @@ class nglRoot {
 			$aAvailables[$sComponent] = array("object"=>$sComponent, "class"=>$aComponent[0], "documentation"=>"https://github.com/hytcom/wiki/blob/master/nogal/docs/".$sComponent.".md");
 		}
 		return $aAvailables;
+	}
+
+	public static function is($obj, $sType=null) {
+		if(method_exists($obj, "__me__")) {
+			$aAvailables = array_merge(self::$vCoreLibs, self::$vLibraries);
+			$object = $obj->__me__();
+			if(isset($aAvailables[$object->name]) && $aAvailables[$object->name][0]==$object->class) {
+				if($sType!==null) {
+					return ($aAvailables[$object->name][0]==$aAvailables[strtolower($sType)][0]) ? true : false;
+				}
+				return true;
+			}
+			return false;
+		} else {
+			return false;
+		}
 	}
 
 	protected static function Libraries() {
@@ -964,14 +970,14 @@ class nglRoot {
 		$sSection = null;
 		foreach($aLines as $sLine) {
 			if($bUseSections) {
-				$bSection = preg_match("/^(\[)([a-zA-Z0-9\_\.]+)(\])/is", $sLine, $aMatchs);
+				$bSection = preg_match("/^(\[)([a-zA-Z0-9\_\.\-]+)(\])/is", $sLine, $aMatchs);
 				if($bSection) {
 					$sSection = $aMatchs[2];
 					continue;
 				}
 			}
 
-			$bStatement = preg_match("/^(?!;)([\w+\.\-]+)(\[[\w+\.\-]*\])?\s*=\s*(.*)\s*$/s", $sLine, $aMatchs);
+			$bStatement = preg_match("/^(?!;)([\w+\.\-\/]+)(\[[\w+\.\-\/]*\])?\s*=\s*(.*)\s*$/s", $sLine, $aMatchs);
 			if($bStatement) {
 				$sKey	= $aMatchs[1];
 				$sIndex	= (!empty($aMatchs[2])) ? substr($aMatchs[2], 1, -1) : null;

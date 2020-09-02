@@ -14,16 +14,18 @@ https://github.com/hytcom/wiki/blob/master/nogal/docs/alvin.md
 https://github.com/hytcom/wiki/blob/master/nogal/docs/alvinuso.md
 
 #errors
-1001 = "Clave de encriptación indefinida"
-1002 = "Token inválido o vacío"
-1003 = "Clave grants duplicada"
-1004 = "Clave grants indefinida"
-1005 = "No se pudieron salvar las claves. Permiso denegado"
-1006 = "Error en la ruta"
+1001 = Clave de encriptación indefinida
+1002 = Token inválido o vacío
+1003 = Clave grants duplicada
+1004 = Clave grants indefinida
+1005 = No se pudieron salvar las claves. Permiso denegado
+1006 = Error en la ruta
 1007 = Clave pública indefinida
 1008 = Clave privada indefinida
 1009 = Nombre de usuario incorrecto para el TOKEN
-1010 = Passhrase indefinida
+1010 = Passphrase indefinida
+1011 = Nombre de permiso inválido
+1012 = No se pudieron cargar los permisos
 
 */
 namespace nogal;
@@ -35,9 +37,11 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 	private $sKeysPath;
 	private $sCryptKey;
 	private $sPrivateKey;
-	private $sPasshrase;
+	private $sPassphrase;
 	private $sGrantsFile;
 	private $aGrants;
+	private $aRAW;
+	private $sDefaultGrants;
 	private $crypt;
 
 	final public function __init__($mArguments=null) {
@@ -45,13 +49,15 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 		$this->aGeneratedKeys = array();
 		$this->sCryptKey = NGL_ALVIN;
 		$this->sPrivateKey = null;
-		$this->sPasshrase = null;
+		$this->sPassphrase = null;
 		$this->aGrants = array();
+		$this->aRAW = array();
 		$this->sGrantsFile = null;
+		$this->sDefaultGrants = '{"GRANTS":{"profiles":{"ADMIN":[]}},"RAW":[]}';
 		$this->crypt = (self::call()->exists("crypt")) ? self::call("crypt") : null;
 		$this->sKeysPath = NGL_PATH_DATA.NGL_DIR_SLASH."alvin";
 		if($this->crypt!==null) { $this->crypt->type("rsa")->base64(true); }
-		self::errorMode("die");
+		$this->__errorMode__("die");
 	}
 
 	// KEYS --------------------------------------------------------------------
@@ -64,13 +70,13 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 			}
 			return ($bReturnKeys) ? $this->aGeneratedKeys : $this;
 		}
-		self::errorMessage($this->object, 1001);
+		return self::errorMessage($this->object, 1001);
 	}
 
 	public function saveKeys() {
 		if(!is_dir($this->sKeysPath)) {
 			if(!@mkdir($this->sKeysPath, 0775, true)) {
-				return self::errorMessage($this->object, 1005, $this->sKeysPath);
+				self::errorMessage($this->object, 1005, $this->sKeysPath);
 			}
 		}
 		@file_put_contents($this->sKeysPath.NGL_DIR_SLASH."private.key", $this->aGeneratedKeys["private"]);
@@ -86,7 +92,7 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 				if(file_exists($this->sKeysPath.NGL_DIR_SLASH."private.key")) {
 					$sKey = file_get_contents($this->sKeysPath.NGL_DIR_SLASH."private.key");
 				} else {
-					self::errorMessage($this->object, 1008);
+					return self::errorMessage($this->object, 1008);
 				}
 			}
 			$sKey = preg_replace(array("/-----BEGIN RSA PRIVATE KEY-----/is", "/-----END RSA PRIVATE KEY-----/is", "/[\s]*/is"), array(""), $sKey);
@@ -96,7 +102,7 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 				if(file_exists($this->sKeysPath.NGL_DIR_SLASH."public.key")) {
 					$sKey = file_get_contents($this->sKeysPath.NGL_DIR_SLASH."public.key");
 				} else {
-					self::errorMessage($this->object, 1007);
+					return self::errorMessage($this->object, 1007);
 				}
 			}
 			$sKey = preg_replace(array("/-----BEGIN PUBLIC KEY-----/is", "/-----END PUBLIC KEY-----/is", "/[\s]*/is"), array(""), $sKey);
@@ -107,36 +113,37 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 
 	// ADMIN GRANTS ------------------------------------------------------------
 	// carga o crea los permisos
-	public function loadGrants($sFilePath, $sPasshrase=null) {
+	public function loadGrants($sFilePath, $sPassphrase=null) {
+		if($sPassphrase===null) { return self::errorMessage($this->object, 1010); }
 		$grants = self::call("file")->load($sFilePath);
 		if($grants->size) {
 			$this->sGrantsFile = $sFilePath;
-			if(!$sPasshrase) { self::errorMessage($this->object, 1010); }
 			$sGrants = $grants->read();
+			$sGrants = preg_replace("/(\n|\r)/is", "", $sGrants);
 			$grants->close();
-			$sGrants = $sGrants = self::call("crypt")->type("aes")->key($sPasshrase)->base64(true)->decrypt($sGrants);
+			$sGrants = $sGrants = self::call("crypt")->type("aes")->key($sPassphrase)->base64(true)->decrypt($sGrants);
 		} else {
-			$sGrants = '{"GRANTS":[],"RAW":[]}';
+			$sGrants = $this->sDefaultGrants;
 		}
 		return $this->jsonGrants($sGrants);
 	}
 
 	// escribe el archivo con los permisos
-	public function save($sFilePath=null, $sPasshrase=null) {
-		if(!$sPasshrase) { self::errorMessage($this->object, 1010); }
-			if($sFilePath===null) {
+	public function save($sFilePath=null, $sPassphrase=null) {
+		if($sPassphrase===null) { return self::errorMessage($this->object, 1010); }
+		if($sFilePath===null) {
 			if($this->sGrantsFile!==null) {
 				$sFilePath = $this->sGrantsFile;
 			} else {
-				self::errorMessage($this->object, 1006);
+				return self::errorMessage($this->object, 1006);
 			}
 		}
 
 		$sGrants = json_encode(array("GRANTS"=>$this->aGrants, "RAW"=>$this->aRAW));
-		$sGrants = self::call("crypt")->type("aes")->key($sPasshrase)->base64(true)->encrypt($sGrants);
+		$sGrants = self::call("crypt")->type("aes")->key($sPassphrase)->base64(true)->encrypt($sGrants);
 
 		$save = self::call("file")->load($sFilePath);
-		if($save->write($sGrants)!==false) {
+		if($save->write(chunk_split($sGrants, 80))!==false) {
 			$save->close();
 			return true;
 		}
@@ -144,11 +151,34 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 		return false;
 	}
 
-	// importa los permisos desde una cadena json
+	// importa los permisos desde una cadena plana o un json
 	public function import($sGrants) {
-		return $this->jsonGrants($sGrants);
+		if($sGrants[0]=="{") {
+			return $this->jsonGrants($sGrants);
+		} else {
+			$aGrants = self::call()->strToArray($sGrants);
+			$this->jsonGrants($this->sDefaultGrants);
+			foreach($aGrants as $sRow) {
+				$aRow = preg_split("/(\t|;|,)/is", $sRow);
+				$sGroup = trim(array_shift($aRow));
+				$this->setGrant("groups", $sGroup, array());
+				foreach($aRow as $sGrant) {
+					$sGrant = trim($sGrant);
+					if(empty($sGrant)) { break; }
+					$this->setGrant("grants", $sGrant, $sGrant);
+					$this->setGrant("groups", $sGroup, array($sGrant=>$sGrant), 1);
+				}
+			}
+		}
+
+		return $this;
 	}
-	
+
+	public function export($bPretty=false) {
+		$sGrants = json_encode(array("GRANTS"=>$this->aGrants, "RAW"=>$this->aRAW));
+		return ($bPretty) ? self::call("shift")->jsonFormat($sGrants) : $sGrants;
+	}
+
 	// retorna todos los permisos del tipo raw
 	public function getraw($sProfile=null) {
 		if($sProfile!==null) {
@@ -182,73 +212,157 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 
 	// listado de permisos segun el tipo (grants|groups|profiles)
 	public function get($sType=null) {
-		if($sType!==null) {
-			return $this->aGrants[$sType];
-		}
-		return $this->getall();
+		if($sType!==null && isset($this->aGrants[$sType])) { return $this->aGrants[$sType]; }
+		return array();
 	}
 
 	// retorna un permiso con su composicion
 	public function grant($sName=null, $sType="grants") {
 		$this->chkType($sType);
+		$sName = $this->GrantName($sName);
+		$sType = strtolower($sType);
 		if($sType!==false && $sName!==null && isset($this->aGrants[$sType][$sName])) {
-			if($sType=="grants") {
-				return $this->aGrants[$sType][$sName];
+			if($sType=="profiles" && $sName=="ADMIN") {
+				return array("ADMIN"=>array());
 			} else {
-				return $this->GetGrant($sType, $sName);
+				return $this->aGrants[$sType][$sName];
 			}
 		}
 		return false;
 	}
 
 	// agrega un permiso a la estructura
-	public function setGrant($sType, $sName, $mGrant, $nMode=0) {
+	public function setGrant($sType, $sName, $mGrant) {
 		$this->chkType($sType);
-		$nIndex = $this->FindGrant($sName, false, $sType);
-		if($nIndex!==false && !$nMode) { $this->aGrants[$sType][$nIndex] = array(); }
+		$sName = $this->GrantName($sName);
+		if($sName===false) { self::errorMessage($this->object, 1011, null, "die"); }
 		
+		$sIndex = $this->FindGrant($sName, false, $sType);
+		
+		// valor a array
 		if(is_array($mGrant)) {
 			$mGrant = array_unique($mGrant);
 		} else {
 			if($sType!="grants") { $mGrant = array($mGrant); }
 		}
 
-		if($nIndex===false) {
+		// nuevo registro
+		if($sIndex===false) {
 			if($sType=="grants") {
-				$this->aGrants[$sType][$sName] = $sName;
+				$this->aGrants["grants"][$sName] = array();
+			} else if($sType=="groups") {
+				$this->MakeGroup($sName, $mGrant, true);
+				ksort($this->aGrants["groups"][$sName]);
 			} else {
-				$this->aGrants[$sType][$sName] = $mGrant;
+				if($sName=="ADMIN") { return $this; }
+				$this->MakeProfile($sName, $mGrant, true);
 			}
-		} else {
-			if($sType=="grants") {
-				$this->aGrants[$sType][$nIndex] = array($sName, $sName);
-			} else {
-				if($nMode===2) {
-					foreach($mGrant as $sGrant) {
-						$nKey = array_search($sGrant, $this->aGrants[$sType][$nIndex]);
-						if($nKey!==false) { unset($this->aGrants[$sType][$nIndex][$nKey]); }
-					}
-				} else {
-					$this->aGrants[$sType][$nIndex] = array_merge($this->aGrants[$sType][$nIndex], $mGrant);
-				}
-
-				$this->aGrants[$sType][$nIndex] = array_unique($this->aGrants[$sType][$nIndex]);
+		} else { // edicion
+			if($sType=="groups") {
+				$this->MakeGroup($sIndex, $mGrant);
+				ksort($this->aGrants["groups"][$sIndex]);
+			} else if($sType=="profiles") {
+				if($sIndex=="ADMIN") { return $this; }
+				$this->MakeProfile($sIndex, $mGrant);
 			}
 		}
+
 		return $this;
+	}
+
+	private function MakeGroup($sName, $aGrants, $bNew=false) {
+		if($bNew) { $this->aGrants["groups"][$sName] = array(); }
+		foreach($aGrants as $sGrant) {
+			$sGrant = $this->GrantName($sGrant);
+			if(array_key_exists($sGrant, $this->aGrants["grants"])) {
+				$this->aGrants["groups"][$sName][$sGrant] = array();
+				$this->aGrants["grants"][$sGrant][$sName] = true;
+			}
+		}
+		
+		ksort($this->aGrants["groups"]);
+		ksort($this->aGrants["groups"][$sName]);
+	}
+
+	private function MakeProfile($sName, $aGrants, $bNew=false) {
+		if($bNew) { $this->aGrants["profiles"][$sName] = array(); }
+		foreach($aGrants as $sGrant) {
+			if($sGrant[0]=="-") { $sGrant = substr($sGrant, 1); $bRemove = true; }
+			$sGrant = $this->GrantName($sGrant, true);
+			$aGrant = explode(".", $sGrant);
+			if(isset($this->aGrants["groups"][$aGrant[0]])) {
+				if(isset($aGrant[1])) {
+					if(!isset($this->aGrants["groups"][$aGrant[0]][$aGrant[1]])) { continue; }
+					if(isset($bRemove)) {
+						unset($this->aGrants["groups"][$aGrant[0]][$aGrant[1]][$sName]);
+						unset($this->aGrants["profiles"][$sName][$aGrant[0]][$aGrant[1]]);
+					} else {
+						$this->aGrants["groups"][$aGrant[0]][$aGrant[1]][$sName] = true;
+						$this->aGrants["profiles"][$sName][$aGrant[0]][$aGrant[1]] = true;
+					}
+				} else {
+					if(!isset($bRemove)) {
+						foreach($this->aGrants["groups"][$aGrant[0]] as $sGrant => $sTrue) {
+							$this->aGrants["groups"][$aGrant[0]][$sGrant][$sName] = true;
+						}
+						$this->aGrants["profiles"][$sName][$aGrant[0]] = self::call()->truelize(array_keys($this->aGrants["groups"][$aGrant[0]]));
+					} else {
+						foreach($this->aGrants["profiles"][$sName][$aGrant[0]] as $sGrant => $sTrue) {
+							unset($this->aGrants["groups"][$aGrant[0]][$sGrant][$sName]);
+							unset($this->aGrants["profiles"][$sName][$aGrant[0]][$sGrant]);
+						}
+						unset($this->aGrants["profiles"][$sName][$aGrant[0]]);
+					}
+				}
+			}
+		}
+
+		ksort($this->aGrants["profiles"]);
+		ksort($this->aGrants["profiles"][$sName]);
 	}
 
 	// elimina un permiso, grupo o perfil
 	public function unsetGrant($sType, $sName) {
 		$this->chkType($sType);
-		if($sName!==false) { unset($this->aGrants[$sType][$sName]); }
+		$sName = $this->GrantName($sName);
+
+		if($sName!==false) { 
+			if($sType=="grants") {
+				foreach($this->aGrants["grants"][$sName] as $sGroup => $bVal) {
+					foreach($this->aGrants["groups"][$sGroup][$sName] as $sProfile => $bVal) {
+						unset($this->aGrants["profiles"][$sProfile][$sGroup][$sName]);
+					}					
+					unset($this->aGrants["groups"][$sGroup][$sName]);
+				}
+			} else if($sType=="groups") {
+				foreach($this->aGrants["groups"][$sName] as $sGrant => $aProfiles) {
+					if(count($aProfiles)) {
+						foreach($aProfiles as $sProfile => $bVal) {
+							unset($this->aGrants["profiles"][$sProfile][$sName]);
+						}
+					}
+				}
+			} else {
+				if($sName=="ADMIN") { return $this; }
+				foreach($this->aGrants["profiles"][$sName] as $sGroup => $aGrants) {
+					if(count($aGrants)) {
+						foreach($aGrants as $sGrant => $bVal) {
+							unset($this->aGrants["groups"][$sGroup][$sGrant][$sName]);
+						}
+					}
+				}
+			}
+
+			unset($this->aGrants[$sType][$sName]);
+			ksort($this->aGrants[$sType]);
+		}
 		return $this;
 	}
 
 	// genera el token del usuario
 	public function token($sProfileName, $aGrants=array(), $aRaw=array(), $sUsername=null) {
 		if($sUsername!==null) { $sUsername = $this->username($sUsername); }
-		if(!$this->crypt) { self::errorMessage($this->object, 1001); }
+		if(!$this->crypt) { return self::errorMessage($this->object, 1001); }
 
 		$sProfileName = trim($sProfileName);
 		$sProfileName = strtoupper($sProfileName);
@@ -256,18 +370,16 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 
 		// permisos
 		if(is_array($aGrants) && count($aGrants)) {
-			$aGrants = $this->PrepareGrants($aGrants); 
-			$aToken["grants"] = self::call()->truelize($aGrants);
+			$aToken["grants"] = $this->PrepareGrants($aGrants); 
 		}
 
 		// permisos crudos
 		if(is_array($aRaw) && count($aRaw)) { $aToken["raw"] = $aRaw; }
 
+		$sTokenContent = serialize($aToken);
 		if($this->crypt) {
-			if(!$this->sPrivateKey) { self::errorMessage($this->object, 1008); }
-			$sTokenContent = $this->crypt->type("rsa")->key($this->sPrivateKey)->encrypt(serialize($aToken));
-		} else {
-			$sTokenContent = serialize($aToken);
+			if(!$this->sPrivateKey) { return self::errorMessage($this->object, 1008); }
+			$sTokenContent = $this->crypt->type("rsa")->key($this->sPrivateKey)->encrypt($sTokenContent);
 		}
 		$sTokenContent = base64_encode($sTokenContent);
 		$sTokenContent = base64_encode($this->password($sUsername))."@".$sTokenContent;
@@ -280,10 +392,23 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 	}
 
 	//
-	private function PrepareGrants($aGrants) {
-		return array_map(function($v) {
-			return strtoupper(preg_replace("/[^a-zA-Z0-9\_\-\.]+/", "", $v));
-		}, $aGrants);
+	private function GrantName($sGrant, $bDot=false) {
+		$sGrant = self::call()->unaccented($sGrant);
+		$sRegex = (!$bDot) ? "/[^a-zA-Z0-9]+/" : "/[^a-zA-Z0-9\-\_\.]+/";
+		return strtoupper(preg_replace($sRegex, "", $sGrant));
+	}
+
+	private function PrepareGrants($aProfile) {
+		if(array_key_exists("ADMIN", $aProfile)) { $aProfile["grants"] = $this->aGrants["groups"]; }
+		$aToken = array();
+		foreach($aProfile as $sGroup => $aGrants) {
+			$aToken[$sGroup] = true;
+			if(!is_array($aGrants) || !count($aGrants)) { continue; }
+			foreach($aGrants as $sGrant => $bVal) {
+				$aToken[$sGroup.".".$sGrant] = true;
+			}
+		}
+		return $aToken;
 	}
 	
 	// decodifica los permisos json
@@ -294,7 +419,7 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 			if(array_key_exists("RAW", $aGrants)) { $this->aRAW = $aGrants["RAW"]; }
 			if(!array_key_exists("GRANTS", $aGrants) && !array_key_exists("RAW", $aGrants)) { $this->aGrants = $aGrants; }
 		} else {
-			self::errorMessage($this->object, 1005);
+			return self::errorMessage($this->object, 1012);
 		}
 
 		return $this;
@@ -303,90 +428,8 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 	// busca permisos
 	private function FindGrant($sName, $bRecursive=false, $sType="grants") {
 		$sType = strtolower($sType);
-		if(!$bRecursive) {
-			if(isset($this->aGrants[$sType], $this->aGrants[$sType][$sName])) {
-				return $sName;
-			}
-		} else {
-			$aFound = array();
-			foreach($this->aGrants[$sType] as $sChkName) {
-				if($sChkName==$sGrant || strpos($sChkName, $sGrant.".")===0) {
-					$aFound[$sChkName] = $sChkName;
-				}
-			}
-
-			uasort($aFound, function ($a, $b) {
-				return (strlen($a) > strlen($b));
-			});
-
-			return $aFound;
-		}
-
+		if(isset($this->aGrants[$sType], $this->aGrants[$sType][$sName])) { return $sName; }
 		return false;
-	}
-
-	// retorna la estructura de un permiso y su composicion
-	private function GetGrant($sType, $sName) {
-		$aRemove = $aReturn = array();
-		$aGrants = $this->aGrants[$sType][$sName];
-
-		// grupos
-		foreach($aGrants as $sGrant) {
-			$sSign = "";
-			if($sGrant[0]=="-") { $sGrant = substr($sGrant, 1); $sSign = "-"; }
-			if($sType=="profiles" && isset($this->aGrants["groups"][$sGrant])) {
-				foreach($this->aGrants["groups"][$sGrant] as $sGrantOfGroup) {
-					$sGroupSign = "";
-					if($sGrantOfGroup[0]=="-") { $sGrantOfGroup = substr($sGrantOfGroup, 1); $sGroupSign = "-"; }
-					if($sSign=="-") { $aRemove[$sGrantOfGroup] = true; }
-					if($sGroupSign=="-") { $aRemove[$sGrantOfGroup] = true; }
-					$aReturn[$sGrantOfGroup] = true;
-				}
-			}
-
-			if(isset($this->aGrants["grants"][$sGrant])) {
-				$aReturn[$sGrant] = true;
-			}
-		}
-
-		$aGrants = array_keys($aReturn);
-		$aReturn = array();
-
-		// permisos individuales
-		foreach($aGrants as $sGrant) {
-			$sSign = "";
-			if($sGrant[0]=="-") { $sGrant = substr($sGrant, 1); $sSign = "-"; }
-			if(isset($this->aGrants["grants"][$sGrant])) {
-				if(strpos($sGrant, ".")===false) {
-					foreach($this->aGrants["grants"] as $sGrantChk) {
-						if($sGrantChk==$sGrant || strpos($sGrantChk, $sGrant.".")===0) {
-							if($sSign=="-") { $aRemove[$sGrantChk] = true; }
-							$aReturn[$sGrantChk] = true;
-						}
-					}
-				} else {
-					if($sSign=="-") { $aRemove[$sGrant] = true; }
-					$aReturn[$sGrant] = true;
-				}
-			} else if(substr($sGrant, -1)==".") {
-				foreach($this->aGrants["grants"] as $sGrantChk) {
-					if(strpos($sGrantChk, $sGrant)===0) {
-						if($sSign=="-") { $aRemove[$sGrantChk] = true; }
-						$aReturn[$sGrantChk] = true;
-					}
-				}
-			}
-		}
-
-		foreach($aRemove as $sKey => $bVal) {
-			if(strpos($sKey, ".")!==false) {
-				$aKey = explode(".", $sKey);
-				unset($aReturn[$aKey[0]]);
-			}
-			unset($aReturn[$sKey]);
-		}
-
-		return array_keys($aReturn);
 	}
 
 	private function chkType(&$sType) {
@@ -450,15 +493,20 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 	public function loaded() {
 		return ($this->aToken!==null);
 	}
-	
+
+	// valida un nombre de perfil
+	public function profile($sProfile) {
+		return $this->GrantName($sProfile, false);
+	}
+
 	// valida un nombre de usuario
 	public function username($sUsername) {
+		$sUsername = self::call()->unaccented($sUsername);
 		return preg_replace("/[^a-zA-Z0-9\_\-\.\@]+/", "", $sUsername);
 	}
 
 	// encripta un password
 	public function password($sPassword) {
-		if(!$this->crypt) { self::errorMessage($this->object, 1001); }
 		$sCryptPassword = crypt($sPassword, '$6$rounds=5000$'.md5($this->sCryptKey).'$');
 		$aCryptPassword = explode('$', $sCryptPassword, 5);
 		return $aCryptPassword[4];
@@ -557,48 +605,21 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 			$sGrant = $aToCheck[0];
 			if(isset($this->aToken["grants"][$sGrant])) {
 				return ($sMode=="none") ? false : true;
-			} else {
-				if(substr($sGrant, -1)==".") {
-					$aCheck = array_filter($this->aToken["grants"], 
-						function($sGrantChk) use ($sGrant) { 
-							if(strpos($sGrantChk, $sGrant)===0) {
-								return true;
-							}
-							return false;
-						}, 
-						ARRAY_FILTER_USE_KEY
-					);
-					
-					if(count($aCheck)) { return true; }
-				}
-				return ($sMode!="none") ? false : true;
 			}
+			return false;				
 		} else {
 			$aReturn = array();
 			$bNone = true;
 			foreach($aToCheck as $sGrant) {
 				if(isset($this->aToken["grants"][$sGrant])) {
+					if($sMode=="any") { return true; }
 					$aReturn[$sGrant] = true;
 					$bNone = false;
 				} else {
-					if(substr($sGrant, -1)==".") {
-						$aCheck = array_filter($this->aToken["grants"], 
-							function($sGrantChk) use ($sGrant) { 
-								if(strpos($sGrantChk, $sGrant)===0) {
-									return true;
-								}
-								return false;
-							}, 
-							ARRAY_FILTER_USE_KEY
-						);
-						
-						if(count($aCheck)) { return true; }
-					}
+					if($sMode=="all") { return false; }
 					$aReturn[$sGrant] = false;
 				}
 
-				if($sMode=="any" && $aReturn[$sGrant]) { return true; }
-				if($sMode=="all" && !$aReturn[$sGrant]) { return false; }
 			}
 
 			if($sMode=="none") { return $bNone; }

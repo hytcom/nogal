@@ -162,6 +162,7 @@ class nglShift extends nglTrunk {
 					<li>object</li>
 					<li>serialize</li>
 					<li>texttable / ttable</li>
+					<li>yml/yaml</li>
 					<li>xml</li>
 				</ul>
 				
@@ -316,6 +317,12 @@ class nglShift extends nglTrunk {
 				$aData = current($aData);
 				break;
 
+			case "yml":
+			case "yaml":
+				$mData = preg_replace(array("/^\t/is", "/\t+/"), "  ", $mData);
+				$aData = yaml_parse($mData);
+				break;
+
 			case "vector":
 				$aData = array();
 				foreach($mData as $mItem) {
@@ -357,6 +364,10 @@ class nglShift extends nglTrunk {
 
 			case "xml":
 				return $this->xmlEncode($aData, $vOptions);
+			
+			case "yml":
+			case "yaml":
+				return yaml_emit($aData);
 
 			case "array":
 			default:

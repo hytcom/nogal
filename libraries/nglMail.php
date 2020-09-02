@@ -980,7 +980,7 @@ class nglMail extends nglBranch implements iNglClient {
 
 	public function send() {
 		list($mTo, $mCC, $mBCC) = $this->getarguments("to,cc,bcc", func_get_args());
-		if($this->attribute("from")==null) { self::errorMode("print"); return self::errorMessage($this->object, 1001); }
+		if($this->attribute("from")==null) { return self::errorMessage($this->object, 1001); }
 		
 		$aTo = $this->PrepareMails($mTo);
 		$this->attribute("mail_to", $aTo);

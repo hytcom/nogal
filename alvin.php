@@ -9,36 +9,24 @@ $NGL_ALVIN_SAFEPATHS[]	= "/logout";
 $NGL_ALVIN_SAFEPATHS[]	= "/index";
 $NGL_ALVIN_SAFEPATHS[]	= "/";
 $NGL_ALVIN_SAFEPATHS[]	= "";
+$NGL_ALVIN_IGNORES = $NGL_ALVIN_SAFEPATHS;
+$NGL_ALVIN_STRICTS = array();
 
-/** $NGL_ALVIN_IGNORES ---------------------------------------------------------
-Archivos ignorados por ALVIN al momento de la carga
-La URL de los archivos son relativas al valor de la constante NGL_URL y deben comenzar con "/"
-Ej:
-	NGL_URL = http://www.dominio.com/project
-	URL COMPLETA = http://www.dominio.com/project/folder/filename.php
-	$NGL_ALVIN_IGNORES[] = "/folder/filename.php";
 
-La carga de estas excepciones debe hacerse en settings.php
-**/
-if(!isset($NGL_ALVIN_IGNORES) || !count($NGL_ALVIN_IGNORES)) {
-	$NGL_ALVIN_IGNORES = $NGL_ALVIN_SAFEPATHS;
+/** $NGL_ALVIN_IGNORES / $NGL_ALVIN_STRICTS ----------------------------------*/
+// alvin.conf
+$ALVINCFG = NGL_PATH_CONF.NGL_DIR_SLASH."alvin.conf";
+if(file_exists($ALVINCFG)) {
+	$ALVINCFG = $ngl()->parseConfigString(file_get_contents($ALVINCFG), true);
+	if(isset($ALVINCFG["firewall-ignore"]) && count($ALVINCFG["firewall-ignore"])) {
+		$NGL_ALVIN_IGNORES = array_merge($NGL_ALVIN_IGNORES, $ALVINCFG["firewall-ignore"]);
+	}
+
+	if(isset($ALVINCFG["firewall-strict"]) && count($ALVINCFG["firewall-strict"])) {
+		$NGL_ALVIN_STRICTS = $ALVINCFG["firewall-strict"];
+	}
 }
-
-
-/** $NGL_ALVIN_STRICTS ---------------------------------------------------------
-Archivos para los que se requiere algun tipo de acceso ALVIN al momento de la carga
-La URL de los archivos son relativas al valor de la constante NGL_URL y deben comenzar con "/"
-Ej:
-	NGL_URL = http://www.dominio.com/project
-	URL COMPLETA = http://www.dominio.com/project/folder/filename.php
-	$NGL_ALVIN_STRICTS["/mods/foobar/file1.php"] = true; <- se requiere unicamente login activo
-	$NGL_ALVIN_STRICTS["/mods/foobar/file2.php"] = "FOO,BAR"; <- se requieren los permisos FOO y BAR
-	$NGL_ALVIN_STRICTS["/mods/foobar/file3.php"] = "?|FOO,BAR"; <- se requieren los permisos FOO ó BAR
-	$NGL_ALVIN_STRICTS["/mods/foobar2/"] = "BAR"; <- bloquea toda la carpeta, se requiere permiso BAR
-
-La carga de estas limitantes debe hacerse en settings.php
-**/
-if(!isset($NGL_ALVIN_STRICTS)) { $NGL_ALVIN_STRICTS = array(); }
+unset($ALVINCFG);
 
 
 /** REDIRECCION DESPUES DEL LOGIN --------------------------------------------*/

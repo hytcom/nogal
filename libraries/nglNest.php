@@ -57,7 +57,8 @@ class nglNest extends nglBranch {
 		$vArguments["nestdata"]				= array('$this->SetNestData($mValue)', null);
 		$vArguments["left"]					= array('(int)$mValue', 0);
 		$vArguments["top"]					= array('(int)$mValue', 0);
-		$vArguments["collapsed"]			= array('(int)$mValue', 0);
+		$vArguments["objcfg_var"]			= array('$mValue', null);
+		$vArguments["objcfg_val"]			= array('(int)$mValue', 0);
 		$vArguments["canvas_width"]			= array('(int)$mValue', 1800);
 		$vArguments["canvas_height"]		= array('(int)$mValue', 900);
 		$vArguments["gui_part"]				= array('$mValue', "table");
@@ -119,7 +120,6 @@ class nglNest extends nglBranch {
 	}
 
 	final public function __init__() {
-		self::errorMode("print");
 	}
 
 	protected function SetNestData($sNestFile) {
@@ -347,10 +347,10 @@ class nglNest extends nglBranch {
 		}
 
 		$sObject = $this->FormatName($sObject);
-		$this->owl["tables"][$sObject]	= array();
-		$this->owl["titles"][$sObject]	= ($sTitle!==null) ? $sTitle : $sObject;
+		$this->owl["tables"][$sObject] = array();
+		$this->owl["titles"][$sObject] = ($sTitle!==null) ? $sTitle : $sObject;
 		$this->owl["nest"]["objects"][$sObject]	= array("left"=>0, "top"=>0);
-		$this->owl["def"][$sObject]		= array();
+		$this->owl["def"][$sObject] = array();
 		$this->SetObject($sObject);
 
 		if(is_array($aFields) && count($aFields)) {
@@ -694,7 +694,7 @@ class nglNest extends nglBranch {
 		$sJSONCompact = $db->escape($sJSONCompact);
 		$sSQL = "\n-- -----------------------------------------------------------------------------\n\n";
 		$sSQL .= "-- SAVE OWL STRUCTURE ON `__ngl_sentences__` --\n";
-		$sSQL .= "REPLACE INTO `__ngl_sentences__` SELECT CONCAT('owl_', DATE_FORMAT(NOW(), '%Y%m%d%H%i%s')) AS 'name', 'structure' AS 'type', `sentence`, `notes` FROM `__ngl_sentences__` WHERE `name` = 'owl';\n";
+		$sSQL .= "REPLACE INTO `__ngl_sentences__` SELECT CONCAT('owl_', DATE_FORMAT(NOW(), '%Y%m%d%H%i%s')) AS 'name', 'structure' AS 'type', `sentence`, `dependencies`, `notes` FROM `__ngl_sentences__` WHERE `name` = 'owl';\n";
 		$sSQL .= $db->insert("__ngl_sentences__", array("name"=>"owl", "type"=>"structure", "sentence"=>$sJSONCompact)).";\n";
 		$sSQL .= "\n\n";
 
@@ -1002,12 +1002,12 @@ class nglNest extends nglBranch {
 		return $this;
 	}
 
-	public function collapse() {
-		list($sObject,$nCollapsed) = $this->getarguments("entity,collapsed", func_get_args());
+	public function objectvar() {
+		list($sObject,$sVariable,$mValue) = $this->getarguments("entity,objcfg_var,objcfg_val", func_get_args());
 		$sObject = $this->FormatName($sObject);
 		if(isset($this->owl["tables"][$sObject]) || isset($this->owl["views"][$sObject])) {
 			if(!isset($this->owl["nest"]["objects"][$sObject])) { $this->owl["nest"]["objects"][$sObject] = array(); }
-			$this->owl["nest"]["objects"][$sObject]["collapsed"] = $nCollapsed;
+			$this->owl["nest"]["objects"][$sObject][$sVariable] = $mValue;
 		}
 		return $this;
 	}
@@ -1301,6 +1301,32 @@ class nglNest extends nglBranch {
 		return $this->create($sObject, $sTitle, $aColumns);
 	}
 
+	public function createFromYaml() {
+		list($sFilePath) = $this->getarguments("filepath", func_get_args());
+		$sType = strtolower(pathinfo($sFilePath, PATHINFO_EXTENSION));
+
+		$yml = self::call("file")->load($sFilePath);
+		$sData = $yml->read();
+		$aData = self::call("shift")->convert($sData, "yml-array");
+
+		foreach($aData as $sTitle => $aFields) {
+			$sObject = $this->FormatName($sTitle);
+			$aColumns = array();
+			foreach($aFields as $sField) {
+				if(is_string($sField)) {
+					$aField = explode(":", $sField);
+					$sField = $this->FormatName($aField[0]);
+					$aField = ($aField[1][0]=="@") ? array_combine(array("label", "type"), $aField) : array_combine(array("label", "alias"), $aField);
+					$aColumns[$sField] = $aField;
+				}
+			}
+
+			if(!$this->create($sObject, $sTitle, $aColumns)) { return false; }
+		}
+		
+		return $this;
+	}
+
 	public function normalize() {
 		list($sField, $sNewObject, $sTitle) = $this->getarguments("field,newname,title", func_get_args());
 
@@ -1544,6 +1570,7 @@ SQL;
 	private function FormatName($sName) {
 		$sName = trim($sName);
 		$sName = strtolower($sName);
+		$sName = self::call()->unaccented($sName);
 		$sName = str_replace(" ", "_", $sName);
 		return preg_replace("/[^a-z-0-9\_]/is", "", $sName);
 	}

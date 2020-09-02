@@ -60,8 +60,7 @@ class nglFn extends nglTrunk {
 		} else {
 			$sURL = "http://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types";
 			if(!$sBuffer = file_get_contents($sURL)) {
-				self::errorMode("die");
-				self::errorMessage("NOGAL", 1016, "URL: ".$sURL);
+				self::errorMessage("NOGAL", 1016, "URL: ".$sURL, "die");
 			} else {
 				$aBuffer = explode("\n", $sBuffer);
 				$vMimeTypes = array();
@@ -1367,35 +1366,49 @@ class nglFn extends nglTrunk {
 		return (is_string($mSource)) ? implode($aDisarrange) : $aDisarrange;
 	}
 	
-	/** FUNCTION {
-		"name" : "dump",
-		"type" : "public",
-		"description" : "
-			Retorna el contenido de una variable de acuerdo al tipo de la misma:<br />
-			<ul>
-				<li>arrays -> print_r</li>
-				<li>cadenas -> echo</li>
-				<li>otros -> var_dump</li>
-			</ul>
-			Los valores son capturados por métodos de control de salida y retornados, no se imprimen
-			directamente en la pantalla.
-		",
-		"parameters" : {
-			"$mVariable1" : ["mixed", "Variable a volcar"],
-			"$..." : ["mixed", "Variable a volcar"],
-			"$mVariableN" : ["mixed", "Variable a volcar"]
-		},
-		"return" : "string"
-	} **/
+	
 	public function dump() {
 		$sOutPut = "";
 		if(func_num_args()) {
 			$aDump = func_get_args();
 			foreach($aDump as $mVariable) {
-				$sOutPut .= (is_string($mVariable) || is_int($mVariable)) ? $mVariable : @var_export($mVariable, true);
+				if($sOutPut!=="") { $sOutPut .= "\n\n--------------------------------------------------------------------------------\n\n"; }
+				$sOutPut .= (is_string($mVariable) || is_int($mVariable)) ? $mVariable : $this->Dumper($mVariable);
 			}
 		}
 		return $sOutPut;
+	}
+
+	private function Dumper($mData, $nIndent=0) {
+		$sDump = "";
+		$sPrefix = str_repeat(" |  ", $nIndent);
+		if(is_numeric($mData)) {
+			$sDump .= "Number: $mData";
+		} elseif(is_string($mData)) {
+			$sDump .= "String: '$mData'";
+		} elseif (is_null($mData)) {
+			$sDump .= "NULL";
+		} elseif($mData===true) {
+			$sDump .= "TRUE";
+		} elseif($mData===false) {
+			$sDump .= "FALSE";
+		} elseif(is_array($mData)) {
+			$sDump .= "Array(".count($mData).")";
+			$nIndent++;
+			foreach($mData AS $k => $mValue) {
+				$sDump .= "\n$sPrefix [$k] = ";
+				$sDump .= $this->Dumper($mValue, $nIndent);
+			}
+		} elseif(is_object($mData)) {
+			$sDump .= "Object(".get_class($mData).")";
+			$nIndent++;
+			foreach($mData AS $k => $mValue) {
+				$sDump .= "\n$sPrefix $k -> ";
+				$sDump .= $this->Dumper($mValue, $nIndent);
+			}
+		}
+
+		return $sDump;
 	}
 
 	public function dumphtml() {

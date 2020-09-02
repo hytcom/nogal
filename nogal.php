@@ -1,4 +1,7 @@
 <?php
+
+namespace nogal;
+
 #===============================================================================
 # CHEQUEOS DE COMPATIBILIDAD
 #===============================================================================
@@ -31,6 +34,23 @@ if(!defined("NGL_RUN_ANYWAY") || (defined("NGL_RUN_ANYWAY") && NGL_RUN_ANYWAY===
 		die("<b>Nogal Fatal Error:</> System requires <b>set_include_path</b> enabled.");
 	}
 	unset($NGL_INCPATH);
+}
+
+#===============================================================================
+# FUNCIONES GLOBALES
+#===============================================================================
+function call($sObjectName=null, $aArguments=array()) {
+	return \nogal\nglRoot::call($sObjectName, $aArguments);
+}
+
+function dump() {
+	echo \nogal\nglRoot::call()->dump(...func_get_args());
+}
+
+// retorna true cuando el objeto es un objeto nogal
+// si se especifica type, tambien chequea el tipo
+function is($obj, $sType=null) {
+	return \nogal\nglRoot::is($obj, $sType);
 }
 
 #===============================================================================

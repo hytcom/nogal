@@ -94,7 +94,6 @@ class nglOwl extends nglBranch {
 
 	final public function __init__() {
 		$this->bViewFields = false;
-		self::errorMode("die");
 	}
 	
 	public function child() {

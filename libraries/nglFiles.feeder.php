@@ -17,7 +17,6 @@ class nglFiles extends nglFeeder implements inglFeeder {
 
 	final public function __init__($mArguments=null) {
 		$this->sSandBox = (defined("NGL_SANDBOX")) ?  realpath(NGL_SANDBOX) : realpath(NGL_PATH_PROJECT);
-		self::errorMode("return");
 	}
 
 	/** FUNCTION {
@@ -751,7 +750,7 @@ class nglFiles extends nglFeeder implements inglFeeder {
 					$vInfo = pathinfo($vFile["name"]);
 					$vInfo = pathinfo($vFile["name"]);
 					if($aExtensions!==null && !in_array($vInfo["extension"], $aExtensions)) {
-						$vUploads["report"][$sIndex] = self::errorMessage($this->object, 1019, $this->errorMode());
+						$vUploads["report"][$sIndex] = self::errorMessage($this->object, 1019);
 						continue;
 					}
 

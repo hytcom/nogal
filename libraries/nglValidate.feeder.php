@@ -747,7 +747,7 @@ class nglValidate extends nglTrunk {
 		for($x=0; $x<$nString; $x++) {
 			if((ord($sString[$x])&0xC0)!=0x80) {
 				if(strlen($sChar)) {
-					$aIs = self::call("unicode")->is($sChar);
+					$aIs = self::call("unicode")->ischr($sChar);
 					if(isset($aParams["types"][$aIs[0]]) || isset($aParams["groups"][$aIs[1]]) || isset($aParams["chars"][$aIs[2]])) {
 						$sNewString .= $sChar;
 					} else {
@@ -761,7 +761,7 @@ class nglValidate extends nglTrunk {
 			}
 		}
 
-		$aIs = self::call("unicode")->is($sChar);
+		$aIs = self::call("unicode")->ischr($sChar);
 		
 		if(isset($aParams["types"][$aIs[0]]) || isset($aParams["groups"][$aIs[1]]) || isset($aParams["chars"][$aIs[2]])) {
 			$sNewString .= $sChar;

@@ -109,7 +109,6 @@ class nglFTP extends nglBranch implements inglBranch {
 	}
 
 	final public function __init__() {
-		self::errorMode("return");
 	}
 
 	/** FUNCTION {

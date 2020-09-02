@@ -751,7 +751,7 @@ class nglUnicode extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "is", 
+		"name" : "ischr", 
 		"type" : "public",
 		"description" : "Retorna el tipo, grupo y valor decimal de un caracter dado, o false en caso de error",
 		"parameters" : {
@@ -759,7 +759,7 @@ class nglUnicode extends nglTrunk {
 		},
 		"return" : "array"
 	} **/
-	public function is($sChar) {
+	public function ischr($sChar) {
 		$nOrd = self::call("unicode")->ord($sChar);
 		foreach($this->vUTF8Groups as $vRange) {
 			if($nOrd>=$vRange[2] && $nOrd<=$vRange[3]) {

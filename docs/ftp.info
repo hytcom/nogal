@@ -1,6 +1,6 @@
 [checksum]
-md5 = "9ba8fc126d045c66d04999461891f3f2"
-sha1 = "7995911fce8063b0109265c8f0d94e9c0b927c0d"
+md5 = "58900fbacf88c87d194f24081c2e43da"
+sha1 = "a4ed3ed53e48ff83daef280554e1a70d2f63b80d"
 
 [documentation]
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/ftp.md"

@@ -1,6 +1,6 @@
 [checksum]
-md5 = "e54c8e5e2b7245edcff39608e477b64a"
-sha1 = "13bd1eb07d53a7911795364ecf6fc5fdd7c41481"
+md5 = "72a9c443ae11656c2964a954c0741ed2"
+sha1 = "731ab32b37e2d2c68ce8419ec2946165dc1cb4b8"
 
 [documentation]
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/jsql.md"

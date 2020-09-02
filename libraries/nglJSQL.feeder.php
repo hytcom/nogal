@@ -43,7 +43,6 @@ class nglJSQL extends nglFeeder implements inglFeeder {
 		if(empty($sString)) { return null; }
 		$aJSON = json_decode($sString, true);
 		if($aJSON===null) {
-			self::errorMode("die");
 			self::errorMessage("jsql", 1001, $sString);
 			return false;
 		}

@@ -16,7 +16,7 @@ BEE
 );
 
 */
-class nglBee extends nglTrunk {
+class nglBee extends nglFeeder implements inglFeeder {
 
 	private $output;
 	private $error;
@@ -27,7 +27,16 @@ class nglBee extends nglTrunk {
 	private $sSeparator;
 	private $bDump;
 
-	public function __builder__() {
+	final public function __init__($mArguments=null) {
+		if(!defined("NGL_BEE") || NGL_BEE===null || NGL_BEE===false) {
+		if(NGL_TERMINAL) {
+			$this->__errorMode__("shell");
+			self::errorMode("shell");
+		} else {
+			$this->__errorMode__("die");
+		}
+		self::errorMessage("bee", null, "Bee is not available"); }
+
 		$this->sDelimiter = "(\r\n|\n)";
 		$this->aLibs = self::Libraries();
 		$this->aObjs = array();
@@ -35,17 +44,6 @@ class nglBee extends nglTrunk {
 		$this->aLoops = array();
 		$this->sSeparator = "\t";
 		$this->bDump = false;
-	}
-
-	final public function __init__($mArguments=null) {
-		self::errorMode("return");
-		if(!defined("NGL_BEE") || NGL_BEE===null || NGL_BEE===false) {
-		if(NGL_TERMINAL) {
-			self::errorMode("shell");
-		} else {
-			self::errorMode("die"); 
-		}
-		self::errorMessage("bee", null, "Bee is not available"); }
 	}
 
 	public function bzzz($sSentences, $bAutoSave=false) {
@@ -153,10 +151,9 @@ class nglBee extends nglTrunk {
 				}
 			} else {
 				if(NGL_TERMINAL) {
-					self::errorMode("shell");
-					self::errorMessage("bee", null, "The required method '".$aCommand[1]."' does not exist for '".$sCmd."'");
+					self::errorMessage("bee", null, "The required method '".$aCommand[1]."' does not exist for '".$sCmd."'", "shell");
 				} else {
-					die(self::errorMessage("bee", null, "The required method '".$aCommand[1]."' does not exist for '".$sCmd."'"));
+					self::errorMessage("bee", null, "The required method '".$aCommand[1]."' does not exist for '".$sCmd."'", "die");
 				}
 			}
 

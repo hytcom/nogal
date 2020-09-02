@@ -1,18 +1,36 @@
 [checksum]
-md5 = "b2ec8ae699c586138a1b9131affd55ec"
-sha1 = "38d8cedc30a633f631514071716d25961e92f459"
+md5 = "5c1ba6567dc6c70fbceb95576df791ef"
+sha1 = "0f5a048031468bd754aa7c354fea5d606a30d5e9"
 
 [documentation]
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/alvin.md"
 
 [errors]
-1001 = "Clave de encriptación indefinida"
-1002 = "Token inválido o vacío"
-1003 = "Clave grants duplicada"
-1004 = "Clave grants indefinida"
-1005 = "No se pudieron salvar las claves. Permiso denegado"
-1006 = "Error en la ruta"
+1001 = Clave de encriptación indefinida
+1002 = Token inválido o vacío
+1003 = Clave grants duplicada
+1004 = Clave grants indefinida
+1005 = No se pudieron salvar las claves. Permiso denegado
+1006 = Error en la ruta
 1007 = Clave pública indefinida
 1008 = Clave privada indefinida
 1009 = Nombre de usuario incorrecto para el TOKEN
-1010 = Passhrase indefinida
+1010 = Passphrase indefinida
+1011 = Nombre de permiso inválido
+1012 = No se pudieron cargar los permisos
+
+[firewall-ignore]
+_help = "Archivos ignorados por ALVIN al momento de la carga\
+La URL de los archivos son relativas al valor de la constante NGL_URL y deben comenzar con /\
+	/folder/bar/filename = 1\
+	/folder/foo/ = 1\
+"
+
+[firewall-strict]
+_help = "Archivos para los que se requiere algun tipo de acceso ALVIN al momento de la carga\
+La URL de los archivos son relativas al valor de la constante NGL_URL y deben comenzar con /\
+	/mods/foobar/file1 = true #se requiere unicamente login activo\
+	/mods/foobar/file2 = FOO,BAR #se requieren los permisos FOO y BAR\
+	/mods/foobar/file3 = ?|FOO,BAR #se requieren los permisos FOO ó BAR\
+	/mods/foobar2/ = BAR #bloquea toda la carpeta, se requiere permiso BAR\
+"

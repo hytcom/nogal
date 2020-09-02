@@ -46,43 +46,6 @@ abstract class nglFeeder extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "__me__", 
-		"type" : "public",
-		"description" : "Retorna un objeto o array con los nombre objeto y clase a la que instancia",
-		"parameters" : { "$bArray" : ["boolean", "Si el valor es True se retorna un array", "false"] },
-		"examples" : {
-			"objeto" : "
-				$object->name = nombre del objeto;
-				$object->class = nombre de la clase;
-			",
-			"array" : "
-				array(
-				→ "0" => "nombre del objeto",
-				→ "1" => "nombre de la clase",
-				→ "name" => "nombre del objeto",
-				→ "class" => "nombre de la clase",
-				);
-			"
-		},
-		"return" : "object o array"
-	} **/
-	final public function __me__($bArray=false) {
-		if(!$bArray) {
-			$me = new \stdClass();
-			$me->name = $this->me;
-			$me->class = $this->class;
-			return $me;
-		} else {
-			$vMe = array();
-			$vMe[0] 		= $this->me;
-			$vMe[1] 		= $this->class;
-			$vMe["name"]	= $this->me;
-			$vMe["class"]	= $this->class;
-			return $vMe;
-		}
-	}
-
-	/** FUNCTION {
 		"name" : "__Whoami__", 
 		"type" : "protected",
 		"description" : "

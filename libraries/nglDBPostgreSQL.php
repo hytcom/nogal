@@ -70,7 +70,6 @@ class nglDBPostgreSQL extends nglBranch implements iNglDataBase {
 	}
 
 	final public function __init__() {
-		self::errorMode("echo");
 		if($this->argument("autoconn")) {
 			$this->connect();
 		}

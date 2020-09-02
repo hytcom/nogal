@@ -31,7 +31,6 @@ class nglNut extends nglTrunk {
 	final public function __init__($sNutID=null, $aMethods=null) {
 		$this->ID = ($sNutID!==null) ? $sNutID : $this->ngl()->unique();
 		$this->aAllowedMethods = $aMethods;
-		self::errorMode("die");
 		return $this->ID;
 	}
 

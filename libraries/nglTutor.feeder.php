@@ -18,7 +18,6 @@ class nglTutor extends nglTrunk {
 	final public function __init__($sTutorID=null, $aMethods=null) {
 		$this->ID = ($sTutorID!==null) ? $sTutorID : self::call()->unique();
 		$this->aAllowedMethods = $aMethods;
-		self::errorMode("die");
 		return $this->ID;
 	}
 

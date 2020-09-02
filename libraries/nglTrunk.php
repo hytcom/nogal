@@ -4,8 +4,6 @@ namespace nogal;
 
 class nglTrunk extends nglRoot {
 
-	protected $sErrorMode;
-
 	final public function __construct() {
 		if(self::$bLoadAllowed===false) {
 			trigger_error("Can't instantiate outside of the «nogal» environment", E_USER_ERROR);
@@ -15,7 +13,7 @@ class nglTrunk extends nglRoot {
 			$this->__builder__(func_get_args());
 		}
 
-		self::errorMode(NGL_HANDLING_ERRORS_MODE);
+		$this->__errorMode__();
 	}
 
 	final public function __configFile__() {
@@ -78,6 +76,47 @@ class nglTrunk extends nglRoot {
 			file_put_contents(NGL_PATH_CONF.NGL_DIR_SLASH.$this->object.".conf", $sContent);
 		} else {
 			return $sContent;
+		}
+	}
+
+	final public function __errorMode__($sMode=NGL_HANDLING_ERRORS_MODE) {
+		return self::errorMode($this->object, $sMode);
+	}
+
+	/** FUNCTION {
+		"name" : "__me__", 
+		"type" : "public",
+		"description" : "Retorna un objeto o array con los nombre objeto y clase a la que instancia",
+		"parameters" : { "$bArray" : ["boolean", "Si el valor es True se retorna un array", "false"] },
+		"examples" : {
+			"objeto" : "
+				$object->name = nombre del objeto;
+				$object->class = nombre de la clase;
+			",
+			"array" : "
+				array(
+				→ "0" => "nombre del objeto",
+				→ "1" => "nombre de la clase",
+				→ "name" => "nombre del objeto",
+				→ "class" => "nombre de la clase",
+				);
+			"
+		},
+		"return" : "object o array"
+	} **/
+	final public function __me__($bArray=false) {
+		if(!$bArray) {
+			$me = new \stdClass();
+			$me->name = $this->me;
+			$me->class = $this->class;
+			return $me;
+		} else {
+			$vMe = array();
+			$vMe[0] 		= $this->me;
+			$vMe[1] 		= $this->class;
+			$vMe["name"]	= $this->me;
+			$vMe["class"]	= $this->class;
+			return $vMe;
 		}
 	}
 }

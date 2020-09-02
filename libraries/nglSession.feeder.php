@@ -57,7 +57,6 @@ class nglSession extends nglTrunk {
 	}
 
 	public function __init__($mArguments=null) {
-		self::errorMode("die");
 	}
 
 	/** FUNCTION {

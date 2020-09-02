@@ -276,8 +276,6 @@ namespace nogal {
 					$this->setSET($sVarname, $mValue, $sVarname);
 				}
 			}
-
-			self::errorMode("die");
 		}
 
 		/** FUNCTION {
@@ -4033,7 +4031,7 @@ namespace {
 			}
 			$aParentData = array_reverse($aParentData);
 
-			$ngl()->errorMode("return");
+			$ngl()->errorForceReturn(true);
 			foreach($aParentData as $aTemplateKeys) {
 				foreach($aTemplateKeys as $sKey => $sValue) {
 					$sValue = base64_decode($sValue);
@@ -4055,7 +4053,8 @@ namespace {
 					// echo $sSubTemplate."\n\n\n\n\n\n";
 				}
 			}
-			$ngl()->errorMode("die");
+			$ngl()->errorForceReturn(false);
+
 			return $sSubTemplate;
 		}
 	}

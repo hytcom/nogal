@@ -70,7 +70,6 @@ class nglDBMySQL extends nglBranch implements iNglDataBase {
 	}
 
 	final public function __init__() {
-		self::errorMode("return");
 		if($this->argument("autoconn")) {
 			$this->connect();
 		}

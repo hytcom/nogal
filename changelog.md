@@ -1,3 +1,34 @@
+# 2.7.0 - 202009021200
+## general
+- cambios en la salida de errores, ahora es independiente para cada tipo de objeto
+- nuevos métodos globales **dump** e **is**
+
+## alvin
+- cambios en la estructura y métodos para administrar y chequear los permisos, grupos y permisos [ACTUALIZACION CRITICA]
+- se eliminó el método **GetGrant**
+- nuevo método **profile**
+
+## nest
+- el método **collapse** fué reemplazado por **objectvar**
+- fix error por campo *dependencies* en el método **generate**
+
+## shift
+- se añadió el formato YAML al método **convert**
+
+## root
+- nuevo método **is**
+- cambio en **parseConfigString**, ahora se aceptan **\\** en las claves y **-** en las secciones
+
+## trunk
+- nuevo método **__errorMode__**, que establece el tipo de salida de error para el objeto
+
+## unicode
+- **is** es ahora **ischr**
+
+## validate
+- cambio de **is** por **ischr** en el método **ClearCharacters**
+
+________________________________________________________________________________
 # 2.6.0 - 202008181200
 ## dbase
 - cambió la manera de leer los registros en el método **Fetch**

@@ -1,19 +1,24 @@
 <?php defined("NGL_SOWED") || exit();
 /*
 switch(true) {
+	// equivalente a una RewriteRule. Siempre dentro de NGL_PATH_PRICKOUT
+	case (substr($REDIRECTURL, 0, 7) == "/admin/"):
+		$REDIRECTURL = "/tools/".substr($REDIRECTURL, 7);
+		break;
+
 	// http://www.dominio.com/foo/bar.php => http://www.dominio.com/index.php?id=foobar
-	case ($_SERVER["REDIRECT_URL"] == "/foo/bar.php"):
+	case ($REDIRECTURL == "/foo/bar.php"):
 		$NGL_REPRICKOUT_URL = "/index.php?id=foobar";
 		break;
 
 	// http://www.dominio.com/foo/1234 => http://www.dominio.com/foo.php?id=1234
-	case (substr($_SERVER["REDIRECT_URL"], 0, 5)=="/foo/"):
-		$NGL_REPRICKOUT_URL = explode("/", $_SERVER["REDIRECT_URL"], 3);
+	case (substr($REDIRECTURL, 0, 5)=="/foo/"):
+		$NGL_REPRICKOUT_URL = explode("/", $REDIRECTURL, 3);
 		$NGL_REPRICKOUT_URL = "/foo.php?id=".$NGL_REPRICKOUT_URL[2];
 		break;
 	
 	// http://www.dominio.com/ws/getinfo => http://www.dominio.com/ws/ws/webservice.php con datos POST
-	case ($_SERVER["REDIRECT_URL"] == "/ws/getinfo"):
+	case ($REDIRECTURL == "/ws/getinfo"):
 		$NGL_REPRICKOUT_REQUEST	= array("method"=>"getinfo", "body"=>file_get_contents("php://input"));
 		$NGL_REPRICKOUT_URL		= NGL_URL."/ws/webservice.php";
 		break;
