@@ -12,12 +12,12 @@
 - el método **collapse** fué reemplazado por **objectvar**
 - fix error por campo *dependencies* en el método **generate**
 
-## shift
-- se añadió el formato YAML al método **convert**
-
 ## root
 - nuevo método **is**
 - cambio en **parseConfigString**, ahora se aceptan **\\** en las claves y **-** en las secciones
+
+## shift
+- se añadió el formato YAML al método **convert**
 
 ## trunk
 - nuevo método **__errorMode__**, que establece el tipo de salida de error para el objeto
