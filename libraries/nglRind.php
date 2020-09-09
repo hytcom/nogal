@@ -2430,12 +2430,12 @@ namespace nogal {
 					if(method_exists('.$sVarname.', '.$this->RIND_QUOTE.'get'.$this->RIND_QUOTE.') && method_exists('.$sVarname.', '.$this->RIND_QUOTE.'reset'.$this->RIND_QUOTE.')) {
 						Rind::nut('.$this->RIND_QUOTE.'owl'.$this->RIND_QUOTE.','.$this->RIND_QUOTE.'reset'.$this->RIND_QUOTE.',array('.$this->RIND_QUOTE.'content'.$this->RIND_QUOTE.'=>'.$sVarname.')); 
 						'.$sVarname.' = Rind::nut('.$this->RIND_QUOTE.'owl'.$this->RIND_QUOTE.','.$this->RIND_QUOTE.'get'.$this->RIND_QUOTE.',array('.$this->RIND_QUOTE.'content'.$this->RIND_QUOTE.'=>'.$sVarname.'));
-						\nogal\dump('.$sVarname.');
+						Rind::dump('.$sVarname.');
 					} else {
-						\nogal\dump('.$sVarname.');
+						Rind::dump('.$sVarname.');
 					}
 				} else {
-					\nogal\dump('.$sVarname.');
+					Rind::dump('.$sVarname.');
 				}
 				'.$sVarname.' = ob_get_clean();
 				
@@ -3798,6 +3798,10 @@ namespace {
 		public static function call($sObjectName) {
 			global $ngl;
 			return $ngl($sObjectName);
+		}
+
+		public static function dump($mVariable) {
+			return \nogal\dump($mVariable);
 		}
 		
 		public static function clearPath($sPath, $bSlashClose=false, $sSeparator=NGL_DIR_SLASH) {
