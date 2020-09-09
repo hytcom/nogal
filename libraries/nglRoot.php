@@ -39,7 +39,7 @@ class nglRoot {
 	protected static 		$aNutsLoaded			= array();
 	private static 			$aTutors				= array();
 	protected static 		$aTutorsLoaded			= array();
-	protected static 		$sLastEval				= array();
+	protected static 		$sLastEval				= "";
 	private static			$aObjectsByClass		= array();
 	private static			$vPaths					= array();
 	private static			$vLastOf				= array();

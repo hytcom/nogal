@@ -1,3 +1,18 @@
+# 2.7.1 - 202009090200
+## general
+- actualización se samples
+
+## fn
+- nuevo método **msort**
+
+## nest
+- se añadió el concepto **foreign table** que permite vincular objetos de **owl** con otras tablas
+
+## rind
+- ahora el comando **alvin** retorna siempre **TRUE** cuando el nombre del usuario es **admin** y acepta variables $_SET
+- cambio de salida en el comando **dump**, ahora utiliza el método global **dump**
+
+________________________________________________________________________________
 # 2.7.0 - 202009021200
 ## general
 - cambios en la salida de errores, ahora es independiente para cada tipo de objeto

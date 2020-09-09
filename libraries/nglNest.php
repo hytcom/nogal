@@ -143,7 +143,7 @@ class nglNest extends nglBranch {
 	}
 
 	public function add() {
-		if($this->attribute("objtype")=="view") {
+		if($this->attribute("objtype")!="table") {
 			self::errorMessage($this->object, 1012); // invalid action on a view
 			return false;
 		}
@@ -316,7 +316,7 @@ class nglNest extends nglBranch {
 
 	public function check() {
 		list($sObject) = $this->getarguments("entity", func_get_args());
-		return (isset($this->owl["tables"][$sObject]) || isset($this->owl["views"][$sObject]));
+		return (isset($this->owl["tables"][$sObject]) || isset($this->owl["views"][$sObject]) || isset($this->owl["foreigns"][$sObject]));
 	}
 
 	public function chtitle() {
@@ -440,7 +440,7 @@ class nglNest extends nglBranch {
 		$sView .= ");";
 		if($sAbout=="view") { return $sView; }
 
-		$bView = (!isset($this->owl["tables"][$sObject]) && isset($this->owl["views"][$sObject])) ? true : false;
+		$bView = (!isset($this->owl["tables"][$sObject]) && isset($this->owl["views"][$sObject]) && !isset($this->owl["foreigns"][$sObject])) ? true : false;
 		$aDescribe = array(
 			"title" => (!$bView) ? (isset($this->owl["titles"][$sObject]) ? $this->owl["titles"][$sObject] : $sObject) : $this->owl["views"][$sObject]["title"],
 			"fields" => (!$bView) ? $this->owl["tables"][$sObject] : array_combine(array_keys($this->owl["views"][$sObject]["fields"]), array_keys($this->owl["views"][$sObject]["fields"])),
@@ -464,7 +464,7 @@ class nglNest extends nglBranch {
 	}
 
 	public function drop() {
-		if($this->attribute("objtype")=="view") {
+		if($this->attribute("objtype")!="table") {
 			self::errorMessage($this->object, 1012); // invalid action on a view
 			return false;
 		}
@@ -503,7 +503,7 @@ class nglNest extends nglBranch {
 	}
 
 	public function createCode() {
-		if($this->attribute("objtype")=="view") {
+		if($this->attribute("objtype")!="table") {
 			self::errorMessage($this->object, 1012); // invalid action on a view
 			return false;
 		}
@@ -517,7 +517,7 @@ class nglNest extends nglBranch {
 	}
 
 	public function createNestCode() {
-		if($this->attribute("objtype")=="view") {
+		if($this->attribute("objtype")!="table") {
 			self::errorMessage($this->object, 1012); // invalid action on a view
 			return false;
 		}
@@ -595,8 +595,14 @@ class nglNest extends nglBranch {
 		if(isset($aOWL["joins"])) {
 			foreach($aOWL["joins"] as $sTable => $aTable) {
 				$aTableJoins = array();
-				foreach($aTable as $sField) {
-					$aTableJoins[substr($sField, 0, strpos($sField, ":"))] = $sField;
+				foreach($aTable as $sIndex => $sField) {
+					if(!is_array($sField)) { $sIndex = substr($sField, 0, strpos($sField, ":")); }
+					if(!isset($aTableJoins[$sIndex])) {
+						$aTableJoins[$sIndex] = $sField;
+					} else {
+						if(!is_array($aTableJoins[$sIndex])) { $aTableJoins[$sIndex] = array($aTableJoins[$sIndex]); }
+						$aTableJoins[$sIndex][] = $sField;
+					}
 				}
 				$aOWL["joins"][$sTable] = $aTableJoins;
 				asort($aOWL["joins"][$sTable]);
@@ -632,6 +638,7 @@ class nglNest extends nglBranch {
 		ksort($aJSON["tables"]);
 		ksort($aJSON["nest"]["objects"]);
 		ksort($aJSON["titles"]);
+		ksort($aJSON["foreigns"]);
 		ksort($aJSON["views"]);
 		ksort($aJSON["def"]);
 		ksort($aJSON["parents"]);
@@ -702,10 +709,18 @@ class nglNest extends nglBranch {
 		$sSQL .= "TRUNCATE TABLE `__ngl_owl_structure__`;\n\n";
 		
 		// COLUMNAS
+		$sSQL .= "-- BEGIN COLUMNS --\n";
 		if(isset($aOWL["tables"])) {
-			$sSQL .= "-- BEGIN COLUMNS --\n";
 			foreach($aOWL["tables"] as $sTable => $aColumns) {
 				$sColumns = '["'.implode('","', array_keys($aColumns)).'"]';
+				$sColumns = $db->escape($sColumns);
+				$sSQL .= $db->insert("__ngl_owl_structure__", array("name"=>$sTable, "columns"=>$sColumns)).";\n";
+			}
+		}
+		if(isset($aOWL["foreigns"])) {
+			foreach($aOWL["foreigns"] as $sTable => $aView) {
+				$aColumns = array_keys($aView["fields"]);
+				$sColumns = '["'.implode('","', $aColumns).'"]';
 				$sColumns = $db->escape($sColumns);
 				$sSQL .= $db->insert("__ngl_owl_structure__", array("name"=>$sTable, "columns"=>$sColumns)).";\n";
 			}
@@ -717,8 +732,8 @@ class nglNest extends nglBranch {
 				$sColumns = $db->escape($sColumns);
 				$sSQL .= $db->insert("__ngl_owl_structure__", array("name"=>$sTable, "columns"=>$sColumns)).";\n";
 			}
-			$sSQL .= "-- END COLUMNS --\n\n";
 		}
+		$sSQL .= "-- END COLUMNS --\n\n";
 		
 		// FOREIGNKEYS
 		if(isset($aOWL["foreignkeys"])) {
@@ -747,9 +762,9 @@ class nglNest extends nglBranch {
 		if(isset($aOWL["joins"])) {
 			foreach($aOWL["joins"] as $sTable => $aReferences) {
 				if(!isset($aJoins[$sTable])) { $aJoins[$sTable] = array("joins"=>array(), "children"=>array()); }
-				foreach($aReferences as $sRef) {
-					// $aLabels = array("using","name","alias");
-					$aLabels = array("using","name", "field");
+				$aFlatReferences = $this->FlatJoins($aReferences);
+				foreach($aFlatReferences as $sRef) {
+					$aLabels = array("using","name","field");
 					$aCross = explode(":", $sRef, 3);
 					if(!isset($aCross[2])) { unset($aLabels[2]); }
 					$aJoins[$sTable]["joins"][] = array_combine($aLabels, $aCross);
@@ -863,9 +878,10 @@ class nglNest extends nglBranch {
 		}
 	}
 
+	// using es el campo del la tabla principal
+	// field es el campo de la view o foreign table
 	public function join() {
 		list($sUsing,$sWith,$sField) = $this->getarguments("using,entity,field", func_get_args());
-
 		$sObject = $this->attribute("object");
 		$sField = $this->FormatName($sField);
 		$sWith = $this->FormatName($sWith);
@@ -873,7 +889,7 @@ class nglNest extends nglBranch {
 		if($sField===null || $sObject===null || $sUsing===null) {
 			self::errorMessage($this->object, 1005); // field name, empty object or using name
 			return false;
-		} else if(!isset($this->owl["tables"][$sObject]) && !isset($this->owl["views"][$sWith])) {
+		} else if(!isset($this->owl["tables"][$sObject]) && !isset($this->owl["views"][$sWith]) && !isset($this->owl["foreigns"][$sObject])) {
 			self::errorMessage($this->object, 1011, $sField); // with object dosent exists
 			return false;
 		}
@@ -881,8 +897,17 @@ class nglNest extends nglBranch {
 		if(!isset($this->owl["joins"][$sObject])) { $this->owl["joins"][$sObject] = array(); }
 		$this->owl["joins"][$sObject][] = $sUsing.":".$sWith.":".$sField;
 
-		if(!isset($this->owl["views"][$sWith]["joins"])) { $this->owl["views"][$sWith]["joins"] = array(); }
-		$this->owl["views"][$sWith]["joins"][$sObject] = array($sUsing, $sField);
+		// foreigns join
+		if(isset($this->owl["foreigns"][$sWith])) {
+			if(!isset($this->owl["foreigns"][$sWith]["joins"])) { $this->owl["foreigns"][$sWith]["joins"] = array(); }
+			$this->owl["foreigns"][$sWith]["joins"][$sObject] = array($sUsing, $sField);
+		}
+
+		// view join
+		if(isset($this->owl["views"][$sWith])) {
+			if(!isset($this->owl["views"][$sWith]["joins"])) { $this->owl["views"][$sWith]["joins"] = array(); }
+			$this->owl["views"][$sWith]["joins"][$sObject] = array($sUsing, $sField);
+		}
 
 		return $this;
 	}
@@ -918,6 +943,7 @@ class nglNest extends nglBranch {
 			"tables" => array(),
 			"nest" => array("canvas"=>array("width"=>"1024", "height"=>"768"), "objects"=>array()),
 			"titles" => array(),
+			"foreigns" => array(),
 			"views" => array(),
 			"def" => array(),
 			"foreignkeys" => array(),
@@ -942,6 +968,7 @@ class nglNest extends nglBranch {
 		ksort($aStructure["tables"]);
 		ksort($aStructure["nest"]["objects"]);
 		ksort($aStructure["titles"]);
+		ksort($aStructure["foreigns"]);
 		ksort($aStructure["views"]);
 		ksort($aStructure["def"]);
 		ksort($aStructure["parents"]);
@@ -960,7 +987,7 @@ class nglNest extends nglBranch {
 	public function position() {
 		list($sObject,$nLeft,$nTop) = $this->getarguments("entity,left,top", func_get_args());
 		$sObject = $this->FormatName($sObject);
-		if(isset($this->owl["tables"][$sObject]) || isset($this->owl["views"][$sObject])) {
+		if(isset($this->owl["tables"][$sObject]) || isset($this->owl["views"][$sObject]) || isset($this->owl["foreigns"][$sObject])) {
 			if(!isset($this->owl["nest"]["objects"][$sObject])) { $this->owl["nest"]["objects"][$sObject] = array(); }
 			$this->owl["nest"]["objects"][$sObject]["left"] = $nLeft;
 			$this->owl["nest"]["objects"][$sObject]["top"] = $nTop;
@@ -973,7 +1000,7 @@ class nglNest extends nglBranch {
 		$sObject = $this->attribute("object");
 
 		$sField = $this->FormatName($sField);
-		if(isset($this->owl["tables"][$sObject]) || isset($this->owl["views"][$sObject])) {
+		if(isset($this->owl["tables"][$sObject]) || isset($this->owl["views"][$sObject]) || isset($this->owl["foreigns"][$sObject])) {
 			if(!isset($this->owl["nest"]["objects"][$sObject]["starred"])) { $this->owl["nest"]["objects"][$sObject]["starred"] = array(); }
 			if(isset($this->owl["nest"]["objects"][$sObject]["starred"][$sField])) {
 				unset($this->owl["nest"]["objects"][$sObject]["starred"][$sField]);
@@ -1005,7 +1032,7 @@ class nglNest extends nglBranch {
 	public function objectvar() {
 		list($sObject,$sVariable,$mValue) = $this->getarguments("entity,objcfg_var,objcfg_val", func_get_args());
 		$sObject = $this->FormatName($sObject);
-		if(isset($this->owl["tables"][$sObject]) || isset($this->owl["views"][$sObject])) {
+		if(isset($this->owl["tables"][$sObject]) || isset($this->owl["views"][$sObject]) || isset($this->owl["foreigns"][$sObject])) {
 			if(!isset($this->owl["nest"]["objects"][$sObject])) { $this->owl["nest"]["objects"][$sObject] = array(); }
 			$this->owl["nest"]["objects"][$sObject][$sVariable] = $mValue;
 		}
@@ -1039,7 +1066,7 @@ class nglNest extends nglBranch {
 	}
 
 	public function rem() {
-		if($this->attribute("objtype")=="view") {
+		if($this->attribute("objtype")!="table") {
 			self::errorMessage($this->object, 1012); // invalid action on a view
 			return false;
 		}
@@ -1199,7 +1226,7 @@ class nglNest extends nglBranch {
 		} else if(!isset($this->owl["tables"][$sObject])) {
 			self::errorMessage($this->object, 1004, $sObject); // object doesn't exists
 			return false;
-		} else if(!isset($this->owl["tables"][$sJoined])) {
+		} else if(!isset($this->owl["views"][$sJoined]) && !isset($this->owl["foreigns"][$sJoined])) {
 			self::errorMessage($this->object, 1004, $sJoined); // object doesn't exists
 			return false;
 		}
@@ -1212,15 +1239,25 @@ class nglNest extends nglBranch {
 
 		// join con tablas y views
 		if(isset($this->owl["joins"][$sObject])) {
-			foreach($this->owl["joins"][$sObject] as $sJoinWith => $sJoin) {
+			$aFlatJoins = $this->FlatJoins($this->owl["joins"][$sObject]);
+			foreach($aFlatJoins as $sJoin) {
 				$aJoin = explode(":", $sJoin);
 				if($aJoin[1]==$sJoined) {
-					unset($this->owl["joins"][$sObject][$sJoinWith]);
+					if(is_array($this->owl["joins"][$sObject][$aJoin[0]])) {
+						$n = array_search($sJoin, $this->owl["joins"][$sObject][$aJoin[0]]);
+						unset($this->owl["joins"][$sObject][$aJoin[0]][$n]);
+						if(!count($this->owl["joins"][$sObject][$aJoin[0]])) {
+							unset($this->owl["joins"][$sObject][$aJoin[0]]);
+						}
+					} else {
+						unset($this->owl["joins"][$sObject][$aJoin[0]]);
+					}
 				}
 			}
 		}
 
 		// views
+		unset($this->owl["foreigns"][$sJoined]["joins"][$sObject]);
 		unset($this->owl["views"][$sJoined]["joins"][$sObject]);
 		
 		return $this;
@@ -1247,6 +1284,26 @@ class nglNest extends nglBranch {
 		}
 
 		return $aView;
+	}
+
+	private function ForeignTableFields() {
+		list($sObject) = $this->getarguments("entity", func_get_args());
+		$sObject = $this->FormatName($sObject);
+		$db = $this->argument("db");
+		$aFields = $db->query("DESCRIBE `".$sObject."`")->getall();
+		$aForeign = array();
+		foreach($aFields as $aField) {
+			$sType = substr($aField["Type"], 0, strpos($aField["Type"], ")"));
+			$aType = explode("(", $sType);
+			$aForeign[$aField["Field"]] = array(
+				"name" => $aField["Field"],
+				"label" => ucfirst(str_replace("_", " ", strtolower($aField["Field"]))),
+				"type" => $aType[0],
+				"length" => $aType[1]
+			);
+		}
+
+		return $aForeign;
 	}
 
 	public function types() {
@@ -1367,7 +1424,7 @@ class nglNest extends nglBranch {
 		if($sObject==null) {
 			self::errorMessage($this->object, 1001); // empty object name
 			return false;
-		} else if(isset($this->owl["views"][$sObject])) {
+		} else if(isset($this->owl["views"][$sObject]) || isset($this->owl["foreigns"][$sObject])) {
 			self::errorMessage($this->object, 1002, $sObject); // object alredy exists
 			return false;
 		}
@@ -1375,6 +1432,24 @@ class nglNest extends nglBranch {
 		if($sTitle===null) { $sTitle = $sObject; }
 		$aFields = $this->ViewFields($sObject);
 		$this->owl["views"][$sObject] = array("title"=>$sTitle, "fields"=>$aFields);
+		$this->owl["nest"]["objects"][$sObject]	= array("left"=>0, "top"=>0);
+		return $this;
+	}
+
+	public function foreign() {
+		list($sObject, $sTitle) = $this->getarguments("entity,title", func_get_args());
+		$sObject = $this->FormatName($sObject);
+		if($sObject==null) {
+			self::errorMessage($this->object, 1001); // empty object name
+			return false;
+		} else if(isset($this->owl["views"][$sObject]) || isset($this->owl["foreigns"][$sObject])) {
+			self::errorMessage($this->object, 1002, $sObject); // object alredy exists
+			return false;
+		}
+
+		if($sTitle===null) { $sTitle = $sObject; }
+		$aFields = $this->ForeignTableFields($sObject);
+		$this->owl["foreigns"][$sObject] = array("title"=>$sTitle, "fields"=>$aFields);
 		$this->owl["nest"]["objects"][$sObject]	= array("left"=>0, "top"=>0);
 		return $this;
 	}
@@ -1567,6 +1642,18 @@ SQL;
 		return $aDescribe;
 	}
 
+	private function FlatJoins($aJoins) {
+		$aFlats = array();
+		foreach($aJoins as $mRef) {
+			if(is_array($mRef)) {
+				$aFlats = array_merge($aFlats, $mRef);
+			} else {
+				$aFlats[] = $mRef;
+			}
+		}
+		return $aFlats;
+	}
+
 	private function FormatName($sName) {
 		$sName = trim($sName);
 		$sName = strtolower($sName);
@@ -1599,6 +1686,9 @@ SQL;
 		if(isset($this->owl["tables"][$sObject])) {
 			$this->attribute("object", $sObject);
 			$this->attribute("objtype", "table");
+		} else if(isset($this->owl["foreigns"][$sObject])) {
+			$this->attribute("object", $sObject);
+			$this->attribute("objtype", "foreign");
 		} else if(isset($this->owl["views"][$sObject])) {
 			$this->attribute("object", $sObject);
 			$this->attribute("objtype", "view");
@@ -1626,7 +1716,6 @@ SQL;
 					foreach($aSentence["joins"][$sTable] as $sJoin) {
 						$aJoin = explode(":", $sJoin);
 						if(isset($aColumns[$aJoin[0]])) {
-							// $aColumns[$aJoin[0]]["join"] = array("table"=>$aJoin[1], "alias"=>$aJoin[2]);
 							$aColumns[$aJoin[0]]["join"] = $aJoin[1];
 						}
 					}

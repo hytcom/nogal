@@ -139,6 +139,7 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 			}
 		}
 
+		self::call()->msort($this->aGrants, "ksort");
 		$sGrants = json_encode(array("GRANTS"=>$this->aGrants, "RAW"=>$this->aRAW));
 		$sGrants = self::call("crypt")->type("aes")->key($sPassphrase)->base64(true)->encrypt($sGrants);
 

@@ -1,4 +1,9 @@
 <?php defined("NGL_SOWED") || exit();
+
+/** $REDIRECTURL ---------------------------------------------------------------
+contiene el path completo de la URL solicitada
+------------------------------------------------------------------------------*/
+
 /*
 switch(true) {
 	// equivalente a una RewriteRule. Siempre dentro de NGL_PATH_PRICKOUT

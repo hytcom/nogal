@@ -1228,30 +1228,16 @@ namespace nogal {
 			$this->attribute("cache_file", $sCacheFile);
 
 			// chequeo de existencia de cache
-			if(file_exists($sCacheFile)) {
+			if($sCacheMode!="none" && file_exists($sCacheFile)) {
 				$sign = fopen($sCacheFile, "r");
 				$sSign = fgets($sign);
 				fclose($sign);
 				$aSign = explode("-", trim($sSign));
-
-				if($sCacheMode=="use" || $sCacheMode=="cache") {
-					$this->RIND_UID = $aSign[2];
-					$this->RIND_ME = $this->RIND_QUOTE.$this->RIND_UID.$this->RIND_QUOTE;
-					\Rind::$Rinds[$aSign[2]] = $this;
-					return $sCacheFile;
-				} else {
-					$sSource = $this->readTemplate($sFilePath);
-					if($sSource===false) { return false; }
-					$sFileHash = md5($sSource);
-
-					if(isset($aSign[1]) && $aSign[1]==$sFileHash) {
-						$this->RIND_UID = $aSign[2];
-						$this->RIND_ME = $this->RIND_QUOTE.$this->RIND_UID.$this->RIND_QUOTE;
-						\Rind::$Rinds[$aSign[2]] = $this;
-						return $sCacheFile;
-					}
-				}
-			} else if($sCacheMode!="cache") {
+				$this->RIND_UID = $aSign[2];
+				$this->RIND_ME = $this->RIND_QUOTE.$this->RIND_UID.$this->RIND_QUOTE;
+				\Rind::$Rinds[$aSign[2]] = $this;
+				return $sCacheFile;
+			} else if($sCacheMode=="none" || ($sCacheMode=="use" && !file_exists($sCacheFile))) {
 				$sSource = $this->readTemplate($sFilePath);
 				if($sSource===false) { return false; }
 				$sFileHash = md5($sSource);
@@ -2440,18 +2426,16 @@ namespace nogal {
 			$sReturn = '<[PHP[eval(\'
 				'.$sVarname.' = '.$vArguments["content"].';
 				ob_start();
-				if(is_array('.$sVarname.')) {
-					print_r('.$sVarname.');
-				} else if(is_object('.$sVarname.')) {
+				if(is_object('.$sVarname.')) {
 					if(method_exists('.$sVarname.', '.$this->RIND_QUOTE.'get'.$this->RIND_QUOTE.') && method_exists('.$sVarname.', '.$this->RIND_QUOTE.'reset'.$this->RIND_QUOTE.')) {
 						Rind::nut('.$this->RIND_QUOTE.'owl'.$this->RIND_QUOTE.','.$this->RIND_QUOTE.'reset'.$this->RIND_QUOTE.',array('.$this->RIND_QUOTE.'content'.$this->RIND_QUOTE.'=>'.$sVarname.')); 
 						'.$sVarname.' = Rind::nut('.$this->RIND_QUOTE.'owl'.$this->RIND_QUOTE.','.$this->RIND_QUOTE.'get'.$this->RIND_QUOTE.',array('.$this->RIND_QUOTE.'content'.$this->RIND_QUOTE.'=>'.$sVarname.'));
-						print_r('.$sVarname.');
+						\nogal\dump('.$sVarname.');
 					} else {
-						var_dump('.$sVarname.');
+						\nogal\dump('.$sVarname.');
 					}
 				} else {
-					var_dump('.$sVarname.');
+					\nogal\dump('.$sVarname.');
 				}
 				'.$sVarname.' = ob_get_clean();
 				
@@ -3295,7 +3279,7 @@ namespace nogal {
 			$sReturn .= $aStructure." = json_decode('".$sTemplates."', true);".$this->EOL;
 			if(is_array($aSubMerge)) { $sReturn .= $sSubTarget.' = "'.$aSubMerge[0].'";'.$this->EOL; }
 
-			if($sCacheMode!="none") {
+			// if($sCacheMode!="none") {
 				if($aSubMerge) {
 					foreach($aFiles[$aSubMerge[0]] as $aTpl) {
 						$sNowDoc = self::call()->unique(6);
@@ -3320,26 +3304,27 @@ namespace nogal {
 						if($nSourceDir) { $sTemplatePath = $sFilePath.NGL_DIR_SLASH.$sTemplatePath; }
 						$sSubTemplateContent = $this->readTemplate($sGUIPath.$sTemplatePath);
 						$sSubTemplateContent = $this->rind2php($sSubTemplateContent);
+						// echo $sSubTemplateContent."\n\n";
 						$this->RIND_TEMPLATESLOG[$aTpl[0]] = true;
 						$this->sMergeFiles .= $this->RIND_TEMPLATES."['".$aTpl[0]."'] = <<<'".$sNowDoc."'\n".$sSubTemplateContent."\n".$sNowDoc.";\n";
 						// dodo
 					}
 				}
-			} else {
-				$sReturn .= $sGui.' = "'.$sGUIPath.'";'.$this->EOL;
-				$sReturn .= $sGuiFile.' = "'.$sFilePath.'";'.$this->EOL;
-				$sReturn .= $sGuiIsDir.' = "'.$nSourceDir.'";'.$this->EOL;
-			}
+			// } else {
+				// $sReturn .= $sGui.' = "'.$sGUIPath.'";'.$this->EOL;
+				// $sReturn .= $sGuiFile.' = "'.$sFilePath.'";'.$this->EOL;
+				// $sReturn .= $sGuiIsDir.' = "'.$nSourceDir.'";'.$this->EOL;
+			// }
 
 			// -- multiple target INI
 			if($aSubMerge) {
 				$sReturn .= 	$sSubTargetContent.' = array();'.$this->EOL;
 				$sReturn .= 	'foreach('.$aStructure.'['.$sSubTarget.'] as '.$aTemplate.') {'.$this->EOL;
-				if($sCacheMode!="none") {
+				// if($sCacheMode!="none") {
 					$sReturn .= 	$sSubTargetContent."[] = Rind::mergetemplate(".$aTemplate.", \"".base64_encode(json_encode($this->aMergeTail))."\", array(".$this->RIND_TEMPLATES."));".$this->EOL;
-				} else {
-					$sReturn .= 	$sSubTargetContent."[] = Rind::mergetemplate(".$aTemplate.", \"".base64_encode(json_encode($this->aMergeTail))."\", array(".$this->RIND_ME.",".$sGuiIsDir.",".$sGuiFile.",".$sGui."));".$this->EOL;
-				}
+				// } else {
+					// $sReturn .= 	$sSubTargetContent."[] = Rind::mergetemplate(".$aTemplate.", \"".base64_encode(json_encode($this->aMergeTail))."\", array(".$this->RIND_ME.",".$sGuiIsDir.",".$sGuiFile.",".$sGui."));".$this->EOL;
+				// }
 				$sReturn .= 	'}'.$this->EOL;
 				$sReturn .= 	'unset('.$aStructure.'['.$sSubTarget.']);'.$this->EOL;
 				$sReturn .= 	$aStructure.'[0][1]['.$sSubTarget.'] = base64_encode(implode(chr(10), '.$sSubTargetContent.'));'.$this->EOL;
@@ -3347,11 +3332,11 @@ namespace nogal {
 			// -- multiple target END
 
 			$sReturn .= 'foreach('.$aStructure.' as '.$aTemplate.') {'.$this->EOL;
-			if($sCacheMode!="none") {
+			// if($sCacheMode!="none") {
 				$sReturn .= 	$sTemplate."[] = Rind::mergetemplate(".$aTemplate.", \"".base64_encode(json_encode($this->aMergeTail))."\", array(".$this->RIND_TEMPLATES."));".$this->EOL;
-			} else {
-				$sReturn .= 	$sTemplate."[] = Rind::mergetemplate(".$aTemplate.", \"".base64_encode(json_encode($this->aMergeTail))."\", array(".$this->RIND_ME.",".$sGuiIsDir.",".$sGuiFile.",".$sGui."));".$this->EOL;
-			}
+			// } else {
+				// $sReturn .= 	$sTemplate."[] = Rind::mergetemplate(".$aTemplate.", \"".base64_encode(json_encode($this->aMergeTail))."\", array(".$this->RIND_ME.",".$sGuiIsDir.",".$sGuiFile.",".$sGui."));".$this->EOL;
+			// }
 			$sReturn .= "}";
 			$sReturn .= $sTemplate.' = implode(chr(10), '.$sTemplate.');'.$this->EOL;
 			$sReturn .= $sTemplate." = preg_replace('/\{\%mergeid\%\}/is', Rind::unique(8), ".$sTemplate.");".$this->EOL;
@@ -3771,11 +3756,14 @@ namespace nogal {
 				$sString = ltrim($sString, " \t\n\r\0\x0B");
 				preg_match("/\((.*?)\)(.*)/is", $sString, $aMatchs);
 				if(!count($aMatchs)) {
-					return 'Rind::alvin("'.$sString.'")';
+					// return 'Rind::alvin("'.$sString.'")';
+					return "Rind::alvin(<<<RINDALVIN\n".$sString."\nRINDALVIN\n, null, null, $this->RIND_ME)";
 				} else if($aMatchs[2]==="") {
-					return 'Rind::alvin("'.$aMatchs[1].'")';
+					// return 'Rind::alvin("'.$aMatchs[1].'")';
+					return "Rind::alvin(<<<RINDALVIN\n".$aMatchs[1]."\nRINDALVIN\n, null, null, $this->RIND_ME)";
 				} else {
-					return '<[PHP[if(Rind::alvin("'.$aMatchs[1].'")) { ]PHP]>'.$aMatchs[2].'<[PHP[}]PHP]>';
+					// return '<[PHP[if(Rind::alvin("'.$aMatchs[1].'")) { ]PHP]>'.$aMatchs[2].'<[PHP[}]PHP]>';
+					return "<[PHP[if(Rind::alvin(<<<RINDALVIN\n".$aMatchs[1]."\nRINDALVIN\n, null, null, $this->RIND_ME)) { ]PHP]>".$aMatchs[2]."<[PHP[}]PHP]>";
 				}
 			}
 		}
@@ -3952,8 +3940,26 @@ namespace {
 			return $ngl()->arrayColumn($aData, $mColumnKey, $mIndexKey);
 		}
 
-		public static function alvin($sGrants=null, $sRawIndex=null, $aData=null) {
+		public static function alvin($sGrants=null, $sRawIndex=null, $aData=null, $sRindID=null) {
 			global $ngl;
+
+			if($sRindID!==null) {
+				$SET = self::this($sRindID)->getSET();
+				$sGrants = preg_replace_callback(
+					"/<\?php echo Rind::this\(\"[0-9a-z]+\"\)->SET(.*?);\?>/is",
+					function($aMatch) use ($ngl, $SET) {
+						ob_start();
+						$sToEval = '<?php echo $SET'.$aMatch[1].";?>";
+						// echo $sToEval."\n";
+						eval($ngl()->EvalCode("?>".$sToEval));
+						$sEvaluated = ob_get_clean();
+						// echo $sEvaluated."\n";
+						return (substr($sEvaluated, 0, 15)!="[ NOGAL ERROR @") ? $sEvaluated : false;
+					},
+					$sGrants
+				);
+				if($sGrants===false) { return false; }
+			}
 
 			if($sGrants==="true") { return true; }
 
@@ -3964,11 +3970,13 @@ namespace {
 
 			if(NGL_ALVIN!==null) {
 				if(!$ngl("alvin")->loaded()) {
-					$sToken		= isset($_SESSION[NGL_SESSION_INDEX]["ALVIN"]["alvin"]) ? $_SESSION[NGL_SESSION_INDEX]["ALVIN"]["alvin"] : null;
 					$sUsername	= isset($_SESSION[NGL_SESSION_INDEX]["ALVIN"]["username"]) ? $_SESSION[NGL_SESSION_INDEX]["ALVIN"]["username"] : null;
+					$sToken		= isset($_SESSION[NGL_SESSION_INDEX]["ALVIN"]["alvin"]) ? $_SESSION[NGL_SESSION_INDEX]["ALVIN"]["alvin"] : null;
 					$sProfile	= isset($_SESSION[NGL_SESSION_INDEX]["ALVIN"]["profile"]) ? $_SESSION[NGL_SESSION_INDEX]["ALVIN"]["profile"] : null;
 					if(!$ngl("alvin")->load($sToken, $sUsername, $sProfile)) { return false; }
 				}
+
+				if(isset($_SESSION[NGL_SESSION_INDEX]["ALVIN"]["username"]) && strtolower($_SESSION[NGL_SESSION_INDEX]["ALVIN"]["username"])==="admin") { return true; }
 				if($sGrants===null) {
 					$mRaw = $ngl("alvin")->raw($sRawIndex);
 					if($aData!==null){

@@ -1030,6 +1030,21 @@ class nglFn extends nglTrunk {
 		return $aOutput;
 	}
 
+	/*
+	aplica el metodo de orden, recursivamente
+		sort
+		rsort
+		ksort
+		krsort
+	*/
+	public function mSort(&$aArray, $sMethod="sort", $nFlags=SORT_REGULAR) {
+		if(!in_array(strtolower($sMethod), array("sort","ksort","rsort","krsort"))) { $sMethod = "sort"; }
+		foreach($aArray as &$mValue) {
+			if(is_array($mValue)) { $this->mSort($mValue, $sMethod, $nFlags); }
+		}
+		return $sMethod($aArray);
+	}
+
 	/**
 	 * convierte un array list en un arbol
 		$arr = array(

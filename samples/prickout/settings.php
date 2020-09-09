@@ -22,7 +22,7 @@ $ENV["theme"]											= NGL_URL;
 $ENV["cdn"]												= NGL_URL."/cdn";
 $ENV["css"]												= NGL_URL."/css";
 $ENV["js"]												= NGL_URL."/js";
-$ENV["docs"]											= NGL_URL."/files";
+$ENV["storage"]											= NGL_URL."/files";
 
 // archivos
 $ENV["self"]											= $ngl("sysvar")->SELF;
@@ -33,7 +33,7 @@ $ENV["dates"]											= $ngl("dates")->settings();
 $ENV["now"]												= $ngl("dates")->info();
 
 // idioma
-$ENV["lang"]											= (isset($_SESSION[NGL_SESSION_INDEX]["LANGUAGE"])) ? $_SESSION[NGL_SESSION_INDEX]["LANGUAGE"] : "es";
+$ENV["lang"]											= $_SESSION[NGL_SESSION_INDEX]["LANGUAGE"];
 
 // búsquedas
 $ENV["q"]												= (isset($_REQUEST["values"]["q"])) ? $_REQUEST["values"]["q"] : "";
@@ -96,40 +96,6 @@ $NGL_ONCECODE_CHECKS[]									= "/tutor/";
 
 // excepciones
 $NGL_ONCECODE_IGNORES									= array();
-
-
-#===============================================================================
-#	ALVIN
-#===============================================================================
-/** $NGL_ALVIN_IGNORES
-Archivos ignorados por ALVIN al momento de la carga
-La URL de los archivos son relativas al valor de la constante NGL_URL y deben comenzar con "/"
-Cuando la URL termine en / se aplicar? la regla para toda la carpeta y sub-carpetas
-Ej:
-	NGL_URL = http://www.dominio.com/project
-	URL COMPLETA = http://www.dominio.com/project/folder/filename.php
-	$NGL_ALVIN_IGNORES[] = "/folder/filename.php";
-**/
-$NGL_ALVIN_IGNORES										= array();
-$NGL_ALVIN_IGNORES[]									= "/gardener";
-$NGL_ALVIN_IGNORES[]									= "/login";
-$NGL_ALVIN_IGNORES[]									= "/logout";
-$NGL_ALVIN_IGNORES[]									= "/index";
-
-
-/** $NGL_ALVIN_STRICTS
-Archivos para los que se requiere algun tipo de acceso ALVIN al momento de la carga
-La URL de los archivos son relativas al valor de la constante NGL_URL y deben comenzar con "/"
-Cuando la URL termine en / se aplicar? la regla para toda la carpeta y sub-carpetas
-Ej:
-	NGL_URL = http://www.dominio.com/project
-	URL COMPLETA = http://www.dominio.com/project/folder/filename.php
-	$NGL_ALVIN_STRICTS["/mods/foobar/file1.php"] = true; <- se requiere unicamente login activo
-	$NGL_ALVIN_STRICTS["/mods/foobar/file2.php"] = "FOO,BAR"; <- se requieren los permisos FOO y BAR
-	$NGL_ALVIN_STRICTS["/mods/foobar/file3.php"] = "?|FOO,BAR"; <- se requieren los permisos FOO ó BAR
-	$NGL_ALVIN_STRICTS["/mods/foobar2/"] = "BAR"; <- bloquea toda la carpeta, se requiere permiso BAR
-**/
-$NGL_ALVIN_STRICTS										= array();
 
 
 #===============================================================================

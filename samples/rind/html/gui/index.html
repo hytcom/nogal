@@ -1,0 +1,96 @@
+<!DOCTYPE html  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+	<head>
+ 		<title>nogal::rind Test Page</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+		<style>
+			.colorbox {
+				font-size: 12px;
+				height: 50px;
+				max-width: 120px;
+			}
+
+			pre.border { max-height: 400px; }
+		</style>
+	</head>
+
+	<body>
+		<div class="container">
+			<div class="row">
+				<div class="col">
+					<h1 class="text-center pt-3">nogal::rind</h1>
+					<h2 class="text-center pt-3">Test Page</h2>
+					<div class="text-center"><a href="https://github.com/hytcom/wiki/blob/master/rind/readme.md" target="_blank">Consultar Manual</a></div>
+					<br /><br />
+
+					<h3>Variable de Entorno {{$ENV}}</h3><br />
+					Hora Actual: <b>{$ENV.now.datetime}</b> {{$ENV.now.datetime}}<br />
+					Tu dirección IP: <b>{$ENV.ip}</b> {{$ENV.ip}}<br /><br />
+					<br />
+					<h3>&lt;rind:dump&gt;{{$ENV}}&lt;/rind:dump&gt;</h3>
+<pre class="border border-dark p-3">
+	<rind:dump>{$ENV}</rind:dump>
+</pre>
+					<br /><br />
+					
+					<h3>&lt;rind:mergefile&gt;</h3>
+<pre class="border border-dark p-3">
+&lt;rind:mergefile&gt;jumbotron&lt;/rind:mergefile&gt;
+</pre>
+<rind:mergefile>jumbotron</rind:mergefile>
+<br /><br />
+
+					<h3>&lt;rind:set&gt;,&lt;rind:loop&gt; y &lt;rind:ifcase&gt;</h3>
+<pre class="border border-dark p-3">
+&lt;div class="row text-center"&gt;
+	&lt;rind:set&gt;
+		&lt;@name&gt;test&lt;/@name&gt;
+		&lt;@value&gt;<a href="colors.json" target="_blank">colors.json</a>&lt;/@value&gt;
+		&lt;@method&gt;file,jsondec&lt;/@method&gt;
+	&lt;/rind:set&gt;
+	&lt;rind:loop&gt;
+		&lt;@source&gt;{&#36;_SET.test}&lt;/@source&gt;
+		&lt;@content&gt;
+			&lt;rind:loop&gt;
+			&lt;@source&gt;{#data}&lt;/@source&gt;
+			&lt;@content&gt;
+				&lt;rind:ifcase&gt;
+					&lt;@iff&gt;{self.#odd}&lt;/@iff&gt;
+					&lt;@then&gt;&lt;div class="col-1 text-black border border-light" style="background: linear-gradient(#FFFFFF, {self.#current})"&gt;R{parent.#line}C{self.#line}&lt;br /&gt;{self.#current}&lt;/div&gt;&lt;/@then&gt;
+					&lt;@else&gt;&lt;div class="col-1 text-black border border-light" style="background: linear-gradient({self.#current}, #FFFFFF)"&gt;R{parent.#line}C{self.#line}&lt;br /&gt;{self.#current}&lt;/div&gt;&lt;/@else&gt;
+				&lt;/rind:ifcase&gt;
+			&lt;/@content&gt;
+			&lt;/rind:loop&gt;
+		&lt;/@content&gt;
+	&lt;/rind:loop&gt;
+&lt;/div&gt;
+</pre>
+					<br /><br />
+					<div class="row text-center">
+						<rind:set>
+							<@name>test</@name>
+							<@value>colors.json</@value>
+							<@method>file,jsondec</@method>
+						</rind:set>
+						<rind:loop>
+							<@source>{$_SET.test}</@source>
+							<@content>
+								<rind:loop>
+									<@source>{#data}</@source>
+									<@content>
+										<rind:ifcase>
+											<@iff>{self.#odd}</@iff>
+											<@then><div class="col-1 text-black border border-light py-3" style="background: linear-gradient(#FFFFFF, {self.#current})">R{parent.#line}C{self.#line}<br />{self.#current}</div></@then>
+											<@else><div class="col-1 text-black border border-light py-3" style="background: linear-gradient({self.#current}, #FFFFFF)">R{parent.#line}C{self.#line}<br />{self.#current}</div></@else>
+										</rind:ifcase>
+									</@content>
+								</rind:loop>
+							</@content>
+						</rind:loop>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

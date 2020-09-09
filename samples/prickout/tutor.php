@@ -45,8 +45,6 @@ try {
 		} else {
 			$sURL = $aRequest["NGL_REDIRECT"]."?response=".base64_encode($sResponse);
 		}
-
-		//header("location:".$sURL);
 		exit($sURL);
 	} else {
 		die($sResponse);
