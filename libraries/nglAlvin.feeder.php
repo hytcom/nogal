@@ -400,7 +400,7 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 	}
 
 	private function PrepareGrants($aProfile) {
-		if(array_key_exists("ADMIN", $aProfile)) { $aProfile["grants"] = $this->aGrants["groups"]; }
+		if(array_key_exists("ADMIN", $aProfile)) { $aProfile = $this->aGrants["groups"]; }
 		$aToken = array();
 		foreach($aProfile as $sGroup => $aGrants) {
 			$aToken[$sGroup] = true;
