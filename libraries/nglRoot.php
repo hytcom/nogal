@@ -644,7 +644,7 @@ class nglRoot {
 			$sDescription .= $sAditionalText;
 		}
 		
-		if(!empty($sDescription) && $sDescription!=$sCode) {
+		if(!empty($sDescription) && $sDescription!==$sCode) {
 			$sMsgText .= $sTitle." - ";
 			$sMsgText .= $sDescription;
 		} else {

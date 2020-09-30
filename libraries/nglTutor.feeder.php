@@ -146,10 +146,22 @@ class nglTutor extends nglTrunk {
 		return self::call()->emptyToNull($aData, $aNulls);
 	}
 
-	final protected function NotNulls($aData, $aNotNulls=null) {
-		if($aNotNulls===null) { $aNotNulls = $this->aNotNulls; }
-		if(!is_array($aNotNulls) || !count($aNotNulls)) { return $aData; }
-		return self::call()->nullToEmpty($aData, $aNotNulls);
+	final protected function Empty($aData, $aEmpty=null) {
+		if($aEmpty===null) { $aEmpty = $this->aEmpty; }
+		if(!is_array($aEmpty) || !count($aEmpty)) { return $aData; }
+		return self::call()->nullToEmpty($aData, $aEmpty);
+	}
+
+	final protected function Zeros($aData, $aZeros=null) {
+		if($aZeros===null) { $aZeros = $this->aZeros; }
+		if(!is_array($aZeros) || !count($aZeros)) { return $aData; }
+		return self::call()->emptyToZero($aData, $aZeros);
+	}
+
+	final protected function Sanitize($aData) {
+		$aData = $this->Nulls($aData);
+		$aData = $this->Empty($aData);
+		return $this->Zeros($aData);
 	}
 
 	final private function TutorCaller($sCaller) {

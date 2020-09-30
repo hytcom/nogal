@@ -869,9 +869,6 @@ class nglNest extends nglBranch {
 				$sSQL .= "-- END NORMALIZATION --\n";
 			}
 
-			// log
-			self::log("nest.log", "-- ".date("Y-m-d H:i:s")." ---------------------------------------------------------\n".$sSQLStructure."\n\n".$sSQL);
-
 			return "ok";
 		} else {
 			return utf8_encode($this->attribute("sql"));
@@ -1624,8 +1621,17 @@ SQL;
 		} else {
 			if(isset($this->owl["joins"][$sObject])) {
 				foreach($this->owl["joins"][$sObject] as $sIndex=>$sJoin) {
-					if(strpos($sJoin, $sField.":")===0) {
-						unset($this->owl["joins"][$sObject][$sIndex]);
+					if(is_array($sJoin)) {
+						foreach($sJoin as $nJoinMulti => $sJoinMulti) {
+							if(strpos($sJoinMulti, $sField.":")===0) { unset($this->owl["joins"][$sObject][$sIndex][$nJoinMulti]); }
+							if(!count($this->owl["joins"][$sObject][$sIndex])) {
+								unset($this->owl["joins"][$sObject][$sIndex]);
+							}
+						}
+					} else {
+						if(strpos($sJoin, $sField.":")===0) {
+							unset($this->owl["joins"][$sObject][$sIndex]);
+						}
 					}
 				}
 				if(!count($this->owl["joins"][$sObject])) { unset($this->owl["joins"][$sObject]); }

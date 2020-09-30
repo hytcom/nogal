@@ -2535,9 +2535,8 @@ namespace nogal {
 			if($nCurly===false && $nSquare===false) {
 				$sString = str_replace(array("\x12json>", "\x12\x11json>"), "", $sString);
 				if(strlen($sString)) {
-					if($sString[0]!=NGL_DIR_SLASH) {
-						$sString = $this->aFilePath["dirname"].NGL_DIR_SLASH.$sString;
-					}
+					$sGUIPath = ($sString[0]==NGL_DIR_SLASH) ? $this->attribute("project_path") : $this->aFilePath["dirname"].NGL_DIR_SLASH;
+					$sString = $sGUIPath.$sString;
 					$sString = $this->readTemplate($sString);
 					$sString = $this->TagConverter($sString);
 					$aString = self::call("unicode")->split($sString);
@@ -3279,24 +3278,8 @@ namespace nogal {
 			$sReturn .= $aStructure." = json_decode('".$sTemplates."', true);".$this->EOL;
 			if(is_array($aSubMerge)) { $sReturn .= $sSubTarget.' = "'.$aSubMerge[0].'";'.$this->EOL; }
 
-			// if($sCacheMode!="none") {
-				if($aSubMerge) {
-					foreach($aFiles[$aSubMerge[0]] as $aTpl) {
-						$sNowDoc = self::call()->unique(6);
-						$sTemplatePath = self::call()->unique(6);
-						$sTemplatePath = (substr($aTpl[0],-1)!=NGL_DIR_SLASH && strtolower(substr($aTpl[0],-5))!=".html") ? $aTpl[0].".html" : $aTpl[0];
-						if(!isset($this->RIND_TEMPLATESLOG[$aTpl[0]])) {
-							if($nSourceDir) { $sTemplatePath = $sFilePath.NGL_DIR_SLASH.$sTemplatePath; }
-							$sSubTemplateContent = $this->readTemplate($sGUIPath.$sTemplatePath);
-							$sSubTemplateContent = $this->rind2php($sSubTemplateContent);
-							$this->RIND_TEMPLATESLOG[$aTpl[0]] = true;
-							$this->sMergeFiles .= $this->RIND_TEMPLATES."['".$aTpl[0]."'] = <<<'".$sNowDoc."'\n".$sSubTemplateContent."\n".$sNowDoc.";\n";
-						}
-					}
-				}
-
-				foreach($aFiles as $mKey => $aTpl) {
-					if($mKey===$aSubMerge[0]) { continue; }
+			if($aSubMerge) {
+				foreach($aFiles[$aSubMerge[0]] as $aTpl) {
 					$sNowDoc = self::call()->unique(6);
 					$sTemplatePath = self::call()->unique(6);
 					$sTemplatePath = (substr($aTpl[0],-1)!=NGL_DIR_SLASH && strtolower(substr($aTpl[0],-5))!=".html") ? $aTpl[0].".html" : $aTpl[0];
@@ -3304,27 +3287,33 @@ namespace nogal {
 						if($nSourceDir) { $sTemplatePath = $sFilePath.NGL_DIR_SLASH.$sTemplatePath; }
 						$sSubTemplateContent = $this->readTemplate($sGUIPath.$sTemplatePath);
 						$sSubTemplateContent = $this->rind2php($sSubTemplateContent);
-						// echo $sSubTemplateContent."\n\n";
 						$this->RIND_TEMPLATESLOG[$aTpl[0]] = true;
 						$this->sMergeFiles .= $this->RIND_TEMPLATES."['".$aTpl[0]."'] = <<<'".$sNowDoc."'\n".$sSubTemplateContent."\n".$sNowDoc.";\n";
-						// dodo
 					}
 				}
-			// } else {
-				// $sReturn .= $sGui.' = "'.$sGUIPath.'";'.$this->EOL;
-				// $sReturn .= $sGuiFile.' = "'.$sFilePath.'";'.$this->EOL;
-				// $sReturn .= $sGuiIsDir.' = "'.$nSourceDir.'";'.$this->EOL;
-			// }
+			}
+
+			foreach($aFiles as $mKey => $aTpl) {
+				if($mKey===$aSubMerge[0]) { continue; }
+				$sNowDoc = self::call()->unique(6);
+				$sTemplatePath = self::call()->unique(6);
+				$sTemplatePath = (substr($aTpl[0],-1)!=NGL_DIR_SLASH && strtolower(substr($aTpl[0],-5))!=".html") ? $aTpl[0].".html" : $aTpl[0];
+				if(!isset($this->RIND_TEMPLATESLOG[$aTpl[0]])) {
+					if($nSourceDir) { $sTemplatePath = $sFilePath.NGL_DIR_SLASH.$sTemplatePath; }
+					$sSubTemplateContent = $this->readTemplate($sGUIPath.$sTemplatePath);
+					$sSubTemplateContent = $this->rind2php($sSubTemplateContent);
+					// echo $sSubTemplateContent."\n\n";
+					$this->RIND_TEMPLATESLOG[$aTpl[0]] = true;
+					$this->sMergeFiles .= $this->RIND_TEMPLATES."['".$aTpl[0]."'] = <<<'".$sNowDoc."'\n".$sSubTemplateContent."\n".$sNowDoc.";\n";
+					// dodo
+				}
+			}
 
 			// -- multiple target INI
 			if($aSubMerge) {
 				$sReturn .= 	$sSubTargetContent.' = array();'.$this->EOL;
 				$sReturn .= 	'foreach('.$aStructure.'['.$sSubTarget.'] as '.$aTemplate.') {'.$this->EOL;
-				// if($sCacheMode!="none") {
-					$sReturn .= 	$sSubTargetContent."[] = Rind::mergetemplate(".$aTemplate.", \"".base64_encode(json_encode($this->aMergeTail))."\", array(".$this->RIND_TEMPLATES."));".$this->EOL;
-				// } else {
-					// $sReturn .= 	$sSubTargetContent."[] = Rind::mergetemplate(".$aTemplate.", \"".base64_encode(json_encode($this->aMergeTail))."\", array(".$this->RIND_ME.",".$sGuiIsDir.",".$sGuiFile.",".$sGui."));".$this->EOL;
-				// }
+				$sReturn .= 		$sSubTargetContent."[] = Rind::mergetemplate(".$aTemplate.", \"".base64_encode(json_encode($this->aMergeTail))."\", array(".$this->RIND_TEMPLATES."));".$this->EOL;
 				$sReturn .= 	'}'.$this->EOL;
 				$sReturn .= 	'unset('.$aStructure.'['.$sSubTarget.']);'.$this->EOL;
 				$sReturn .= 	$aStructure.'[0][1]['.$sSubTarget.'] = base64_encode(implode(chr(10), '.$sSubTargetContent.'));'.$this->EOL;
@@ -3332,11 +3321,7 @@ namespace nogal {
 			// -- multiple target END
 
 			$sReturn .= 'foreach('.$aStructure.' as '.$aTemplate.') {'.$this->EOL;
-			// if($sCacheMode!="none") {
-				$sReturn .= 	$sTemplate."[] = Rind::mergetemplate(".$aTemplate.", \"".base64_encode(json_encode($this->aMergeTail))."\", array(".$this->RIND_TEMPLATES."));".$this->EOL;
-			// } else {
-				// $sReturn .= 	$sTemplate."[] = Rind::mergetemplate(".$aTemplate.", \"".base64_encode(json_encode($this->aMergeTail))."\", array(".$this->RIND_ME.",".$sGuiIsDir.",".$sGuiFile.",".$sGui."));".$this->EOL;
-			// }
+			$sReturn .= 	$sTemplate."[] = Rind::mergetemplate(".$aTemplate.", \"".base64_encode(json_encode($this->aMergeTail))."\", array(".$this->RIND_TEMPLATES."));".$this->EOL;
 			$sReturn .= "}";
 			$sReturn .= $sTemplate.' = implode(chr(10), '.$sTemplate.');'.$this->EOL;
 			$sReturn .= $sTemplate." = preg_replace('/\{\%mergeid\%\}/is', Rind::unique(8), ".$sTemplate.");".$this->EOL;

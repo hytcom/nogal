@@ -1471,6 +1471,28 @@ class nglFn extends nglTrunk {
 		return  $aData;
 	}
 
+	/** FUNCTION {
+		"name" : "emptyToZero", 
+		"type" : "public",
+		"description" : "
+			Establece como NULL los valores de $aData, cuyo indice se encuentre en $aKeys, que retornen TRUE a la funcion empty.
+			Si $aKeys es NULL se evaluarán todos los indices.
+		",
+		"parameters" : {
+			"$aData" : ["array", "Array de datos"],
+			"$aKeys" : ["array", "Array con los nombres de las claves del array $aData que deberán ser evaluadas","null"]
+		},
+		"return" : "array"
+	} **/
+	public function emptyToZero($aData, $aKeys=null) {
+		if($aKeys===null) { $aKeys = array_keys($aData); }
+		foreach($aKeys as $mKey) {
+			if(!isset($aData[$mKey]) || empty($aData[$mKey])) { $aData[$mKey] = 0; }
+		}
+
+		return  $aData;
+	}
+
 
 	/** FUNCTION {
 		"name" : "nullToEmpty", 

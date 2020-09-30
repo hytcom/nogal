@@ -1,3 +1,21 @@
+# 2.7.2 - 202009301030
+## fn
+- nuevo método **emptyToZero**
+
+## nest
+- se eliminó el log
+- fix error en **alter**
+
+## rind
+- **mergefile** admite ahora que la ruta de los JSON en el modo *multiple* sean realtivas al proyecto
+
+## root
+- fix error en **errorMessage**
+
+## tutor
+- nuevo método **Sanitize**
+
+________________________________________________________________________________
 # 2.7.1 - 202009090200
 ## general
 - actualización se samples
