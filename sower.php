@@ -51,15 +51,17 @@ unset($NGL_LIBS, $NGL_GRAFTS);
 if(NGL_FALLEN) { $ngl()->errorPages(503); }
 
 // session
-if(file_exists(NGL_PATH_PROJECT."/session.php")) {
-	require_once(NGL_PATH_PROJECT."/session.php");
-} else {
-	session_start();
+if(PHP_SAPI!="cli") {
+	if(file_exists(NGL_PATH_PROJECT."/session.php")) {
+		require_once(NGL_PATH_PROJECT."/session.php");
+	} else {
+		session_start();
+	}
+	if(!isset($_SESSION[NGL_SESSION_INDEX])) {
+		$_SESSION[NGL_SESSION_INDEX] = array("SESS" => array(),"ONCECODES" => array());
+	}
+	$ngl("sysvar")->sessionVars();
 }
-if(!isset($_SESSION[NGL_SESSION_INDEX])) {
-	$_SESSION[NGL_SESSION_INDEX] = array("SESS" => array(),"ONCECODES" => array());
-}
-$ngl("sysvar")->sessionVars();
 
 // configuraciones del proyecto activo
 if(file_exists(NGL_PATH_PROJECT."/settings.php")) {

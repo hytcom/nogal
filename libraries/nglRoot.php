@@ -265,14 +265,14 @@ class nglRoot {
 		usort($mPath, function($a, $b) { return strlen($b) - strlen($a); });
 		$nLength = strlen(NGL_PATH_CURRENT);
 		foreach($mPath as $sPath) {
-			if(NGL_PATH_CURRENT==$sPath) {
+			if(NGL_PATH_CURRENT===$sPath) {
 				return $sPath;
-			} else if(substr($sPath, -1, 1)=="/") {
-				if(substr(NGL_PATH_CURRENT, 0, strlen($sPath)) == $sPath) {
+			} else if(strlen($sPath)>1 && substr($sPath, -1, 1)=="/") {
+				if(substr(NGL_PATH_CURRENT, 0, strlen($sPath))===$sPath) {
 					return $sPath;
 				}
 			} else if(substr($sPath, -1, 1)=="*") {
-				if(substr($sPath, 0, -1) == substr(NGL_PATH_CURRENT, 0, strlen($sPath)-1)) {
+				if(substr($sPath, 0, -1)===substr(NGL_PATH_CURRENT, 0, strlen($sPath)-1)) {
 					return $sPath;
 				}
 			}
@@ -344,7 +344,9 @@ class nglRoot {
 			$vURL = parse_url(NGL_URL);
 			$vCurrent["scheme"] = $vURL["scheme"];
 			$vCurrent["host"] = $vURL["host"];
+			$vCurrent["port"] = (isset($vURL["port"])) ? $vURL["port"] : "";
 			$vCurrent["urlroot"] = $vURL["scheme"]."://".$vURL["host"];
+			if(!empty($vURL["port"])) { $vCurrent["urlroot"] .= ":".$vURL["port"]; }
 			$vCurrent["urldirname"] = (!empty($vCurrent["dirname"])) ? str_replace("\\", "/", $vCurrent["dirname"])."/" : "";
 			$vCurrent["url"] = $vCurrent["urldirname"].$vCurrent["basename"].(($vCurrent["query_string"]!="") ? "?".$vCurrent["query_string"] : "");
 			$vCurrent["urlpath"] = $vCurrent["urldirname"].$vCurrent["basename"];

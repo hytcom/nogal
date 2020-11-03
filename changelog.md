@@ -1,3 +1,35 @@
+# 2.7.3 - 202011022100
+## general
+- nuevo método global **dumpc**
+- fix firewall-ignore en el archivo alvin.php
+
+## crypt
+- nuevo método **chKeys**, que permite verificar y un par de claves RSA se corresponden
+
+## excel
+- se añadieron los argumentos *csv_enclosed*, *csv_splitter* y *csv_eol* en el método **write**
+
+## nest
+- se añadieron los argumentos *enclosed*, *splitter* y *eol* en el método **write**
+- fix error en **normalize**
+- fix error en el nombre de los campos al crear
+- fix error en los joins al utilizar **rename**
+
+## pecker
+- NUEVO OBJETO (beta)
+
+## rind
+- se añadió el argumento que determina el modo de validación alvin **alvin_mode**
+- se añadió la posibilidad de recuperar un índice de un array en el comando **set**
+- el método **vector** del comando **set** ya no requiere especificar el nombre de la columna
+
+## root
+- se integró **port** al método **currentpath**
+- fix error en **inCurrentPath**
+
+## shift
+- reemplazo de tabulaciones por **\t** en el método **textTable**
+________________________________________________________________________________
 # 2.7.2 - 202009301030
 ## fn
 - nuevo método **emptyToZero**

@@ -1,6 +1,6 @@
 [checksum]
-md5 = "53c195c28d891ff0d8362e62abc3e7df"
-sha1 = "11b937c3f83de49e63bb6c04990b39d3f9467eb1"
+md5 = "b854ae6a73268a9ecc0cb92f9dd9fc03"
+sha1 = "52f87047dc4146f06f7ac55b77732d1ec02a8292"
 
 [documentation]
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/coon.md"

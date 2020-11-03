@@ -1269,6 +1269,28 @@ class nglFn extends nglTrunk {
 		}
 	}
 
+	public function dataFileLoad($sFilePath) {
+		$sFilePath = $this->sandboxPath($sFilePath);
+		$aData = array();
+		if(file_exists($sFilePath)) {
+			$sData = file_get_contents($sFilePath);
+			$aData = unserialize($sData);
+		}
+
+		return $aData;
+	}
+
+	public function dataFileSave($sFilePath, $aData) {
+		$sFilePath = $this->sandboxPath($sFilePath);
+		$sDirPath = pathinfo($sFilePath, PATHINFO_DIRNAME);
+		if(is_writable($sDirPath)) {
+			file_put_contents($sFilePath, serialize($aData));
+			return true;
+		}
+		return false;
+	}
+
+
 	/** FUNCTION {
 		"name" : "dec2hex", 
 		"type" : "public",
@@ -1433,7 +1455,7 @@ class nglFn extends nglTrunk {
 		return $sDump;
 	}
 
-	public function dumpconsole($bReturn=false) {
+	public function dumpconsole() {
 		$sConsole = "<script>\r\n//<![CDATA[\r\nif(!console){var console={log:function(){}}}";
 		$sDump = $this->dump(func_get_args());
 		if($sDump!=="") {

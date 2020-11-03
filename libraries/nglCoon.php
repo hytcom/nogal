@@ -194,7 +194,7 @@ class nglCoon extends nglBranch implements inglBranch {
 			if($sToken!==null) {
 				$aResponse["token"] 	= self::call()->tokenEncode($sToken, $this->argument("key"), false);
 			}
-			$aResponse["count"]			= count($aData);
+			$aResponse["count"]			= (is_array($aData)) ? count($aData) : 0;
 			$aResponse["data"]			= $aData;
 
 			header("Content-Type: application/".$sCType, true);

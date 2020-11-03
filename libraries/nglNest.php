@@ -62,8 +62,11 @@ class nglNest extends nglBranch {
 		$vArguments["canvas_width"]			= array('(int)$mValue', 1800);
 		$vArguments["canvas_height"]		= array('(int)$mValue', 900);
 		$vArguments["gui_part"]				= array('$mValue', "table");
-		$vArguments["normalize_code"]		= array('$mValue', "Code");
-		$vArguments["normalize_name"]		= array('$mValue', "Name");
+		$vArguments["normalize_code"]		= array('$mValue', "Código");
+		$vArguments["normalize_name"]		= array('$mValue', "Nombre");
+		$vArguments["enclosed"]				= array('$mValue', '"');
+		$vArguments["splitter"]				= array('$mValue', ";");
+		$vArguments["eol"]					= array('$mValue', "\r\n");
 		
 		return $vArguments;
 	}
@@ -162,7 +165,7 @@ class nglNest extends nglBranch {
 		$sField = $this->FormatName($sField);
 		if($this->bAlterField===true && is_array($mType)) {
 			$sOldField = $sField;
-			if(isset($mType["name"])) { $sField = $mType["name"]; }
+			if(isset($mType["name"])) { $sField = $this->FormatName($mType["name"]); }
 			if(!isset($mType["label"])) { $mType["label"] = $sField; }
 
 			$aOldType = $this->owl["def"][$sObject][$sOldField];
@@ -214,6 +217,7 @@ class nglNest extends nglBranch {
 		}
 
 		if(is_array($mType)) {
+			if(!isset($mType["name"])) { $mType["name"] = $sField; }
 			if(array_key_exists("type", $mType) && $mType["type"][0]=="@") { // @tabla OR @tabla-padre cuando es pid
 				if(!isset($mType["label"])) { $mType["label"] = $mType["name"]; }
 				$this->DefJoins($sObject, $sField, $mType["type"], $mType["label"]);
@@ -1156,14 +1160,19 @@ class nglNest extends nglBranch {
 		}
 
 		foreach($this->owl["joins"] as $sJoinWith => &$aJoins) {
-			foreach($aJoins as &$sJoin) {
-				$aJoin = explode(":", $sJoin);
-				if($aJoin[1]==$sObject) {
-					$aJoin[1] = $sNewName;
-					$sJoin = implode(":", $aJoin);
+			foreach($aJoins as $x => $mJoin) {
+				if(!is_array($mJoin)) { $mJoin = array($mJoin); }
+				foreach($mJoin as $y => $sJoin) {
+					$aJoin = explode(":", $sJoin);
+					if($aJoin[1]==$sObject) {
+						$aJoin[1] = $sNewName;
+						$mJoin[$y] = implode(":", $aJoin);
+					}
 				}
+				$aJoins[$x] = (count($mJoin)>1) ? $mJoin : current($mJoin);
+
 			}
-			unset($sJoin);
+			unset($mJoin);
 		}
 		unset($aJoins);
 
@@ -1333,10 +1342,13 @@ class nglNest extends nglBranch {
 
 			case "txt":
 			case "csv":
+				$sEnclosed = $this->argument("enclosed");
+				$sSplitter = $this->argument("splitter");
+				$sEOL = $this->argument("eol");
 				$nIni = 1;
 				$csv = self::call("file")->load($sFilePath);
 				$sData = $csv->read();
-				$aData = self::call("shift")->convert($sData, "csv-array", array("splitter"=>";"));
+				$aData = self::call("shift")->convert($sData, "csv-array", array("enclosed"=>$sEnclosed, "splitter"=>$sSplitter, "eol"=>$sEOL));
 				$aGetColumns = $aData[0];
 				break;
 		}
@@ -1394,10 +1406,10 @@ class nglNest extends nglBranch {
 			"codigo" => array("alias"=>"code", "label"=>$sCodeField),
 			"nombre" => array("alias"=>"name", "label"=>$sNameField)
 		);
+		$create = $this->create($sNewObject, $sTitle, $aColumns);
 
 		$sHash = self::call()->unique(8);
 		$this->aNormalize[$sNewObject] = array($sObject, $sField, $sHash);
-
 		if(!$this->bAutoNormalize) {
 			$sLabel = $this->owl["tables"][$sObject][$sField];
 			$this->select($sObject)
@@ -1405,8 +1417,6 @@ class nglNest extends nglBranch {
 				->add($sField, array("type"=>"@".$sNewObject, "label"=>$sLabel))
 			;
 		}
-
-		$create = $this->create($sNewObject, $sTitle, $aColumns);
 		$this->SetObject($sObject);
 		return $create;
 	}

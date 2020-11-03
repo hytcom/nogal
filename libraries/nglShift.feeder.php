@@ -1556,14 +1556,18 @@ class nglShift extends nglTrunk {
 		$nHeaderAlign	= ($sHeaderAlign=="left") ? STR_PAD_RIGHT : ($sHeaderAlign=="right" ? STR_PAD_LEFT : STR_PAD_BOTH);
 		$nBodyAlign		= ($sBodyAlign=="left") ? STR_PAD_RIGHT : ($sBodyAlign=="right" ? STR_PAD_LEFT : STR_PAD_BOTH);
 
+		if(!self::call()->isarrayarray($aData)) { $aData = array($aData); }
+		
 		$aCells = array_fill_keys(array_keys(current($aData)), 0);
 		$nCells = count($aCells);
 		foreach($aCells AS $sColname => $nLength) {
-			$aCells[$sColname] = self::call("unicode")->strlen($sColname);
+			$aCells[$sColname] = self::call("unicode")->strlen(trim($sColname, "\t"));
 		}
-		foreach($aData as $aRow) {
+		foreach($aData as $i => $aRow) {
 			foreach($aRow as $sColname=>$sCell) {
+				$sCell = str_replace("\t", "\\t", $sCell);
 				$aCells[$sColname] = max($aCells[$sColname], self::call("unicode")->strlen($sCell));
+				$aData[$i][$sColname] = $sCell;
 			}
 		}
 		
@@ -1584,6 +1588,7 @@ class nglShift extends nglTrunk {
 			if(count($aRow) < $nCells) { $aRow = array_pad($aRow, $nCells, "NULL"); }
 			$x = 0;
 			foreach($aRow as $sCell) {
+				$sCell = trim($sCell, "\t");
 				if($sCell===null) {
 					$sCell = "NULL";
 				} else if($sCell===false) {

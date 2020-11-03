@@ -482,6 +482,7 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 			$this->aToken = array("profile"=>$sProfileName);
 		}
 
+		// \nogal\dump($this->aToken);
 		if(!is_array($this->aToken)) {
 			self::errorMessage($this->object, 1002);
 			return false;
@@ -538,6 +539,9 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 		} else if($sGrant[0].$sGrant[1]=="?|") {
 			$sGrant = substr($sGrant, 2);
 			return $this->CheckGrant($sGrant, $sToken, "any");
+		// } else if($sGrant[0].$sGrant[1]=="-|") {
+		// 	$sGrant = substr($sGrant, 2);
+		// 	return $this->CheckGrant($sGrant, $sToken, "not");
 		} else {
 			return $this->CheckGrant($sGrant, $sToken, "all");
 		}
@@ -600,20 +604,22 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 		$aToCheck = (strpos($sGrant, ",")===false) ? array($sGrant) : self::call()->explodeTrim(",", $sGrant);
 
 		// nombre del perfil
-		if(in_array($this->aToken["profile"], $aToCheck)) { return true; }
+		if(in_array($this->aToken["profile"], $aToCheck)) { return ($sMode=="none") ? false : true; }
 
 		if(count($aToCheck)==1) {
 			$sGrant = $aToCheck[0];
 			if(isset($this->aToken["grants"][$sGrant])) {
 				return ($sMode=="none") ? false : true;
 			}
-			return false;				
+			return ($sMode=="none") ? true : false;
 		} else {
+			
 			$aReturn = array();
 			$bNone = true;
 			foreach($aToCheck as $sGrant) {
 				if(isset($this->aToken["grants"][$sGrant])) {
 					if($sMode=="any") { return true; }
+					if($sMode=="none") { return false; }
 					$aReturn[$sGrant] = true;
 					$bNone = false;
 				} else {

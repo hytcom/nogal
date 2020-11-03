@@ -1,0 +1,52 @@
+[checksum]
+md5 = "8ed56ad5b20ada3b31872b0dc6a4f078"
+sha1 = "86b07fbf6a84a8a80810bdb5cdd24d769e301159"
+
+[documentation]
+url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/pecker.md"
+
+[arguments]
+analyse_datatype = ""
+col = ""
+cols = ""
+datafile = ""
+db = ""
+exec = ""
+features = ""
+fields = ""
+file = ""
+force = ""
+grouper = ""
+hashappend = ""
+hittest = ""
+id = ""
+inverse = ""
+key = ""
+limit = ""
+markas = ""
+markon = ""
+newnames = ""
+output = ""
+overwrite = ""
+policy = ""
+rules = ""
+skip = ""
+splitter = ""
+table = ""
+truncate = ""
+where = ""
+xtable = ""
+
+[errors]
+1001 = objeto de base de datos indefinido
+1002 = 
+1003 = tabla indefinida
+1004 = grouper indefinido
+1005 = columna indefinida
+1006 = tabla inexistente
+1007 = hash indefinido
+1008 = campo key inexistente
+1009 = la tabla para analizar esta vacía
+1010 = tabla cruzada indefinida
+1011 = datos de la tabla de caracteristicas indefinidos/erroneos/incompletos
+1012 = falta analisis de la tabla

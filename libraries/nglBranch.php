@@ -247,7 +247,7 @@ abstract class nglBranch extends nglTrunk {
 		} else {
 			$vConfig = $this->CONFIG;
 		}
-
+		
 		if(isset($vConfig["arguments"])) { $this->args($vConfig["arguments"]); }
 		if(isset($vConfig["errors"])) { self::errorSetCodes($this->object, $vConfig["errors"]); }
 		
@@ -298,7 +298,7 @@ abstract class nglBranch extends nglTrunk {
 		$aArguments = array();
 		foreach($aArgs as $nIndex => $sArgument) {
 			$sArgument = trim($sArgument);
-			$aArguments[] = (isset($aPassedArgs[$nIndex]) && $aPassedArgs[$nIndex]!==NGL_NULL) ? $aPassedArgs[$nIndex] : $this->Argument($sArgument);
+			$aArguments[] = (array_key_exists($nIndex, $aPassedArgs) && $aPassedArgs[$nIndex]!==NGL_NULL) ? $aPassedArgs[$nIndex] : $this->Argument($sArgument);
 		}
 
 		return $aArguments;

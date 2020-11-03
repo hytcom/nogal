@@ -91,6 +91,19 @@ class nglGraftCrypt extends nglScion {
 
 		return false;
 	}
+
+	public function chKeys($sKey1, $sKey2) {
+		if($this->sCrypter===null) { $this->SetType(); }
+		if($this->sCrypter=="\phpseclib\Crypt\RSA") { $this->RSAMode(); }
+		$sTest = md5(microtime());
+		ob_start();
+		$this->SetKey($sKey1);
+		$sEncrypted = $this->crypter->encrypt($sTest);
+		$this->SetKey($sKey2);
+		$sDecrypted = $this->crypter->decrypt($sEncrypted);
+		ob_end_clean();
+		return ($sTest===$sDecrypted) ? true : false;
+	}
 	
 	private function RSAMode() {
 		if($this->attribute("keyword")===null) { return false; }

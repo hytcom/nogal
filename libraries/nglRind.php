@@ -160,12 +160,14 @@ namespace nogal {
 			$vArguments["include_support"]		= array('self::call()->isTrue($mValue)', true);
 			$vArguments["clear_utf8_bom"]		= array('self::call()->isTrue($mValue)', true);
 			$vArguments["trim_stamp"]			= array('self::call()->isTrue($mValue)', true);
+			$vArguments["alvin_mode"]			= array('$this->SetAlvinMode($mValue)', "all");
 			
 			return $vArguments;
 		}
 
 		final protected function __declareAttributes__() {
 			$vAttributes 						= array();
+			$vAttributes["alvin_type"]			= null;
 			$vAttributes["root_url"]			= null;
 			$vAttributes["project_path"]		= null;
 			$vAttributes["gui_url"]				= null;
@@ -276,6 +278,19 @@ namespace nogal {
 					$this->setSET($sVarname, $mValue, $sVarname);
 				}
 			}
+		}
+
+		protected function SetAlvinMode($sMode) {
+			$aConstants = array();
+			if(strtolower($sMode)!="none" && strtolower($sMode)!="all") {
+				$sMode = self::call()->explodeTrim(",", $sMode);
+				$this->attribute("alvin_type", $sMode);
+				$sMode = implode(",", $sMode);
+			} else {
+				$this->attribute("alvin_type", strtolower($sMode));
+			}
+
+			return $sMode;
 		}
 
 		/** FUNCTION {
@@ -423,6 +438,7 @@ namespace nogal {
 
 			$this->setSET("CONSTANTS", $aConstants);
 			$this->bInitConstants = true;
+			return implode(",", array_keys($aConstants));
 		}
 
 		/** FUNCTION {
@@ -1178,6 +1194,7 @@ namespace nogal {
 
 			$this->setSET("PHP_FUNCTIONS", $aAllowedPHPFunctions);
 			$this->bInitPHPFunctions = true;
+			return implode(",", array_keys($aAllowedPHPFunctions));
 		}
 
 		/** FUNCTION {
@@ -2459,7 +2476,8 @@ namespace nogal {
 			"return" : "string"
 		} **/
 		private function rindEco($vArguments) {
-			$sReturn = '<[PHP[ print('.$vArguments["content"].'); ]PHP]>';
+			// $sReturn = '<[PHP[ print('.$vArguments["content"].'); ]PHP]>';
+			$sReturn = '<[PHP[ Rind::eco('.$vArguments["content"].'); ]PHP]>';
 			return $sReturn;
 		}
 
@@ -3419,12 +3437,14 @@ namespace nogal {
 					';
 					continue;
 				}
-				if(is_numeric($mMethod) || strpos($mMethod,":") || strpos($mMethod,"|")) {
+				if(is_numeric($mMethod) || strpos($mMethod,":") || strpos($mMethod,"|") || $mMethod[0]=="[") {
 					$nPosition = $this->dynVar();
 					if(strpos($mMethod,":")) {
 						$aMethod = explode(":", $mMethod);
 						$nIndex = (int)$aMethod[0];
 						$nLength = (int)$aMethod[1];
+					} else if($mMethod[0]=="[") {
+						$sIndex = substr($mMethod, 1, -1);
 					} else if(strpos($mMethod,"|")) {
 						$aPipes = $this->dynVar();
 					} else {
@@ -3440,6 +3460,8 @@ namespace nogal {
 							if(is_string('.$sDataVar.')) { '.$sDataVar.' = str_split('.$sDataVar.'); }
 							'.$sDataVar.' = array_map(function ($a) use ('.$sDataVar.') { return (array_key_exists($a, '.$sDataVar.')) ? '.$sDataVar.'[$a] : ""; }, '.$aPipes.');
 						';
+					} else if(isset($sIndex)) {
+						$sReturn .= $sDataVar.' = isset('.$sDataVar.'["'.$sIndex.'"]) ? '.$sDataVar.'["'.$sIndex.'"] : null;';
 					} else {
 						$sReturn .= '
 							'.$nPosition.' = ('.$nIndex.'<0) ? '.$nIndex.' : ('.$nIndex.'-1);
@@ -3558,7 +3580,7 @@ namespace nogal {
 							break;
 
 						case "vector":
-							$mColumn = isset($vArguments["column"]) ? $this->RIND_QUOTE.$vArguments["column"].$this->RIND_QUOTE : $this->RIND_QUOTE."0".$this->RIND_QUOTE;
+							$mColumn = isset($vArguments["column"]) ? $this->RIND_QUOTE.$vArguments["column"].$this->RIND_QUOTE : "null";
 							$mIndex = isset($vArguments["index"]) ? $this->RIND_QUOTE.$vArguments["index"].$this->RIND_QUOTE : "null";
 							$sReturn .= $sDataVar.' = Rind::arrayColumn('.$sDataVar.','.$mColumn.','.$mIndex.');';
 							break;
@@ -3789,6 +3811,18 @@ namespace {
 			return \nogal\dump($mVariable);
 		}
 		
+		public static function eco($mContent) {
+			global $ngl;
+			if($ngl()->isarrayarray($mContent)) {
+				$mContent = $ngl()->imploder(";", $mContent);
+			} else if(is_object($mContent)) {
+				$mContent = implode(";", (array)$mContent);
+			} else if(is_array($mContent)) {
+				$mContent = implode(";", $mContent);
+			}
+			return print($mContent);
+		}
+
 		public static function clearPath($sPath, $bSlashClose=false, $sSeparator=NGL_DIR_SLASH) {
 			global $ngl;
 			return $ngl()->clearPath($sPath, $bSlashClose, $sSeparator);
@@ -3926,28 +3960,41 @@ namespace {
 		public static function arrayColumn($aData, $mColumnKey, $mIndexKey) {
 			global $ngl;
 			if(!is_array($aData)) { return array(); }
+			if($mColumnKey===null) {
+				if(count($aData)) {
+					$aKeys = array_keys(current($aData));
+					$mColumnKey = $aKeys[0];
+				} else {
+					return array();
+				}
+			}
 			return $ngl()->arrayColumn($aData, $mColumnKey, $mIndexKey);
 		}
 
 		public static function alvin($sGrants=null, $sRawIndex=null, $aData=null, $sRindID=null) {
 			global $ngl;
 
+			$sUsername = (isset($_SESSION[NGL_SESSION_INDEX]["ALVIN"]["username"])) ? $_SESSION[NGL_SESSION_INDEX]["ALVIN"]["username"] : null;
 			if($sRindID!==null) {
-				$SET = self::this($sRindID)->getSET();
+				$rind = self::this($sRindID);
+				$SET = $rind->getSET();
 				$sGrants = preg_replace_callback(
 					"/<\?php echo Rind::this\(\"[0-9a-z]+\"\)->SET(.*?);\?>/is",
 					function($aMatch) use ($ngl, $SET) {
 						ob_start();
 						$sToEval = '<?php echo $SET'.$aMatch[1].";?>";
-						// echo $sToEval."\n";
 						eval($ngl()->EvalCode("?>".$sToEval));
 						$sEvaluated = ob_get_clean();
-						// echo $sEvaluated."\n";
 						return (substr($sEvaluated, 0, 15)!="[ NOGAL ERROR @") ? $sEvaluated : false;
 					},
 					$sGrants
 				);
 				if($sGrants===false) { return false; }
+				$mAlvinType = $rind->alvin_type;
+				if(!empty($sGrants)) {
+					if($mAlvinType=="none" || $sUsername=="admin") { return true; }
+					if(is_array($mAlvinType) && in_array($sUsername, $mAlvinType)) { return true; }
+				}
 			}
 
 			if($sGrants==="true") { return true; }
@@ -3965,7 +4012,6 @@ namespace {
 					if(!$ngl("alvin")->load($sToken, $sUsername, $sProfile)) { return false; }
 				}
 
-				if(isset($_SESSION[NGL_SESSION_INDEX]["ALVIN"]["username"]) && strtolower($_SESSION[NGL_SESSION_INDEX]["ALVIN"]["username"])==="admin") { return true; }
 				if($sGrants===null) {
 					$mRaw = $ngl("alvin")->raw($sRawIndex);
 					if($aData!==null){

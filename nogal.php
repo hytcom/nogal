@@ -47,6 +47,10 @@ function dump() {
 	echo \nogal\nglRoot::call()->dump(...func_get_args());
 }
 
+function dumpc() {
+	echo \nogal\nglRoot::call()->dumpconsole(...func_get_args());
+}
+
 // retorna true cuando el objeto es un objeto nogal
 // si se especifica type, tambien chequea el tipo
 function is($obj, $sType=null) {

@@ -82,6 +82,10 @@ class nglGraftExcel extends nglScion {
 		$vArguments["styles"]		= array('(array)$mValue', null); 
 		$vArguments["unmergefill"]	= array('self::call()->istrue($mValue)', false); 
 
+		$vArguments["csv_enclosed"]		= array('$mValue', '"');
+		$vArguments["csv_splitter"]		= array('$mValue', ";");
+		$vArguments["csv_eol"]			= array('$mValue', "\r\n");
+
 		return $vArguments;
 	}
 
@@ -288,8 +292,14 @@ class nglGraftExcel extends nglScion {
 
 	public function write() {
 		list($sFileName) = $this->getarguments("filename", func_get_args());
+		$sFileName = self::call()->sandboxPath($sFileName);
 		$aFileType = $this->FileType($sFileName);
 		$writer = \PHPExcel_IOFactory::createWriter($this->excel, $aFileType[0]);
+		if($aFileType[0]) {
+			$writer->setEnclosure($this->argument("csv_enclosed"));
+			$writer->setDelimiter($this->argument("csv_splitter"));
+			$writer->setLineEnding($this->argument("csv_eol"));
+		}
 		$writer->save($sFileName);
 		return $this;
 	}

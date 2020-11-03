@@ -1,6 +1,6 @@
 [checksum]
-md5 = "0ae56e997ff77389a973948ead1e7258"
-sha1 = "46b2ec09196aaf45cf88df47218bd9160db65fc7"
+md5 = "dd8e704efbb873aaf47a0706783d87c7"
+sha1 = "87c924c9c86d1630ebe080ddb4144704bddea0b2"
 
 [documentation]
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/sess.md"

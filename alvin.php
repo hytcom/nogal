@@ -19,7 +19,7 @@ $ALVINCFG = NGL_PATH_CONF.NGL_DIR_SLASH."alvin.conf";
 if(file_exists($ALVINCFG)) {
 	$ALVINCFG = $ngl()->parseConfigString(file_get_contents($ALVINCFG), true);
 	if(isset($ALVINCFG["firewall-ignore"]) && count($ALVINCFG["firewall-ignore"])) {
-		$NGL_ALVIN_IGNORES = array_merge($NGL_ALVIN_IGNORES, $ALVINCFG["firewall-ignore"]);
+		$NGL_ALVIN_IGNORES = array_merge($NGL_ALVIN_IGNORES, array_keys($ALVINCFG["firewall-ignore"]));
 	}
 
 	if(isset($ALVINCFG["firewall-strict"]) && count($ALVINCFG["firewall-strict"])) {

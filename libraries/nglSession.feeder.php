@@ -189,8 +189,8 @@ class nglSession extends nglTrunk {
 		"description" : "Retorna el ID de la sesion activa",
 		"return" : "string"
 	} **/
-	public function id() {
-		return session_id();
+	public function id($sSessId=null) {
+		return ($sSessId!==null) ? session_id($sSessId) : session_id();
 	}
 
 	/** FUNCTION {

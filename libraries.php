@@ -10,6 +10,7 @@ $NGL_LIBS["mysql"]			= array("nglDBMySQL", false);
 $NGL_LIBS["mysqlq"]			= array("nglDBMySQLQuery", false);
 $NGL_LIBS["nest"] 			= array("nglNest", false); // ORM Manager
 $NGL_LIBS["owl"] 			= array("nglOwl", false); // ORM
+$NGL_LIBS["pecker"]			= array("nglPecker", false);
 $NGL_LIBS["pgsql"]			= array("nglDBPostgreSQL", false);
 $NGL_LIBS["pgsqlq"]			= array("nglDBPostgreSQLQuery", false);
 $NGL_LIBS["qparser"]		= array("nglQParser", true); // Parser SQL
