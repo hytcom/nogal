@@ -3481,7 +3481,7 @@ namespace nogal {
 								$sFilePath = self::call()->clearPath($vArguments["value"]);
 								$sAuth = (isset($vArguments["userpwd"])) ? $vArguments["userpwd"] : "0";
 								$sBody = (isset($vArguments["body"])) ? $vArguments["body"] : "0";
-								$sReturn .= $sAuthorization.' = '.$this->RIND_QUOTE.$sAuth.$this->RIND_QUOTE.';'.$this->EOL;
+								$sReturn .= $sAuthorization.' = base64_encode("'.$sAuth.'");'.$this->EOL;
 								$sReturn .= $sBodyContent.' = '.$sBody.';'.$this->EOL;
 								$sReturn .= $sDataVar.' = Rind::readFile("'.$sFilePath.'", null, '.$sAuthorization.', '.$sBodyContent.'); ';
 							break;
@@ -3890,10 +3890,11 @@ namespace {
 			global $ngl;
 			$aOptions = array("CURLOPT_SSL_VERIFYPEER" => false);
 			if($sAuth!==0) {
+				$sAuth = base64_decode($sAuth);
 				$aAuth = explode(" ", $sAuth, 2);
 				$sAuthMethod = strtolower($aAuth[0]);
 				if($sAuthMethod=="basic") {
-					$aOptions["CURLOPT_HTTPHEADER"] = array("Authorization: basic ".base64_encode($aAuth[1]));
+					$aOptions["CURLOPT_HTTPHEADER"] = array("Authorization: basic ".$aAuth[1]);
 				} else if($sAuthMethod=="bearer" || $sAuthMethod=="alvin") {
 					$aOptions["CURLOPT_HTTPHEADER"] = array("Authorization: ".$sAuth);
 				} else {

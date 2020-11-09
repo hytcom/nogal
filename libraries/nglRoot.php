@@ -57,7 +57,17 @@ class nglRoot {
 		self::setPath("grafts");
 		
 		// librerias
-		self::$vLibraries = array_merge($vLibraries, $vGraftsLibraries);
+		self::$vCoreLibs = array(
+			"fn" => array("nglFn", true),
+			"nut" => array("nglNut", true),
+			"sess" => array("nglSession", true),
+			"shift" => array("nglShift", true),
+			"sysvar" => array("nglSystemVars", true),
+			"tutor" => array("nglTutor", true),
+			"unicode" => array("nglUnicode", true),
+			"validate" => array("nglValidate", true)
+		);
+		self::$vLibraries = array_merge(self::$vCoreLibs,  $vLibraries, $vGraftsLibraries);
 
 		// kernel
 		self::$bLoadAllowed = true;
@@ -66,35 +76,23 @@ class nglRoot {
 		require_once(self::$vPaths["libraries"]."nglFeeder.php");
 		require_once(self::$vPaths["libraries"]."nglScion.php");
 
-		// core libs
-		self::$vCoreLibs = array(
-			"fn" => array("nglFn"),
-			"shift" => array("nglShift"),
-			"sysvar" => array("nglSystemVars"),
-			"validate" => array("nglValidate"),
-			"sess" => array("nglSession"),
-			"tutor" => array("nglTutor"),
-			"unicode" => array("nglUnicode"),
-			"nut" => array("nglNut")
-		);
-
-		require_once(self::$vPaths["libraries"]."nglUnicode.feeder.php");
-		self::$unicode = new nglUnicode();
-
 		require_once(self::$vPaths["libraries"]."nglFn.feeder.php");
 		self::$fn = new nglFn();
 
-		require_once(self::$vPaths["libraries"]."nglShift.feeder.php");
-		self::$shift = new nglShift();
+		// require_once(self::$vPaths["libraries"]."nglUnicode.feeder.php");
+		// self::$unicode = new nglUnicode();
 
-		require_once(self::$vPaths["libraries"]."nglSystemVars.feeder.php");
-		self::$var = new nglSystemVars();
+		// require_once(self::$vPaths["libraries"]."nglShift.feeder.php");
+		// self::$shift = new nglShift();
 
-		require_once(self::$vPaths["libraries"]."nglValidate.feeder.php");
-		self::$val = new nglValidate();
+		// require_once(self::$vPaths["libraries"]."nglSystemVars.feeder.php");
+		// self::$var = new nglSystemVars();
 
-		require_once(self::$vPaths["libraries"]."nglSession.feeder.php");
-		self::$session = new nglSession();
+		// require_once(self::$vPaths["libraries"]."nglValidate.feeder.php");
+		// self::$val = new nglValidate();
+
+		// require_once(self::$vPaths["libraries"]."nglSession.feeder.php");
+		// self::$session = new nglSession();
 
 		require_once(self::$vPaths["libraries"]."nglTutor.feeder.php");
 		self::$tutor = new nglTutor();
@@ -174,11 +172,11 @@ class nglRoot {
 				case "fn"		: 	return self::returnFeeder(self::$fn);
 				case "tutor"	: 	return self::$tutor->load($aObjectName[1], $aArguments);
 				case "nut"		: 	return self::$nut->load($aObjectName[1], $aArguments);
-				case "sess"		: 	return self::returnFeeder(self::$session);
-				case "shift"	: 	return self::returnFeeder(self::$shift);
-				case "sysvar"	: 	return self::returnFeeder(self::$var);
-				case "unicode"	: 	return self::returnFeeder(self::$unicode);
-				case "validate"	: 	return self::returnFeeder(self::$val);
+				// case "sess"		: 	return self::returnFeeder(self::$session);
+				// case "shift"	: 	return self::returnFeeder(self::$shift);
+				// case "sysvar"	: 	return self::returnFeeder(self::$var);
+				// case "unicode"	: 	return self::returnFeeder(self::$unicode);
+				// case "validate"	: 	return self::returnFeeder(self::$val);
 				default			:	$sObjectType = $sObjectName;
 			}
 		}
@@ -857,7 +855,8 @@ class nglRoot {
 	}
 
 	protected static function Libraries() {
-		$aAvailables = array("fn"=>true, "nut"=>true, "tutor"=>true, "sess"=>true, "shift"=>true, "sysvar"=>true, "unicode"=>true, "validate"=>true);
+		// $aAvailables = array("fn"=>true, "nut"=>true, "tutor"=>true, "sess"=>true, "shift"=>true, "sysvar"=>true, "unicode"=>true, "validate"=>true);
+		$aAvailables = array();
 		foreach(self::$vLibraries as $sLib => $aLib) {
 			$aAvailables[$sLib] = $aLib[1];
 		}

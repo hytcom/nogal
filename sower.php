@@ -61,6 +61,7 @@ if(PHP_SAPI!="cli") {
 		$_SESSION[NGL_SESSION_INDEX] = array("SESS" => array(),"ONCECODES" => array());
 	}
 	$ngl("sysvar")->sessionVars();
+	$ngl("validate");
 }
 
 // configuraciones del proyecto activo

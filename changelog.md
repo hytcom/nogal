@@ -1,3 +1,14 @@
+# 2.7.4 - 202011090000
+## rind
+- fix **userpwd** en readfile
+
+## root
+- se mejoró la performance en la carga del nucleo
+
+## validate
+- fix error en validación de enteros
+ 
+________________________________________________________________________________
 # 2.7.3 - 202011022100
 ## general
 - nuevo método global **dumpc**

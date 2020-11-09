@@ -697,7 +697,7 @@ class nglValidate extends nglTrunk {
 				
 			case "int":
 				$mNewValue = preg_replace("/^[^0-9]+$/s", "", $mValue);
-				$mNewValue *= 1;
+				$mNewValue = (int)$mNewValue;
 				break;
 
 			case "coords":
@@ -706,6 +706,7 @@ class nglValidate extends nglTrunk {
 
 			case "number":
 				$mNewValue = preg_replace("/^[^0-9\.\,]+$/s", "", $mValue);
+				if(!is_numeric($mNewValue)) { $mNewValue = 0; }
 				$mNewValue *= 1;
 				break;
 
