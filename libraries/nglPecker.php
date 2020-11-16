@@ -37,13 +37,13 @@ class nglPecker extends nglBranch implements inglBranch {
 		$vArguments							= array();
 		$vArguments["analyse_datatype"]		= array('self::call()->isTrue($mValue)', false);
 		$vArguments["col"]					= array('(int)$mValue', null);
-		$vArguments["cols"]					= array('(array)$mValue', null);
-		$vArguments["datafile"]				= array('$this->SetDataFile($mValue)', null);
+		$vArguments["cols"]					= array('$this->SetCols($mValue)', null);
+		$vArguments["datafile"]				= array('$this->SetDataFile($mValue)', "pecker");
 		$vArguments["db"]					= array('$this->SetDb($mValue)', null);
 		$vArguments["exec"]					= array('$mValue', false);
 		$vArguments["features"]				= array('$this->SetFeatures($mValue)', null);
-		$vArguments["fields"]				= array('$this->SetFields($mValue)', null);
 		$vArguments["file"]					= array('$mValue', null);
+		$vArguments["file_eol"]				= array('$mValue', "\\r\\n");
 		$vArguments["force"]				= array('self::call()->isTrue($mValue)', false);
 		$vArguments["grouper"]				= array('$this->SetGrouper($mValue)', null);
 		$vArguments["hashappend"]			= array('self::call()->isTrue($mValue)', false);
@@ -51,6 +51,7 @@ class nglPecker extends nglBranch implements inglBranch {
 		$vArguments["id"]					= array('$mValue', null);
 		$vArguments["inverse"]				= array('self::call()->isTrue($mValue)', false);
 		$vArguments["key"]					= array('$this->SecureName($mValue)', null);
+		$vArguments["length"]				= array('$mValue', 32);
 		$vArguments["limit"]				= array('$mValue', 20);
 		$vArguments["markas"]				= array('$mValue', "1");
 		$vArguments["markon"]				= array('$mValue', "pecked");
@@ -60,8 +61,9 @@ class nglPecker extends nglBranch implements inglBranch {
 		$vArguments["policy"]				= array('(array)$mValue', null);
 		$vArguments["rules"]				= array('(array)$mValue', null);
 		$vArguments["skip"]					= array('self::call()->isTrue($mValue)', true);
-		$vArguments["splitter"]				= array('$mValue', "\t");
+		$vArguments["splitter"]				= array('$mValue', "\\t");
 		$vArguments["table"]				= array('$this->SetTable($mValue)', null);
+		$vArguments["tables"]				= array('(array)$mValue', null);
 		$vArguments["truncate"]				= array('self::call()->isTrue($mValue)', false);
 		$vArguments["where"]				= array('$mValue', null);
 		$vArguments["xtable"]				= array('$this->SecureName($mValue)', null);
@@ -72,9 +74,9 @@ class nglPecker extends nglBranch implements inglBranch {
 	final protected function __declareAttributes__() {
 		$vAttributes						= array();
 		$vAttributes["analysis"]			= null;
-		$vAttributes["grouper_str"]			= null;
-		$vAttributes["fields_str"]			= null;
+		$vAttributes["colstr"]				= null;
 		$vAttributes["features_schema"]		= null;
+		$vAttributes["grouper_str"]			= null;
 		return $vAttributes;
 	}
 
@@ -88,7 +90,7 @@ class nglPecker extends nglBranch implements inglBranch {
 	// analiza la tabla y sugiere el mejor tipo de dato para cada columna
 	public function analyse() {
 		list($sTable,$bForce) = $this->getarguments("table,force", func_get_args());
-		$this->ChkSource();
+		$this->ChkSource($sTable);
 		if(isset($this->aSavedData["ANALYSIS"], $this->aSavedData["ANALYSIS"][$sTable]) && !$bForce) {
 			$this->attribute("analysis", $this->aSavedData["ANALYSIS"][$sTable]);
 			return $this->Output($this->attribute("analysis"));
@@ -97,15 +99,36 @@ class nglPecker extends nglBranch implements inglBranch {
 			return $this->Output($this->BuildAnalysis($sTable));
 		}
 	}
+
+	public function analyseAll() {
+		list($aTables,$bForce) = $this->getarguments("tables,force", func_get_args());
+		if(count($aTables)) {
+			foreach($aTables as $sTable) {
+				$this->analyse($sTable, $bForce);
+			}
+		}
+		return $this;
+	}
 	
 	public function backup() {
-		$sTable = $this->ChkSource();
+		list($sTable) = $this->getarguments("table", func_get_args());
+		$this->ChkSource($sTable);
 		$sCreate = $this->db->query("SHOW CREATE TABLE `".$sTable."`")->get("Create Table");
 		$sDate = date("YmdHi");
 		$sCreate = str_replace("TABLE `".$sTable."` (", "TABLE `".$sTable."_".$sDate."` (", $sCreate);
 		$this->db->query($sCreate);
 		$insert = $this->db->query("INSERT INTO `".$sTable."_".$sDate."` SELECT * FROM `".$sTable."`");
 		$this->Output(array(array("table"=> $sTable."_".$sDate, "rows"=>$insert->rows())));
+	}
+
+	public function backupAll() {
+		list($aTables) = $this->getarguments("tables", func_get_args());
+		if(count($aTables)) {
+			foreach($aTables as $sTable) {
+				$this->backup($sTable);
+			}
+		}
+		return $this;
 	}
 
 	public function colsid() {
@@ -214,7 +237,7 @@ class nglPecker extends nglBranch implements inglBranch {
 		$sTable = $this->ChkSource();
 		$this->ChkHash();
 		$sKey = ($this->argument("key")!==null) ? "`".$this->argument("key")."`, " : "";
-		$sFields = ($this->attribute("fields_str")!==null) ? $this->attribute("fields_str") : "`".$sTable."`.* ";
+		$sFields = ($this->attribute("colstr")!==null) ? $this->attribute("colstr") : "`".$sTable."`.* ";
 		$show = $this->db->query("
 			SELECT 
 				COUNT(`__pecker__`) AS '__duplicates__', 
@@ -235,7 +258,7 @@ class nglPecker extends nglBranch implements inglBranch {
 		$sTable = $this->ChkSource();
 		$this->ChkHash();
 		$sKey = ($this->argument("key")!==null) ? "`".$this->argument("key")."`, " : "";
-		$sFields = ($this->attribute("fields_str")!==null) ? $this->attribute("fields_str") : "`".$sTable."`.* ";
+		$sFields = ($this->attribute("colstr")!==null) ? $this->attribute("colstr") : "`".$sTable."`.* ";
 		$show = $this->db->query("
 			SELECT 
 				".$sKey." ".$sFields." 
@@ -253,7 +276,7 @@ class nglPecker extends nglBranch implements inglBranch {
 		$sTable = $this->ChkSource();
 		$sKey = $this->ChkKey();
 		$this->ChkHash();
-		$sFields = ($this->attribute("fields_str")!==null) ? $this->attribute("fields_str") : "`".$sTable."`.* ";
+		$sFields = ($this->attribute("colstr")!==null) ? $this->attribute("colstr") : "`".$sTable."`.* ";
 		$sId = $this->db->escape($sId);
 		$show = $this->db->query("
 			SELECT 
@@ -412,6 +435,8 @@ class nglPecker extends nglBranch implements inglBranch {
 			if($bTruncate) {
 				if($this->IfTableExist($sTable)) { $this->db->query("TRUNCATE TABLE `".$sTable."`"); }
 			}
+			$this->db->file_eol($this->argument("file_eol"));
+			$this->db->file_separator($sSplitter);
 			$this->db->import($sLoadFile, $sTable);
 		}
 
@@ -737,7 +762,6 @@ class nglPecker extends nglBranch implements inglBranch {
 		return $this->Output(array(array("message"=>"empty result")));	
 	}
 
-
 	public function drop($mCols) {
 		$sTable = $this->ChkSource();
 		$this->ChkAnalysis();
@@ -761,7 +785,6 @@ class nglPecker extends nglBranch implements inglBranch {
 		return array_keys(array_filter($this->aAnalysis, $lambda));
 	}
 
-	
 	private function Sanitizer($sField, $aPolicy) {
 		foreach($aPolicy as $sPolicy) {
 			if(strstr($sPolicy, ":")) {
@@ -815,7 +838,7 @@ class nglPecker extends nglBranch implements inglBranch {
 
 	private function BuildAnalysis($sTable) {
 		$nRows = $this->db->query("SELECT COUNT(*) AS 'rows' FROM `".$sTable."`")->get("rows");
-		if(!$nRows) { self::errorMessage($this->object, 1009); }
+		if(!$nRows) { self::errorMessage($this->object, 1009, $sTable); }
 		$aColumns = array();
 
 		$structure = $this->db->query("SELECT `COLUMN_NAME`, `DATA_TYPE`, `COLUMN_TYPE` FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA`='".$this->db->base."' AND `TABLE_NAME`='".$sTable."'");
@@ -825,6 +848,7 @@ class nglPecker extends nglBranch implements inglBranch {
 		$bAnalyseDataType = $this->argument("analyse_datatype");
 
 		$x = 0;
+		$nLength = $this->argument("length");
 		foreach($aAnalyse as $aTable) {
 			$sField = substr($aTable["Field_name"], strrpos($aTable["Field_name"], ".")+1);
 			if($sField=="__pecker__" || $sField=="__pecked__" || $sField=="__wano__") { continue; }
@@ -833,8 +857,8 @@ class nglPecker extends nglBranch implements inglBranch {
 			$aColumns[$x]["type"] = $aStructure[$sField]["COLUMN_TYPE"];
 			$aColumns[$x]["improve"] = "text";
 			$aColumns[$x]["length"] = $aTable["Max_length"];
-			$aColumns[$x]["min"] = $aTable["Min_value"];
-			$aColumns[$x]["max"] = $aTable["Max_value"];
+			$aColumns[$x]["min"] = substr($aTable["Min_value"], 0, $nLength);
+			$aColumns[$x]["max"] = substr($aTable["Max_value"], 0, $nLength);
 			$aColumns[$x]["empties"] = $aTable["Empties_or_zeros"];
 			$aColumns[$x]["nulls"] = $aTable["Nulls"];
 			$aColumns[$x]["normalizable"] = 0;
@@ -901,10 +925,10 @@ class nglPecker extends nglBranch implements inglBranch {
 		return $aColumns;
 	}
 
-	private function ChkSource() {
-		$sTable = $this->argument("table");
+	private function ChkSource($sTable=null) {
+		if($sTable===null) { $sTable = $this->argument("table"); }
 		$chk = $this->db->query("SELECT * FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA`='".$this->db->base."' AND `TABLE_NAME`='".$sTable."'");
-		if(!$chk->rows()) { self::errorMessage($this->object, 1006); }
+		if(!$chk->rows()) { self::errorMessage($this->object, 1006, $sTable); }
 		return $sTable;
 	}
 
@@ -925,7 +949,7 @@ class nglPecker extends nglBranch implements inglBranch {
 		$sTable = $this->argument("table");
 		$sKey = $this->argument("key");
 		$chk = $this->db->query("SELECT * FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA`='".$this->db->base."' AND `TABLE_NAME`='".$sTable."' AND `COLUMN_NAME`='".$sKey."'");
-		if(!$chk->rows()) { self::errorMessage($this->object, 1008); }
+		if(!$chk->rows()) { self::errorMessage($this->object, 1008, $sTable.".".$sKey); }
 		return $sKey;
 	}
 
@@ -934,25 +958,32 @@ class nglPecker extends nglBranch implements inglBranch {
 		return $this->attribute("features_schema");
 	}
 
-	
 	protected function SetGrouper($aGrouper) {
-		$this->attribute("grouper_str", "`".implode("`,`", $aGrouper)."`");
-		$sTable = $this->argument("table");
-		if($sTable!==null) {
-			$this->aSavedData["GROUPER"][$sTable] = $aGrouper;
-			$this->SaveData();
+		if($aGrouper!==null) {
+			$aGrouper = $this->GetCols($aGrouper);
+			if(!is_array($aGrouper)) { $aGrouper = array($aGrouper); }
+			$this->attribute("grouper_str", "`".implode("`,`", $aGrouper)."`");
+			$sTable = $this->argument("table");
+			if($sTable!==null) {
+				$this->aSavedData["GROUPER"][$sTable] = $aGrouper;
+				$this->SaveData();
+			}
 		}
 		return $aGrouper;
 	}
 
-	protected function SetFields($aFields) {
-		$this->attribute("fields_str", "`".implode("`,`", $aFields)."`");
-		$sTable = $this->argument("table");
-		if($sTable!==null) {
-			$this->aSavedData["FIELDS"][$sTable] = $aFields;
-			$this->SaveData();
+	protected function SetCols($aCols) {
+		if($aCols!==null) {
+			$aCols = $this->GetCols($aCols);
+			if(!is_array($aCols)) { $aCols = array($aCols); }
+			$this->attribute("colstr", "`".implode("`,`", $aCols)."`");
+			$sTable = $this->argument("table");
+			if($sTable!==null) {
+				$this->aSavedData["COLS"][$sTable] = $aCols;
+				$this->SaveData();
+			}
 		}
-		return $aFields;
+		return $aCols;
 	}
 
 	protected function SecureName($sName) {
@@ -960,18 +991,25 @@ class nglPecker extends nglBranch implements inglBranch {
 	}
 
 	protected function SetTable($sTableName) {
-		$sTableName = $this->SecureName($sTableName);
-		if(isset($this->aSavedData["ANALYSIS"], $this->aSavedData["ANALYSIS"][$sTableName])) {
-			$this->attribute("analysis", $this->aSavedData["ANALYSIS"][$sTableName]);
-			if(isset($this->aSavedData["GROUPER"][$sTableName])) { $this->attribute("grouper_str", $this->aSavedData["GROUPER"][$sTableName]); }
-			if(isset($this->aSavedData["FIELDS"][$sTableName])) { $this->attribute("fields_str", $this->aSavedData["FIELDS"][$sTableName]); }
+		if($sTableName!==null) {
+			$sTableName = $this->SecureName($sTableName);
+			if(isset($this->aSavedData["ANALYSIS"], $this->aSavedData["ANALYSIS"][$sTableName])) {
+				$this->attribute("analysis", $this->aSavedData["ANALYSIS"][$sTableName]);
+				if(isset($this->aSavedData["GROUPER"][$sTableName])) { $this->attribute("grouper_str", $this->aSavedData["GROUPER"][$sTableName]); }
+				if(isset($this->aSavedData["COLS"][$sTableName])) { $this->attribute("colstr", $this->aSavedData["COLS"][$sTableName]); }
+			}
 		}
 		return $sTableName;
 	}
 
 	protected function SetDb($db) {
-		$this->db = $db;
-		if(!$this->db->connect()) { self::errorMessage($this->object, 1001); }
+		if($db!==null) {
+			if(is_string($db)) { $db = self::call($db); }
+			$this->db = $db;
+			if(method_exists($db, "connect")) {
+				if(!$this->db->connect()) { self::errorMessage($this->object, 1001); }
+			}
+		}
 		return $db;
 	}
 
@@ -982,26 +1020,28 @@ class nglPecker extends nglBranch implements inglBranch {
 	}
 
 	protected function SetFeatures($aFeatures) {
-		if(!is_array($aFeatures) || count($aFeatures)<3) { self::errorMessage($this->object, 1011); }
-		$sFeTable = $this->SecureName($aFeatures[0]);
-		$sFeId = $this->SecureName($aFeatures[1]);
-		$sFeMatch = $this->SecureName($aFeatures[2]);
+		if($aFeatures!==null) {
+			if(!is_array($aFeatures) || count($aFeatures)<3) { self::errorMessage($this->object, 1011); }
+			$sFeTable = $this->SecureName($aFeatures[0]);
+			$sFeId = $this->SecureName($aFeatures[1]);
+			$sFeMatch = $this->SecureName($aFeatures[2]);
 
-		$schema = $this->db->query("SELECT * FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA`='".$this->db->base."' AND `TABLE_NAME`='".$sFeTable."'");
-		if($schema->rows()) {
-			$aGetSchema = $schema->getall("#COLUMN_NAME");
-			if(!isset($aGetSchema[$sFeId]) || !isset($aGetSchema[$sFeMatch])) { self::errorMessage($this->object, 1012); }
-			$aSchema = array(
-				"table" => $sFeTable,
-				"id" => $sFeId,
-				"match" => $sFeMatch,
-				"imya" => (isset($aGetSchema["imya"])) ? true : false
-			);
-		} else {
-			self::errorMessage($this->object, 1012);
+			$schema = $this->db->query("SELECT * FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA`='".$this->db->base."' AND `TABLE_NAME`='".$sFeTable."'");
+			if($schema->rows()) {
+				$aGetSchema = $schema->getall("#COLUMN_NAME");
+				if(!isset($aGetSchema[$sFeId]) || !isset($aGetSchema[$sFeMatch])) { self::errorMessage($this->object, 1012); }
+				$aSchema = array(
+					"table" => $sFeTable,
+					"id" => $sFeId,
+					"match" => $sFeMatch,
+					"imya" => (isset($aGetSchema["imya"])) ? true : false
+				);
+			} else {
+				self::errorMessage($this->object, 1012);
+			}
+
+			$this->attribute("features_schema", $aSchema);
 		}
-
-		$this->attribute("features_schema", $aSchema);
 		return $aFeatures;
 	}
 

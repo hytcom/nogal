@@ -1589,6 +1589,7 @@ class nglShift extends nglTrunk {
 			$x = 0;
 			foreach($aRow as $sCell) {
 				$sCell = trim($sCell, "\t");
+				$sCell = preg_replace('/[\x00-\x1F\x80-\xFF]/', "?", $sCell);
 				if($sCell===null) {
 					$sCell = "NULL";
 				} else if($sCell===false) {

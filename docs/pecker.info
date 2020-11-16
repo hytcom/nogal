@@ -1,41 +1,75 @@
 [checksum]
-md5 = "8ed56ad5b20ada3b31872b0dc6a4f078"
-sha1 = "86b07fbf6a84a8a80810bdb5cdd24d769e301159"
+md5 = "124c7131fc14fda59bdcf53fdcd79d9f"
+sha1 = "2e559f2610d45388e254a3feb07e8d34d2b9565f"
 
 [documentation]
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/pecker.md"
 
 [arguments]
-analyse_datatype = ""
-col = ""
-cols = ""
-datafile = ""
-db = ""
-exec = ""
-features = ""
-fields = ""
-file = ""
-force = ""
-grouper = ""
-hashappend = ""
-hittest = ""
-id = ""
-inverse = ""
-key = ""
-limit = ""
-markas = ""
-markon = ""
-newnames = ""
-output = ""
-overwrite = ""
-policy = ""
-rules = ""
-skip = ""
-splitter = ""
-table = ""
-truncate = ""
-where = ""
-xtable = ""
+analyse_datatype = "analiza los datos de la tabla para determinar normalizaciones y tipos de datos"
+col = "número de una columna"
+cols = "array con números de columnas. En el método hit, las claves del array representan las columnas de la tabla principal y los valores su contraparte en la tabla secundaria"
+datafile = "nombre del archivo en donde se guarda la información del set actual"
+db = "objeto controlador de base de datos. Si el valor es un string, se utilizará dicho objeto con la configuración por defecto"
+exec = "actua como confirmación en algunos métodos"
+features = "array con los datos de la tabla de 'features' usada por el método normalize\
+	0 => indice con el nombre de la tabla\
+	1 => nombre del campo id\
+	2 => nombre del campo contra el que se hará match\
+"
+file = "path del archivo para LOAD"
+file_eol = "fin de línea"
+force = "booleano que determina si debe forzarse el reanalisis"
+grouper = "array con los números de columnas que compondrán el agrupador"
+hashappend = "booleano que determina si el valor del hash debe incluir el hash actual"
+hittest = "modo de hit\
+	test = retorna el número de colisiones encotradas\
+	show = muestra un número especifico de colisiones\
+	true = ejecuta la colisión\
+"
+id = "id del registro a mostrar en el método 'show'"
+inverse = "booleano que determina si se debe filtrar por NULL o NOT NULL en los métodos fill"
+key = "nombre del campo de la clave primaria de la tabla actual"
+length = "tamaño máximo de los valores guardados en los campos 'min' y 'max' en el analisis"
+limit = "limite de registros a mostrar"
+markas = "valor con el que se marcarán los registros en el método 'mark', 1 o null"
+markon = "campo que deberá marcarse, __pecked__ o __wano__"
+newnames = "array con los nuevos nombres de las columnas"
+output = "tipo de salida de datos\
+	print = imprime los datos en formato ttable\
+	table = retorna los datos en formato ttable\
+	data = array de datos\
+"
+overwrite = "booleano que determina si el método 'complete' debe sobreescribir los datos"
+policy = "array con los métodos de sanitización que deben aplicarse sobre la columna activa\
+	trim = elimina espacios en blanco a ambos lados\
+	trim:STRING = elimina STRING a ambos lados del valor\
+	lcase = convierte el valor a minúsculas\
+	ucase = convierte el valor a mayúsculas\
+	letters = elimina todo menos las letras (a-zA-Z)\
+	digits = elimina todo menos los digitos (0-9)\
+	numbers = elimina todo menos los números, sin importar signo ni signos de puntuación\
+	email = elimina cualquier caracter que no sea válido en un email\
+	words = elimina todo menos letters + digits\
+	nospaces = elimina todos los caracteres de espacio, tabulaciones y saltos de línea\
+	consonants = elimina todo menos las consonantes\
+	right:LENGTH = toma los LENGTH caracteres desde la derecha\
+	left:LENGTH = toma los LENGTH caracteres desde la izquierda\
+"
+rules = "array con las reglas para la unificación de datos\
+	false = no hace nada\
+	any = cualquier valor que no sea vacio\
+	noempty = cualquier valor que no sea vacio ni 0\
+	join = une los valores si son diferentes\
+	longer = valor de mayor longuitud. Si tienen igual longuitud, hace join\
+"
+skip = "booleano que determina si el método hash debe rehashear todo"
+splitter = "separador de campos"
+table = "nombre de la tabla activa"
+tables = "array con nombres de tablas para operaciones en bloque"
+truncate = "booleano que determina si debe vaciarse la tabla antes de hacer loadfile"
+where = "condición SQL utilizada en varios métodos"
+xtable = "nombre de la tabla secundaria contra la que se realizan las operaciones"
 
 [errors]
 1001 = objeto de base de datos indefinido

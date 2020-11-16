@@ -1,3 +1,14 @@
+# 2.7.5 - 202011161500
+## pecker
+- BETA finalizado
+
+## owl
+- cambio en sintaxis
+
+## shift
+- reemplazo de caracteres de control por **?** en el método **textTable**
+
+________________________________________________________________________________
 # 2.7.4 - 202011090000
 ## rind
 - fix **userpwd** en readfile

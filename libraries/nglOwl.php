@@ -381,7 +381,7 @@ class nglOwl extends nglBranch {
 		return ($nRowID) ? $nRowID : false;
 	}
 
-	public function load($driver) {
+	public function load() {
 		list($driver) = $this->getarguments("db", func_get_args());
 		$this->db = $driver;
 		if(method_exists($this->db, "connect")) { $this->db->connect(); }
