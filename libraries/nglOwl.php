@@ -37,6 +37,7 @@ class nglOwl extends nglBranch {
 	private $aTmpChildren;
 	private $aRelationships;
 	private $nRelationshipsLevel;
+	private $nRelationshipsLevelLimit;
 	private $bViewFields;
 
 	final protected function __declareArguments__() {
@@ -54,7 +55,7 @@ class nglOwl extends nglBranch {
 		$vArguments["inherit"]				= array('self::call()->istrue($mValue)', false);
 		$vArguments["insert_mode"]			= array('$mValue', "INSERT");
 		$vArguments["jsql"]					= array('$mValue', null);
-		$vArguments["join_level"]			= array('(int)$mValue', 500);
+		$vArguments["join_level"]			= array('(int)$mValue', 2);
 		$vArguments["owlog"]				= array('self::call()->istrue($mValue)', true);
 		$vArguments["owlog_changelog"]		= array('self::call()->istrue($mValue)', false);
 		$vArguments["object"]				= array('strtolower($mValue)', null);
@@ -407,7 +408,6 @@ class nglOwl extends nglBranch {
 		$vObject = $this->vObjects[$this->sObject];
 		if(!isset($vObject["tables"])) { return false; }
 		$vTables = $vObject["tables"];
-		$nJoinLevel = 1000;
 
 		$nLoopingOut = 0;
 		$aUsed = $aUnUsed = array();
@@ -1181,6 +1181,7 @@ class nglOwl extends nglBranch {
 	}
 	
 	private function GetRelationship(&$aTables, $vObject, $sAlias, $aParents) {
+		$this->x = 0;
 		$this->GetRelationshipChildren($aTables, $vObject, $sAlias, $aParents);
 		$aTablesNames = array_keys($aTables);
 		$aWhere = array();
@@ -1235,15 +1236,16 @@ class nglOwl extends nglBranch {
 		$aTables[$sAlias]["columns"] = $aColumns;
 		if(is_array($aRelations)) {
 			$this->nRelationshipsLevel++;
+			if($this->nRelationshipsLevel <= $this->argument("join_level")) {
+				// joins
+				if(isset($aRelations["joins"]) && count($aRelations["joins"])) {
+					$this->GetRelationshipStructure($aTables, $aParents, $sObjectName, $sAlias, $aRelations["joins"], false);
+				}
 
-			// joins
-			if(isset($aRelations["joins"]) && count($aRelations["joins"])) {
-				$this->GetRelationshipStructure($aTables, $aParents, $sObjectName, $sAlias, $aRelations["joins"], false);
-			}
-
-			// children
-			if(isset($aRelations["children"]) && count($aRelations["children"])) {
-				$this->GetRelationshipStructure($aTables, $aParents, $sObjectName, $sAlias, $aRelations["children"], true);
+				// children
+				if(isset($aRelations["children"]) && count($aRelations["children"])) {
+					$this->GetRelationshipStructure($aTables, $aParents, $sObjectName, $sAlias, $aRelations["children"], true);
+				}
 			}
 		}
 

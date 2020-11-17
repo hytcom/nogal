@@ -1,3 +1,14 @@
+# 2.7.6 - 202011171600
+## pecker
+- organización del código
+
+## owl
+- fix join level
+
+## tutor
+- fix sanitizer
+
+________________________________________________________________________________
 # 2.7.5 - 202011161500
 ## pecker
 - BETA finalizado

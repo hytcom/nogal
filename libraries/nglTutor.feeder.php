@@ -13,10 +13,16 @@ class nglTutor extends nglTrunk {
 	protected $me				= "tutor";
 	protected $object			= "tutor";
 	protected $bDebug			= false;
-	protected $master;			
+	protected $master;
+	protected $aNulls;
+	protected $aEmpty;
+	protected $aZeros;
 
 	final public function __init__($sTutorID=null, $aMethods=null) {
 		$this->ID = ($sTutorID!==null) ? $sTutorID : self::call()->unique();
+		$this->aNulls = array();
+		$this->aEmpty = array();
+		$this->aZeros = array();
 		$this->aAllowedMethods = $aMethods;
 		return $this->ID;
 	}
