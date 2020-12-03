@@ -23,26 +23,26 @@ class nglRoot {
 	private static			$var					= null;
 
 	private static			$nStarTime				= null;
-	private static			$vErrorCodes			= array();
-	private static			$vLastError				= array();
+	private static			$vErrorCodes			= [];
+	private static			$vLastError				= [];
 	private static			$bErrorReport			= true;
 	private static			$bErrorReportPrevius	= true;
-	private static			$aErrorModes			= array();
+	private static			$aErrorModes			= [];
 	private static			$bErrorForceReturn		= false;
-	private static			$vCurrentPath			= array();
-	private static			$vCoreLibs				= array();
-	private static			$vLibraries				= array();
-	private static			$vFeederInits			= array();
-	protected static		$aObjects				= array();
+	private static			$vCurrentPath			= [];
+	private static			$vCoreLibs				= [];
+	private static			$vLibraries				= [];
+	private static			$vFeederInits			= [];
+	protected static		$aObjects				= [];
 	protected static		$bLoadAllowed			= false;
-	private static 			$aNuts					= array();
-	protected static 		$aNutsLoaded			= array();
-	private static 			$aTutors				= array();
-	protected static 		$aTutorsLoaded			= array();
+	private static 			$aNuts					= [];
+	protected static 		$aNutsLoaded			= [];
+	private static 			$aTutors				= [];
+	protected static 		$aTutorsLoaded			= [];
 	protected static 		$sLastEval				= "";
-	private static			$aObjectsByClass		= array();
-	private static			$vPaths					= array();
-	private static			$vLastOf				= array();
+	private static			$aObjectsByClass		= [];
+	private static			$vPaths					= [];
+	private static			$vLastOf				= [];
 
 
 	// METODOS PUBLICOS --------------------------------------------------------
@@ -50,24 +50,24 @@ class nglRoot {
 		__construct: Constructor
 	**/
 	public function __construct($vLibraries, $vGraftsLibraries) {
-		self::$nStarTime = microtime(true);
+		self::$nStarTime = \microtime(true);
 		
 		// paths
 		self::setPath("libraries");
 		self::setPath("grafts");
 		
 		// librerias
-		self::$vCoreLibs = array(
-			"fn" => array("nglFn", true),
-			"nut" => array("nglNut", true),
-			"sess" => array("nglSession", true),
-			"shift" => array("nglShift", true),
-			"sysvar" => array("nglSystemVars", true),
-			"tutor" => array("nglTutor", true),
-			"unicode" => array("nglUnicode", true),
-			"validate" => array("nglValidate", true)
-		);
-		self::$vLibraries = array_merge(self::$vCoreLibs,  $vLibraries, $vGraftsLibraries);
+		self::$vCoreLibs = [
+			"fn" => ["nglFn", true],
+			"nut" => ["nglNut", true],
+			"sess" => ["nglSession", true],
+			"shift" => ["nglShift", true],
+			"sysvar" => ["nglSystemVars", true],
+			"tutor" => ["nglTutor", true],
+			"unicode" => ["nglUnicode", true],
+			"validate" => ["nglValidate", true]
+		];
+		self::$vLibraries = \array_merge(self::$vCoreLibs,  $vLibraries, $vGraftsLibraries);
 
 		// kernel
 		self::$bLoadAllowed = true;
@@ -78,21 +78,6 @@ class nglRoot {
 
 		require_once(self::$vPaths["libraries"]."nglFn.feeder.php");
 		self::$fn = new nglFn();
-
-		// require_once(self::$vPaths["libraries"]."nglUnicode.feeder.php");
-		// self::$unicode = new nglUnicode();
-
-		// require_once(self::$vPaths["libraries"]."nglShift.feeder.php");
-		// self::$shift = new nglShift();
-
-		// require_once(self::$vPaths["libraries"]."nglSystemVars.feeder.php");
-		// self::$var = new nglSystemVars();
-
-		// require_once(self::$vPaths["libraries"]."nglValidate.feeder.php");
-		// self::$val = new nglValidate();
-
-		// require_once(self::$vPaths["libraries"]."nglSession.feeder.php");
-		// self::$session = new nglSession();
 
 		require_once(self::$vPaths["libraries"]."nglTutor.feeder.php");
 		self::$tutor = new nglTutor();
@@ -109,9 +94,9 @@ class nglRoot {
 		}
 	**/
 	public function __invoke() {
-		$aArguments = func_get_args();
-		if(!count($aArguments)) { $aArguments = array(); }
-		return call_user_func_array(array("self", "call"), $aArguments);
+		$aArguments = \func_get_args();
+		if(!\count($aArguments)) { $aArguments = []; }
+		return \call_user_func_array(["self", "call"], $aArguments);
 	}
 
 	/** FUNCTION {
@@ -142,18 +127,18 @@ class nglRoot {
 			"return" : "objeto o false"
 		}
 	**/
-	public static function call($sObjectName=null, $aArguments=array()) {
+	public static function call($sObjectName=null, $aArguments=[]) {
 		if($sObjectName===null) { return self::$fn; }
-		if(!is_array($aArguments) || !count($aArguments)) { $aArguments = null; }
+		if(!\is_array($aArguments) || !\count($aArguments)) { $aArguments = null; }
 
-		if(strpos($sObjectName, "|")!==false) {
-			$aObjectConf	= explode("|", $sObjectName, 2);
+		if(\strpos($sObjectName, "|")!==false) {
+			$aObjectConf	= \explode("|", $sObjectName, 2);
 			$sObjectName	= $aObjectConf[0];
 			$sConfFile		= $aObjectConf[1];
 		}
 
 		$sObjectName = self::objectName($sObjectName);
-		$aObjectName = explode(".", $sObjectName, 2);
+		$aObjectName = \explode(".", $sObjectName, 2);
 
 		$bFeeder = true;
 		if(isset(self::$vLibraries[$aObjectName[0]])) {
@@ -161,9 +146,9 @@ class nglRoot {
 		}
 		
 		if(!$bFeeder && $aObjectName[0]!="nut" && $aObjectName[0]!="tutor") {
-			if(count($aObjectName)==1 || (isset($aObjectName[1]) && $aObjectName[1]==="")) {
+			if((\is_array($aObjectName) && \count($aObjectName)==1) || (isset($aObjectName[1]) && $aObjectName[1]==="")) {
 				$tmp = self::call()->unique();
-				$sObjectName .= ".".strtolower($tmp);
+				$sObjectName .= ".".\strtolower($tmp);
 			}
 			$sObjectType = $aObjectName[0];
 		} else {
@@ -172,11 +157,6 @@ class nglRoot {
 				case "fn"		: 	return self::returnFeeder(self::$fn);
 				case "tutor"	: 	return self::$tutor->load($aObjectName[1], $aArguments);
 				case "nut"		: 	return self::$nut->load($aObjectName[1], $aArguments);
-				// case "sess"		: 	return self::returnFeeder(self::$session);
-				// case "shift"	: 	return self::returnFeeder(self::$shift);
-				// case "sysvar"	: 	return self::returnFeeder(self::$var);
-				// case "unicode"	: 	return self::returnFeeder(self::$unicode);
-				// case "validate"	: 	return self::returnFeeder(self::$val);
 				default			:	$sObjectType = $sObjectName;
 			}
 		}
@@ -200,7 +180,7 @@ class nglRoot {
 	}
 
 	public static function requirer() {
-		$aBacktrace = debug_backtrace(false);
+		$aBacktrace = \debug_backtrace(false);
 		foreach($aBacktrace as $aFile) {
 			if(
 				$aFile["function"]=="require" ||
@@ -216,13 +196,13 @@ class nglRoot {
 	}
 
 	public static function EvalCode($sCode) {
-		self::$sLastEval = base64_encode($sCode);
+		self::$sLastEval = \base64_encode($sCode);
 		return $sCode;
 	}
 
 	public static function returnFeeder($object) {
-		$sClass = get_class($object);
-		if(method_exists($object, "__init__") && !isset(self::$vFeederInits[$sClass])) {
+		$sClass = \get_class($object);
+		if(\method_exists($object, "__init__") && !isset(self::$vFeederInits[$sClass])) {
 			$object->__init__();
 			self::$vFeederInits[$sClass] = true;
 		}
@@ -230,47 +210,47 @@ class nglRoot {
 	}
 
 	public static function tutor($sTutorName, $sClassName=null, $aMethods=null) {
-		if($sClassName!==null) { self::$aTutors[$sTutorName] = array($sClassName,$aMethods); }
+		if($sClassName!==null) { self::$aTutors[$sTutorName] = [$sClassName,$aMethods]; }
 		return (isset(self::$aTutors[$sTutorName])) ? self::$aTutors[$sTutorName] : null;
 	}
 
 	public static function nut($sNutName, $sClassName=null, $aMethods=null) {
-		if($sClassName!==null) { self::$aNuts[$sNutName] = array($sClassName,$aMethods); }
+		if($sClassName!==null) { self::$aNuts[$sNutName] = [$sClassName,$aMethods]; }
 		return (isset(self::$aNuts[$sNutName])) ? self::$aNuts[$sNutName] : null;
 	}
 
     public static function absolutePath($sPath, $sDirSlash=DIRECTORY_SEPARATOR) {
-        $sPath = str_replace(array('/', '\\'), $sDirSlash, $sPath);
-        $aPath = explode($sDirSlash, $sPath);
-		$aPath = array_filter($aPath, "strlen");
-        $aAbsolutes = array();
+        $sPath = \str_replace(['/', '\\'], $sDirSlash, $sPath);
+        $aPath = \explode($sDirSlash, $sPath);
+		$aPath = \array_filter($aPath, "strlen");
+        $aAbsolutes = [];
         foreach($aPath as $sPart) {
             if("."==$sPart) { continue; }
             if(".."==$sPart) {
-                array_pop($aAbsolutes);
+                \array_pop($aAbsolutes);
             } else {
                 $aAbsolutes[] = $sPart;
             }
         }
 
-        return implode($sDirSlash, $aAbsolutes);
+        return \implode($sDirSlash, $aAbsolutes);
     }
 
 	// verifica si $mPath o alguno de sus indices (si es array) es parte de NGL_PATH_CURRENT
 	// $sPath debe terminar en /
 	public static function inCurrentPath($mPath) {
-		if(!is_array($mPath)) { $mPath = array($mPath); }
-		usort($mPath, function($a, $b) { return strlen($b) - strlen($a); });
-		$nLength = strlen(NGL_PATH_CURRENT);
+		if(!\is_array($mPath)) { $mPath = [$mPath]; }
+		\usort($mPath, function($a, $b) { return \strlen($b) - \strlen($a); });
+		$nLength = \strlen(NGL_PATH_CURRENT);
 		foreach($mPath as $sPath) {
 			if(NGL_PATH_CURRENT===$sPath) {
 				return $sPath;
-			} else if(strlen($sPath)>1 && substr($sPath, -1, 1)=="/") {
-				if(substr(NGL_PATH_CURRENT, 0, strlen($sPath))===$sPath) {
+			} else if(\strlen($sPath)>1 && \substr($sPath, -1, 1)=="/") {
+				if(\substr(NGL_PATH_CURRENT, 0, \strlen($sPath))===$sPath) {
 					return $sPath;
 				}
-			} else if(substr($sPath, -1, 1)=="*") {
-				if(substr($sPath, 0, -1)===substr(NGL_PATH_CURRENT, 0, strlen($sPath)-1)) {
+			} else if(\substr($sPath, -1, 1)=="*") {
+				if(\substr($sPath, 0, -1)===\substr(NGL_PATH_CURRENT, 0, \strlen($sPath)-1)) {
 					return $sPath;
 				}
 			}
@@ -280,72 +260,72 @@ class nglRoot {
 	}
 		
 	public static function constants() {
-		$aConstants = array();
-		$aGetConstants = get_defined_constants(true);
+		$aConstants = [];
+		$aGetConstants = \get_defined_constants(true);
 		foreach($aGetConstants["user"] as $sName => $sConstant) {
-			if(substr($sName,0,4)=="NGL_") {
-				$aConstants[$sName] = addcslashes($sConstant, "\t\r\n");
+			if(\substr($sName,0,4)=="NGL_") {
+				$aConstants[$sName] = \addcslashes($sConstant, "\t\r\n");
 			}
 		}
 		
-		ksort($aConstants);
+		\ksort($aConstants);
 		return $aConstants;
 	}
 
 	public static function currentPath($sDirSlash=DIRECTORY_SEPARATOR) {
-		if(is_array(self::$vCurrentPath) && count(self::$vCurrentPath)) { return self::$vCurrentPath; }
+		if(\is_array(self::$vCurrentPath) && \count(self::$vCurrentPath)) { return self::$vCurrentPath; }
 		
 		// document_root
-		$sDocumentRoot = str_replace("\\", "/", NGL_DOCUMENT_ROOT);
-		$aDocumentRoot = explode("/", $sDocumentRoot);
-		if(end($aDocumentRoot)=="") { array_pop($aDocumentRoot); }
-		$sDocumentRoot = implode($sDirSlash, $aDocumentRoot);
+		$sDocumentRoot = \str_replace("\\", "/", NGL_DOCUMENT_ROOT);
+		$aDocumentRoot = \explode("/", $sDocumentRoot);
+		if(end($aDocumentRoot)=="") { \array_pop($aDocumentRoot); }
+		$sDocumentRoot = \implode($sDirSlash, $aDocumentRoot);
 
 		// php_self
-		if(array_key_exists("REDIRECT_SCRIPT_URL", $_SERVER)) {
+		if(\array_key_exists("REDIRECT_SCRIPT_URL", $_SERVER)) {
 			$sPHPSelf = $_SERVER["REDIRECT_SCRIPT_URL"];
-		} else if(array_key_exists("REDIRECT_URL", $_SERVER)) {
+		} else if(\array_key_exists("REDIRECT_URL", $_SERVER)) {
 			$sPHPSelf = $_SERVER["REDIRECT_URL"];
 		} else {
 			$sPHPSelf = $_SERVER["PHP_SELF"];
 		}
 
 		if($sPHPSelf=="/") { $sPHPSelf = "/index"; }
-		$sPHPSelf = str_replace("\\", "/", $sPHPSelf);
+		$sPHPSelf = \str_replace("\\", "/", $sPHPSelf);
 		
-		$aPath = explode("/", $sPHPSelf);
+		$aPath = \explode("/", $sPHPSelf);
 		foreach($aPath as $nIndex => $sPart) {
 			if($sPart==="") { unset($aPath[$nIndex]); }
 		}
-		$sPHPSelf = implode($sDirSlash, $aPath);
-		$vPHPSelf = pathinfo($sPHPSelf);
+		$sPHPSelf = \implode($sDirSlash, $aPath);
+		$vPHPSelf = \pathinfo($sPHPSelf);
 
-		$vCurrent = array();
+		$vCurrent = [];
 		$vCurrent["basename"] 	= $vPHPSelf["basename"];
 		$vCurrent["path"]		= self::absolutePath($sDocumentRoot.$sDirSlash.$vPHPSelf["dirname"], $sDirSlash);
 		$vCurrent["fullpath"]	= $vCurrent["path"].$sDirSlash.$vCurrent["basename"];
 		$vCurrent["dirname"]	= ($vPHPSelf["dirname"]!=".") ? $vPHPSelf["dirname"] : "";
 
-		$aBasename = explode(".", $vCurrent["basename"]);
-		if(count($aBasename)>1) {
-			$vCurrent["extension"] = array_pop($aBasename);
-			$vCurrent["filename"] = implode(".", $aBasename);
+		$aBasename = \explode(".", $vCurrent["basename"]);
+		if(\is_array($aBasename) && \count($aBasename)>1) {
+			$vCurrent["extension"] = \array_pop($aBasename);
+			$vCurrent["filename"] = \implode(".", $aBasename);
 		} else {
 			$vCurrent["extension"] = "";
 			$vCurrent["filename"] = $vCurrent["basename"];
 		}
 		
-		$vCurrent["query_string"] = (array_key_exists("QUERY_STRING", $_SERVER)) ? $_SERVER["QUERY_STRING"] : "";
+		$vCurrent["query_string"] = (\array_key_exists("QUERY_STRING", $_SERVER)) ? $_SERVER["QUERY_STRING"] : "";
 
-		$NGL_URL = constant("NGL_URL");
+		$NGL_URL = \constant("NGL_URL");
 		if(!empty($NGL_URL)) {
-			$vURL = parse_url(NGL_URL);
+			$vURL = \parse_url(NGL_URL);
 			$vCurrent["scheme"] = $vURL["scheme"];
 			$vCurrent["host"] = $vURL["host"];
 			$vCurrent["port"] = (isset($vURL["port"])) ? $vURL["port"] : "";
 			$vCurrent["urlroot"] = $vURL["scheme"]."://".$vURL["host"];
 			if(!empty($vURL["port"])) { $vCurrent["urlroot"] .= ":".$vURL["port"]; }
-			$vCurrent["urldirname"] = (!empty($vCurrent["dirname"])) ? str_replace("\\", "/", $vCurrent["dirname"])."/" : "";
+			$vCurrent["urldirname"] = (!empty($vCurrent["dirname"])) ? \str_replace("\\", "/", $vCurrent["dirname"])."/" : "";
 			$vCurrent["url"] = $vCurrent["urldirname"].$vCurrent["basename"].(($vCurrent["query_string"]!="") ? "?".$vCurrent["query_string"] : "");
 			$vCurrent["urlpath"] = $vCurrent["urldirname"].$vCurrent["basename"];
 			$vCurrent["fullurl"] = $vCurrent["urlroot"]."/".$vCurrent["url"];
@@ -356,86 +336,86 @@ class nglRoot {
 	}
 
 	public static function defineConstant($sConstantName, $sConstantValue=null) {
-		if(!defined($sConstantName)) { define($sConstantName, $sConstantValue); }
-		return constant($sConstantName);
+		if(!\defined($sConstantName)) { \define($sConstantName, $sConstantValue); }
+		return \constant($sConstantName);
 	}
 
 	public static function prickout($sURL=null, $sGround=null) {
 		if($sURL===null) { $sURL = NGL_URL; }
-		$sURL = parse_url($sURL, PHP_URL_PATH);
-		$sFile = str_replace(parse_url(NGL_URL, PHP_URL_PATH), "", $sURL);
-		$sFile = str_replace("\\", "/", $sFile);
+		$sURL = \parse_url($sURL, PHP_URL_PATH);
+		$sFile = \str_replace(\parse_url(NGL_URL, PHP_URL_PATH), "", $sURL);
+		$sFile = \str_replace("\\", "/", $sFile);
 
 		if($sFile[0]!="/") { $sFile = "/".$sFile; }
 		$sFile = self::call()->clearPath($sFile, false, "/");
-		$aParts = explode("/", $sFile, 3);
+		$aParts = \explode("/", $sFile, 3);
 
 		// casos especiales
 		if(isset($aParts[1])) {
 			if($aParts[1]=="tutor" && isset($aParts[2])) {
-				return array(NGL_PATH_PROJECT."/tutor.php", $aParts[2]);
+				return [NGL_PATH_PROJECT."/tutor.php", $aParts[2]];
 			} else if($aParts[1]=="nut" && isset($aParts[2])) {
-				return array(NGL_PATH_PROJECT."/nut.php", $aParts[2]);
+				return [NGL_PATH_PROJECT."/nut.php", $aParts[2]];
 			}
 		}
 
 		// caso normal
 		if($sGround===null) { $sGround = NGL_PATH_PRICKOUT; }
 		$sFilePath = $sGround.NGL_DIR_SLASH.$sFile;
-		$sFile = realpath($sFilePath);
+		$sFile = \realpath($sFilePath);
 
-		if(file_exists($sFile) && !is_dir($sFile)) {
-			return array($sFile, null);
+		if(\file_exists($sFile) && !\is_dir($sFile)) {
+			return [$sFile, null];
 		} else if(is_dir($sFile)) {
-			if($sURL[strlen($sURL)-1]!="/") {
-				header("location: ".$sURL."/");
+			if($sURL[\strlen($sURL)-1]!="/") {
+				\header("location: ".$sURL."/");
 				exit();
 			}
 			$sFile .= "/index.php";
-			$sFile = realpath($sFile);
-			if(file_exists($sFile)) { return array($sFile, null); }
+			$sFile = \realpath($sFile);
+			if(\file_exists($sFile)) { return [$sFile, null]; }
 			$sFilePath .= "/";
 		} else {
 			$sFile = $sFilePath.".php";
-			$sFile = realpath($sFile);
-			if(file_exists($sFile)) {
-				return array($sFile, null);
+			$sFile = \realpath($sFile);
+			if(\file_exists($sFile)) {
+				return [$sFile, null];
 			}
 		}
 
 		// error
-		$sFilePath = self::call()->clearPath($sFilePath, ($sURL[strlen($sURL)-1]=="/"), NGL_DIR_SLASH);
-		return array(false, $sFilePath);
+		$sFilePath = self::call()->clearPath($sFilePath, ($sURL[\strlen($sURL)-1]=="/"), NGL_DIR_SLASH);
+		return [false, $sFilePath];
 	}
 
 	public static function errorsHandler($nError, $sMessage, $sFile, $nLine) {
-		if(defined("E_ERROR")) { 				$aErrors[E_ERROR]		 		= "Error"; }
-		if(defined("E_WARNING")) { 				$aErrors[E_WARNING]				= "Warning"; }
-		if(defined("E_PARSE")) { 				$aErrors[E_PARSE]				= "Parsing Error"; }
-		if(defined("E_NOTICE")) { 				$aErrors[E_NOTICE]				= "Notice"; }
-		if(defined("E_CORE_ERROR")) { 			$aErrors[E_CORE_ERROR]			= "Core Error"; }
-		if(defined("E_CORE_WARNING")) { 		$aErrors[E_CORE_WARNING]		= "Core Warning"; }
-		if(defined("E_COMPILE_ERROR")) { 		$aErrors[E_COMPILE_ERROR]		= "Compile Error"; }
-		if(defined("E_COMPILE_WARNING")) { 		$aErrors[E_COMPILE_WARNING]		= "Compile Warning"; }
-		if(defined("E_USER_ERROR")) { 			$aErrors[E_USER_ERROR]			= "User Error"; }
-		if(defined("E_USER_WARNING")) {			$aErrors[E_USER_WARNING]		= "User Warning"; }
-		if(defined("E_USER_NOTICE")) { 			$aErrors[E_USER_NOTICE]			= "User Notice"; }
-		if(defined("E_STRICT")) { 				$aErrors[E_STRICT]				= "Runtime Notice"; }
-		if(defined("E_RECOVERABLE_ERROR")) {	$aErrors[E_RECOVERABLE_ERROR]	= "Catchable Fatal Error"; }
-		if(defined("E_DEPRECATED")) { 			$aErrors[E_DEPRECATED]			= "Runtime Notice, this code not work in future versions"; }
+		if(\defined("E_ERROR")) { 				$aErrors[E_ERROR]		 		= "Error"; }
+		if(\defined("E_WARNING")) { 				$aErrors[E_WARNING]				= "Warning"; }
+		if(\defined("E_PARSE")) { 				$aErrors[E_PARSE]				= "Parsing Error"; }
+		if(\defined("E_NOTICE")) { 				$aErrors[E_NOTICE]				= "Notice"; }
+		if(\defined("E_CORE_ERROR")) { 			$aErrors[E_CORE_ERROR]			= "Core Error"; }
+		if(\defined("E_CORE_WARNING")) { 		$aErrors[E_CORE_WARNING]		= "Core Warning"; }
+		if(\defined("E_COMPILE_ERROR")) { 		$aErrors[E_COMPILE_ERROR]		= "Compile Error"; }
+		if(\defined("E_COMPILE_WARNING")) { 		$aErrors[E_COMPILE_WARNING]		= "Compile Warning"; }
+		if(\defined("E_USER_ERROR")) { 			$aErrors[E_USER_ERROR]			= "User Error"; }
+		if(\defined("E_USER_WARNING")) {			$aErrors[E_USER_WARNING]		= "User Warning"; }
+		if(\defined("E_USER_NOTICE")) { 			$aErrors[E_USER_NOTICE]			= "User Notice"; }
+		if(\defined("E_STRICT")) { 				$aErrors[E_STRICT]				= "Runtime Notice"; }
+		if(\defined("E_RECOVERABLE_ERROR")) {	$aErrors[E_RECOVERABLE_ERROR]	= "Catchable Fatal Error"; }
+		if(\defined("E_DEPRECATED")) { 			$aErrors[E_DEPRECATED]			= "Runtime Notice, this code not work in future versions"; }
 		
-		$sMessage = str_replace("[<a href='function", "[<a target='_blank' href='http://php.net/function", $sMessage);
+		$sMessage = \str_replace("[<a href='function", "[<a target='_blank' href='http://php.net/function", $sMessage);
 
 		$bIgnoreError = false;
 		switch($nError) {
 			case E_NOTICE:
-				if(strpos($sMessage, "undefined constant")) {
+				if(\strpos($sMessage, "undefined constant")) {
 					$bIgnoreError = true;
 				}
 				break;
 
 			case E_WARNING:
-				if(strpos($sMessage, "headers already sent")) {
+				if(\strpos($sMessage, "headers already sent")) {
 					$bIgnoreError = true;
 				}
 			
@@ -454,32 +434,32 @@ class nglRoot {
 		}
 
 		$sError = "";
-		if(strtoupper(substr($sMessage, 0, 4))!="NGL|") {
-			if(strtolower(NGL_HANDLING_ERRORS_FORMAT)=="html") {
+		if(\strtoupper(\substr($sMessage, 0, 4))!="NGL|") {
+			if(\strtolower(NGL_HANDLING_ERRORS_FORMAT)=="html") {
 				$sError .= $sMessage."<br />";
 				$sError .= "<b>file:</b> ".$sFile." - <b>line:</b> ".$nLine;
 			} else {
 				$sError .= $sMessage." -> file: ".$sFile." - line: ".$nLine;
 			}
 		} else {
-			$sError .= substr($sMessage, 4);
+			$sError .= \substr($sMessage, 4);
 		}
 
-		self::$vLastError = array(
+		self::$vLastError = [
 			"object" => "PHP",
 			"type" => $aErrors[$nError],
 			"file" => $sFile,
 			"line" => $nLine,
 			"description" => $sMessage,
 			"message" => $sError
-		);
+		];
 
 		if(self::$bErrorReport) {
-			if(strpos($sFile, "eval()'d")) {
+			if(\strpos($sFile, "eval()'d")) {
 				self::$vLastError["aditional"] = "\nEVAL-CODE:base64[".self::$sLastEval."]\n";
 			}
 
-			if(error_reporting()) {
+			if(\error_reporting()) {
 				if(!$bIgnoreError) {
 					try {
 						self::errorMessage();
@@ -496,7 +476,7 @@ class nglRoot {
 	}
 
 	public static function errorClearLast() {
-		self::$vLastError = array();
+		self::$vLastError = [];
 	}
 
 	public static function errorReporting($bReport) {
@@ -514,8 +494,8 @@ class nglRoot {
 	public static function errorMode($sObject, $sMode=null) {
 		$sCurrent = (isset(self::$aErrorModes[$sObject])) ? self::$aErrorModes[$sObject] : NGL_HANDLING_ERRORS_MODE;
 		if($sMode!==null) {
-			$sMode = strtolower($sMode);
-			if(!in_array($sMode, array("boolean","code","die","print","return"))) { $sMode = NGL_HANDLING_ERRORS_MODE; }
+			$sMode = \strtolower($sMode);
+			if(!\in_array($sMode, ["boolean","code","die","print","return"])) { $sMode = NGL_HANDLING_ERRORS_MODE; }
 			self::$aErrorModes[$sObject] = $sMode;
 		}
 		return $sCurrent;
@@ -528,38 +508,38 @@ class nglRoot {
 	public static function errorPages($nCode) {
 		switch($nCode) {
 			case 403:
-				header("HTTP/1.0 403 Forbidden", true, 403);
+				\header("HTTP/1.0 403 Forbidden", true, 403);
 				$sError = "403 Forbidden";
 				break;
 
 			case 404:
-				header("HTTP/1.0 404 Not Found", true, 404);
+				\header("HTTP/1.0 404 Not Found", true, 404);
 				$sError = "404 Not Found";
 				break;
 
 			case 503:
-				header("HTTP/1.0 503 Not Service Unavailable", true, 503);
+				\header("HTTP/1.0 503 Not Service Unavailable", true, 503);
 				$sError = "503 Service Unavailable";
 				break;
 		}
 
-		$sMessage = @file_get_contents(NGL_PATH_CONF.NGL_DIR_SLASH."errorpage.html");
+		$sMessage = @\file_get_contents(NGL_PATH_CONF.NGL_DIR_SLASH."errorpage.html");
 		if($sMessage===false) {
-			$sMessage = @file_get_contents(NGL_PATH_FRAMEWORK.NGL_DIR_SLASH."assets".NGL_DIR_SLASH."errorpage.html");
+			$sMessage = @\file_get_contents(NGL_PATH_FRAMEWORK.NGL_DIR_SLASH."assets".NGL_DIR_SLASH."errorpage.html");
 		}
 
 		if($sMessage===false) {
 			$sMessage = $sError;
 		} else {
-			$sMessage = str_replace("{%TITLE%}", NGL_PROJECT, $sMessage);
-			$sMessage = str_replace("{%ERROR%}", $sError, $sMessage);
+			$sMessage = \str_replace("{%TITLE%}", NGL_PROJECT, $sMessage);
+			$sMessage = \str_replace("{%ERROR%}", $sError, $sMessage);
 		}
 		
 		die($sMessage);
 	}
 
 	public static function exists($sObjectType) {
-		$sObjectType = strtok($sObjectType, ".");
+		$sObjectType = \strtok($sObjectType, ".");
 		return isset(self::$vLibraries[$sObjectType]);
 	}
 
@@ -578,7 +558,7 @@ class nglRoot {
 
 			self::$aObjects[$sObjectName] = null;
 			unset(self::$aObjects[$sObjectName]);
-			gc_collect_cycles();
+			\gc_collect_cycles();
 			return true;
 		}
 		return false;
@@ -591,14 +571,14 @@ class nglRoot {
 	public static function errorCodes($sObject, $nCode) {
 		if(!isset(self::$vErrorCodes[$sObject])) {
 			$sErrorFile = null;
-			if(file_exists(NGL_PATH_CONF.NGL_DIR_SLASH.$sObject.".conf")) {
+			if(\file_exists(NGL_PATH_CONF.NGL_DIR_SLASH.$sObject.".conf")) {
 				$sErrorFile = NGL_PATH_CONF.NGL_DIR_SLASH.$sObject.".conf";
-			} else if(file_exists(NGL_PATH_FRAMEWORK.NGL_DIR_SLASH."docs".NGL_DIR_SLASH.$sObject.".info")) {
+			} else if(\file_exists(NGL_PATH_FRAMEWORK.NGL_DIR_SLASH."docs".NGL_DIR_SLASH.$sObject.".info")) {
 				$sErrorFile = NGL_PATH_FRAMEWORK.NGL_DIR_SLASH."docs".NGL_DIR_SLASH.$sObject.".info";
 			}
 
 			if($sErrorFile!==null) {
-				$aConfig = self::parseConfigString(file_get_contents($sErrorFile), true);
+				$aConfig = self::parseConfigString(\file_get_contents($sErrorFile), true);
 				if(isset($aConfig["errors"])) { self::errorSetCodes($sObject, $aConfig["errors"]); }
 			}
 		}
@@ -614,7 +594,7 @@ class nglRoot {
 		if($sObject===null) {
 			$bLast = true;
 			$aLast = self::errorGetLast();
-			if(count($aLast)) {
+			if(\is_array($aLast) && \count($aLast)) {
 				$sObject = $aLast["object"];
 				$sCode = $aLast["type"];
 				$sDescription = $sDescriptionPure = $aLast["description"];
@@ -624,18 +604,18 @@ class nglRoot {
 		}
 
 		$sTitle = ($sCode!==null) ? "@".$sObject."#".$sCode : $sObject;
-		$sObject = strtolower($sObject);
+		$sObject = \strtolower($sObject);
 		if($sMode===null) { $sMode = self::errorMode($sObject); }
 
 		if($sMode=="boolean") { return false; }
 		if($sMode=="code") { return $sCode; }
 
-		$aBacktrace = debug_backtrace();
+		$aBacktrace = \debug_backtrace();
 		$sCurrentFile = $aBacktrace[0]["file"];
 		$nCurrentLine = $aBacktrace[0]["line"];
 
-		$EOL = (strtolower(NGL_HANDLING_ERRORS_FORMAT)=="html") ? "<br />" : "\n";
-		$SOL = (strtolower(NGL_HANDLING_ERRORS_FORMAT)=="html") ? "&nbsp;&nbsp;&nbsp;&nbsp;" : "\t";
+		$EOL = (\strtolower(NGL_HANDLING_ERRORS_FORMAT)=="html") ? "<br />" : "\n";
+		$SOL = (\strtolower(NGL_HANDLING_ERRORS_FORMAT)=="html") ? "&nbsp;&nbsp;&nbsp;&nbsp;" : "\t";
 
 		if(!$bLast) { $sDescription = $sDescriptionPure = self::errorCodes($sObject, $sCode); }
 
@@ -658,10 +638,10 @@ class nglRoot {
 			foreach($aBacktrace as $vNode) {
 				if(isset($vNode["file"])) { $sFile = $vNode["file"]; }
 				if(isset($vNode["line"])) { $nLine = $vNode["line"]; }
-				$sBacktrace .= "#".$x." - ".basename($sFile)." (" .$nLine.")".$EOL;
+				$sBacktrace .= "#".$x." - ".\basename($sFile)." (" .$nLine.")".$EOL;
 				$sBacktrace .= $vNode["function"]."(".$EOL;
 				if(isset($vNode["args"])) {
-					$sBacktrace .= $SOL.self::call()->imploder(array(", ", $EOL.$SOL), $vNode["args"]).$EOL;
+					$sBacktrace .= $SOL.self::call()->imploder([", ", $EOL.$SOL], $vNode["args"]).$EOL;
 				}
 				$sBacktrace .= ")".$EOL.$EOL;
 				$x++;
@@ -670,11 +650,11 @@ class nglRoot {
 			$sMsgText .= $sBacktrace;
 		}
 
-		$sMsgText = "[ ".strip_tags($sMsgText)." ]\n";
+		$sMsgText = "[ ".\strip_tags($sMsgText)." ]\n";
 		
 		// log
 		$vCurrentPath = self::currentPath();
-		$sErrRow  = date("Y-m-d H:i:s");
+		$sErrRow  = \date("Y-m-d H:i:s");
 		$sErrRow .= "\t".(isset($_SERVER["REMOTE_ADDR"]) ? $_SERVER["REMOTE_ADDR"] : "localhost");
 		$sErrRow .= "\t".$vCurrentPath["path"];
 		$sErrRow .= "\t".$sCurrentFile." (".$nCurrentLine.")";
@@ -697,7 +677,7 @@ class nglRoot {
 
 			$sDescription = "";
 			if(isset($vErrors[$sObject])) {
-				if(array_key_exists($sCode, $vErrors[$sObject])) { $sDescription = $vErrors[$sObject][$sCode]; }
+				if(\array_key_exists($sCode, $vErrors[$sObject])) { $sDescription = $vErrors[$sObject][$sCode]; }
 			}
 
 			if($sAditionalText!==null) {
@@ -717,14 +697,14 @@ class nglRoot {
 			$sMsg .= "</code>\n";
 		}
 
-		self::$vLastError = array(
+		self::$vLastError = [
 			"object" => $sObject,
 			"type" => $sCode,
 			"file" => $vCurrentPath["path"],
 			"line" => $nCurrentLine,
 			"description" => $sDescriptionPure,
 			"message" => $sMsgText
-		);
+		];
 
 		if(PHP_SAPI=="cli") { $sMsg = self::out("\n".$sMsg."\n", "error"); }
 		switch($sMode) {
@@ -769,12 +749,12 @@ class nglRoot {
 		}
 
 		if(!isset(self::$aObjectsByClass[$sClassName])) {
-			if(file_exists(self::$vPaths["libraries"].$sClassFile)) {
+			if(\file_exists(self::$vPaths["libraries"].$sClassFile)) {
 				require_once(self::$vPaths["libraries"].$sClassFile);
-				self::$aObjectsByClass[$sClassName] = array();
-			} else if(file_exists(self::$vPaths["grafts"].$sClassFile)) {
+				self::$aObjectsByClass[$sClassName] = [];
+			} else if(\file_exists(self::$vPaths["grafts"].$sClassFile)) {
 				require_once(self::$vPaths["grafts"].$sClassFile);
-				self::$aObjectsByClass[$sClassName] = array();
+				self::$aObjectsByClass[$sClassName] = [];
 			} else {
 				self::errorMessage("nogal", "1001", self::$vPaths["libraries"].$sClassFile." (".$sClassName.")", "die");
 			}
@@ -782,21 +762,21 @@ class nglRoot {
 
 		if($sObjectName!==null) {
 			$sObjectName = self::objectName($sObjectName);
-			if(!in_array($sObjectName, self::$aObjectsByClass[$sClassName])) {
+			if(!\in_array($sObjectName, self::$aObjectsByClass[$sClassName])) {
 				$sCallClass = __NAMESPACE__."\\".$sClassName;
 
 				self::$bLoadAllowed = true;
 				self::$aObjects[$sObjectName] = new $sCallClass ($sClassName, $sObjectName);
 				self::$bLoadAllowed = false;
-				if(method_exists(self::call($sObjectName), "__vendor__")) { self::call($sObjectName)->__vendor__(); }
-				if(method_exists(self::call($sObjectName), "__declareAttributes__")) { self::call($sObjectName)->__SetupAttributes__(self::call($sObjectName)->__declareAttributes__()); }
-				if(method_exists(self::call($sObjectName), "__declareArguments__")) { self::call($sObjectName)->__SetupArguments__(self::call($sObjectName)->__declareArguments__()); }
-				if(method_exists(self::call($sObjectName), "__declareVariables__")) { self::call($sObjectName)->__declareVariables__(); }
-				if(!$bFeeder && file_exists($sConfigFile = NGL_PATH_CONF.NGL_DIR_SLASH.$sConfFile.".conf")) {
+				if(\method_exists(self::call($sObjectName), "__vendor__")) { self::call($sObjectName)->__vendor__(); }
+				if(\method_exists(self::call($sObjectName), "__declareAttributes__")) { self::call($sObjectName)->__SetupAttributes__(self::call($sObjectName)->__declareAttributes__()); }
+				if(\method_exists(self::call($sObjectName), "__declareArguments__")) { self::call($sObjectName)->__SetupArguments__(self::call($sObjectName)->__declareArguments__()); }
+				if(\method_exists(self::call($sObjectName), "__declareVariables__")) { self::call($sObjectName)->__declareVariables__(); }
+				if(!$bFeeder && \file_exists($sConfigFile = NGL_PATH_CONF.NGL_DIR_SLASH.$sConfFile.".conf")) {
 					self::call($sObjectName)->__config__($sConfigFile);
 				}
-				if(method_exists(self::call($sObjectName), "__arguments__") && $aArguments!==null) { self::call($sObjectName)->args($aArguments); }
-				if(method_exists(self::call($sObjectName), "__init__")) {
+				if(\method_exists(self::call($sObjectName), "__arguments__") && $aArguments!==null) { self::call($sObjectName)->args($aArguments); }
+				if(\method_exists(self::call($sObjectName), "__init__")) {
 					if($bFeeder) {
 						self::call($sObjectName)->__init__($aArguments);
 					} else {
@@ -829,22 +809,22 @@ class nglRoot {
 	}
 
 	public static function availables() {
-		$aComponents = array_merge(self::$vCoreLibs, self::$vLibraries);
-		ksort($aComponents);
-		$aAvailables = array();
+		$aComponents = \array_merge(self::$vCoreLibs, self::$vLibraries);
+		\ksort($aComponents);
+		$aAvailables = [];
 		foreach($aComponents as $sComponent => $aComponent) {
-			$aAvailables[$sComponent] = array("object"=>$sComponent, "class"=>$aComponent[0], "documentation"=>"https://github.com/hytcom/wiki/blob/master/nogal/docs/".$sComponent.".md");
+			$aAvailables[$sComponent] = ["object"=>$sComponent, "class"=>$aComponent[0], "documentation"=>"https://github.com/hytcom/wiki/blob/master/nogal/docs/".$sComponent.".md"];
 		}
 		return $aAvailables;
 	}
 
 	public static function is($obj, $sType=null) {
-		if(method_exists($obj, "__me__")) {
-			$aAvailables = array_merge(self::$vCoreLibs, self::$vLibraries);
+		if(\method_exists($obj, "__me__")) {
+			$aAvailables = \array_merge(self::$vCoreLibs, self::$vLibraries);
 			$object = $obj->__me__();
 			if(isset($aAvailables[$object->name]) && $aAvailables[$object->name][0]==$object->class) {
 				if($sType!==null) {
-					return ($aAvailables[$object->name][0]==$aAvailables[strtolower($sType)][0]) ? true : false;
+					return ($aAvailables[$object->name][0]==$aAvailables[\strtolower($sType)][0]) ? true : false;
 				}
 				return true;
 			}
@@ -855,8 +835,7 @@ class nglRoot {
 	}
 
 	protected static function Libraries() {
-		// $aAvailables = array("fn"=>true, "nut"=>true, "tutor"=>true, "sess"=>true, "shift"=>true, "sysvar"=>true, "unicode"=>true, "validate"=>true);
-		$aAvailables = array();
+		$aAvailables = [];
 		foreach(self::$vLibraries as $sLib => $aLib) {
 			$aAvailables[$sLib] = $aLib[1];
 		}
@@ -865,11 +844,11 @@ class nglRoot {
 	}
 
 	public static function log($sFileName, $sContent) {
-		if(is_dir(NGL_PATH_LOGS) && is_writable(NGL_PATH_LOGS)) {
+		if(\is_dir(NGL_PATH_LOGS) && \is_writable(NGL_PATH_LOGS)) {
 			$sFileName = self::call()->sandboxPath(NGL_PATH_LOGS.NGL_DIR_SLASH.$sFileName);
 			$sFileName = self::call()->clearPath($sFileName);
-			if(file_exists($sFileName) && !is_writable($sFileName)) { return false; }
-			file_put_contents($sFileName, $sContent, FILE_APPEND);
+			if(\file_exists($sFileName) && !\is_writable($sFileName)) { return false; }
+			\file_put_contents($sFileName, $sContent, FILE_APPEND);
 		}
 	}
 
@@ -878,7 +857,7 @@ class nglRoot {
 			if($bReturnMode) { return false; }
 			self::call()->errorPages(403);
 		} else {
-			if(strpos($_SERVER["HTTP_REFERER"], NGL_URL)===false) {
+			if(\strpos($_SERVER["HTTP_REFERER"], NGL_URL)===false) {
 				if($bReturnMode) { return false; }
 				self::call()->errorPages(403);
 			}
@@ -890,12 +869,11 @@ class nglRoot {
 	public static function passwd($sPassword, $bDecrypt=false) {
 		if(NGL_PASSWORD_KEY!==null && self::call()->exists("crypt")) {
 			if($bDecrypt) {
-				$sPassword = base64_decode($sPassword);
-
+				$sPassword = \base64_decode($sPassword);
 				$sPassword = self::call("crypt")->type("aes")->key(NGL_PASSWORD_KEY)->decrypt($sPassword);
 			} else {
 				$sPassword = self::call("crypt")->type("aes")->key(NGL_PASSWORD_KEY)->encrypt($sPassword);
-				$sPassword = base64_encode($sPassword);
+				$sPassword = \base64_encode($sPassword);
 			}
 		}
 		
@@ -903,20 +881,20 @@ class nglRoot {
 	}
 
 	public static function out($sMessage, $sStyle=null, $bNewLine=true) {
-		$aStyles = array(
+		$aStyles = [
 			"success" => "\033[0;92m%s\033[0m",
 			"error" => "\033[91;91m%s\033[0m",
 			"info" => "\033[96;96m%s\033[0m",
 			"light" => "\033[93;93m%s\033[0m",
 			"bold" => "\033[1m%s\033[0m"
-		);
+		];
 	
 		$sFormat = '%s';
 	
 		if(isset($aStyles[$sStyle])) { $sFormat = $aStyles[$sStyle]; }
 		if($bNewLine) { $sFormat .= PHP_EOL; }
 	
-		printf($sFormat, $sMessage);
+		\printf($sFormat, $sMessage);
 	}
 
 	public static function objects() {
@@ -924,8 +902,8 @@ class nglRoot {
 	}
 
 	public static function objectName($sObjectName) {
-		$sObjectName = preg_replace("/[^a-zA-Z0-9_\.]/is", "", $sObjectName);
-		return strtolower($sObjectName);
+		$sObjectName = \preg_replace("/[^a-zA-Z0-9_\.]/is", "", $sObjectName);
+		return \strtolower($sObjectName);
 	}
 
 	/** FUNCTION {
@@ -939,10 +917,10 @@ class nglRoot {
 		"return" : "array o null"
 	} **/
 	public static function parseConfigFile($sFilePath, $bUseSections=false) {
-		$sFilePath = preg_replace("/[\\\\\/]{1,}/", NGL_DIR_SLASH, $sFilePath);
-		$sFilePath = rtrim($sFilePath, NGL_DIR_SLASH);
-		if(file_exists($sFilePath)) {
-			$sContent = file_get_contents($sFilePath);
+		$sFilePath = \preg_replace("/[\\\\\/]{1,}/", NGL_DIR_SLASH, $sFilePath);
+		$sFilePath = \rtrim($sFilePath, NGL_DIR_SLASH);
+		if(\file_exists($sFilePath)) {
+			$sContent = \file_get_contents($sFilePath);
 			return self::parseConfigString($sContent, $bUseSections);
 		}
 		return null;
@@ -961,57 +939,57 @@ class nglRoot {
 	public static function parseConfigString($sString, $bUseSections=false, $bPreserveNL=false) {
 		if($bPreserveNL) {
 			$NL = self::call()->unique(6);
-			$sString = preg_replace("/(\\\(\\r\\n|\\n))/", $NL, $sString);
+			$sString = \preg_replace("/(\\\(\\r\\n|\\n))/", $NL, $sString);
 		}
-		$sString = preg_replace("/\\\(\\r\\n|\\n)/s", "", $sString);
+		$sString = \preg_replace("/\\\(\\r\\n|\\n)/s", "", $sString);
 
-		$aData = array();
-		$aLines = explode(chr(10), $sString);
+		$aData = [];
+		$aLines = \explode(chr(10), $sString);
 
 		$sSection = null;
 		foreach($aLines as $sLine) {
 			if($bUseSections) {
-				$bSection = preg_match("/^(\[)([a-zA-Z0-9\_\.\-]+)(\])/is", $sLine, $aMatchs);
+				$bSection = \preg_match("/^(\[)([a-zA-Z0-9\_\.\-]+)(\])/is", $sLine, $aMatchs);
 				if($bSection) {
 					$sSection = $aMatchs[2];
 					continue;
 				}
 			}
 
-			$bStatement = preg_match("/^(?!;)([\w+\.\-\/]+)(\[[\w+\.\-\/]*\])?\s*=\s*(.*)\s*$/s", $sLine, $aMatchs);
+			$bStatement = \preg_match("/^(?!;)([\w+\.\-\/]+)(\[[\w+\.\-\/]*\])?\s*=\s*(.*)\s*$/s", $sLine, $aMatchs);
 			if($bStatement) {
 				$sKey	= $aMatchs[1];
-				$sIndex	= (!empty($aMatchs[2])) ? substr($aMatchs[2], 1, -1) : null;
+				$sIndex	= (!empty($aMatchs[2])) ? \substr($aMatchs[2], 1, -1) : null;
 				$mValue	= $aMatchs[3];
-				if(preg_match("/^(((\"|\')(.*)(\"|\'))?.*)(;.*)?$/is", $mValue, $aValue)) {
-					if(!array_key_exists(4, $aValue)) {
-						$aValue = explode(";", $aValue[1]);
+				if(\preg_match("/^(((\"|\')(.*)(\"|\'))?.*)(;.*)?$/is", $mValue, $aValue)) {
+					if(!\array_key_exists(4, $aValue)) {
+						$aValue = \explode(";", $aValue[1]);
 						$mValue	= $aValue[0];
 					} else {
-						$mValue	= strlen($aValue[4]) ? $aValue[4] : "";
+						$mValue	= \strlen($aValue[4]) ? $aValue[4] : "";
 					}
 				}
 				
-				$mValue = trim($mValue);
+				$mValue = \trim($mValue);
 
 				// constantes
-				$mValue = preg_replace_callback(
+				$mValue = \preg_replace_callback(
 					"/\{@([a-z_][a-z0-9_]*)\}/i", 
 					function($aMatches) {
-						return (defined($aMatches[1])) ? constant($aMatches[1]) : $aMatches[1];
+						return (\defined($aMatches[1])) ? \constant($aMatches[1]) : $aMatches[1];
 					},
 					$mValue
 				);
 
 				// booleans
-				switch(strtolower($mValue)) {
+				switch(\strtolower($mValue)) {
 					case "null": $mValue = null; break;
 					case "false": $mValue = false; break;
 					case "true": $mValue = true; break;
 				}
 
 				// multilinea
-				if($bPreserveNL) { $mValue = str_replace($NL, chr(10), $mValue); }
+				if($bPreserveNL) { $mValue = \str_replace($NL, chr(10), $mValue); }
 
 				if($sSection!==null) {
 					if($sIndex!==null) {
@@ -1041,14 +1019,14 @@ class nglRoot {
 	}
 
 	public static function path($sPath) {
-		$sPath = strtolower($sPath);
+		$sPath = \strtolower($sPath);
 		if(isset(self::$vPaths[$sPath])) { return self::$vPaths[$sPath]; }
 		return null;
 	}
 	
 	public static function setPath($sPath) {
-		$sBaseDir = preg_replace("/[\\\\\/]{1,}/", NGL_DIR_SLASH, NGL_PATH_FRAMEWORK);
-		self::$vPaths[$sPath] = realpath($sBaseDir.NGL_DIR_SLASH.$sPath).NGL_DIR_SLASH;
+		$sBaseDir = \preg_replace("/[\\\\\/]{1,}/", NGL_DIR_SLASH, NGL_PATH_FRAMEWORK);
+		self::$vPaths[$sPath] = \realpath($sBaseDir.NGL_DIR_SLASH.$sPath).NGL_DIR_SLASH;
 	}
 
 	public static function starTime() {
@@ -1057,37 +1035,37 @@ class nglRoot {
 
 	public static function tempDir() {
 		if(!function_exists("sys_get_temp_dir") ) {
-			if(!empty($_ENV["TMP"])) { return realpath($_ENV["TMP"]); }
-			if(!empty($_ENV["TMPDIR"])) { return realpath($_ENV["TMPDIR"]); }
-			if(!empty($_ENV["TEMP"])) { return realpath($_ENV["TEMP"]); }
+			if(!empty($_ENV["TMP"])) { return \realpath($_ENV["TMP"]); }
+			if(!empty($_ENV["TMPDIR"])) { return \realpath($_ENV["TMPDIR"]); }
+			if(!empty($_ENV["TEMP"])) { return \realpath($_ENV["TEMP"]); }
 
-			$sTempFile = tempnam(self::call()->unique(16), "");
+			$sTempFile = \tempnam(self::call()->unique(16), "");
 			if($sTempFile) {
-				$sTempDir = realpath(dirname($sTempFile));
-				unlink($sTempFile);
+				$sTempDir = \realpath(\dirname($sTempFile));
+				\unlink($sTempFile);
 				return $sTempDir;
 			} else {
 				return false;
 			}
 		}
 		
-		return sys_get_temp_dir();
+		return \sys_get_temp_dir();
 	}
 
 	public static function whois($sElement=null) {
 		if($sElement===null) {
 			$aLibraries = self::$vLibraries;
-			$aMethods = get_class_methods(__CLASS__);
+			$aMethods = \get_class_methods(__CLASS__);
 			foreach($aMethods as $nKey => $sMethod) {
 				if($sMethod[0]=="_") { unset($aMethods[$nKey]); }
 			}
 			
-			$vInfo = array();
-			$vInfo["objects"] = array_keys($aLibraries);
+			$vInfo = [];
+			$vInfo["objects"] = \array_keys($aLibraries);
 			$vInfo["methods"] = $aMethods;
 			
 		} else {
-			$sElement = strtolower($sElement);
+			$sElement = \strtolower($sElement);
 			$vInfo = self::call($sElement)->Whoami();
 		}
 		return $vInfo;

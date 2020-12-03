@@ -20,20 +20,19 @@ class nglDBPostgreSQLQuery extends nglBranch implements iNglDBQuery {
 	private $cursor = null;
 	
 	final protected function __declareArguments__() {
-		$vArguments							= array();
-
-		$vArguments["column"]				= array('$mValue', null);
-		$vArguments["get_mode"]				= array('$this->GetMode($mValue)', PGSQL_ASSOC);
-		$vArguments["link"]					= array('$mValue', null);
-		$vArguments["query"]				= array('$mValue', null);
-		$vArguments["sentence"]				= array('(string)$mValue', null);
-		$vArguments["query_time"]			= array('$mValue', null);
+		$vArguments							= [];
+		$vArguments["column"]				= ['$mValue', null];
+		$vArguments["get_mode"]				= ['$this->GetMode($mValue)', \PGSQL_ASSOC];
+		$vArguments["link"]					= ['$mValue', null];
+		$vArguments["query"]				= ['$mValue', null];
+		$vArguments["sentence"]				= ['(string)$mValue', null];
+		$vArguments["query_time"]			= ['$mValue', null];
 
 		return $vArguments;
 	}
 
 	final protected function __declareAttributes__() {
-		$vAttributes						= array();
+		$vAttributes						= [];
 		$vAttributes["sql"]					= null;
 		$vAttributes["time"]				= null;
 		$vAttributes["crud"]				= null;
@@ -56,19 +55,19 @@ class nglDBPostgreSQLQuery extends nglBranch implements iNglDBQuery {
 		$nRows = null;
 		if($this->attribute("crud")=="SELECT") {
 			$sSQL = $sSQLCheck = $this->attribute("sql");
-			$sSQLCheck = preg_replace("/(\t|\n|\r)/i", "", $sSQLCheck);
-			$sSQLCheck = preg_replace("/(\"(.*?)\"|'(.*?)'|`(.*?)`)/", "", $sSQLCheck);
-			if(preg_match("/OVER\(\)/i", $sSQLCheck)) { return null; }
+			$sSQLCheck = \preg_replace("/(\t|\n|\r)/i", "", $sSQLCheck);
+			$sSQLCheck = \preg_replace("/(\"(.*?)\"|'(.*?)'|`(.*?)`)/", "", $sSQLCheck);
+			if(\preg_match("/OVER\(\)/i", $sSQLCheck)) { return null; }
 
-			$sSQL = trim($sSQL);
-			if(preg_match("/LIMIT *[0-9]+/i", $sSQL)) {
-				$sRowsAlias = strtolower(self::call()->unique());
+			$sSQL = \trim($sSQL);
+			if(\preg_match("/LIMIT *[0-9]+/i", $sSQL)) {
+				$sRowsAlias = \strtolower(self::call()->unique());
 				$sOver = "SELECT COUNT(*) OVER() AS ".$sRowsAlias.", "; //"
-				$sSQL = preg_replace("/^SELECT/i", $sOver, $sSQL, 1);
-				$getrows = pg_query($this->db, $sSQL);
-				$aRows = pg_fetch_array($getrows, null, PGSQL_ASSOC);
+				$sSQL = \preg_replace("/^SELECT/i", $sOver, $sSQL, 1);
+				$getrows = \pg_query($this->db, $sSQL);
+				$aRows = \pg_fetch_array($getrows, null, PGSQL_ASSOC);
 				$nRows = (int)$aRows[$sRowsAlias];
-				pg_free_result($getrows);
+				\pg_free_result($getrows);
 			} else {
 				$nRows = (int)$this->rows();
 			}
@@ -81,10 +80,10 @@ class nglDBPostgreSQLQuery extends nglBranch implements iNglDBQuery {
 	public function columns() {
 		if($this->attribute("_columns")!==null) { return $this->attribute("_columns"); }
 
-		$aGetColumns = array();
-		$nCols = pg_num_fields($this->cursor);
+		$aGetColumns = [];
+		$nCols = \pg_num_fields($this->cursor);
 		for($x=0; $x<$nCols; $x++) {
-			$aGetColumns[] = pg_field_name($this->cursor, $x);
+			$aGetColumns[] = \pg_field_name($this->cursor, $x);
 		}
 		
 		$this->attribute("_columns", $aGetColumns);
@@ -93,10 +92,10 @@ class nglDBPostgreSQLQuery extends nglBranch implements iNglDBQuery {
 
 	public function count() {
 		if($this->attribute("_rows")!==null) { return $this->attribute("_rows"); }
-		if(in_array($this->attribute("crud"), array("INSERT", "UPDATE", "DELETE"))) {
-			$nRows = pg_affected_rows($this->cursor);
+		if(in_array($this->attribute("crud"), ["INSERT", "UPDATE", "DELETE"])) {
+			$nRows = \pg_affected_rows($this->cursor);
 		} else {
-			$nRows = pg_num_rows($this->cursor);
+			$nRows = \pg_num_rows($this->cursor);
 		}
 		
 		$this->attribute("_rows", $nRows);
@@ -104,29 +103,29 @@ class nglDBPostgreSQLQuery extends nglBranch implements iNglDBQuery {
 	}
 	
 	public function destroy() {
-		if(!is_bool($this->cursor)) { $this->free(); }
+		if(!\is_bool($this->cursor)) { $this->free(); }
 		$this->db = null;
 		$this->cursor = null;
 		return parent::__destroy__();
 	}
 
 	public function free() {
-		pg_free_result($this->cursor);
+		\pg_free_result($this->cursor);
 		return $this;
 	}
 
 	public function get() {
-		list($sColumn,$nMode) = $this->getarguments("column,get_mode", func_get_args());
-		$aRow = pg_fetch_array($this->cursor, null, $nMode);
-		if($sColumn[0]=="#") { $sColumn = substr($sColumn, 1); }
-		return ($sColumn!==null && $aRow!==false && $aRow!==null && array_key_exists($sColumn, $aRow)) ? $aRow[$sColumn] : $aRow;
+		list($sColumn,$nMode) = $this->getarguments("column,get_mode", \func_get_args());
+		$aRow = \pg_fetch_array($this->cursor, null, $nMode);
+		if($sColumn[0]=="#") { $sColumn = \substr($sColumn, 1); }
+		return ($sColumn!==null && $aRow!==false && $aRow!==null && \array_key_exists($sColumn, $aRow)) ? $aRow[$sColumn] : $aRow;
 	}
 
 	public function getall() {
-		list($sColumn,$nMode) = $this->getarguments("column,get_mode", func_get_args());
+		list($sColumn,$nMode) = $this->getarguments("column,get_mode", \func_get_args());
 		$bGroupByMode = $bIndexMode = $bKeyValue = false;
 
-		if(is_array($sColumn)) {
+		if(\is_array($sColumn)) {
 			$aGroup = $sColumn;
 			$sColumn = null;
 			$bGroupByMode = true;
@@ -137,27 +136,27 @@ class nglDBPostgreSQLQuery extends nglBranch implements iNglDBQuery {
 			}
 
 			if($sColumn[0]=="@") {
-				$aColumn = explode(";", substr($sColumn, 1));
+				$aColumn = \explode(";", \substr($sColumn, 1));
 				$sColumn = $aColumn[0];
-				$sValue = (count($aColumn)>1) ? $aColumn[1] : $aColumn[0];
+				$sValue = (\count($aColumn)>1) ? $aColumn[1] : $aColumn[0];
 				$bKeyValue = true;
 			}			
 		}
 
 		$this->reset();
-		$aRow = pg_fetch_array($this->cursor, null, $nMode);
+		$aRow = \pg_fetch_array($this->cursor, null, $nMode);
 
-		$aGetAll = array();
-		if($sColumn!==null && $aRow!==false && $aRow!==null && !array_key_exists($sColumn, $aRow)) { return $aGetAll; }
+		$aGetAll = [];
+		if($sColumn!==null && $aRow!==false && $aRow!==null && !\array_key_exists($sColumn, $aRow)) { return $aGetAll; }
 		$this->reset();
 
 		if($sColumn!==null) {
 			if($bIndexMode) {
-				$aMultiple = array();
-				while($aRow = pg_fetch_array($this->cursor, null, $nMode)) {
+				$aMultiple = [];
+				while($aRow = \pg_fetch_array($this->cursor, null, $nMode)) {
 					if(isset($aGetAll[$aRow[$sColumn]])) {
 						if(!isset($aMultiple[$aRow[$sColumn]])) {
-							$aGetAll[$aRow[$sColumn]] = array($aGetAll[$aRow[$sColumn]]);
+							$aGetAll[$aRow[$sColumn]] = [$aGetAll[$aRow[$sColumn]]];
 							$aMultiple[$aRow[$sColumn]] = true;
 						}
 						$aGetAll[$aRow[$sColumn]][] = $aRow;
@@ -166,16 +165,16 @@ class nglDBPostgreSQLQuery extends nglBranch implements iNglDBQuery {
 					}
 				}
 			} else if($bKeyValue) {
-				while($aRow = pg_fetch_array($this->cursor, null, $nMode)) {
+				while($aRow = \pg_fetch_array($this->cursor, null, $nMode)) {
 					$aGetAll[$aRow[$sColumn]] = $aRow[$sValue];
 				}			
 			} else {
-				while($aRow = pg_fetch_array($this->cursor, null, $nMode)) {
+				while($aRow = \pg_fetch_array($this->cursor, null, $nMode)) {
 					$aGetAll[] = $aRow[$sColumn];
 				}			
 			}
 		} else {
-			while($aRow = pg_fetch_array($this->cursor, null, $nMode)) {
+			while($aRow = \pg_fetch_array($this->cursor, null, $nMode)) {
 				$aGetAll[] = $aRow;
 			}
 		}
@@ -189,19 +188,19 @@ class nglDBPostgreSQLQuery extends nglBranch implements iNglDBQuery {
 	}
 
 	public function getobj() {
-		return pg_fetch_object($this->cursor);
+		return \pg_fetch_object($this->cursor);
 	}
 
 	public function lastid() {
 		if($this->attribute("crud")=="INSERT") {
-			return pg_last_oid($this->cursor);
+			return \pg_last_oid($this->cursor);
 		} else {
 			return null;
 		}
 	}
 
 	public function load() {
-		list($link, $query, $sQuery, $nQueryTime) = $this->getarguments("link,query,sentence,query_time", func_get_args());
+		list($link, $query, $sQuery, $nQueryTime) = $this->getarguments("link,query,sentence,query_time", \func_get_args());
 		
 		$this->db = $link;
 		$this->cursor = $query;
@@ -209,11 +208,11 @@ class nglDBPostgreSQLQuery extends nglBranch implements iNglDBQuery {
 		$this->attribute("time", $nQueryTime);
 
 		$sSQL = $sQuery;
-		$sSQL = preg_replace("/^[^A-Z]*/i", "", $sSQL);
-		$sSQLCommand = strtok($sSQL, " ");
-		$sSQLCommand = strtoupper($sSQLCommand);
+		$sSQL = \preg_replace("/^[^A-Z]*/i", "", $sSQL);
+		$sSQLCommand = \strtok($sSQL, " ");
+		$sSQLCommand = \strtoupper($sSQLCommand);
 		
-		if(in_array($sSQLCommand, array("SELECT", "INSERT", "UPDATE", "REPLACE", "DELETE"))) {
+		if(\in_array($sSQLCommand, ["SELECT", "INSERT", "UPDATE", "REPLACE", "DELETE"])) {
 			$this->attribute("crud", $sSQLCommand);
 		} else {
 			$this->attribute("crud", false);
@@ -223,7 +222,7 @@ class nglDBPostgreSQLQuery extends nglBranch implements iNglDBQuery {
 	}
 
 	public function reset() {
-		pg_result_seek($this->cursor, 0);
+		\pg_result_seek($this->cursor, 0);
 		return $this;
 	}
 
@@ -233,8 +232,8 @@ class nglDBPostgreSQLQuery extends nglBranch implements iNglDBQuery {
 
 	public function toArray() {
 		$this->reset();
-		$aGetAll = array();
-		while($aRow = pg_fetch_array($this->cursor, null, PGSQL_ASSOC)) {
+		$aGetAll = [];
+		while($aRow = \pg_fetch_array($this->cursor, null, \PGSQL_ASSOC)) {
 			$aGetAll[] = $aRow;
 		}
 		$this->reset();
@@ -242,16 +241,16 @@ class nglDBPostgreSQLQuery extends nglBranch implements iNglDBQuery {
 	}
 
 	protected function GetMode($sMode) {
-		$aModes 				= array();
-		$aModes["both"] 		= PGSQL_BOTH;
-		$aModes["num"] 			= PGSQL_NUM;
-		$aModes["assoc"] 		= PGSQL_ASSOC;
-		$aModes[3] 				= PGSQL_BOTH;
-		$aModes[2] 				= PGSQL_NUM;
-		$aModes[1] 				= PGSQL_ASSOC;
+		$aModes 				= [];
+		$aModes["both"] 		= \PGSQL_BOTH;
+		$aModes["num"] 			= \PGSQL_NUM;
+		$aModes["assoc"] 		= \PGSQL_ASSOC;
+		$aModes[3] 				= \PGSQL_BOTH;
+		$aModes[2] 				= \PGSQL_NUM;
+		$aModes[1] 				= \PGSQL_ASSOC;
 
-		$sMode = strtolower($sMode);
-		return (isset($aModes[$sMode])) ? (int)$aModes[$sMode] : PGSQL_ASSOC;
+		$sMode = \strtolower($sMode);
+		return (isset($aModes[$sMode])) ? (int)$aModes[$sMode] : \PGSQL_ASSOC;
 	}
 }
 

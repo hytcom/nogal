@@ -22,27 +22,27 @@ class nglGraftCrypt extends nglScion {
 
 	private $crypter	= null;
 	private $sCrypter	= null;
-	private $vAlgorithms	= array();
+	private $vAlgorithms	= [];
 
 	final protected function __declareArguments__() {
-		$vArguments					= array();
-		$vArguments["key"]			= array('$this->SetKey($mValue)', null);
-		$vArguments["keyslen"]		= array('(int)$mValue', 512);
-		$vArguments["text"]			= array('$mValue');
-		$vArguments["type"]			= array('$this->SetType($mValue)', "aes");
-		$vArguments["base64"]		= array('self::call()->isTrue($mValue)', false);
+		$vArguments					= [];
+		$vArguments["key"]			= ['$this->SetKey($mValue)', null];
+		$vArguments["keyslen"]		= ['(int)$mValue', 512];
+		$vArguments["text"]			= ['$mValue'];
+		$vArguments["type"]			= ['$this->SetType($mValue)', "aes"];
+		$vArguments["base64"]		= ['self::call()->isTrue($mValue)', false];
 	
 		return $vArguments;
 	}
 
 	final protected function __declareAttributes__() {
-		$vAttributes 				= array();
+		$vAttributes 				= [];
 		$vAttributes["keyword"] 	= null;
 		return $vAttributes;
 	}
 
 	final protected function __declareVariables__() {
-		$vAlgorithms				= array();
+		$vAlgorithms				= [];
 		$vAlgorithms["aes"]			= "\phpseclib\Crypt\AES";
 		$vAlgorithms["blowfish"]	= "\phpseclib\Crypt\Blowfish";
 		$vAlgorithms["des"]			= "\phpseclib\Crypt\DES";
@@ -56,37 +56,37 @@ class nglGraftCrypt extends nglScion {
 	}
 
 	public function decrypt() {
-		list($sString) = $this->getarguments("text", func_get_args());
+		list($sString) = $this->getarguments("text", \func_get_args());
 		if($this->sCrypter===null) { $this->SetType(); }
 		if($this->sCrypter=="\phpseclib\Crypt\RSA") { $this->RSAMode(); }
-		if($this->argument("base64")) { $sString = base64_decode($sString); }
+		if($this->argument("base64")) { $sString = \base64_decode($sString); }
 		
 		self::errorMode("print");
-		ob_start();
+		\ob_start();
 		$sDecrypted = $this->crypter->decrypt($sString);
-		$sError = ob_get_contents();
-		ob_end_clean();
-		if(strlen($sError)) { self::errorMode("die"); self::errorMessage($this->object, 1002, $sError); }
+		$sError = \ob_get_contents();
+		\ob_end_clean();
+		if(\strlen($sError)) { self::errorMode("die"); self::errorMessage($this->object, 1002, $sError); }
 		self::errorModeRestore();
 		return ($sString!="") ? $sDecrypted : "";
 	}
 
 	public function encrypt() {
-		list($sString) = $this->getarguments("text", func_get_args());
+		list($sString) = $this->getarguments("text", \func_get_args());
 		if($this->sCrypter===null) { $this->SetType(); }
 		if($this->sCrypter=="\phpseclib\Crypt\RSA") { $this->RSAMode(); }
 		$sString = ($sString!="") ? $this->crypter->encrypt($sString) : "";
-		if($this->argument("base64")) { $sString = base64_encode($sString); }
+		if($this->argument("base64")) { $sString = \base64_encode($sString); }
 		return $sString;
 	}
 
 	public function keys() {
-		list($nLength) = $this->getarguments("keyslen", func_get_args());
+		list($nLength) = $this->getarguments("keyslen", \func_get_args());
 
 		if($nLength<256) { $nLength = 512; }
 		if($this->sCrypter=="\phpseclib\Crypt\RSA") {
 			$vKeys = $this->crypter->createKey($nLength);
-			return array("private"=>$vKeys["privatekey"], "public"=>$vKeys["publickey"]);
+			return ["private"=>$vKeys["privatekey"], "public"=>$vKeys["publickey"]];
 		}
 
 		return false;
@@ -95,13 +95,13 @@ class nglGraftCrypt extends nglScion {
 	public function chKeys($sKey1, $sKey2) {
 		if($this->sCrypter===null) { $this->SetType(); }
 		if($this->sCrypter=="\phpseclib\Crypt\RSA") { $this->RSAMode(); }
-		$sTest = md5(microtime());
-		ob_start();
+		$sTest = \md5(\microtime());
+		\ob_start();
 		$this->SetKey($sKey1);
 		$sEncrypted = $this->crypter->encrypt($sTest);
 		$this->SetKey($sKey2);
 		$sDecrypted = $this->crypter->decrypt($sEncrypted);
-		ob_end_clean();
+		\ob_end_clean();
 		return ($sTest===$sDecrypted) ? true : false;
 	}
 	
@@ -116,7 +116,7 @@ class nglGraftCrypt extends nglScion {
 		}
 
 		if($key===null) { self::errorMode("die"); self::errorMessage($this->object, 1001); }
-		$nModulus = strlen($key["modulus"]->toBytes());
+		$nModulus = \strlen($key["modulus"]->toBytes());
 		if(($nModulus - 2 * $this->crypter->hLen - 2) > 0) {
 			$this->crypter->setEncryptionMode(1);
 		} else if(($nModulus - 11) > 0) {
@@ -130,9 +130,9 @@ class nglGraftCrypt extends nglScion {
 		if($this->sCrypter===null) { $this->SetType(); }
 		if($sKey!==null) {
 			$this->attribute("keyword", $sKey);
-			if(method_exists($this->crypter, "setKey")) {
+			if(\method_exists($this->crypter, "setKey")) {
 				$this->crypter->setKey($sKey);
-			} else if(method_exists($this->crypter, "loadKey")) {
+			} else if(\method_exists($this->crypter, "loadKey")) {
 				$this->crypter->loadKey($sKey);
 			}
 		}
@@ -141,7 +141,7 @@ class nglGraftCrypt extends nglScion {
 	}
 	
 	protected function SetType($sCrypter="aes") {
-		$sCrypter = strtolower($sCrypter);
+		$sCrypter = \strtolower($sCrypter);
 		$sAlgorithm = (isset($this->vAlgorithms[$sCrypter])) ? $this->vAlgorithms[$sCrypter] : $this->vAlgorithms["aes"];
 		$this->sCrypter = $sAlgorithm;
 		$this->crypter = new $this->sCrypter();
@@ -149,9 +149,9 @@ class nglGraftCrypt extends nglScion {
 		// reasignacion de key
 		$sKey = $this->attribute("keyword");
 		if($sKey!==null) {
-			if(method_exists($this->crypter, "setKey")) {
+			if(\method_exists($this->crypter, "setKey")) {
 				$this->crypter->setKey($sKey);
-			} else if(method_exists($this->crypter, "loadKey")) {
+			} else if(\method_exists($this->crypter, "loadKey")) {
 				$this->crypter->loadKey($sKey);
 			}
 		}

@@ -1,6 +1,6 @@
 [checksum]
-md5 = "8d4cd6abcd3cf67b8ea746f66259a672"
-sha1 = "e5d51ddb264159b6d678250556e2fe75d7f6160f"
+md5 = "70bc5afe395861784b05dd4c0870200e"
+sha1 = "706702810008c3c4ad370dca5d902b99e6c9e568"
 
 [documentation]
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/crypt.md"

@@ -1,59 +1,59 @@
 <?php
 
 // interprete BEE
-$NGL_LIBS["bee"]			= array("nglBee", true);
+$NGL_LIBS["bee"]			= ["nglBee", true];
 
 // base de datos
-$NGL_LIBS["dbase"]			= array("nglDBase", false);
-$NGL_LIBS["jsql"]			= array("nglJSQL", true);
-$NGL_LIBS["mysql"]			= array("nglDBMySQL", false);
-$NGL_LIBS["mysqlq"]			= array("nglDBMySQLQuery", false);
-$NGL_LIBS["nest"] 			= array("nglNest", false); // ORM Manager
-$NGL_LIBS["owl"] 			= array("nglOwl", false); // ORM
-$NGL_LIBS["pecker"]			= array("nglPecker", false);
-$NGL_LIBS["pgsql"]			= array("nglDBPostgreSQL", false);
-$NGL_LIBS["pgsqlq"]			= array("nglDBPostgreSQLQuery", false);
-$NGL_LIBS["qparser"]		= array("nglQParser", true); // Parser SQL
-$NGL_LIBS["sqlite"]			= array("nglDBSQLite", false);
-$NGL_LIBS["sqliteq"]		= array("nglDBSQLiteQuery", false);
+$NGL_LIBS["dbase"]			= ["nglDBase", false];
+$NGL_LIBS["jsql"]			= ["nglJSQL", true];
+$NGL_LIBS["mysql"]			= ["nglDBMySQL", false];
+$NGL_LIBS["mysqlq"]			= ["nglDBMySQLQuery", false];
+$NGL_LIBS["nest"] 			= ["nglNest", false]; // ORM Manager
+$NGL_LIBS["owl"] 			= ["nglOwl", false]; // ORM
+$NGL_LIBS["pecker"]			= ["nglPecker", false];
+$NGL_LIBS["pgsql"]			= ["nglDBPostgreSQL", false];
+$NGL_LIBS["pgsqlq"]			= ["nglDBPostgreSQLQuery", false];
+$NGL_LIBS["qparser"]		= ["nglQParser", true]; // Parser SQL
+$NGL_LIBS["sqlite"]			= ["nglDBSQLite", false];
+$NGL_LIBS["sqliteq"]		= ["nglDBSQLiteQuery", false];
 
 // fechas
-$NGL_LIBS["dates"] 			= array("nglDates", true);
+$NGL_LIBS["dates"] 			= ["nglDates", true];
 
 // gestion de imagenes
-$NGL_LIBS["image"] 			= array("nglImage", false);
+$NGL_LIBS["image"] 			= ["nglImage", false];
 
 // gestion de archivos y directorios
-$NGL_LIBS["file"] 			= array("nglFile", false);
-$NGL_LIBS["files"] 			= array("nglFiles", true);
-$NGL_LIBS["ftp"]	 		= array("nglFTP", false);
+$NGL_LIBS["file"] 			= ["nglFile", false];
+$NGL_LIBS["files"] 			= ["nglFiles", true];
+$NGL_LIBS["ftp"]	 		= ["nglFTP", false];
 
 // grafts
-$NGL_LIBS["graft"] 			= array("nglGraft", false);
+$NGL_LIBS["graft"] 			= ["nglGraft", false];
 
 // mails
-$NGL_LIBS["mail"] 			= array("nglMail", false);
+$NGL_LIBS["mail"] 			= ["nglMail", false];
 
 // plantillas
-$NGL_LIBS["rind"] 			= array("nglRind", false);
+$NGL_LIBS["rind"] 			= ["nglRind", false];
 
 // security
-$NGL_LIBS["alvin"] 			= array("nglAlvin", true);
+$NGL_LIBS["alvin"] 			= ["nglAlvin", true];
 
 // sets
-$NGL_LIBS["set"] 			= array("nglSet", false);
+$NGL_LIBS["set"] 			= ["nglSet", false];
 
 // tree
-$NGL_LIBS["tree"] 			= array("nglTree", false);
+$NGL_LIBS["tree"] 			= ["nglTree", false];
 
 // tutor
-// $NGL_LIBS["tutor"] 			= array("nglTutor", false);
+// $NGL_LIBS["tutor"] 			= ["nglTutor", false];
 
 // web
-$NGL_LIBS["coon"] 			= array("nglCoon", false);
-$NGL_LIBS["url"] 			= array("nglURL", false);
+$NGL_LIBS["coon"] 			= ["nglCoon", false];
+$NGL_LIBS["url"] 			= ["nglURL", false];
 
 // zip
-$NGL_LIBS["zip"] 			= array("nglZip", false);
+$NGL_LIBS["zip"] 			= ["nglZip", false];
 
 ?>

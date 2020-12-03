@@ -66,14 +66,14 @@ class nglSession extends nglTrunk {
 		"return" : "boolean"
 	} **/
 	public function gc($nMaxLifeTime) {
-		$nTime = time();
+		$nTime = \time();
 		if($this->db!==null) {
 			$this->db->exec("DELETE FROM `__ngl_sessions__` WHERE `expire` < '".$nTime."' AND `persistent` = '0'");
 		} else {
-			$aSessions = glob($this->sPath."sess_*");
+			$aSessions = \glob($this->sPath."sess_*");
 			foreach($aSessions as $sSession) {
-				if(file_exists($sSession) && (filemtime($sSession) + $nMaxLifeTime) < $nTime) {
-					unlink($sSession);
+				if(\file_exists($sSession) && (\filemtime($sSession) + $nMaxLifeTime) < $nTime) {
+					\unlink($sSession);
 				}
 			}
 		}
@@ -105,10 +105,10 @@ class nglSession extends nglTrunk {
 			$sessions = $this->db->query("SELECT * FROM `__ngl_sessions__`");
 			return $sessions->rows();
 		} else if($this->sMode=="fs") {
-			$aSessions = glob($this->sPath."sess_*");
-			$aPersistents = glob($this->sPath."psess_*");
+			$aSessions = \glob($this->sPath."sess_*");
+			$aPersistents = \glob($this->sPath."psess_*");
 			
-			return (count($aSessions)+count($aPersistents));
+			return (\count($aSessions)+\count($aPersistents));
 		}
 
 		self::errorMessage($this->object, "0001");
@@ -128,10 +128,10 @@ class nglSession extends nglTrunk {
 			$this->db->exec("DELETE FROM `__ngl_sessions__` WHERE `id` = '".$SID."'");
 		} else if($this->sMode=="fs") {
 			$sFileName = $this->sPath."sess_".$SID;
-			if(file_exists($sFileName)) { unlink($sFileName); }
+			if(\file_exists($sFileName)) { \unlink($sFileName); }
 
 			$sFileName = $this->sPath."psess_".$SID;
-			if(file_exists($sFileName)) { unlink($sFileName); }
+			if(\file_exists($sFileName)) { \unlink($sFileName); }
 		}
 		
 		return true;
@@ -146,11 +146,11 @@ class nglSession extends nglTrunk {
 	public function destroyAll() {
 		if($this->sMode==="db") {
 			$this->db->exec("DELETE FROM `__ngl_sessions__`");
-			session_destroy();
+			\session_destroy();
 		} else if($this->sMode==="fs") {
-			$aSessions = glob($this->sPath."*sess_*");
+			$aSessions = \glob($this->sPath."*sess_*");
 			foreach($aSessions as $sSession) {
-				if(file_exists($sSession)) { unlink($sSession); }
+				if(\file_exists($sSession)) { \unlink($sSession); }
 			}
 		}
 
@@ -177,7 +177,7 @@ class nglSession extends nglTrunk {
 				return self::call()->isTrue($session->get("persistent"));
 			}
 		} else if($this->sMode==="fs") {
-			return file_exists($this->sPath."psess_".$SID);
+			return \file_exists($this->sPath."psess_".$SID);
 		}
 
 		return false;
@@ -190,7 +190,7 @@ class nglSession extends nglTrunk {
 		"return" : "string"
 	} **/
 	public function id($sSessId=null) {
-		return ($sSessId!==null) ? session_id($sSessId) : session_id();
+		return ($sSessId!==null) ? \session_id($sSessId) : \session_id();
 	}
 
 	/** FUNCTION {
@@ -217,7 +217,7 @@ class nglSession extends nglTrunk {
 		"return" : "boolean"
 	} **/
 	public function persistent($bPersistent=true, $SID=null) {
-		if($SID==null) { $SID = session_id(); }
+		if($SID==null) { $SID = \session_id(); }
 		if($this->GetPersistent($SID)===false) { $this->write($SID, array()); }
 		$nPersistent = (self::call()->istrue($bPersistent)) ? "1" : "0";
 
@@ -225,10 +225,10 @@ class nglSession extends nglTrunk {
 			$SID = $this->db->escape($SID);
 			return $this->db->exec("UPDATE `__ngl_sessions__` SET `persistent` = '".$nPersistent."' WHERE `id` = '".$SID."'");
 		} else if($this->sMode==="fs") {
-			if($nPersistent==="1" && file_exists($this->sPath."sess_".$SID)) {
-				return rename($this->sPath."sess_".$SID, $this->sPath."psess_".$SID);
-			} else if($nPersistent==="0" && file_exists($this->sPath."psess_".$SID)) {
-				return rename($this->sPath."psess_".$SID, $this->sPath."sess_".$SID);
+			if($nPersistent==="1" && \file_exists($this->sPath."sess_".$SID)) {
+				return \rename($this->sPath."sess_".$SID, $this->sPath."psess_".$SID);
+			} else if($nPersistent==="0" && \file_exists($this->sPath."psess_".$SID)) {
+				return \rename($this->sPath."psess_".$SID, $this->sPath."sess_".$SID);
 			}
 			
 			return true;
@@ -245,8 +245,8 @@ class nglSession extends nglTrunk {
 		"return" : "boolean"
 	} **/
 	public function read($SID) {
-		if($SID==null) { $SID = session_id(); }
-		$nTime	= time();
+		if($SID==null) { $SID = \session_id(); }
+		$nTime	= \time();
 		
 		if($this->sMode==="db") {
 			$session = $this->db->query("
@@ -262,10 +262,10 @@ class nglSession extends nglTrunk {
 				return $session->get("data");
 			} 
 		} else if($this->sMode==="fs") {
-			if(file_exists($this->sPath."psess_".$SID)) {
-				return file_get_contents($this->sPath."psess_".$SID);
-			} else if(file_exists($this->sPath."sess_".$SID)) {
-				return file_get_contents($this->sPath."sess_".$SID);
+			if(\file_exists($this->sPath."psess_".$SID)) {
+				return \file_get_contents($this->sPath."psess_".$SID);
+			} else if(\file_exists($this->sPath."sess_".$SID)) {
+				return \file_get_contents($this->sPath."sess_".$SID);
 			}
 		}
 
@@ -286,7 +286,7 @@ class nglSession extends nglTrunk {
 			$query = $this->db->query("SELECT * FROM `__ngl_sessions__`");
 			return $query->toArray();
 		} else if($this->sMode==="fs") {
-			return glob($this->sPath."*sess_*");
+			return \glob($this->sPath."*sess_*");
 		}
 
 		self::errorMessage($this->object, "0004");
@@ -310,40 +310,40 @@ class nglSession extends nglTrunk {
 		"return" : "void"
 	} **/
 	public function start($handler=null, $nLifeTime=null) {
-		if(!$nLifeTime) { $nLifeTime = get_cfg_var("session.gc_maxlifetime"); }
+		if(!$nLifeTime) { $nLifeTime = \get_cfg_var("session.gc_maxlifetime"); }
 		$this->lifeTime = $nLifeTime;
 		
 		if($handler!==null) {
-			if(is_object($handler)) {
+			if(\is_object($handler)) {
 				$this->sMode = "db";
 				$this->db = $handler;
-			} else if(is_string($handler)) {
+			} else if(\is_string($handler)) {
 				$this->sMode = "fs";
 				$this->sPath = self::call()->clearPath(NGL_PATH_SESSIONS, true);
-				if(!is_dir($this->sPath)) {
+				if(!\is_dir($this->sPath)) {
 					self::errorMessage("nogal", "1010", $this->sPath);
 				}
 			} else {
 				$this->sMode = "php";
 			}
 
-			session_set_save_handler(
-				array($this, "open"),
-				array($this, "close"),
-				array($this, "read"),
-				array($this, "write"),
-				array($this, "destroy"),
-				array($this, "gc")
+			\session_set_save_handler(
+				[$this, "open"],
+				[$this, "close"],
+				[$this, "read"],
+				[$this, "write"],
+				[$this, "destroy"],
+				[$this, "gc"]
 			);
 
-			register_shutdown_function("session_write_close");
+			\register_shutdown_function("session_write_close");
 			
 			// recolector de residuos
 			$this->gc($nLifeTime);
 		}
 		
 		// inicio de sesion
-		session_start();
+		\session_start();
 	}
 
 	/** FUNCTION {
@@ -357,12 +357,12 @@ class nglSession extends nglTrunk {
 		"return" : "boolean"
 	} **/
 	public function write($SID, $vSessionData) {
-		$nTime	= (time() + $this->nLifeTime);
+		$nTime	= (\time() + $this->nLifeTime);
 		$bPersistent = $this->GetPersistent($SID);
-		$sData = (is_array($vSessionData)) ? serialize($vSessionData) : $vSessionData;
+		$sData = (\is_array($vSessionData)) ? \serialize($vSessionData) : $vSessionData;
 
 		if($this->sMode==="db") {
-			$vSession = array();
+			$vSession = [];
 			$vSession["id"] 			= $SID;
 			$vSession["expire"] 		= $nTime;
 			$vSession["persistent"] 	= ($bPersistent) ? "1" : "0";
@@ -376,9 +376,9 @@ class nglSession extends nglTrunk {
 			return ($query->rows()) ? true : false;
 		} else if($this->sMode==="fs") {
 			if($bPersistent) {
-				return file_put_contents($this->sPath."psess_".$SID, $sData);
+				return \file_put_contents($this->sPath."psess_".$SID, $sData);
 			} else {
-				return file_put_contents($this->sPath."sess_".$SID, $sData);
+				return \file_put_contents($this->sPath."sess_".$SID, $sData);
 			}
 		}
 		
@@ -393,16 +393,16 @@ class nglSession extends nglTrunk {
 	} **/
 	public function sqlcreate() {
 		return <<<SQL
-		DROP TABLE IF EXISTS `__ngl_sessions__`;
-		CREATE TABLE `__ngl_sessions__` (
-			`id` VARCHAR(32) NOT NULL DEFAULT '',
-			`expire` INT(11) NOT NULL DEFAULT '0',
-			`persistent` ENUM('0', '1') NOT NULL DEFAULT '0',
-			`data` BLOB NOT NULL,
-			PRIMARY KEY (`id`) 
-		);
-		CREATE INDEX `expire_idx` ON `__ngl_sessions__` (`expire` DESC);
-		CREATE INDEX `persistent_idx` ON `__ngl_sessions__` (`persistent`);
+DROP TABLE IF EXISTS `__ngl_sessions__`;
+CREATE TABLE `__ngl_sessions__` (
+	`id` VARCHAR(32) NOT NULL DEFAULT '',
+	`expire` INT(11) NOT NULL DEFAULT '0',
+	`persistent` ENUM('0', '1') NOT NULL DEFAULT '0',
+	`data` BLOB NOT NULL,
+	PRIMARY KEY (`id`) 
+);
+CREATE INDEX `expire_idx` ON `__ngl_sessions__` (`expire` DESC);
+CREATE INDEX `persistent_idx` ON `__ngl_sessions__` (`persistent`);
 SQL;
 	}
 }

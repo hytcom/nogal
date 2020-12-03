@@ -70,35 +70,35 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 	private $vModes;
 
 	final protected function __declareArguments__() {
-		$vArguments							= array();
-		$vArguments["autoconn"]				= array('self::call()->istrue($mValue)', false);
-		$vArguments["base"]					= array('$mValue', null);
-		$vArguments["check_colnames"]		= array('self::call()->istrue($mValue)', true);
-		$vArguments["debug"]				= array('self::call()->istrue($mValue)', false);
-		$vArguments["do"]					= array('self::call()->istrue($mValue)', false);
-		$vArguments["error_description"]	= array('self::call()->istrue($mValue)', false);
-		$vArguments["error_query"]			= array('self::call()->istrue($mValue)', false);
-		$vArguments["flags"]				= array('(int)$mValue', (SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE));
-		$vArguments["insert_mode"]			= array('$mValue', "INSERT");
-		$vArguments["jsql"]					= array('$mValue', null);
-		$vArguments["jsql_eol"]				= array('$mValue', "");
-		$vArguments["pass"]					= array('$mValue', null);
-		$vArguments["sql"]					= array('$mValue', null);
-		$vArguments["table"]				= array('(string)$mValue', null);
-		$vArguments["update_mode"]			= array('strtoupper($mValue)', "UPDATE");
-		$vArguments["values"]				= array('$mValue', null);
-		$vArguments["where"]				= array('$mValue', null);
+		$vArguments							= [];
+		$vArguments["autoconn"]				= ['self::call()->istrue($mValue)', false];
+		$vArguments["base"]					= ['$mValue', null];
+		$vArguments["check_colnames"]		= ['self::call()->istrue($mValue)', true];
+		$vArguments["debug"]				= ['self::call()->istrue($mValue)', false];
+		$vArguments["do"]					= ['self::call()->istrue($mValue)', false];
+		$vArguments["error_description"]	= ['self::call()->istrue($mValue)', false];
+		$vArguments["error_query"]			= ['self::call()->istrue($mValue)', false];
+		$vArguments["flags"]				= ['(int)$mValue', (SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE)];
+		$vArguments["insert_mode"]			= ['$mValue', "INSERT"];
+		$vArguments["jsql"]					= ['$mValue', null];
+		$vArguments["jsql_eol"]				= ['$mValue', ""];
+		$vArguments["pass"]					= ['$mValue', null];
+		$vArguments["sql"]					= ['$mValue', null];
+		$vArguments["table"]				= ['(string)$mValue', null];
+		$vArguments["update_mode"]			= ['\strtoupper($mValue)', "UPDATE"];
+		$vArguments["values"]				= ['$mValue', null];
+		$vArguments["where"]				= ['$mValue', null];
 
 		return $vArguments;
 	}
 
 	final protected function __declareAttributes__() {
-		$vAttributes						= array();
+		$vAttributes						= [];
 		return $vAttributes;
 	}
 
 	final protected function __declareVariables__() {
-		$vModes 			= array();
+		$vModes 			= [];
 		$vModes["INSERT"] 	= "";
 		$vModes["UPDATE"] 	= "";
 		$vModes["REPLACE"] 	= "OR REPLACE";
@@ -134,7 +134,7 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 		"return": "$this"
 	} **/
 	public function connect() {
-		list($sBase, $sPass, $nFlags) = $this->getarguments("base,pass,flags", func_get_args());
+		list($sBase, $sPass, $nFlags) = $this->getarguments("base,pass,flags", \func_get_args());
 		$sPass = self::passwd($sPass, true);
 		$sBase = self::call()->sandboxPath($sBase);
 		$this->link = new \SQLite3($sBase, $nFlags, $sPass);
@@ -181,15 +181,15 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 		"return": "mixed"
 	} **/
 	public function escape() {
-		list($mValues) = $this->getarguments("values", func_get_args());
+		list($mValues) = $this->getarguments("values", \func_get_args());
 
-		if(is_array($mValues)) {
-			$mEscapedValues = array();
+		if(\is_array($mValues)) {
+			$mEscapedValues = [];
 			foreach($mValues as $sField => $mValue) {
 				if($mValue===null) {
 					$mEscapedValues[$sField] = null;
 				} else if($mValue!==NGL_NULL) {
-					if(is_array($mValue)) {
+					if(\is_array($mValue)) {
 						$mEscapedValues[$sField] = $this->escape($mValue);
 					} else {
 						$mEscapedValues[$sField] = $this->link->escapeString($mValue);
@@ -201,7 +201,7 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 				$mEscapedValues = null;
 			} else if($mValues!==NGL_NULL) {
 				$mEscapedValues = $mValues;
-				if(is_array($mEscapedValues)) {
+				if(\is_array($mEscapedValues)) {
 					$mEscapedValues = $this->escape($mEscapedValues);
 				} else {
 					$mEscapedValues = $this->link->escapeString($mEscapedValues);
@@ -222,7 +222,7 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 		"return": "SQLite3Result object"
 	} **/
 	public function exec() {
-		list($sQuery) = $this->getarguments("sql", func_get_args());
+		list($sQuery) = $this->getarguments("sql", \func_get_args());
 		if($this->argument("debug")) { return $sQuery; }
 		if(!$query = @$this->link->query($sQuery)) {
 			return $this->Error();
@@ -246,11 +246,11 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 		"return" : "string"
 	} **/
 	public function jsqlParser() {
-		list($mJSQL, $sEOL) = $this->getarguments("jsql,jsql_eol", func_get_args());
-		$aJSQL = (is_string($mJSQL)) ? self::call("jsql")->decode($mJSQL) : $mJSQL;
-		$sType = (isset($aJSQL["type"])) ? strtolower($aJSQL["type"]) : "select";
+		list($mJSQL, $sEOL) = $this->getarguments("jsql,jsql_eol", \func_get_args());
+		$aJSQL = (\is_string($mJSQL)) ? self::call("jsql")->decode($mJSQL) : $mJSQL;
+		$sType = (isset($aJSQL["type"])) ? \strtolower($aJSQL["type"]) : "select";
 
-		$vSQL = array();
+		$vSQL = [];
 		$vSQL["columns"]	= "";
 		$vSQL["tables"]		= "";
 		$vSQL["where"]		= "";
@@ -262,7 +262,7 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 		// select
 		switch($sType) {
 			case "select":
-				$aSelect = array();
+				$aSelect = [];
 				if(isset($aJSQL["columns"])) {
 					foreach($aJSQL["columns"] as $sField) {
 						$aSelect[] = self::call("jsql")->column($sField);
@@ -270,12 +270,12 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 				} else {
 					$aSelect[] = "*";
 				}
-				$vSQL["columns"] = "SELECT ".$sEOL.implode(", ".$sEOL, $aSelect).$sEOL;
+				$vSQL["columns"] = "SELECT ".$sEOL.\implode(", ".$sEOL, $aSelect).$sEOL;
 				break;
 
 			case "insert":
 			case "update":
-				$aSelect = array();
+				$aSelect = [];
 				if(isset($aJSQL["columns"])) {
 					$sSelect = self::call("jsql")->conditions($aJSQL["columns"], true);
 				}
@@ -290,9 +290,9 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 		// tables
 		if(isset($aJSQL["tables"])) {
 			$sFirstTable = array_shift($aJSQL["tables"]);
-			$aFrom = array(self::call("jsql")->column($sFirstTable,""));
+			$aFrom = [self::call("jsql")->column($sFirstTable,"")];
 			foreach($aJSQL["tables"] as $aTable) {
-				if(!is_array($aTable) || (is_array($aTable) && !isset($aTable[2]))) {
+				if(!\is_array($aTable) || (\is_array($aTable) && !isset($aTable[2]))) {
 					$aFrom[] = ", ".$sEOL.self::call("jsql")->column($aTable, "");
 				} else {
 					$aFrom[] = "LEFT JOIN ".self::call("jsql")->column($aTable, "")." ON (".self::call("jsql")->conditions($aTable[2]).")".$sEOL;
@@ -301,15 +301,15 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 			
 			switch($sType) {
 				case "select":
-					$vSQL["tables"] = "FROM ".$sEOL.implode(" ", $aFrom);
+					$vSQL["tables"] = "FROM ".$sEOL.\implode(" ", $aFrom);
 					break;
 
 				case "insert":
-					$vSQL["tables"] = "INSERT INTO ".$sEOL.implode(" ", $aFrom);
+					$vSQL["tables"] = "INSERT INTO ".$sEOL.\implode(" ", $aFrom);
 					break;
 
 				case "update":
-					$vSQL["tables"] = "UPDATE ".$sEOL.implode(" ", $aFrom);
+					$vSQL["tables"] = "UPDATE ".$sEOL.\implode(" ", $aFrom);
 					break;
 			}
 		}
@@ -319,11 +319,11 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 		
 		// group by
 		if(isset($aJSQL["group"])) {
-			$aGroup = array();
+			$aGroup = [];
 			foreach($aJSQL["group"] as $sField) {
 				$aGroup[] = self::call("jsql")->column($sField);
 			}
-			$vSQL["group"] = "GROUP BY ".$sEOL.implode(", ", $aGroup);
+			$vSQL["group"] = "GROUP BY ".$sEOL.\implode(", ", $aGroup);
 		}
 		
 		// having
@@ -331,15 +331,15 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 		
 		// order by
 		if(isset($aJSQL["order"])) {
-			$aOrder = array();
+			$aOrder = [];
 			foreach($aJSQL["order"] as $sField) {
 				if($sField==="RANDOM") { $aOrder[] = "RANDOM()"; break; }
-				$aField = explode(":", $sField);
-				$sOrder = (is_numeric($aField[0])) ? $aField[0] : self::call("jsql")->column($aField[0]);
+				$aField = \explode(":", $sField);
+				$sOrder = (\is_numeric($aField[0])) ? $aField[0] : self::call("jsql")->column($aField[0]);
 				if(isset($aField[1])) { $sOrder .= " ".$aField[1]; }
 				$aOrder[] = $sOrder;
 			}
-			$vSQL["order"] = "ORDER BY ".$sEOL.implode(", ".$sEOL, $aOrder);
+			$vSQL["order"] = "ORDER BY ".$sEOL.\implode(", ".$sEOL, $aOrder);
 		}
 		
 		if(isset($aJSQL["limit"])) {
@@ -354,7 +354,7 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 		$sSQL = "";
 		switch($sType) {
 			case "select":
-				$sSQL = implode(" ", $vSQL);
+				$sSQL = \implode(" ", $vSQL);
 				break;
 
 			case "insert":
@@ -378,11 +378,11 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 		"return": "array"
 	} **/
 	public function mexec() {
-		list($sQuery) = $this->getarguments("sql", func_get_args());
-		$aQueries = self::call()->strToArray($sQuery, ";");
+		list($sQuery) = $this->getarguments("sql", \func_get_args());
+		$aQueries = self::call()->strtoArray($sQuery, ";");
 		if($this->argument("debug")) { return $aQueries; }
 		
-		$aResults = array();
+		$aResults = [];
 		foreach($aQueries as $sQuery) {
 			$sQuery = trim($sQuery);
 			if(!empty($sQuery)) {
@@ -409,25 +409,25 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 		"return": "array"
 	} **/
 	public function mquery() {
-		list($sQuery,$bDO) = $this->getarguments("sql,do", func_get_args());
-		$sQuery = preg_replace("/^--(.*?)$/m", "", $sQuery);
-		$aQueries = self::call()->strToArray($sQuery, ";");
+		list($sQuery,$bDO) = $this->getarguments("sql,do", \func_get_args());
+		$sQuery = \preg_replace("/^--(.*?)$/m", "", $sQuery);
+		$aQueries = self::call()->strtoArray($sQuery, ";");
 		if($this->argument("debug")) { return $aQueries; }
 
-		$aResults = array();
+		$aResults = [];
 		foreach($aQueries as $sQuery) {
 			$sQuery = trim($sQuery);
 			if(!empty($sQuery)) {
-				$nTimeIni = microtime(true);
+				$nTimeIni = \microtime(true);
 				if(!$query = @$this->link->query($sQuery)) {
 					if(!$bDO) { $aResults[] = $this->Error(true); }
 				} else {
 					if($bDO) {
-						if(method_exists($query, "free")) { $query->free(); }
+						if(\method_exists($query, "free")) { $query->free(); }
 						$aResults = true;
 					} else {
 						$nQueryTime		= self::call("dates")->microtimer($nTimeIni);
-						$sQueryName 	= "sqliteq".strstr($this->me, ".")."_".self::call()->unique();
+						$sQueryName 	= "sqliteq".\strstr($this->me, ".")."_".self::call()->unique();
 						$aResults[] 	= self::call($sQueryName)->load($this->link, $query, $sQuery, $nQueryTime);
 					}
 				}
@@ -467,17 +467,17 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 		"return": "SQLite3Result object"
 	} **/
 	public function insert() {
-		list($sTable, $mValues, $sMode, $bCheckColumns) = $this->getarguments("table,values,insert_mode,check_colnames", func_get_args());
+		list($sTable, $mValues, $sMode, $bCheckColumns) = $this->getarguments("table,values,insert_mode,check_colnames", \func_get_args());
 
 		if(!empty($sTable)) {
 			$aToInsert = $this->PrepareValues("INSERT", $sTable, $mValues, $bCheckColumns);
 
-			if(is_array($aToInsert) && count($aToInsert)) {
-				$sMode = strtoupper($sMode);
+			if(\is_array($aToInsert) && \count($aToInsert)) {
+				$sMode = \strtoupper($sMode);
 				$sInsertMode = (isset($this->vModes[$sMode])) ? $this->vModes[$sMode] : "";
 				$sSQL  = "INSERT ".$sInsertMode." INTO `".$sTable."` ";
-				$sSQL .= "(`".implode("`, `", array_keys($aToInsert))."`) ";
-				$sSQL .= "VALUES (".implode(",", $aToInsert).")";
+				$sSQL .= "(`".\implode("`, `", \array_keys($aToInsert))."`) ";
+				$sSQL .= "VALUES (".\implode(",", $aToInsert).")";
 				return $this->query($sSQL);
 			}
 		}
@@ -502,20 +502,20 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 		"return": "SQLite3Result object"
 	} **/
 	private function PrepareValues($sType, $sTable, $mValues, $bCheckColumns) {
-		if(is_array($mValues)) {
+		if(\is_array($mValues)) {
 			$aValues = $mValues;
-		} else if(is_string($mValues)){
-			parse_str($mValues, $aValues);
+		} else if(\is_string($mValues)){
+			\parse_str($mValues, $aValues);
 			$aValues = $this->escape($aValues);
 		} else {
 			return false;
 		}
 		
 		// campos validos
-		$aFields = array_keys($aValues);
+		$aFields = \array_keys($aValues);
 		if($bCheckColumns) {
 			$columns = $this->link->query("PRAGMA table_info(".$sTable.")");
-			$aFields = array();
+			$aFields = [];
 			while($aGetColumn = $columns->fetchArray(SQLITE3_ASSOC)) {
 				$aFields[] = $aGetColumn["name"];
 			}
@@ -524,19 +524,19 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 		}
 		
 		// limpieza de campos inexistentes
-		$aNewValues = array();
-		if($bCheckColumns && !count($aFields)) { return $aNewValues; }
+		$aNewValues = [];
+		if($bCheckColumns && !\count($aFields)) { return $aNewValues; }
 
-		if(count($aFields)) {
+		if(\is_array($aFields) && \count($aFields)) {
 			if($sType=="INSERT") {
 				foreach($aValues as $sField => $mValue) {
-					if($bCheckColumns && !in_array($sField, $aFields)) { unset($aValues[$sField]); continue; }
+					if($bCheckColumns && !\in_array($sField, $aFields)) { unset($aValues[$sField]); continue; }
 					$mValue = ($mValue===null) ? "NULL" : "'".$mValue."'";
 					$aNewValues[$sField] = $mValue;
 				}
 			} else {
 				foreach($aValues as $sField => $mValue) {
-					if($bCheckColumns && !in_array($sField, $aFields)) { unset($aValues[$sField]); continue; }
+					if($bCheckColumns && !\in_array($sField, $aFields)) { unset($aValues[$sField]); continue; }
 					$mValue = ($mValue===null) ? "NULL" : "'".$mValue."'";
 					$aNewValues[] = "`".$sField."` = ".$mValue."";
 				}		
@@ -565,11 +565,11 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 		"return": "nglDBSQLiteQuery object"
 	} **/
 	public function query() {
-		list($sQuery,$bDO) = $this->getarguments("sql,do", func_get_args());
+		list($sQuery,$bDO) = $this->getarguments("sql,do", \func_get_args());
 
 		if($this->argument("debug")) { return $sQuery; }
 
-		$nTimeIni = microtime(true);
+		$nTimeIni = \microtime(true);
 		if(!$query = @$this->link->query($sQuery)) {
 			return $this->Error();
 		}
@@ -579,8 +579,8 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 			return true;
 		}
 
-		$nQueryTime		= self::call("dates")->microtimer($nTimeIni);
-		$sQueryName 	= "sqliteq".strstr($this->me, ".")."_".self::call()->unique();
+		$nQueryTime = self::call("dates")->microtimer($nTimeIni);
+		$sQueryName = "sqliteq".\strstr($this->me, ".")."_".self::call()->unique();
 		return self::call($sQueryName)->load($this->link, $query, $sQuery, $nQueryTime);
 	}
 
@@ -615,14 +615,14 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 		"return": "SQLite3Result object"
 	} **/
 	public function update() {
-		list($sTable, $mValues, $sWhere, $sMode, $bCheckColumns, $bDO) = $this->getarguments("table,values,where,update_mode,check_colnames,do", func_get_args());
+		list($sTable, $mValues, $sWhere, $sMode, $bCheckColumns, $bDO) = $this->getarguments("table,values,where,update_mode,check_colnames,do", \func_get_args());
 
 		if(!empty($sTable)) {
 			$aToUpdate = $this->PrepareValues("UPDATE", $sTable, $mValues, $bCheckColumns);
-			if(is_array($aToUpdate) && count($aToUpdate)) {
-				$sMode = strtoupper($sMode);
+			if(\is_array($aToUpdate) && count($aToUpdate)) {
+				$sMode = \strtoupper($sMode);
 				$sUpdateMode = (isset($this->vModes[$sMode])) ? $this->vModes[$sMode] : "";
-				$sSQL = "UPDATE ".$sUpdateMode." `".$sTable."` SET ".implode(", ", $aToUpdate)." WHERE ".$sWhere;
+				$sSQL = "UPDATE ".$sUpdateMode." `".$sTable."` SET ".\implode(", ", $aToUpdate)." WHERE ".$sWhere;
 				return $this->query($sSQL, $bDO);
 			}
 		}

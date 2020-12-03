@@ -1,6 +1,6 @@
 [checksum]
-md5 = "0a13bc47cad95c2c84a3fb8c39f01f5a"
-sha1 = "62253517e6c6265dfcf5c903af3c9718cc25fca0"
+md5 = "977abea5a97f76e84eddeca661828c8c"
+sha1 = "0fe75cd6177903c450ec605bac792c503a13f5ea"
 
 [documentation]
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/zip.md"

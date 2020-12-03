@@ -41,40 +41,40 @@ class nglOwl extends nglBranch {
 	private $bViewFields;
 
 	final protected function __declareArguments__() {
-		$vArguments							= array();
-		$vArguments["alvin"]				= array('self::call()->istrue($mValue)', false);
-		$vArguments["cascade"]				= array('self::call()->istrue($mValue)', false);
-		$vArguments["child"]				= array('strtolower($mValue)', null);
-		$vArguments["data"]					= array('(array)$mValue', null);
-		$vArguments["db"]					= array('$mValue', null);
-		$vArguments["debug"]				= array('self::call()->istrue($mValue)', false);
-		$vArguments["duplicate_children"]	= array('self::call()->istrue($mValue)', false);
-		$vArguments["escape"]				= array('self::call()->istrue($mValue)', true);
-		$vArguments["filter"]				= array('$mValue', null);
-		$vArguments["id"]					= array('$this->GetID($mValue)', null);
-		$vArguments["inherit"]				= array('self::call()->istrue($mValue)', false);
-		$vArguments["insert_mode"]			= array('$mValue', "INSERT");
-		$vArguments["jsql"]					= array('$mValue', null);
-		$vArguments["join_level"]			= array('(int)$mValue', 2);
-		$vArguments["owlog"]				= array('self::call()->istrue($mValue)', true);
-		$vArguments["owlog_changelog"]		= array('self::call()->istrue($mValue)', false);
-		$vArguments["object"]				= array('strtolower($mValue)', null);
-		$vArguments["subobject"]			= array('strtolower($mValue)', null);
-		$vArguments["use_history"]			= array('self::call()->istrue($mValue)', false);
-		$vArguments["view_alias"]			= array('strtolower($mValue)', "auto");
-		$vArguments["view_children"]		= array('self::call()->istrue($mValue)', false);
-		$vArguments["view_columns"]			= array('$mValue', null);
-		$vArguments["view_deleted"]			= array('self::call()->istrue($mValue)', false);
-		$vArguments["view_eol"]				= array('$mValue', "");
-		$vArguments["view_joins"]			= array('self::call()->istrue($mValue)', false);
-		$vArguments["view_mode"]			= array('strtolower($mValue)', "sql");
-		$vArguments["view_parent"]			= array('self::call()->istrue($mValue)', false);
+		$vArguments							= [];
+		$vArguments["alvin"]				= ['self::call()->istrue($mValue)', false];
+		$vArguments["cascade"]				= ['self::call()->istrue($mValue)', false];
+		$vArguments["child"]				= ['strtolower($mValue)', null];
+		$vArguments["data"]					= ['(array)$mValue', null];
+		$vArguments["db"]					= ['$mValue', null];
+		$vArguments["debug"]				= ['self::call()->istrue($mValue)', false];
+		$vArguments["duplicate_children"]	= ['self::call()->istrue($mValue)', false];
+		$vArguments["escape"]				= ['self::call()->istrue($mValue)', true];
+		$vArguments["filter"]				= ['$mValue', null];
+		$vArguments["id"]					= ['$this->GetID($mValue)', null];
+		$vArguments["inherit"]				= ['self::call()->istrue($mValue)', false];
+		$vArguments["insert_mode"]			= ['$mValue', "INSERT"];
+		$vArguments["jsql"]					= ['$mValue', null];
+		$vArguments["join_level"]			= ['(int)$mValue', 2];
+		$vArguments["owlog"]				= ['self::call()->istrue($mValue)', true];
+		$vArguments["owlog_changelog"]		= ['self::call()->istrue($mValue)', false];
+		$vArguments["object"]				= ['strtolower($mValue)', null];
+		$vArguments["subobject"]			= ['strtolower($mValue)', null];
+		$vArguments["use_history"]			= ['self::call()->istrue($mValue)', false];
+		$vArguments["view_alias"]			= ['strtolower($mValue)', "auto"];
+		$vArguments["view_children"]		= ['self::call()->istrue($mValue)', false];
+		$vArguments["view_columns"]			= ['$mValue', null];
+		$vArguments["view_deleted"]			= ['self::call()->istrue($mValue)', false];
+		$vArguments["view_eol"]				= ['$mValue', ""];
+		$vArguments["view_joins"]			= ['self::call()->istrue($mValue)', false];
+		$vArguments["view_mode"]			= ['strtolower($mValue)', "sql"];
+		$vArguments["view_parent"]			= ['self::call()->istrue($mValue)', false];
 		
 		return $vArguments;
 	}
 
 	final protected function __declareAttributes__() {
-		$vAttributes						= array();
+		$vAttributes						= [];
 		$vAttributes["history"]				= null;
 		$vAttributes["current"]				= null;
 		$vAttributes["log"]					= null;
@@ -88,7 +88,7 @@ class nglOwl extends nglBranch {
 	final protected function __declareVariables__() {
 		$this->bChildMode = false;
 		$this->bInternalCall = false;
-		$this->aTmpChildren = array();
+		$this->aTmpChildren = [];
 		
 		if(NGL_ALVIN) { $this->args(array("alvin"=>true)); }
 	}
@@ -98,11 +98,11 @@ class nglOwl extends nglBranch {
 	}
 	
 	public function child() {
-		list($sChild) = $this->getarguments("child", func_get_args());
+		list($sChild) = $this->getarguments("child", \func_get_args());
 		if(!$this->sObject) { self::errorMessage($this->object, 1001); }
 		if(isset($this->vObjects[$this->sObject]["children"])) {
 			if(!isset($this->vObjects[$this->sObject]["children"][$sChild])) {
-				$sChild = array_search($sChild, $this->vObjects[$this->sObject]["children"]);
+				$sChild = \array_search($sChild, $this->vObjects[$this->sObject]["children"]);
 			}
 			if($sChild===false || !isset($this->vObjects[$this->sObject]["children"][$sChild])) {
 				self::errorMessage($this->object, 1004);
@@ -120,11 +120,11 @@ class nglOwl extends nglBranch {
 
 	public function children() {
 		if(!$this->sObject) { self::errorMessage($this->object, 1001); }
-		$aChildren = array();
+		$aChildren = [];
 		if(isset($this->vObjects[$this->sObject]["children"])) {
 			$aChildren = $this->vObjects[$this->sObject]["children"];
-			if(is_array($aChildren) && count($aChildren)) {
-				$aChildren = array_values($aChildren);
+			if(\is_array($aChildren) && \count($aChildren)) {
+				$aChildren = \array_values($aChildren);
 			}
 		}
 		
@@ -146,22 +146,22 @@ class nglOwl extends nglBranch {
 
 	public function delete() {
 		if(!$this->bInternalCall) { $this->Logger(); }
-		$mDelete = $this->UpdateData(func_get_args(), 0);
+		$mDelete = $this->UpdateData(\func_get_args(), 0);
 		return ($mDelete===0) ? false : $mDelete;
 	}
 
 	public function describe() {
-		list($sSubObject) = $this->getarguments("subobject", func_get_args());
+		list($sSubObject) = $this->getarguments("subobject", \func_get_args());
 		if(!$this->sObject) { return false; }
 		$aReturn = $this->vObjects[$this->sObject];
-		$aFields = array();
+		$aFields = [];
 
 		if($sSubObject!=null) {
 			if($sSubObject[0]=="*") {
-				$sSubObject = substr($sSubObject, 1);
-				$aReturnTables = array();
+				$sSubObject = \substr($sSubObject, 1);
+				$aReturnTables = [];
 				foreach($aReturn["tables"] as $aTable) {
-					if(strpos($aTable["alias"], $sSubObject)!==false) {
+					if(\strpos($aTable["alias"], $sSubObject)!==false) {
 						$aReturnTables[$aTable["alias"]] = $aTable;
 					}
 				}
@@ -183,9 +183,9 @@ class nglOwl extends nglBranch {
 	}
 
 	public function duplicate() {
-		list($mID,$bChildren) = $this->getarguments("id,duplicate_children", func_get_args());
+		list($mID,$bChildren) = $this->getarguments("id,duplicate_children", \func_get_args());
 		
-		$aNewIDs = array();
+		$aNewIDs = [];
 		if(!$this->bChildMode) {
 			$data = $this->get($mID, false, false, false);
 			$aData = $data->get();
@@ -193,7 +193,7 @@ class nglOwl extends nglBranch {
 				$nOldID = $aData["id"];
 				$nNewID = $this->insert($aData);
 
-				$aNewIDs[$this->sObject] = array($nNewID);
+				$aNewIDs[$this->sObject] = [$nNewID];
 				if($bChildren) {
 					$aChildren = $this->children();
 					foreach($aChildren as $sChild) {
@@ -202,7 +202,7 @@ class nglOwl extends nglBranch {
 						if($children->rows()) {
 							$aChildData = $children->getall();
 							$this->attribute("current", $nNewID);
-							$aNewIDs[$sChild] = array();
+							$aNewIDs[$sChild] = [];
 							foreach($aChildData as $aChild) {
 								$nNewChildID = $this->child($sChild)->insert($aChild);
 								$aNewIDs[$sChild][] = $nNewChildID;
@@ -216,7 +216,7 @@ class nglOwl extends nglBranch {
 			$sWhere = ($mID) ? '{"where":[["id","eq","('.$mID.')]","OR",["imya","eq","('.$mID.')"]]}' : null;
 			$children = $this->child($this->sChildTable)->getall($sWhere, false, false, false);
 			if($children->rows()) {
-				$aNewIDs[$this->sChildTable] = array();
+				$aNewIDs[$this->sChildTable] = [];
 				$aChildData = $children->getall();
 				foreach($aChildData as $aChild) {
 					$nNewChildID = $this->child($this->sChildTable)->insert($aChild);
@@ -229,7 +229,7 @@ class nglOwl extends nglBranch {
 	}
 
 	public function get() {
-		list($mID,$sAliasMode,$mJoins,$mChildren,$sColumns,$bParent,$bDeleted) = $this->getarguments("id,view_alias,view_joins,view_children,view_columns,view_parent,view_deleted", func_get_args());
+		list($mID,$sAliasMode,$mJoins,$mChildren,$sColumns,$bParent,$bDeleted) = $this->getarguments("id,view_alias,view_joins,view_children,view_columns,view_parent,view_deleted", \func_get_args());
 		if(!$this->bChildMode) {
 			if(!$this->sObject) { self::errorMessage($this->object, 1001); }
 			$nID = ($mID) ? $this->GetID($mID, $this->sObject) : $this->attribute("current");
@@ -258,10 +258,10 @@ class nglOwl extends nglBranch {
 	}
 
 	public function getall() {
-		list($sFilter,$sAliasMode,$mJoins,$mChildren,$sColumns,$bParent,$bDeleted) = $this->getarguments("filter,view_alias,view_joins,view_children,view_columns,view_parent,view_deleted", func_get_args());
+		list($sFilter,$sAliasMode,$mJoins,$mChildren,$sColumns,$bParent,$bDeleted) = $this->getarguments("filter,view_alias,view_joins,view_children,view_columns,view_parent,view_deleted", \func_get_args());
 
 		// filtro
-		$sFilter = ($sFilter!==null) ? ltrim($sFilter) : "";
+		$sFilter = ($sFilter!==null) ? \ltrim($sFilter) : "";
 		
 		if(!$this->bChildMode) {
 			$sJSQL = $this->view("jsql",$sAliasMode,$mJoins,$mChildren,$sColumns,$bParent,$bDeleted);
@@ -295,17 +295,17 @@ class nglOwl extends nglBranch {
 	public function insert() {
 		if(!$this->bInternalCall) { $this->Logger(); }
 
-		$aArguments = func_get_args();
+		$aArguments = \func_get_args();
 
 		// actualizacion multiple con array multiple
-		if(count($aArguments)==1 && is_array(current($aArguments)) && is_array(current(current($aArguments)))) {
-			$aArguments = current($aArguments);
+		if(\is_array($aArguments) && \count($aArguments)==1 && \is_array(\current($aArguments)) && \is_array(\current(\current($aArguments)))) {
+			$aArguments = \current($aArguments);
 		}
 
 		// insercion multiple
-		if(count($aArguments)>1) {
+		if(\is_array($aArguments) && \count($aArguments)>1) {
 			$bChildMode = $this->bChildMode;
-			$aIDs = array();
+			$aIDs = [];
 			foreach($aArguments as $aInput) {
 				// evita la desactivacion del modo child
 				$this->bInternalCall = true;
@@ -359,7 +359,7 @@ class nglOwl extends nglBranch {
 				$bAlvin = $this->AlvinInit();
 				if($bAlvin) {
 					$aAlvin = self::call("alvin")->raw("owl");
-					$aIndex				= array();
+					$aIndex				= [];
 					$aIndex["table"]	= $sTable;
 					$aIndex["row"]		= $nRowID;
 					$aIndex["imya"]		= $vData["imya"];
@@ -383,14 +383,14 @@ class nglOwl extends nglBranch {
 	}
 
 	public function load() {
-		list($driver) = $this->getarguments("db", func_get_args());
+		list($driver) = $this->getarguments("db", \func_get_args());
 		$this->db = $driver;
-		if(method_exists($this->db, "connect")) { $this->db->connect(); }
+		if(\method_exists($this->db, "connect")) { $this->db->connect(); }
 		return $this;
 	}
 
 	public function query() {
-		list($sJSQL) = $this->getarguments("jsql", func_get_args());
+		list($sJSQL) = $this->getarguments("jsql", \func_get_args());
 		$sSQL = $this->AlvinSQL($sJSQL, "select");
 		$this->attribute("query", $sSQL);
 		if($this->argument("debug")) { echo self::call()->dump($sSQL); }
@@ -399,9 +399,9 @@ class nglOwl extends nglBranch {
 	
 	public function relationship() {
 		if(!$this->sObject) { self::errorMessage($this->object, 1001); }
-		list($bJoins,$bChildren,$bParent,$nJoinLevel) = $this->getarguments("view_joins,view_children,view_parent,join_level", func_get_args());
+		list($bJoins,$bChildren,$bParent,$nJoinLevel) = $this->getarguments("view_joins,view_children,view_parent,join_level", \func_get_args());
 
-		$aReturn = array();
+		$aReturn = [];
 		if(!$this->sObject) { self::errorMessage($this->object, 1001); }
 		
 		$sErrors = "";
@@ -410,8 +410,8 @@ class nglOwl extends nglBranch {
 		$vTables = $vObject["tables"];
 
 		$nLoopingOut = 0;
-		$aUsed = $aUnUsed = array();
-		while(count($vTables)) {
+		$aUsed = $aUnUsed = [];
+		while(\count($vTables)) {
 			if($nLoopingOut++>200) { echo "Error looping in relationship method\n";
 				// print_r($vTables);
 				// print_r($aUsed);
@@ -425,9 +425,9 @@ class nglOwl extends nglBranch {
 				if(!isset($vTables[$sTable]) && !isset($aUsed[$sTable])) { continue; }
 				$vTable = $vTables[$sTable];
 			} else {
-				$sTable = key($vTables);
-				$vTable = current($vTables);
-				next($vTables);
+				$sTable = \key($vTables);
+				$vTable = \current($vTables);
+				\next($vTables);
 			}
 
 			if($vTable["level"]>$nJoinLevel) {
@@ -452,10 +452,10 @@ class nglOwl extends nglBranch {
 				}
 
 				$aUsed[$sTable] = true;
-				$aReturn[] = str_repeat("--", $vTable["level"])." CHILD `".$vTable["name"]."` AS '".$sTable."' USING `".$sTable."_pid`";
+				$aReturn[] = \str_repeat("--", $vTable["level"])." CHILD `".$vTable["name"]."` AS '".$sTable."' USING `".$sTable."_pid`";
 			} else if($vTable["type"]=="parent" && $bParent) {
 				$aUsed[$sTable] = true;
-				$aReturn[] = str_repeat("--", $vTable["level"])." PARENT OF `".$vTable["name"]."` AS '".$sTable."' USING `id` = `".$vTable["join"]."`.`".$vTable["using"]."`";
+				$aReturn[] = \str_repeat("--", $vTable["level"])." PARENT OF `".$vTable["name"]."` AS '".$sTable."' USING `id` = `".$vTable["join"]."`.`".$vTable["using"]."`";
 			} else if(!empty($vTable["join"]) && $vTable["type"]=="join" && $bJoins) {
 				if(isset($aUnUsed[$vTable["join"]])) {
 					$aUnUsed[$sTable] = true;
@@ -468,7 +468,7 @@ class nglOwl extends nglBranch {
 				}
 
 				$aUsed[$sTable] = true;
-				$aReturn[] = str_repeat("--", $vTable["level"])." JOIN `".$vTable["name"]."` AS '".$sTable."' USING `".$vTable["join"]."_".$vTable["using"]."`";
+				$aReturn[] = \str_repeat("--", $vTable["level"])." JOIN `".$vTable["name"]."` AS '".$sTable."' USING `".$vTable["join"]."_".$vTable["using"]."`";
 			} else {
 				$aUnUsed[$sTable] = true;
 				unset($vTables[$sTable]);
@@ -481,14 +481,14 @@ class nglOwl extends nglBranch {
 			$this->Logger("warning", $sErrors);
 		}
 
-		return implode("\n", $aReturn);
+		return \implode("\n", $aReturn);
 	}
 
 	public function select() {
-		list($sObjectName) = $this->getarguments("object", func_get_args());
+		list($sObjectName) = $this->getarguments("object", \func_get_args());
 
-		$sObjectName = preg_replace("/[^a-zA-Z0-9_\-]/s", "", $sObjectName);
-		$this->args(array("id"=>null));
+		$sObjectName = \preg_replace("/[^a-zA-Z0-9_\-]/s", "", $sObjectName);
+		$this->args(["id"=>null]);
 		$this->attribute("current", null);
 
 		if(isset($this->vObjects[$sObjectName])) {
@@ -512,29 +512,29 @@ class nglOwl extends nglBranch {
 		}
 
 		$aObject					= $table->get();
-		$vObject					= array();
+		$vObject					= [];
 		$vObject["name"]			= $aObject["name"];
-		$vObject["columns"]			= ($aObject["columns"]) ? self::call("jsql")->decode($aObject["columns"]) : array();
-		$vObject["foreignkey"]		= ($aObject["foreignkey"]) ? self::call("jsql")->decode($aObject["foreignkey"]) : array();
-		$vObject["relationship"]	= ($aObject["relationship"]) ? self::call("jsql")->decode($aObject["relationship"]) : array();
+		$vObject["columns"]			= ($aObject["columns"]) ? self::call("jsql")->decode($aObject["columns"]) : [];
+		$vObject["foreignkey"]		= ($aObject["foreignkey"]) ? self::call("jsql")->decode($aObject["foreignkey"]) : [];
+		$vObject["relationship"]	= ($aObject["relationship"]) ? self::call("jsql")->decode($aObject["relationship"]) : [];
 		$vObject["validate_insert"] = $aObject["validate_insert"];
 		$vObject["validate_update"] = $aObject["validate_update"];
 		$table->destroy();
 		$table = null;
 
 		// tabla 
-		$vMain = array(
+		$vMain = [
 			"name"		=>	$vObject["name"], 
 			"alias"		=>	$vObject["name"], 
 			"type"		=>	"main", 
 			"parent"	=>	((isset($vObject["relationship"]["parent"])) ? "__parent" : ""), 
 			"level"		=>	0, 
 			"columns"	=>	$vObject["columns"]
-		);
+		];
 		$aTables = array($vObject["name"] => $vMain);
 
-		$this->aRelationships = array();
-		if(count($vObject["relationship"])) {
+		$this->aRelationships = [];
+		if(\is_array($vObject["relationship"]) && \count($vObject["relationship"])) {
 			// parent
 			if(isset($vObject["relationship"]["parent"]) && !empty($vObject["relationship"]["parent"])) {
 				$sSQL = $this->JsqlParser('{
@@ -546,7 +546,7 @@ class nglOwl extends nglBranch {
 				$this->attribute("query", $sSQL);
 				$parent = $this->db->query($sSQL);
 				if($parent->rows()) {
-					$aTable						= array();
+					$aTable						= [];
 					$aTable["name"] 			= $vObject["relationship"]["parent"];
 					$aTable["level"] 			= 1;
 					$aTable["alias"] 			= "__parent";
@@ -557,7 +557,7 @@ class nglOwl extends nglBranch {
 					$aTables[$aTable["alias"]]	= $aTable;
 
 					$aParentJoins = self::call("jsql")->decode($parent->reset()->get("relationship"));
-					if(isset($aParentJoins["joins"]) && count($aParentJoins["joins"])) {
+					if(isset($aParentJoins["joins"]) && \count($aParentJoins["joins"])) {
 						$aParentJoins = $aParentJoins["joins"];
 						foreach($aParentJoins as $aPJoin) {
 							$sSQL = $this->JsqlParser('{
@@ -569,7 +569,7 @@ class nglOwl extends nglBranch {
 							$this->attribute("query", $sSQL);
 							$parentjoin = $this->db->query($sSQL);
 
-							$aParentJoin = array();
+							$aParentJoin = [];
 							$aTable["name"] 			= $aPJoin["name"];
 							$aTable["level"] 			= 2;
 							$aTable["alias"] 			= "__parent_".$aPJoin["name"];
@@ -584,13 +584,13 @@ class nglOwl extends nglBranch {
 			}
 
 			// children
-			$this->aTmpChildren = array();
+			$this->aTmpChildren = [];
 			$this->nRelationshipsLevel = 0;
-			$this->GetRelationship($aTables, $vObject, $sObjectName, array("**CONTROL**"=>array(), $sObjectName=>true));
+			$this->GetRelationship($aTables, $vObject, $sObjectName, ["**CONTROL**"=>[], $sObjectName=>true]);
 			$vObject["children"] = $this->aTmpChildren;
 		}
 
-		$vObject["tables"] = self::call()->arrayMultiSort($aTables, array(array("field"=>"level", "type"=>2)));
+		$vObject["tables"] = self::call()->arrayMultiSort($aTables, [["field"=>"level", "type"=>2]]);
 
 		// recarga de hijos con dependencias
 		if(isset($vObject["relationship"]) && isset($vObject["relationship"]["children"])) {
@@ -606,7 +606,7 @@ class nglOwl extends nglBranch {
 	}
 
 	public function showtables() {
-		$aTables = array();
+		$aTables = [];
 		$sSQL = $this->JsqlParser('{"columns":["name","columns","foreignkey","relationship","validate_insert","validate_update"], "tables":["__ngl_owl_structure__"], "order":["name"]}');
 		$this->attribute("query", $sSQL);
 		$tables = $this->db->query($sSQL);
@@ -629,37 +629,37 @@ class nglOwl extends nglBranch {
 
 	public function suspend() {
 		if(!$this->bInternalCall) { $this->Logger(); }
-		$mUpdate = $this->UpdateData(func_get_args(), 2);
+		$mUpdate = $this->UpdateData(\func_get_args(), 2);
 		return ($mUpdate===0) ? false : $mUpdate;
 	}
 
 	public function toggle() {
 		if(!$this->bInternalCall) { $this->Logger(); }
-		$mUpdate = $this->UpdateData(func_get_args(), 4);
+		$mUpdate = $this->UpdateData(\func_get_args(), 4);
 		return ($mUpdate===0) ? false : $mUpdate;
 	}
 
 	public function unsuspend() {
 		if(!$this->bInternalCall) { $this->Logger(); }
-		$mUpdate = $this->UpdateData(func_get_args(), 3);
+		$mUpdate = $this->UpdateData(\func_get_args(), 3);
 		return ($mUpdate===0) ? false : $mUpdate;
 	}
 	
 	public function update() {
 		if(!$this->bInternalCall) { $this->Logger(); }
-		$mUpdate = $this->UpdateData(func_get_args());
+		$mUpdate = $this->UpdateData(\func_get_args());
 		return ($mUpdate===false) ? false : $mUpdate;
 	}
 	
 	public function upsert() {
 		if(!$this->bInternalCall) { $this->Logger(); }
 
-		$aArguments = func_get_args();
-		if(count($aArguments)==1 && is_array(current($aArguments)) && is_array(current(current($aArguments)))) {
-			$aArguments = current($aArguments);
+		$aArguments = \func_get_args();
+		if(\is_array($aArguments) && \count($aArguments)==1 && \is_array(\current($aArguments)) && \is_array(\current(\current($aArguments)))) {
+			$aArguments = \current($aArguments);
 		}
 
-		$aToInsert = $aToUpdate = array();
+		$aToInsert = $aToUpdate = [];
 		foreach($aArguments as $aRow) {
 			if((isset($aRow["id"]) && !empty($aRow["id"])) || (isset($aRow["imya"]) && !empty($aRow["imya"]))) {
 				$aToUpdate[] = $aRow;
@@ -668,16 +668,16 @@ class nglOwl extends nglBranch {
 			}
 		}
 
-		$mInsert = (count($aToInsert)) ? $this->insert($aToInsert) : null;
-		$mUpdate = (count($aToUpdate)) ? $this->UpdateData($aToUpdate) : null;
-		return array("insert"=>$mInsert, "update"=>$mUpdate);
+		$mInsert = (\count($aToInsert)) ? $this->insert($aToInsert) : null;
+		$mUpdate = (\count($aToUpdate)) ? $this->UpdateData($aToUpdate) : null;
+		return ["insert"=>$mInsert, "update"=>$mUpdate];
 	}
 
 	public function view() {
 		if(!$this->sObject) { self::errorMessage($this->object, 1001); }
-		list($sOutputMode,$sAliasMode,$mJoins,$mChildren,$mColumns,$bParent,$bDeleted) = $this->getarguments("view_mode,view_alias,view_joins,view_children,view_columns,view_parent,view_deleted", func_get_args());
+		list($sOutputMode,$sAliasMode,$mJoins,$mChildren,$mColumns,$bParent,$bDeleted) = $this->getarguments("view_mode,view_alias,view_joins,view_children,view_columns,view_parent,view_deleted", \func_get_args());
 
-		$aSelect = $aFrom = array();
+		$aSelect = $aFrom = [];
 		$sErrors = "";
 		$vObject = $this->vObjects[$this->sObject];
 		if(!isset($vObject["tables"])) { return false; }
@@ -685,11 +685,11 @@ class nglOwl extends nglBranch {
 
 		// SELECT customizado
 		if($mColumns) {
-			$aRequires = (is_array($mColumns)) ? $mColumns : self::call("shift")->convert($mColumns, "json-array");
-			$aSelected = array();
+			$aRequires = (\is_array($mColumns)) ? $mColumns : self::call("shift")->convert($mColumns, "json-array");
+			$aSelected = [];
 			foreach($aRequires as $mColumn) {
-				$aColumn = (is_array($mColumn)) ? $mColumn : array($mColumn);
-				$aTable = explode(".", $aColumn[0]);
+				$aColumn = (\is_array($mColumn)) ? $mColumn : [$mColumn];
+				$aTable = \explode(".", $aColumn[0]);
 				$aSelected[$aTable[0]] = true;
 				$sAlias = ((isset($aColumn[1])) ? $aColumn[1] : $aTable[1]);
 				$aSelect[$sAlias] = '["'.$aTable[0].'.'.$aTable[1].'","'.$sAlias.'"]';
@@ -698,24 +698,24 @@ class nglOwl extends nglBranch {
 		}
 
 		$nJoinLevel = $this->argument("join_level");
-		if(is_array($mJoins)) {
+		if(\is_array($mJoins)) {
 			$aJoins = $mJoins;
 		} else if($mJoins[0]==":") {
-			$aJoins = array_keys($vTables);
-			$nJoinLevel = substr($mJoins, 1);
+			$aJoins = \array_keys($vTables);
+			$nJoinLevel = \substr($mJoins, 1);
 		} else {
 			$mJoins = self::call("fn")->istrue($mJoins);
-			$aJoins = ($mJoins) ? array_keys($vTables) : array();
+			$aJoins = ($mJoins) ? \array_keys($vTables) : [];
 		}
 
-		$aChildren = (is_array($mChildren)) ? $mChildren : (($mChildren==true) ? array_keys($vTables) : array());
+		$aChildren = (\is_array($mChildren)) ? $mChildren : (($mChildren==true) ? \array_keys($vTables) : []);
 
 		$nLoopingOut = 0;
-		$aUsed = $aUnUsed = array();
+		$aUsed = $aUnUsed = [];
 
 		// print_r($vTables);die("#".count($vTables));
-		$nTables = count($vTables);
-		while(count($vTables)) {
+		$nTables = \count($vTables);
+		while(\count($vTables)) {
 			if($nLoopingOut++>$nTables) {
 				echo "Error looping in view method\n";
 				// print_r($vTables);
@@ -730,9 +730,9 @@ class nglOwl extends nglBranch {
 				if(!isset($vTables[$sTable]) && !isset($aUsed[$sTable])) { continue; }
 				$vTable = $vTables[$sTable];
 			} else {
-				$sTable = key($vTables);
-				$vTable = current($vTables);
-				next($vTables);
+				$sTable = \key($vTables);
+				$vTable = \current($vTables);
+				\next($vTables);
 			}
 
 			if($vTable["level"]>$nJoinLevel) {
@@ -742,11 +742,11 @@ class nglOwl extends nglBranch {
 			}
 
 			// FROM (va antes por el continue en los joins)
-			if($vTable["type"]=="main" || !count($aFrom)) {
+			if($vTable["type"]=="main" || !\count($aFrom)) {
 				$aUsed[$this->sObject] = true;
 				$aFrom[] = '"'.$this->sObject.'"';
 			} else if($vTable["type"]=="children") {
-				if($mChildren===true || in_array($sTable, $aChildren) || (isset($vTable["parent"]) && $vTable["parent"]!=$this->sObject && count($aChildren))) {
+				if($mChildren===true || \in_array($sTable, $aChildren) || (isset($vTable["parent"]) && $vTable["parent"]!=$this->sObject && \count($aChildren))) {
 					if(isset($aUnUsed[$vTable["join"]])) {
 						$aUnUsed[$sTable] = true;
 						unset($vTables[$sTable]);
@@ -781,7 +781,7 @@ class nglOwl extends nglBranch {
 						["'.$sTable.'.id","eq","'.$this->sObject.'.pid"]
 					]
 				]';
-			} else if(($mJoins===true || in_array($sTable, $aJoins)) && !empty($vTable["join"]) && $vTable["type"]=="join") {
+			} else if(($mJoins===true || \in_array($sTable, $aJoins)) && !empty($vTable["join"]) && $vTable["type"]=="join") {
 				if(isset($aUnUsed[$vTable["join"]])) {
 					$aUnUsed[$sTable] = true;
 					unset($vTables[$sTable]);
@@ -801,7 +801,7 @@ class nglOwl extends nglBranch {
 						["'.$sTable.'.'.$sJoinField.'","eq","'.$vTable["join"].'.'.$vTable["using"].'"]
 				';
 
-				if(!$bDeleted && in_array("state", $vTables[$sTable]["columns"])) { $sFrom .= ',"AND",["'.$sTable.'.state","isnot","(NULL)"]'; }
+				if(!$bDeleted && \in_array("state", $vTables[$sTable]["columns"])) { $sFrom .= ',"AND",["'.$sTable.'.state","isnot","(NULL)"]'; }
 				$sFrom .= ']]';
 				$aFrom[] = $sFrom;
 			} else {
@@ -815,9 +815,9 @@ class nglOwl extends nglBranch {
 			if(!isset($aSelected) && $vTable) {
 				foreach($vTable["columns"] as $sField) {
 					if($sTable!=$this->sObject) {
-						if($vTable["type"]=="children" && ($mChildren==false || !in_array($sTable, $aChildren))) { break; }
+						if($vTable["type"]=="children" && ($mChildren==false || !\in_array($sTable, $aChildren))) { break; }
 						if($vTable["type"]=="parent" && !$bParent) { break; }
-						if($vTable["type"]=="join" && ($mJoins==false || !in_array($sTable, $aJoins))) { break; }
+						if($vTable["type"]=="join" && ($mJoins==false || !\in_array($sTable, $aJoins))) { break; }
 					}
 
 					switch($sAliasMode) {
@@ -853,42 +853,42 @@ class nglOwl extends nglBranch {
 		}
 
 		if(!$mColumns) {
-			$aSelect = array_merge(array(
+			$aSelect = \array_merge([
 				"__id__" => '["'.$this->sObject.'.id","__id__"]',
 				"__imya__" => '["'.$this->sObject.'.imya","__imya__"]'
-			), $aSelect);
+			], $aSelect);
 		}
 
 		if($this->bViewFields) { return $aSelect; }
 
-		$sView = '{"columns" : ['.implode(',', $aSelect).'], "tables" : ['.implode(', ', $aFrom).']}';
+		$sView = '{"columns" : ['.\implode(',', $aSelect).'], "tables" : ['.\implode(', ', $aFrom).']}';
 		$sEOL = $this->argument("view_eol");
-		return (strtolower($sOutputMode)=="jsql") ? $sView : $this->JsqlParser($sView, $sEOL);
+		return (\strtolower($sOutputMode)=="jsql") ? $sView : $this->JsqlParser($sView, $sEOL);
 	}
 
 	public function viewFields() {
 		if(!$this->sObject) { self::errorMessage($this->object, 1001); }
-		list($sOutputMode,$sAliasMode,$mJoins,$mChildren,$mColumns,$bParent) = $this->getarguments("view_mode,view_alias,view_joins,view_children,view_columns,view_parent", func_get_args());
+		list($sOutputMode,$sAliasMode,$mJoins,$mChildren,$mColumns,$bParent) = $this->getarguments("view_mode,view_alias,view_joins,view_children,view_columns,view_parent", \func_get_args());
 
 		$this->bViewFields = true;
 		$aFields = $this->view($sOutputMode,$sAliasMode,$mJoins,$mChildren,$mColumns,$bParent);
-		$aFields = array_map("json_decode", $aFields);
+		$aFields = \array_map("json_decode", $aFields);
 		$this->bViewFields = false;
 		return $aFields;
 	}
 
 	public function viewchildren() {
 		if(!$this->sObject) { self::errorMessage($this->object, 1001); }
-		list($sOutputMode,$sAliasMode,$bJoins,$bDeleted) = $this->getarguments("view_mode,view_alias,view_joins,view_deleted", func_get_args());
+		list($sOutputMode,$sAliasMode,$bJoins,$bDeleted) = $this->getarguments("view_mode,view_alias,view_joins,view_deleted", \func_get_args());
 
-		$aSelect = $aFrom = array();
+		$aSelect = $aFrom = [];
 		$sErrors = "";
 		$vObject = $this->vObjects[$this->sObject];
 		if(!isset($vObject["tables"])) { return false; }
 		$vTables = $vObject["tables"];
 
-		array_shift($vTables);
-		array_unshift($vTables, $vTables[$this->sChildTableAlias]);
+		\array_shift($vTables);
+		\array_unshift($vTables, $vTables[$this->sChildTableAlias]);
 		$vTables[$this->sChildTableAlias]["type"] = "main";
 
 		foreach($vTables as $sTable => $vTable) {
@@ -945,7 +945,7 @@ class nglOwl extends nglBranch {
 			$this->Logger("warning", $sErrors);
 		}
 
-		$sView = '{"columns" : ['.implode(', ', $aSelect).'], "tables" : ['.implode(', ', $aFrom).']}';
+		$sView = '{"columns" : ['.\implode(', ', $aSelect).'], "tables" : ['.\implode(', ', $aFrom).']}';
 		$sEOL = $this->argument("view_eol");
 		return (strtolower($sOutputMode)=="jsql") ? $sView : $this->JsqlParser($sView, $sEOL);
 	}
@@ -957,7 +957,7 @@ class nglOwl extends nglBranch {
 	}
 
 	final private function AlvinSQL($sJSQL, $sAlvinGrant="select") {
-		$sAlvinGrant = strtolower($sAlvinGrant);
+		$sAlvinGrant = \strtolower($sAlvinGrant);
 		$bAlvin = $this->AlvinInit();
 
 		if($bAlvin!==null) {
@@ -966,15 +966,15 @@ class nglOwl extends nglBranch {
 			if($bAlvin) {
 				$aAlvin = self::call("alvin")->raw("owl");
 				if($aAlvin!==false && isset($aAlvin[$sTableName][$sAlvinGrant])) {
-					$sOR = trim($aAlvin[$sTableName][$sAlvinGrant]);
+					$sOR = \trim($aAlvin[$sTableName][$sAlvinGrant]);
 					if($sOR!="*") {
 						if($sAlvinGrant!="insert") {
-							$sInsert = trim($aAlvin[$sTableName]["insert"]);
-							if(!empty($sInsert)) { $sOR .= ",".trim($aAlvin[$sTableName]["insert"]); }
+							$sInsert = \trim($aAlvin[$sTableName]["insert"]);
+							if(!empty($sInsert)) { $sOR .= ",".\trim($aAlvin[$sTableName]["insert"]); }
 						}
-						$sOR = addslashes($sOR);
+						$sOR = \addslashes($sOR);
 						$sOR = self::call()->explodeTrim(",", $sOR);
-						$sOR = (count($sOR)) ? implode("','", array_unique($sOR)) : "";
+						$sOR = (\count($sOR)) ? \implode("','", \array_unique($sOR)) : "";
 						$sOR = " OR `alvin` IN('".$sOR."') ";
 					}
 				}
@@ -986,23 +986,23 @@ class nglOwl extends nglBranch {
 				$aJSQL = self::call("jsql")->decode($sJSQL);
 				
 				if(isset($aJSQL["where"])) {
-					$aJSQL["where"] = array($aJSQL["where"], "AND", array(
-						array($sTableName.".id", "notin", $sHashNot),
+					$aJSQL["where"] = [$aJSQL["where"], "AND", [
+						[$sTableName.".id", "notin", $sHashNot],
 						"OR",
-						array($sTableName.".id", "in", $sHash)
-					));
+						[$sTableName.".id", "in", $sHash]
+					]];
 				} else {
-					$aJSQL["where"] = array(
-						array($sTableName.".id", "notin", $sHashNot),
+					$aJSQL["where"] = [
+						[$sTableName.".id", "notin", $sHashNot],
 						"OR",
-						array($sTableName.".id", "in", $sHash)
-					);
+						[$sTableName.".id", "in", $sHash]
+					];
 				}
 				$sSQL = $this->JsqlParser($aJSQL);
 			
 				// consulta final
-				$sSQL = str_replace($sHash, "SELECT `row` FROM `__ngl_owl_index__` WHERE `table` = '".$sTableName."' AND (`alvin` IS NULL ".$sOR.")", $sSQL);
-				$sSQL = str_replace($sHashNot, "SELECT `row` FROM `__ngl_owl_index__` WHERE `table` = '".$sTableName."'", $sSQL);
+				$sSQL = \str_replace($sHash, "SELECT `row` FROM `__ngl_owl_index__` WHERE `table` = '".$sTableName."' AND (`alvin` IS NULL ".$sOR.")", $sSQL);
+				$sSQL = \str_replace($sHashNot, "SELECT `row` FROM `__ngl_owl_index__` WHERE `table` = '".$sTableName."'", $sSQL);
 			} else {
 				$sSQL = $this->JsqlParser($sJSQL);
 			}
@@ -1028,17 +1028,17 @@ class nglOwl extends nglBranch {
 			$vForeignKey = self::call("jsql")->decode($sForeignKey);
 		}
 
-		$vCrossRows = array();
-		if(is_array($vForeignKey) && count($vForeignKey)) {
+		$vCrossRows = [];
+		if(\is_array($vForeignKey) && \count($vForeignKey)) {
 			foreach($vForeignKey["tables"] as $sCrossTable => $aFields) {
 				if($sWhere!==false) {
-					$aConditions = array();
-					$aConditions["where"] = array($sWhere);
-					$aConditions["from"] = array();
+					$aConditions = [];
+					$aConditions["where"] = [$sWhere];
+					$aConditions["from"] = [];
 				}
 			
 				foreach($aFields as $nKey => $sField) {
-					$sIndex = md5($sTable.$vForeignKey["fields"][$nKey].$sCrossTable.$sField);
+					$sIndex = \md5($sTable.$vForeignKey["fields"][$nKey].$sCrossTable.$sField);
 					$aConditions["where"][$sIndex] = '
 						["'.$sTable.'.'.$vForeignKey["fields"][$nKey].'","eq","'.$sCrossTable.'.'.$sField.'"],
 						"AND",
@@ -1053,32 +1053,32 @@ class nglOwl extends nglBranch {
 				$sSQL = $this->AlvinSQL('{
 					"type":"select",
 					"columns":["'.$sCrossTable.'.id"],
-					"tables":["'.implode('","', $aConditions["from"]).'"],
-					"where":['.implode(',"AND",', $aConditions["where"]).']
+					"tables":["'.\implode('","', $aConditions["from"]).'"],
+					"where":['.\implode(',"AND",', $aConditions["where"]).']
 				}', "update");
 
-				$aRows = array();
+				$aRows = [];
 				$this->attribute("query", $sSQL);
 				$rows = $this->db->query($sSQL);
 				if($rows) {
-					$aRows	= ($rows->rows()) ? $rows->getall("id") : array();
-					$nRows	= count($aRows);
-					$sRows	= implode(",", $aRows);
+					$aRows	= ($rows->rows()) ? $rows->getall("id") : [];
+					$nRows	= \count($aRows);
+					$sRows	= \implode(",", $aRows);
 					if($nRows) {
 						$sSQLUpdate = '{
 							"type":"update",
 							"columns":[["'.$sCrossTable.'.state","eq","(NULL)"]],
-							"tables":["'.implode('","', $aConditions["from"]).'"],
-							"where":['.implode(',"AND",', $aConditions["where"]).']
+							"tables":["'.\implode('","', $aConditions["from"]).'"],
+							"where":['.\implode(',"AND",', $aConditions["where"]).']
 						}';
 
 						$aCascade 					= $this->aCascade;
-						$sCascadeIndex 				= count($aConditions["from"])."-".implode("-", $aConditions["from"]);
-						$aCascade[$sCascadeIndex] 	= array($sCrossTable, $sRows, $sSQLUpdate);
+						$sCascadeIndex 				= \count($aConditions["from"])."-".\implode("-", $aConditions["from"]);
+						$aCascade[$sCascadeIndex] 	= [$sCrossTable, $sRows, $sSQLUpdate];
 						$this->aCascade 			= $aCascade;
 
 						$vCrossRows[] = $nRows." ROWS IN `".$sCrossTable."` LINKED WITH `".$sTable."`";
-						$vCrossRows = array_merge($vCrossRows, $this->CrossRows($sCrossTable, false, $aConditions));
+						$vCrossRows = \array_merge($vCrossRows, $this->CrossRows($sCrossTable, false, $aConditions));
 					}
 				}
 				
@@ -1086,17 +1086,17 @@ class nglOwl extends nglBranch {
 			}
 		}
 
-		return (!empty($vCrossRows)) ? array("info"=>$vCrossRows, "cascade"=>$this->aCascade) : array();
+		return (!empty($vCrossRows)) ? ["info"=>$vCrossRows, "cascade"=>$this->aCascade] : [];
 	}
 
 	private function DeleteInCascade($aCascade) {
-		krsort($aCascade);
+		\krsort($aCascade);
 
 		$nRows = 0;
 		foreach($aCascade as $aTable) {
 			$this->attribute("query", $aTable[2]);
 			if($this->db->query($aTable[2])) {
-				$aIDs = explode(",", $aTable[1]);
+				$aIDs = \explode(",", $aTable[1]);
 				foreach($aIDs as $nId) {
 					$this->OwLog($aTable[0], $nId, "delete");
 					$nRows++;
@@ -1143,7 +1143,7 @@ class nglOwl extends nglBranch {
 			}
 		}
 
-		if(is_array($mID)) {
+		if(\is_array($mID)) {
 			$aWhere = $this->db->escape($mID);
 			$sJSQL = $this->JsqlParser('{
 				"columns":["id"],
@@ -1183,12 +1183,12 @@ class nglOwl extends nglBranch {
 	private function GetRelationship(&$aTables, $vObject, $sAlias, $aParents) {
 		$this->x = 0;
 		$this->GetRelationshipChildren($aTables, $vObject, $sAlias, $aParents);
-		$aTablesNames = array_keys($aTables);
-		$aWhere = array();
+		$aTablesNames = \array_keys($aTables);
+		$aWhere = [];
 		foreach($aTablesNames as $sTbName) {
 			$aWhere[] = '["name","eq","('.$sTbName.')"]';
 		}
-		$sWhere = implode(',"OR",', $aWhere);
+		$sWhere = \implode(',"OR",', $aWhere);
 		$sSQL = $this->JsqlParser('{"tables":["__ngl_owl_structure__"], "where":['.$sWhere.']}');
 		$relationship = $this->db->query($sSQL);
 		$vRelationship = $relationship->getall("#name");
@@ -1197,11 +1197,11 @@ class nglOwl extends nglBranch {
 	}
 
 	private function GetRelationshipChildren(&$aTables, $mObject, $sAlias, $aParents) {
-		if($this->x++>500) { echo "Error GetRelationshipChildren method\n"; print_r($aTables); exit(); }
+		if($this->x++>500) { echo "Error GetRelationshipChildren method\n"; \print_r($aTables); exit(); }
 
-		$aRelations = $aColumns = array();
+		$aRelations = $aColumns = [];
 
-		if(is_array($mObject)) {
+		if(\is_array($mObject)) {
 			$sObjectName = $sAlias = $mObject["name"];
 			$aColumns = $mObject["columns"];
 			$aRelations = $mObject["relationship"];
@@ -1220,30 +1220,30 @@ class nglOwl extends nglBranch {
 				$aGetRelations = $relations->get();
 				$relations->destroy();
 				$relations = null;
-				$aColumns = ($aGetRelations["columns"]) ? self::call("jsql")->decode($aGetRelations["columns"]) : array();
-				$aRelations = ($aGetRelations["relationship"]) ? self::call("jsql")->decode($aGetRelations["relationship"]) : array();
+				$aColumns = ($aGetRelations["columns"]) ? self::call("jsql")->decode($aGetRelations["columns"]) : [];
+				$aRelations = ($aGetRelations["relationship"]) ? self::call("jsql")->decode($aGetRelations["relationship"]) : [];
 
-				if(!isset($aRelations["joins"])) { $aRelations["joins"] = array(); }
-				if(!isset($aRelations["children"])) { $aRelations["children"] = array(); }
+				if(!isset($aRelations["joins"])) { $aRelations["joins"] = []; }
+				if(!isset($aRelations["children"])) { $aRelations["children"] = []; }
 			}
 
-			if(count($aRelations) && isset($aTables[$sAlias])) {
+			if(\is_array($aRelations) && \count($aRelations) && isset($aTables[$sAlias])) {
 				$aTables[$sAlias]["parent"] = (isset($aRelations["parent"])) ? $aRelations["parent"] : null;
 			}
 		}
 
 		$this->aRelationships[$sObjectName] = $aColumns;
 		$aTables[$sAlias]["columns"] = $aColumns;
-		if(is_array($aRelations)) {
+		if(\is_array($aRelations)) {
 			$this->nRelationshipsLevel++;
 			if($this->nRelationshipsLevel <= $this->argument("join_level")) {
 				// joins
-				if(isset($aRelations["joins"]) && count($aRelations["joins"])) {
+				if(isset($aRelations["joins"]) && \count($aRelations["joins"])) {
 					$this->GetRelationshipStructure($aTables, $aParents, $sObjectName, $sAlias, $aRelations["joins"], false);
 				}
 
 				// children
-				if(isset($aRelations["children"]) && count($aRelations["children"])) {
+				if(isset($aRelations["children"]) && \count($aRelations["children"])) {
 					$this->GetRelationshipStructure($aTables, $aParents, $sObjectName, $sAlias, $aRelations["children"], true);
 				}
 			}
@@ -1255,14 +1255,14 @@ class nglOwl extends nglBranch {
 
 	private function GetRelationshipStructure(&$aTables, &$aParents, $sObjectName, $sAlias, $aRelations, $bChildren) {
 		// resolucion de multiples joins
-		$aTablesToJoin = $aToJoinsUnique = array();
+		$aTablesToJoin = $aToJoinsUnique = [];
 		foreach($aRelations as $aTableToJoin) {
-			if(!isset($aToJoinsUnique[$aTableToJoin["name"]])) { $aToJoinsUnique[$aTableToJoin["name"]] = array(); }
+			if(!isset($aToJoinsUnique[$aTableToJoin["name"]])) { $aToJoinsUnique[$aTableToJoin["name"]] = []; }
 			$aTableToJoin["alias"] = $aTableToJoin["name"];
 			$aToJoinsUnique[$aTableToJoin["name"]][] = $aTableToJoin;
 		}
 		foreach($aToJoinsUnique as $aTablesJoinsGroup) {
-			if(count($aTablesJoinsGroup)>1) {
+			if(\is_array($aTablesJoinsGroup) && \count($aTablesJoinsGroup)>1) {
 				foreach($aTablesJoinsGroup as $aTableGroup) {
 					$aTableGroup["alias"] = $aTableGroup["name"]."_".$aTableGroup["using"];
 					$aTablesToJoin[] = $aTableGroup;
@@ -1274,22 +1274,22 @@ class nglOwl extends nglBranch {
 		
 		// joins
 		foreach($aTablesToJoin as $vTable) {
-			$sUsingField				= ($bChildren) ? "id" : (array_key_exists("using", $vTable) ? $vTable["using"] : null);
+			$sUsingField				= ($bChildren) ? "id" : (\array_key_exists("using", $vTable) ? $vTable["using"] : null);
 			$sJoinAlias					= $sAlias."_".$vTable["alias"];
 
-			$aTable						= array();
+			$aTable						= [];
 			$aTable["name"] 			= $vTable["name"];
 			$aTable["level"] 			= $this->nRelationshipsLevel;
 			$aTable["alias"] 			= $sJoinAlias;
 			$aTable["type"]				= ($bChildren) ? "children" : "join";
 			$aTable["join"]				= $sAlias;
 			$aTable["using"]			= $sUsingField;
-			$aTable["field"]			= (array_key_exists("field", $vTable)) ? $vTable["field"] : "id";
+			$aTable["field"]			= (\array_key_exists("field", $vTable)) ? $vTable["field"] : "id";
 			$aTables[$sJoinAlias] 		= $aTable;
 
 			// joins
-			$sJoinUniqueID = md5($sObjectName."@".$vTable["name"]."@".$sUsingField);
-			if(!key_exists($sJoinAlias, $aParents) && !isset($aParents["**CONTROL**"][$sJoinUniqueID])) {
+			$sJoinUniqueID = \md5($sObjectName."@".$vTable["name"]."@".$sUsingField);
+			if(!\key_exists($sJoinAlias, $aParents) && !isset($aParents["**CONTROL**"][$sJoinUniqueID])) {
 				$aParents[$sJoinAlias] = true;
 				$aParents["**CONTROL**"][$sJoinUniqueID] = $sObjectName."@".$vTable["name"]."@".$sUsingField;
 				$this->GetRelationshipChildren($aTables, $aTable["name"], $sJoinAlias, $aParents);
@@ -1317,11 +1317,11 @@ class nglOwl extends nglBranch {
 		return $this->db->jsqlParser($mJSQL, $EOL);
 	}
 
-	private function Logger($sStatus=null, $aDetails=array()) {
+	private function Logger($sStatus=null, $aDetails=[]) {
 		if($sStatus===null) {
-			$this->attribute("log", array());
+			$this->attribute("log", []);
 		} else {
-			$this->attribute("log", array("status"=>$sStatus, "details"=>$aDetails));
+			$this->attribute("log", ["status"=>$sStatus, "details"=>$aDetails]);
 
 			if($this->argument("use_history")) {
 				$aAttrHistory = $this->attribute("history");
@@ -1333,14 +1333,14 @@ class nglOwl extends nglBranch {
 
 	private function OwLog($sTable, $nRow, $sAction, $aChangeLog=null) {
 		if($this->argument("owlog")) {
-			$aLog				= array();
+			$aLog				= [];
 			$aLog["table"]		= $sTable;
 			$aLog["row"]		= $nRow;
 			$aLog["user"]		= self::call("sysvar")->UID;
 			$aLog["action"]		= $sAction;
-			$aLog["date"]		= date("Y-m-d H:i:s");
+			$aLog["date"]		= \date("Y-m-d H:i:s");
 			$aLog["ip"]			= self::call("sysvar")->IP;
-			$aLog["changelog"]	= ($aChangeLog!=null) ? json_encode($aChangeLog) : null;
+			$aLog["changelog"]	= ($aChangeLog!=null) ? \json_encode($aChangeLog) : null;
 
 			$this->db->insert("__ngl_owl_log__", $aLog, "INSERT", false, true);
 			$this->Logger("success", $aLog);
@@ -1351,19 +1351,19 @@ class nglOwl extends nglBranch {
 		$nRows = 0;
 
 		// actualizacion multiple con array multiple
-		$mCurrent = current($aArguments);
-		if(count($aArguments)==1 && is_array($mCurrent) && is_array(current($mCurrent))) {
+		$mCurrent = \current($aArguments);
+		if(\is_array($aArguments) && \count($aArguments)==1 && \is_array($mCurrent) && \is_array(current($mCurrent))) {
 			$aArguments = $mCurrent;
 		}
 		
 		// update multiple
-		if(count($aArguments)>1 && is_array($mCurrent)) {
+		if(\is_array($aArguments) && \count($aArguments)>1 && \is_array($mCurrent)) {
 			$bChildMode = $this->bChildMode;
 			foreach($aArguments as $aInput) {
 				// evita la desactivacion del modo child
 				$this->bChildMode = $bChildMode;
 				$this->bInternalCall = true;
-				if(!is_array(current($aInput))) { $aInput = array($aInput); }
+				if(!\is_array(\current($aInput))) { $aInput = [$aInput]; }
 				$nReturn = $this->UpdateData($aInput, $nState);
 				if($nReturn!==false) { $nRows += $nReturn; }
 				$this->bInternalCall = false;
@@ -1378,7 +1378,7 @@ class nglOwl extends nglBranch {
 			// padres
 			if(!$this->sObject) { self::errorMessage($this->object, 1001); }
 			$sTable = $this->sObject;
-			if(count($vData)) {
+			if(\is_array($vData) && \count($vData)) {
 				if(isset($vData["id"])) {
 					$this->attribute("current", $vData["id"]);
 				} else if(isset($vData["imya"])) {
@@ -1395,7 +1395,7 @@ class nglOwl extends nglBranch {
 			$sTable = $this->sChildTable;
 			if(!$this->attribute("current")) { self::errorMessage($this->object, 1002); }
 			
-			$aWhere = array();
+			$aWhere = [];
 			$aWhere[] = '["'.$sTable.'.pid","eq","('.$this->attribute('current').')"],"AND",["'.$sTable.'.state","isnot","(NULL)"]';
 			if(isset($vData["id"])) {
 				$aWhere[] = '"AND",["'.$sTable.'.id","eq","('.(int)$vData["id"].')"]';
@@ -1405,12 +1405,12 @@ class nglOwl extends nglBranch {
 				$aWhere[] = '"AND",["'.$sTable.'.id","eq","('.(int)$vData["id"].')"]';
 				$nRowID = $vData["id"];
 			} else {
-				$sSQLChildren = '{"columns":["id"], "tables":["'.$sTable.'"], "where":['.implode($aWhere).']}';
+				$sSQLChildren = '{"columns":["id"], "tables":["'.$sTable.'"], "where":['.\implode($aWhere).']}';
 				$childrens = $this->query($sSQLChildren);
 				$aRowID = $childrens->getall("id");
 			}
 
-			$sWhere = "[".implode(",", $aWhere)."]";
+			$sWhere = "[".\implode(",", $aWhere)."]";
 		}
 
 		// chequeo de permisos
@@ -1421,7 +1421,7 @@ class nglOwl extends nglBranch {
 				// borrado (state = NULL)
 				$this->sCrossTable = $sTable;
 				$vCrossRows = $this->CrossRows($sTable, $sWhere);
-				$this->aCascade = array();
+				$this->aCascade = [];
 
 				if(!empty($vCrossRows)) {
 					if($this->argument("cascade")) {
@@ -1432,10 +1432,10 @@ class nglOwl extends nglBranch {
 					}
 				}
 
-				$vData = array("state"=>null);
+				$vData = ["state"=>null];
 			} else if($nState==2) {
 				// suspencion (state = 0)
-				$vData = array("state"=>0);
+				$vData = ["state"=>0];
 				if(!$this->bChildMode && $this->argument("inherit")) {
 					if($sTable==$this->sObject && isset($this->vObjects[$sTable]["children"])) {
 						foreach($this->vObjects[$sTable]["children"] as $sChildTable) {
@@ -1446,7 +1446,7 @@ class nglOwl extends nglBranch {
 				}
 			} else if($nState==3) {
 				// reactivación (state = 1)
-				$vData = array("state"=>1);
+				$vData = ["state"=>1];
 				if(!$this->bChildMode && $this->argument("inherit")) {
 					if($sTable==$this->sObject && isset($this->vObjects[$sTable]["children"])) {
 						foreach($this->vObjects[$sTable]["children"] as $sChildTable) {
@@ -1460,11 +1460,11 @@ class nglOwl extends nglBranch {
 				if(!$this->bChildMode && $this->argument("inherit")) {
 					if($sTable==$this->sObject && isset($this->vObjects[$sTable]["children"])) {
 						foreach($this->vObjects[$sTable]["children"] as $sChildTable) {
-							$vData = array("state"=>0);
+							$vData = ["state"=>0];
 							$sChildWhere = $this->JsqlParser('{"type":"where", "where":[["pid","eq","('.$nRowID.')"],"AND",["state","eq","(1)"]]}');
 							$update = $this->db->update($sChildTable, $vData, $sChildWhere);
 							if(!$update->rows()) {
-								$vData = array("state"=>1);
+								$vData = ["state"=>1];
 								$sChildWhere = $this->JsqlParser('{"type":"where", "where":[["pid","eq","('.$nRowID.')"],"AND",["state","eq","(0)"]]}');							
 								$update = $this->db->update($sChildTable, $vData, $sChildWhere);
 							}
@@ -1489,10 +1489,10 @@ class nglOwl extends nglBranch {
 			if($this->argument("escape")) { $vData = $this->db->escape($vData); }
 			$sSQLWhere = $this->JsqlParser('{"type":"where", "where":'.$sWhere.'}');
 			if($nState==4) {
-				$vData = array("state"=>0);
+				$vData = ["state"=>0];
 				$update = $this->db->update($sTable, $vData, $sSQLWhere);
 				if(!$update->rows()) {
-					$vData = array("state"=>1);
+					$vData = ["state"=>1];
 					$update = $this->db->update($sTable, $vData, $sSQLWhere);
 				}
 			} else {
@@ -1506,9 +1506,9 @@ class nglOwl extends nglBranch {
 			if($update) {
 				$nRows += $update->rows();
 				if($nRows) {
-					$aActions = array("delete", "update", "suspend", "unsuspend", "toggle");
+					$aActions = ["delete", "update", "suspend", "unsuspend", "toggle"];
 					$sLogAction = $aActions[$nState];
-					if(!isset($aRowID)) { $aRowID = array($nRowID); }
+					if(!isset($aRowID)) { $aRowID = [$nRowID]; }
 					foreach($aRowID as $nID) {
 						$aChanges = (isset($aChangeLog, $aChangeLog[$nID])) ? $aChangeLog[$nID] : null;
 						$this->OwLog($sTable, $nID, $sLogAction, $aChanges);
@@ -1533,7 +1533,7 @@ class nglOwl extends nglBranch {
 		$vValidate = self::call("validate")->validate($vData, $sRules, $bIgnoreDefault); 
 		$this->attribute("validate", $vValidate);
 		if(isset($vValidate["errors"]) && $vValidate["errors"]===0) {
-			$vData = array_merge($vData, $vValidate["values"]);
+			$vData = \array_merge($vData, $vValidate["values"]);
 			return $vData;
 		}
 

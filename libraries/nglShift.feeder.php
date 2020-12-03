@@ -92,18 +92,18 @@ class nglShift extends nglTrunk {
 		"return" : "mixed"
 	} **/
 	public function cast($mValue, $sCastType="text") {
-		$sType = gettype($mValue);
+		$sType = \gettype($mValue);
 		
-		if(!in_array($sType, array("array","boolean","double","integer","NULL","object","string"))) { return true; }
-		if(is_object($mValue)) { $mValue = $this->objToArray($mValue); }
+		if(!\in_array($sType, ["array","boolean","double","integer","NULL","object","string"])) { return true; }
+		if(\is_object($mValue)) { $mValue = $this->objToArray($mValue); }
 
-		$sCastType = strtolower($sCastType);
-		if(!is_array($mValue)) {
+		$sCastType = \strtolower($sCastType);
+		if(!\is_array($mValue)) {
 			return $this->CastValue($mValue, $sCastType);
 		} else {
-			$aCleanData = array();
+			$aCleanData = [];
 			foreach($mValue as $mIndex => $mValue) {
-				$aCleanData[$mIndex] = (is_array($mValue)) ? $this->cast($mValue, $sCastType) : $this->CastValue($mValue, $sCastType);
+				$aCleanData[$mIndex] = (\is_array($mValue)) ? $this->cast($mValue, $sCastType) : $this->CastValue($mValue, $sCastType);
 			}
 			return $aCleanData;
 		}
@@ -130,11 +130,11 @@ class nglShift extends nglTrunk {
 	private function CastValue($mValue, $sCastType) {
 		switch($sCastType) {
 			case "html":
-				return htmlspecialchars($mValue, ENT_QUOTES, strtoupper(NGL_CHARSET));
+				return \htmlspecialchars($mValue, ENT_QUOTES, \strtoupper(NGL_CHARSET));
 				break;
 
 			case "htmlall":
-				return htmlentities($mValue, ENT_QUOTES, strtoupper(NGL_CHARSET));
+				return \htmlentities($mValue, ENT_QUOTES, \strtoupper(NGL_CHARSET));
 				break;
 
 			default:
@@ -264,8 +264,8 @@ class nglShift extends nglTrunk {
 	} **/
 	public function convert($mData, $sMethod=null, $vOptions=null) {
 		if(empty($sMethod)) { $sMethod = "object-array"; }
-		$sMethod = strtolower($sMethod);
-		$aMethod = explode("-", $sMethod);
+		$sMethod = \strtolower($sMethod);
+		$aMethod = \explode("-", $sMethod);
 
 		// source
 		switch($aMethod[0]) {
@@ -288,15 +288,15 @@ class nglShift extends nglTrunk {
 				break;
 
 			case "json":
-				$nBackTrack = ini_get("pcre.backtrack_limit");
-				ini_set("pcre.backtrack_limit", ($nBackTrack+strlen($mData)));
+				$nBackTrack = \ini_get("pcre.backtrack_limit");
+				\ini_set("pcre.backtrack_limit", ($nBackTrack+\strlen($mData)));
 				$aData = $this->jsonDecode($mData);
-				ini_set("pcre.backtrack_limit", $nBackTrack);
+				\ini_set("pcre.backtrack_limit", $nBackTrack);
 				$aData = $this->objToArray($aData);
 				break;
 
 			case "object":
-				if(method_exists($mData, "getall")) {
+				if(\method_exists($mData, "getall")) {
 					$aData = $mData->getall();
 				} else {
 					$aData = $this->objToArray($mData);
@@ -304,9 +304,9 @@ class nglShift extends nglTrunk {
 				break;
 
 			case "serialize":
-				$aData = unserialize($mData);
-				if(!is_array($aData)) {
-					if(is_object($aData)) {
+				$aData = \unserialize($mData);
+				if(!\is_array($aData)) {
+					if(\is_object($aData)) {
 						$aData = $this->objToArray($aData);
 					}
 				}
@@ -314,19 +314,19 @@ class nglShift extends nglTrunk {
 
 			case "xml":
 				$aData = $this->xmlToArray($mData, $vOptions);
-				$aData = current($aData);
+				$aData = \current($aData);
 				break;
 
 			case "yml":
 			case "yaml":
-				$mData = preg_replace(array("/^\t/is", "/\t+/"), "  ", $mData);
-				$aData = yaml_parse($mData);
+				$mData = \preg_replace(["/^\t/is", "/\t+/"], "  ", $mData);
+				$aData = \yaml_parse($mData);
 				break;
 
 			case "vector":
-				$aData = array();
+				$aData = [];
 				foreach($mData as $mItem) {
-					$aData[] = array($mItem);
+					$aData[] = [$mItem];
 				}
 				break;
 
@@ -335,7 +335,7 @@ class nglShift extends nglTrunk {
 				$aData = $mData;
 		}
 		
-		if(!is_array($aData)) { $aData = array($aData); }
+		if(!\is_array($aData)) { $aData = [$aData]; }
 
 		// destine
 		switch($aMethod[1]) {
@@ -360,14 +360,14 @@ class nglShift extends nglTrunk {
 				return $aData = $this->objToArray($aData);
 
 			case "serialize":
-				return serialize($aData);
+				return \serialize($aData);
 
 			case "xml":
 				return $this->xmlEncode($aData, $vOptions);
 			
 			case "yml":
 			case "yaml":
-				return yaml_emit($aData);
+				return \yaml_emit($aData);
 
 			case "array":
 			default:
@@ -404,39 +404,39 @@ class nglShift extends nglTrunk {
 		$sEOL			= (isset($vOptions["eol"])) ? $vOptions["eol"] : "\r\n";
 	
 		$sCSV = "";
-		if(!is_array($aData)) { return ""; }
+		if(!\is_array($aData)) { return ""; }
 		
 		if($aColnames) {
-			if(!is_array($aColnames) && self::call()->isTrue($aColnames)) { $aColnames = array_keys(array_shift($aData)); }
+			if(!\is_array($aColnames) && self::call()->isTrue($aColnames)) { $aColnames = \array_keys(\array_shift($aData)); }
 			foreach($aColnames as $mColumnKey => $sColumn) {
-				$sColumn = str_replace($sEnclosed, $sEscaped.$sEnclosed, $sColumn);
-				$sColumn = str_replace($sJoiner, $sEscaped.$sJoiner, $sColumn);
+				$sColumn = \str_replace($sEnclosed, $sEscaped.$sEnclosed, $sColumn);
+				$sColumn = \str_replace($sJoiner, $sEscaped.$sJoiner, $sColumn);
 				$aColnames[$mColumnKey] = $sEnclosed.$sColumn.$sEnclosed;
 			}
 			
-			$sCSV .= implode($sJoiner, $aColnames).$sEOL;
+			$sCSV .= \implode($sJoiner, $aColnames).$sEOL;
 		}
 		
 		if(self::call()->isarrayarray($aData)) {
-			reset($aData);
+			\reset($aData);
 			foreach($aData as $mLineKey => $aLine) {
 				foreach($aLine as $mColumnKey => $sColumn) {
-					$sColumn = str_replace($sEnclosed, $sEscaped.$sEnclosed, $sColumn);
-					$sColumn = str_replace($sJoiner, $sEscaped.$sJoiner, $sColumn);
+					$sColumn = \str_replace($sEnclosed, $sEscaped.$sEnclosed, $sColumn);
+					$sColumn = \str_replace($sJoiner, $sEscaped.$sJoiner, $sColumn);
 					$aLine[$mColumnKey] = $sEnclosed.$sColumn.$sEnclosed;
 				}
-				$aData[$mLineKey] = implode($sJoiner, $aLine);
+				$aData[$mLineKey] = \implode($sJoiner, $aLine);
 			}
 
-			$sCSV .= implode($sEOL, $aData);
+			$sCSV .= \implode($sEOL, $aData);
 		} else {
 			foreach($aData as $mColumnKey => $sColumn) {
-				$sColumn = str_replace($sEnclosed, $sEscaped.$sEnclosed, $sColumn);
-				$sColumn = str_replace($sJoiner, $sEscaped.$sJoiner, $sColumn);
+				$sColumn = \str_replace($sEnclosed, $sEscaped.$sEnclosed, $sColumn);
+				$sColumn = \str_replace($sJoiner, $sEscaped.$sJoiner, $sColumn);
 				$aData[$mColumnKey] = $sEnclosed.$sColumn.$sEnclosed;
 			}
 			
-			$sCSV .= implode($sJoiner, $aData);
+			$sCSV .= \implode($sJoiner, $aData);
 		}
 		
 		return $sCSV;
@@ -456,7 +456,7 @@ class nglShift extends nglTrunk {
 		"return" : "array"
 	} **/
 	private function CSVParseLine($sSplitter, $sEnclosed, $sEscaped, $sEOL) {
-		$aLine			= array();
+		$aLine			= [];
 		$sData			= "";
 		$bEnclosed		= false;
 
@@ -484,9 +484,9 @@ class nglShift extends nglTrunk {
 			$this->vCSV["chk_eol"]		= ($this->vCSV["eol"]) ? $sChar : self::call()->strBoxAppend($this->vCSV["chk_eol"], $sChar);
 
 			if($this->vCSV["chk_splitter"]===$sSplitter && $this->vCSV["chk_escaped"]!==$sEscaped && !$bEnclosed) {
-				if($this->vCSV["use_colnames"] && count($this->vCSV["colnames"])) {
-					if(isset($this->vCSV["colnames"][count($aLine)])) {
-						$aLine[$this->vCSV["colnames"][count($aLine)]] = $sData;
+				if($this->vCSV["use_colnames"] && \count($this->vCSV["colnames"])) {
+					if(isset($this->vCSV["colnames"][\count($aLine)])) {
+						$aLine[$this->vCSV["colnames"][\count($aLine)]] = $sData;
 					}
 				} else {
 					$aLine[] = $sData;
@@ -497,10 +497,10 @@ class nglShift extends nglTrunk {
 			}
 
 			if($this->vCSV["chk_eol"]===$sEOL) {
-				$sData = substr($sData, 0, strlen($sEOL)*-1);
-				if($this->vCSV["use_colnames"] && count($this->vCSV["colnames"])) {
-					if(isset($this->vCSV["colnames"][count($aLine)])) {
-						$aLine[$this->vCSV["colnames"][count($aLine)]] = $sData;
+				$sData = \substr($sData, 0, \strlen($sEOL)*-1);
+				if($this->vCSV["use_colnames"] && \count($this->vCSV["colnames"])) {
+					if(isset($this->vCSV["colnames"][\count($aLine)])) {
+						$aLine[$this->vCSV["colnames"][\count($aLine)]] = $sData;
 					}
 				} else {
 					$aLine[] = $sData;
@@ -541,34 +541,34 @@ class nglShift extends nglTrunk {
 		"seealso" : ["nglShift::convert","nglShift::csvEncode"],
 		"return" : "string"
 	} **/
-	public function csvToArray($sSource, $vOptions=array()) {
+	public function csvToArray($sSource, $vOptions=[]) {
 		$bColnames		= (isset($vOptions["use_colnames"])) ? self::call()->isTrue($vOptions["use_colnames"]) : false;
-		$aColnames		= (isset($vOptions["colnames"])) ? $vOptions["colnames"] : array();
+		$aColnames		= (isset($vOptions["colnames"])) ? $vOptions["colnames"] : [];
 		$sSplitter	 	= (isset($vOptions["splitter"])) ? $vOptions["splitter"] : ",";
 		$sEnclosed		= (isset($vOptions["enclosed"])) ? $vOptions["enclosed"] : "\"";
 		$sEscaped	 	= (isset($vOptions["escaped"])) ? $vOptions["escaped"] : "\\";
 		$sEOL			= (isset($vOptions["eol"])) ? $vOptions["eol"] : "\r\n";
 
-		if(is_array($aColnames) && count($aColnames)) { $bColnames = true; }
+		if(\is_array($aColnames) && \count($aColnames)) { $bColnames = true; }
 		
 		$this->vCSV["use_colnames"]		= $bColnames;
 		$this->vCSV["colnames"]			= $aColnames;
-		$this->vCSV["chk_splitter"]		= str_pad("", strlen($sSplitter), "\x0B");
-		$this->vCSV["chk_enclosed"]		= str_pad("", strlen($sEnclosed), "\x0B");
-		$this->vCSV["chk_escaped"]		= str_pad("", strlen($sEscaped), "\x0B");
-		$this->vCSV["chk_eol"]			= str_pad("", strlen($sEOL), "\x0B");
+		$this->vCSV["chk_splitter"]		= \str_pad("", \strlen($sSplitter), "\x0B");
+		$this->vCSV["chk_enclosed"]		= \str_pad("", \strlen($sEnclosed), "\x0B");
+		$this->vCSV["chk_escaped"]		= \str_pad("", \strlen($sEscaped), "\x0B");
+		$this->vCSV["chk_eol"]			= \str_pad("", \strlen($sEOL), "\x0B");
 		$this->vCSV["splitter"]			= ($this->vCSV["chk_splitter"]==="\x0B");
 		$this->vCSV["enclosed"]			= ($this->vCSV["chk_enclosed"]==="\x0B");
 		$this->vCSV["escaped"]			= ($this->vCSV["chk_escaped"]==="\x0B");
 		$this->vCSV["eol"]				= ($this->vCSV["chk_eol"]==="\x0B");
 		$this->vCSV["source"] 			= $sSource;
-		$this->vCSV["length"] 			= strlen($sSource);
+		$this->vCSV["length"] 			= \strlen($sSource);
 		$this->vCSV["pointer"] 			= -1;
 
-		$aCSV = array();
+		$aCSV = [];
 		while(1) {
 			$aLine = null;
-			if($this->vCSV["use_colnames"] && !count($this->vCSV["colnames"])) {
+			if($this->vCSV["use_colnames"] && !\count($this->vCSV["colnames"])) {
 				$aLine = $this->CSVParseLine($sSplitter, $sEnclosed, $sEscaped, $sEOL);
 				$this->vCSV["colnames"] = $aLine;
 				continue;
@@ -629,20 +629,20 @@ class nglShift extends nglTrunk {
 		"return" : "array"
 	} **/
 	public function fixedExplode($sString, $vOptions=null) {
-		if(!isset($vOptions["positions"]) || !is_array($vOptions["positions"]) || !count($vOptions["positions"])) {
-			return array($sString);
+		if(!isset($vOptions["positions"]) || !\is_array($vOptions["positions"]) || !\count($vOptions["positions"])) {
+			return [$sString];
 		}
 		
 		$sEOL = (isset($vOptions["eol"])) ? $vOptions["eol"] : false;
 		$aString = ($sEOL) ? self::call()->strToArray($sString, $sEOL) : array($sString);
 
-		$aExplode = array();
+		$aExplode = [];
 		$bTrim = (isset($vOptions["trim"]) && $vOptions["trim"]);
 		foreach($aString as $sLine) {
 			$nLen = 0;
-			$aLine = array();
+			$aLine = [];
 			foreach($vOptions["positions"] as $nIndex) {
-				$aLine[] = ($bTrim) ? trim(substr($sLine, $nLen, $nIndex)) : substr($sLine, $nLen, $nIndex);
+				$aLine[] = ($bTrim) ? \trim(\substr($sLine, $nLen, $nIndex)) : \substr($sLine, $nLen, $nIndex);
 				$nLen += $nIndex;
 			}
 			
@@ -692,20 +692,20 @@ class nglShift extends nglTrunk {
 	public function fixedImplode($aString, $vOptions=null) {
 		$sFill		= (isset($vOptions["fill"])) ? $vOptions["fill"] : " ";
 		$sJoiner	= (isset($vOptions["joiner"])) ? $vOptions["joiner"] : null;
-		$nJoiner	= (isset($vOptions["joiner"])) ? strlen($sJoiner) : 0;
+		$nJoiner	= (isset($vOptions["joiner"])) ? \strlen($sJoiner) : 0;
 		$sEOL		= (isset($vOptions["eol"])) ? $vOptions["eol"] : "\n";
 
 		$bRecursive = self::call()->isarrayarray($aString);
 		
-		if(!isset($vOptions["positions"]) || !is_array($vOptions["positions"]) || !count($vOptions["positions"])) {
+		if(!isset($vOptions["positions"]) || !\is_array($vOptions["positions"]) || !\count($vOptions["positions"])) {
 			if($bRecursive) {
-				$aCurrent = current($aString);
-				reset($aString);
+				$aCurrent = \current($aString);
+				\reset($aString);
 			} else {
 				$aCurrent = $aString;
 			}
 
-			$aPositions = array();
+			$aPositions = [];
 			foreach($aCurrent as $mValue) {
 				$aPositions[] = self::call("unicode")->strlen($mValue);
 			}
@@ -719,13 +719,13 @@ class nglShift extends nglTrunk {
 				$sString .= $this->fixedImplode($aLine, $vOptions).$sEOL;
 			}
 		} else {
-			$aString = array_values($aString);
-			$nPositions = count($vOptions["positions"]);
+			$aString = \array_values($aString);
+			$nPositions = \count($vOptions["positions"]);
 			for($x=0;$x<$nPositions;$x++) {
 				$nLen = (isset($vOptions["positions"][$x])) ? $vOptions["positions"][$x] : $nPositions;
-				$sValue = substr($aString[$x],0,$nLen);
-				$sValue = str_pad($sValue, $nLen, $sFill);
-				if($sJoiner!==null) { $sValue = substr($sValue, 0, $nJoiner*-1).$sJoiner; }
+				$sValue = \substr($aString[$x],0,$nLen);
+				$sValue = \str_pad($sValue, $nLen, $sFill);
+				if($sJoiner!==null) { $sValue = \substr($sValue, 0, $nJoiner*-1).$sJoiner; }
 				$sString .= $sValue;
 			}
 		}
@@ -851,12 +851,12 @@ class nglShift extends nglTrunk {
 		"seealso" : ["nglShift::cast", "nglShift::convert"],
 		"return" : "string"
 	} **/
-	public function html($aData=null, $vOptions=array()) {
+	public function html($aData=null, $vOptions=[]) {
 		$sFormat	= (isset($vOptions["format"])) ? $vOptions["format"] : "table";
 		$sClassName	= (isset($vOptions["class"])) ? $vOptions["class"] : "class";
 		$sClasses	= (isset($vOptions["classes"])) ? $vOptions["classes"] : "";
 
-		$sFormat = strtolower($sFormat);
+		$sFormat = \strtolower($sFormat);
 		switch($sFormat) {
 			case "div":
 				$sTagTable 	= "div";
@@ -886,13 +886,13 @@ class nglShift extends nglTrunk {
 		// contenido del bloque
 		if(self::call()->isarrayarray($aData)) {
 			// cabeceras
-			$aHeaders = array();
+			$aHeaders = [];
 			foreach($aData as $aRow) {
-				if(is_array($aRow) && (count($aRow) > count($aHeaders))) { $aHeaders = $aRow; }
+				if(\is_array($aRow) && (\count($aRow) > \count($aHeaders))) { $aHeaders = $aRow; }
 			}
 			
-			$aColumns = array_keys($aHeaders);
-			$nColumns = count($aColumns);
+			$aColumns = \array_keys($aHeaders);
+			$nColumns = \count($aColumns);
 			$sHTML .= "\t<".$sTagRow." class=\"".$sClassName."-head\">\n";
 			foreach($aColumns as $sColumn) {
 				$sHTML .= "\t\t<".$sTagHeader." class=\"".$sClassName."-head-cell\">".$sColumn."</".$sTagHeader.">\n";
@@ -904,19 +904,19 @@ class nglShift extends nglTrunk {
 				$sHTML .= "\t<".$sTagRow." class=\"".$sClassName."-row\">\n";
 				if(is_array($mRow)) {
 					foreach($mRow as $r => $sValue) {
-						$sHTML .= (strlen($sValue)) ? "\t\t<".$sTagCell." class=\"".$sClassName."-cell\">".$sValue."</".$sTagCell.">\n" : "\t\t<".$sTagCell." class=\"".$sClassName."-cell\">&nbsp;</".$sTagCell.">\n";
+						$sHTML .= (\strlen($sValue)) ? "\t\t<".$sTagCell." class=\"".$sClassName."-cell\">".$sValue."</".$sTagCell.">\n" : "\t\t<".$sTagCell." class=\"".$sClassName."-cell\">&nbsp;</".$sTagCell.">\n";
 					}
 				} else {
-					$sHTML .= (strlen($mRow)) ? "\t\t<".$sTagCell." class=\"".$sClassName."-cell\" colspan='".$nColumns."'>".$mRow."</".$sTagCell.">\n" : "\t\t<".$sTagCell." class=\"".$sClassName."-cell\" colspan='".$nColumns."'>&nbsp;</".$sTagCell.">\n";
+					$sHTML .= (\strlen($mRow)) ? "\t\t<".$sTagCell." class=\"".$sClassName."-cell\" colspan='".$nColumns."'>".$mRow."</".$sTagCell.">\n" : "\t\t<".$sTagCell." class=\"".$sClassName."-cell\" colspan='".$nColumns."'>&nbsp;</".$sTagCell.">\n";
 				}
 				$sHTML .= "\t</".$sTagRow.">\n";
 			}
 		} else {
-			if(is_array($aData) && count($aData)) {
+			if(\is_array($aData) && \count($aData)) {
 				foreach($aData as $sField => $mValue) {
 					$sHTML .= "\t<".$sTagRow." class=\"".$sClassName."-head\">\n";
 					$sHTML .= "\t\t<".$sTagHeader." class=\"".$sClassName."-head-cell\">".$sField."</".$sTagHeader.">\n";
-					$sHTML .= (strlen($mValue)) ? "\t\t<".$sTagCell." class=\"".$sClassName."-cell\">".$mValue."</".$sTagCell.">\n" : "\t\t<".$sTagCell." class=\"".$sClassName."-cell\">&nbsp;</".$sTagCell.">\n";
+					$sHTML .= (\strlen($mValue)) ? "\t\t<".$sTagCell." class=\"".$sClassName."-cell\">".$mValue."</".$sTagCell.">\n" : "\t\t<".$sTagCell." class=\"".$sClassName."-cell\">&nbsp;</".$sTagCell.">\n";
 					$sHTML .= "\t</".$sTagRow.">\n";
 				}
 			} else {
@@ -952,12 +952,12 @@ class nglShift extends nglTrunk {
 		$doc->loadHTML($sHTML);
 		$this->xpath = new \DOMXPath($doc);
 		$tables =  $this->xpath->query("body/table");
-		$aTables = array();
+		$aTables = [];
 		foreach($tables as $table) {
 			$aTables[] = $this->HTMLTableParser($table);
 		}
 	
-		return (count($aTables)==1) ? current($aTables) : $aTables;
+		return (\count($aTables)==1) ? \current($aTables) : $aTables;
 	}
 
 	/** FUNCTION {
@@ -976,9 +976,9 @@ class nglShift extends nglTrunk {
 		if($thead->length) {
 			$headers = $this->xpath->query("tr/th", $thead->item(0));
 			if($headers->length) {
-				$aHeaders = array();
+				$aHeaders = [];
 				foreach($headers as $header) {
-					$aHeaders[] = trim($header->nodeValue);
+					$aHeaders[] = \trim($header->nodeValue);
 				}
 			}
 		}
@@ -986,20 +986,20 @@ class nglShift extends nglTrunk {
 		$tbody = $this->xpath->query("tbody", $table);
 		if($tbody->length) { $table = $tbody->item(0); }
 	
-		$aTable = array();
+		$aTable = [];
 		foreach($this->xpath->query("tr", $table) as $row) {
-			$aRow = array();
+			$aRow = [];
 			foreach($this->xpath->query("td", $row) as $sColnameey => $cell) {
 				$sIndex = ($aHeaders && isset($aHeaders[$sColnameey])) ? $aHeaders[$sColnameey] : $sColnameey;
 				$subtables = $this->xpath->query("table", $cell);
 				if($subtables->length>0) {
-					$aSubtables = array();
+					$aSubtables = [];
 					foreach($subtables as $subtable) {
 						$aSubtables[] = $this->HTMLTableParser($subtable);
 					}
 					$aRow[$sIndex] = $aSubtables;
 				} else {
-					$aRow[$sIndex] = trim($cell->nodeValue);
+					$aRow[$sIndex] = \trim($cell->nodeValue);
 				}
 			}
 			$aTable[] = $aRow;
@@ -1023,7 +1023,7 @@ class nglShift extends nglTrunk {
 	} **/
 	private function JSONChar($sChar, $bUTF8=false, $bConverSpaces=false, $bAddSlashes=false) {
 		if($bConverSpaces) {
-			$nOrd = ord($sChar);
+			$nOrd = \ord($sChar);
 			switch(true) {
 				case $nOrd == 0x08:
 					return "\\b";
@@ -1039,7 +1039,7 @@ class nglShift extends nglTrunk {
 		}
 
 		if($bAddSlashes) {
-			$nOrd = ord($sChar);
+			$nOrd = \ord($sChar);
 			switch(true) {
 				case $nOrd == 0x22:
 				//case $nOrd == 0x27:
@@ -1052,7 +1052,7 @@ class nglShift extends nglTrunk {
 		if(!$bUTF8) {
 			return $sChar;
 		} else {
-			return "\\u".str_pad(dechex(self::call("unicode")->ord($sChar)), 4, "0", STR_PAD_LEFT);
+			return "\\u".\str_pad(\dechex(self::call("unicode")->ord($sChar)), 4, "0", STR_PAD_LEFT);
 		}
 	}
 
@@ -1069,7 +1069,7 @@ class nglShift extends nglTrunk {
 	public function jsonDecode($sString) {
 		$sString = $this->JSONReduceString($sString);
 
-		switch(strtolower($sString)) {
+		switch(\strtolower($sString)) {
 			case "true":
 				return true;
 
@@ -1082,7 +1082,7 @@ class nglShift extends nglTrunk {
 			default:
 				$sString = $this->JSONReduceString($sString);
 
-				switch(strtolower($sString)) {
+				switch(\strtolower($sString)) {
 					case "true":
 						return true;
 		
@@ -1093,37 +1093,37 @@ class nglShift extends nglTrunk {
 						return null;
 		
 					default:
-						$aDecoded = array();
-						if(is_numeric($sString)) {
+						$aDecoded = [];
+						if(\is_numeric($sString)) {
 							return ((float)$sString==(integer)$sString) ? (integer)$sString : (float)$sString;
-						} else if(preg_match("/^(\"|').*(\\1)$/s", $sString, $aDecoded) && $aDecoded[1]==$aDecoded[2]) {
-							$sQuote = substr($sString, 0, 1);
-							$sString = substr($sString, 1, -1);
+						} else if(\preg_match("/^(\"|').*(\\1)$/s", $sString, $aDecoded) && $aDecoded[1]==$aDecoded[2]) {
+							$sQuote = \substr($sString, 0, 1);
+							$sString = \substr($sString, 1, -1);
 							$sString = self::call("unicode")->unescape($sString);
-							$nString = strlen($sString);
+							$nString = \strlen($sString);
 		
 							$sUTF8 = "";
 							for($x=0; $x<$nString; $x++) {
-								$sSub2Chars = substr($sString, $x, 2);
+								$sSub2Chars = \substr($sString, $x, 2);
 								switch(true) {
 									case $sSub2Chars == "\\b":
-										$sUTF8 .= chr(0x08);
+										$sUTF8 .= \chr(0x08);
 										$x++;
 										break;
 									case $sSub2Chars == "\\t":
-										$sUTF8 .= chr(0x09);
+										$sUTF8 .= \chr(0x09);
 										$x++;
 										break;
 									case $sSub2Chars == "\\n":
-										$sUTF8 .= chr(0x0A);
+										$sUTF8 .= \chr(0x0A);
 										$x++;
 										break;
 									case $sSub2Chars == "\\f":
-										$sUTF8 .= chr(0x0C);
+										$sUTF8 .= \chr(0x0C);
 										$x++;
 										break;
 									case $sSub2Chars == "\\r":
-										$sUTF8 .= chr(0x0D);
+										$sUTF8 .= \chr(0x0D);
 										$x++;
 										break;
 		
@@ -1144,72 +1144,72 @@ class nglShift extends nglTrunk {
 		
 							return $sUTF8;
 		
-						} else if(preg_match("/^\[.*\]$/s", $sString) || preg_match("/^\{.*\}$/s", $sString)) {
+						} else if(\preg_match("/^\[.*\]$/s", $sString) || \preg_match("/^\{.*\}$/s", $sString)) {
 							if($sString[0]=="[") {
-								$aStakeState = array(3);
-								$aDecoded = array();
+								$aStakeState = [3];
+								$aDecoded = [];
 							} else {
-								$aStakeState = array(4);
-								$aDecoded = array();
+								$aStakeState = [4];
+								$aDecoded = [];
 							}
 		
-							$aStakeState[] = array(0=>1, 1=>0, 2=>false);
+							$aStakeState[] = [0=>1, 1=>0, 2=>false];
 		
-							$sString = substr($sString, 1, -1);
+							$sString = \substr($sString, 1, -1);
 							$sString = $this->JSONReduceString($sString);
 		
 							if($sString=="") {
 								return $aDecoded;
 							}
 		
-							$nString = strlen($sString);
+							$nString = \strlen($sString);
 							for($x=0; $x <= $nString; ++$x) {
-								$aStakeTop = end($aStakeState);
-								$sSub2Chars = substr($sString, $x, 2);
+								$aStakeTop = \end($aStakeState);
+								$sSub2Chars = \substr($sString, $x, 2);
 								if(($x==$nString) || (($sString[$x]==",") && ($aStakeTop[0]==1))) {
-									$sSlice = substr($sString, $aStakeTop[1], ($x - $aStakeTop[1]));
-									$aStakeState[] = array(0=>1, 1=>($x + 1), 2=>false);
+									$sSlice = \substr($sString, $aStakeTop[1], ($x - $aStakeTop[1]));
+									$aStakeState[] = [0=>1, 1=>($x + 1), 2=>false];
 		
-									if(reset($aStakeState)==3) {
+									if(\reset($aStakeState)==3) {
 										$aDecoded[] = $this->jsonDecode($sSlice);
-									} else if(reset($aStakeState)==4) {
-										$aParts = array();
-										if(preg_match('/^\s*(["\'].*[^\\\]["\'])\s*:\s*(\S.*),?$/Uis', $sSlice, $aParts)) {
+									} else if(\reset($aStakeState)==4) {
+										$aParts = [];
+										if(\preg_match('/^\s*(["\'].*[^\\\]["\'])\s*:\s*(\S.*),?$/Uis', $sSlice, $aParts)) {
 											$mKey = $this->jsonDecode($aParts[1]);
 											$mValue = $this->jsonDecode($aParts[2]);
 											$aDecoded[$mKey] = $mValue;
-										} else if(preg_match('/^\s*(\w+)\s*:\s*(\S.*),?$/Uis', $sSlice, $aParts)) {
+										} else if(\preg_match('/^\s*(\w+)\s*:\s*(\S.*),?$/Uis', $sSlice, $aParts)) {
 											$mKey = $aParts[1];
 											$mValue = $this->jsonDecode($aParts[2]);
 											$aDecoded[$mKey] = $mValue;
 										}
 									}
 								} else if((($sString[$x]=='"') || ($sString[$x]=="'")) && ($aStakeTop[0]!=2)) {
-									$aStakeState[] = array(0=>2, 1=>$x, 2=>$sString[$x]);
-								} else if(($sString[$x] == $aStakeTop[2]) && ($aStakeTop[0] == 2) && ((strlen(substr($sString, 0, $x)) - strlen(rtrim(substr($sString, 0, $x), "\\"))) % 2 != 1)) {
-									array_pop($aStakeState);
-								} else if(($sString[$x]=="[") && in_array($aStakeTop[0], array(1, 3, 4))) {
-									$aStakeState[] = array(0=>3, 1=>$x, 2=>false);
+									$aStakeState[] = [0=>2, 1=>$x, 2=>$sString[$x]];
+								} else if(($sString[$x] == $aStakeTop[2]) && ($aStakeTop[0] == 2) && ((\strlen(\substr($sString, 0, $x)) - \strlen(\rtrim(\substr($sString, 0, $x), "\\"))) % 2 != 1)) {
+									\array_pop($aStakeState);
+								} else if(($sString[$x]=="[") && \in_array($aStakeTop[0], [1, 3, 4])) {
+									$aStakeState[] = [0=>3, 1=>$x, 2=>false];
 								} else if(($sString[$x]=="]") && ($aStakeTop[0]==3)) {
-									array_pop($aStakeState);
-								} else if(($sString[$x]=="{") && in_array($aStakeTop[0], array(1, 3, 4))) {
-									$aStakeState[] = array(0=>4, 1=>$x, 2=>false);
+									\array_pop($aStakeState);
+								} else if(($sString[$x]=="{") && \in_array($aStakeTop[0], [1, 3, 4])) {
+									$aStakeState[] = [0=>4, 1=>$x, 2=>false];
 								} else if(($sString[$x]=="}") && ($aStakeTop[0]==4)) {
-									array_pop($aStakeState);
-								} else if(($sSub2Chars=="/*") && in_array($aStakeTop[0], array(1, 3, 4))) {
-									$aStakeState[] = array(0=>5, 1=>$x, 2=>false);
+									\array_pop($aStakeState);
+								} else if(($sSub2Chars=="/*") && \in_array($aStakeTop[0], [1, 3, 4])) {
+									$aStakeState[] = [0=>5, 1=>$x, 2=>false];
 									$x++;
 								} else if(($sSub2Chars=="*/") && ($aStakeTop[0]==5)) {
-									array_pop($aStakeState);
+									\array_pop($aStakeState);
 									$x++;
 		
 									for($y=$aStakeTop[1]; $y<=$x; ++$y) {
-										$sString = substr_replace($sString, " ", $y, 1);
+										$sString = \substr_replace($sString, " ", $y, 1);
 									}
 								}
 							}
 		
-							if(reset($aStakeState)==3 || reset($aStakeState)==4) {
+							if(\reset($aStakeState)==3 || \reset($aStakeState)==4) {
 								return $aDecoded;
 							}
 						}
@@ -1240,7 +1240,7 @@ class nglShift extends nglTrunk {
 		$bConverSpaces = (isset($vOptions["convert_spaces"])) ? self::call()->isTrue($vOptions["convert_spaces"]) : true;
 		$bAddSlashes = (isset($vOptions["add_slashes"])) ? self::call()->isTrue($vOptions["add_slashes"]) : true;
 
-		switch(gettype($mValue)) {
+		switch(\gettype($mValue)) {
 			case "boolean":
 				return ($mValue) ? "true" : "false";
 
@@ -1258,10 +1258,10 @@ class nglShift extends nglTrunk {
 				$sASCII = "";
 				$sChar = "";
 				$bUTF8 = false;
-				$nValue = strlen($mValue);
+				$nValue = \strlen($mValue);
 				for($x=0; $x<$nValue; $x++) {
-					if((ord($mValue[$x])&0xC0)!=0x80) {
-						if(strlen($sChar)) {
+					if((\ord($mValue[$x])&0xC0)!=0x80) {
+						if(\strlen($sChar)) {
 							if(!$bConverUTF8) { $bUTF8 = false; }
 							$sASCII .= $this->JSONChar($sChar, $bUTF8, $bConverSpaces, $bAddSlashes);
 							$sChar = "";
@@ -1276,25 +1276,24 @@ class nglShift extends nglTrunk {
 
 				if(!$bConverUTF8) { $bUTF8 = false; }
 				$sASCII .= $this->JSONChar($sChar, $bUTF8, $bConverSpaces, $bAddSlashes);
-				// return '"'.addslashes($sASCII).'"';
 				return '"'.$sASCII.'"';
 
 			case "array":
-				if(is_array($mValue) && count($mValue) && (array_keys($mValue)!==range(0, count($mValue)-1))) {
-					$aProperties = array_map(array($this, "JSONNameValuePair"), array_keys($mValue), array_values($mValue));
-					$sProperties = "{".implode(",", $aProperties)."}";
+				if(\is_array($mValue) && \count($mValue) && (\array_keys($mValue)!==\range(0, \count($mValue)-1))) {
+					$aProperties = \array_map([$this, "JSONNameValuePair"], \array_keys($mValue), \array_values($mValue));
+					$sProperties = "{".\implode(",", $aProperties)."}";
 					return $sProperties;
 				}
 
-				if(!is_array($vOptions)) { $vOptions = array(); }
-				$aElements = array_map(array($this, "jsonEncode"), $mValue, $vOptions);
-				return "[".implode(",", $aElements)."]";
+				if(!\is_array($vOptions)) { $vOptions = []; }
+				$aElements = \array_map([$this, "jsonEncode"], $mValue, $vOptions);
+				return "[".\implode(",", $aElements)."]";
 
 			case "object":
-				$mValues = get_object_vars($mValue);
+				$mValues = \get_object_vars($mValue);
 
-				$aProperties = array_map(array($this, "JSONNameValuePair"), array_keys($mValues), array_values($mValues));
-				return "{".implode(",", $aProperties)."}";
+				$aProperties = \array_map([$this, "JSONNameValuePair"], \array_keys($mValues), \array_values($mValues));
+				return "{".\implode(",", $aProperties)."}";
 		}
 	}
 
@@ -1313,23 +1312,23 @@ class nglShift extends nglTrunk {
 		"return" : "string"
 	} **/
 	public function jsonFormat($sJson, $bCompress=false, $bHTML=false, $sTab="\t", $sEOL="\n") {
-		$sJson = preg_replace("/[\n\r\t]/is", "", $sJson);
+		$sJson = \preg_replace("/[\n\r\t]/is", "", $sJson);
 		if($bCompress) { return $sJson; }
 		
 		$sResult = "";
 		for($x=$y=$z=0;isset($sJson[$x]);$x++) {
 			if($sJson[$x]=='"' && ($x>0 ? $sJson[$x-1] : "")!="\\" && $y=!$y) {
-				if(!$y && strchr(" \t\n\r", $sJson[$x])){ continue; }
+				if(!$y && \strchr(" \t\n\r", $sJson[$x])){ continue; }
 			}
 
-			if(strchr("}]", $sJson[$x]) && !$y && $z--) {
-				if(!strchr("{[", $sJson[$x-1])) { $sResult .= $sEOL.str_repeat($sTab, $z); }
+			if(\strchr("}]", $sJson[$x]) && !$y && $z--) {
+				if(!\strchr("{[", $sJson[$x-1])) { $sResult .= $sEOL.\str_repeat($sTab, $z); }
 			}
 			
-			$sResult .= ($bHTML) ? htmlentities($sJson[$x]) : $sJson[$x];
-			if(strchr(",{[", $sJson[$x]) && !$y) {
-				$z += (strchr("{[", $sJson[$x])===false) ? 0 : 1;
-				if(!strchr("}]", $sJson[$x+1])) { $sResult .= $sEOL.str_repeat($sTab, $z); }
+			$sResult .= ($bHTML) ? \htmlentities($sJson[$x]) : $sJson[$x];
+			if(\strchr(",{[", $sJson[$x]) && !$y) {
+				$z += (\strchr("{[", $sJson[$x])===false) ? 0 : 1;
+				if(!\strchr("}]", $sJson[$x+1])) { $sResult .= $sEOL.\str_repeat($sTab, $z); }
 			}
 		}
 
@@ -1348,7 +1347,7 @@ class nglShift extends nglTrunk {
 		"return" : "string"
 	} **/
 	private function JSONNameValuePair($sName, $mValue) {
-		$sName = $this->jsonEncode(strval($sName));
+		$sName = $this->jsonEncode(\strval($sName));
 		$sEncoded = $this->jsonEncode($mValue);
 		return $sName.":".$sEncoded;
 	}	
@@ -1364,8 +1363,8 @@ class nglShift extends nglTrunk {
 		"return" : "string"
 	} **/
 	private function JSONReduceString($sString) {
-		$sString = preg_replace(array("/^\s*\/\/(.+)$/m", "/^\s*\/\*(.+)\*\//Us", "/\/\*(.+)\*\/\s*$/Us"), "", $sString);
-		return trim($sString);
+		$sString = \preg_replace(["/^\s*\/\/(.+)$/m", "/^\s*\/\*(.+)\*\//Us", "/\/\*(.+)\*\/\s*$/Us"], "", $sString);
+		return \trim($sString);
 	}
 	
 	/** FUNCTION {
@@ -1377,12 +1376,12 @@ class nglShift extends nglTrunk {
 		"return" : "array"
 	} **/
 	public function objToArray($mObject) {
-		if(is_object($mObject)) { $mObject = get_object_vars($mObject); }
+		if(\is_object($mObject)) { $mObject = \get_object_vars($mObject); }
 
-		$aArray = array();
-		if(is_array($mObject) && count($mObject)) {
+		$aArray = [];
+		if(\is_array($mObject) && \count($mObject)) {
 			foreach($mObject as $mKey => $mValue) {
-				$mValue = (is_array($mValue) || is_object($mValue)) ? $this->objToArray($mValue) : $mValue;
+				$mValue = (\is_array($mValue) || \is_object($mValue)) ? $this->objToArray($mValue) : $mValue;
 				$aArray[$mKey] = $mValue;
 			}
 		}
@@ -1400,9 +1399,9 @@ class nglShift extends nglTrunk {
 	} **/
 	public function objFromArray($aArray) {
 		$oObject = new \stdClass();
-		if(is_array($aArray) && count($aArray)) {
+		if(\is_array($aArray) && \count($aArray)) {
 			foreach($aArray as $mKey => $mValue) {
-				$oObject->{$mKey} = (is_array($mValue) || is_object($mValue)) ? $this->objFromArray($mValue) : $mValue;
+				$oObject->{$mKey} = (\is_array($mValue) || \is_object($mValue)) ? $this->objFromArray($mValue) : $mValue;
 			}
 		}
 	
@@ -1422,29 +1421,29 @@ class nglShift extends nglTrunk {
 		"return" : "array"
 	} **/
 	private function XMLChildren($vXML, $bAttributes=false, &$x) {
-		$aWithChildren = array();
-		$vChildren = array();
+		$aWithChildren = [];
+		$vChildren = [];
 
-		while($x++ < count($vXML)-1) {
-			$vNode = array();
-			$sTagName = strtolower($vXML[$x]["tag"]);
+		while($x++ < \count($vXML)-1) {
+			$vNode = [];
+			$sTagName = \strtolower($vXML[$x]["tag"]);
 
 			switch($vXML[$x]["type"]) {
 				case "complete":
 					if($bAttributes) {
-						$vNode["node"] = (isset($vXML[$x]["value"])) ? $vXML[$x]["value"] : array();
-						$vNode["attributes"] = (isset($vXML[$x]["attributes"])) ? $vXML[$x]["attributes"] : array();
+						$vNode["node"] = (isset($vXML[$x]["value"])) ? $vXML[$x]["value"] : [];
+						$vNode["attributes"] = (isset($vXML[$x]["attributes"])) ? $vXML[$x]["attributes"] : [];
 					} else {
-						$vNode = (isset($vXML[$x]["value"])) ? $vXML[$x]["value"] : array();
+						$vNode = (isset($vXML[$x]["value"])) ? $vXML[$x]["value"] : [];
 					}
 
 					// siempre usa el indice 0
 					if(isset($vChildren[$sTagName])) {
-						if(!is_array($vChildren[$sTagName])) {
-							$vChildren[$sTagName] = array($vChildren[$sTagName]);
+						if(!\is_array($vChildren[$sTagName])) {
+							$vChildren[$sTagName] = [$vChildren[$sTagName]];
 						} else {
-							if(is_array($vChildren[$sTagName]) && count($vChildren[$sTagName])==2 && isset($vChildren[$sTagName]["attributes"])) {
-								$vChildren[$sTagName] = array($vChildren[$sTagName]);
+							if(\is_array($vChildren[$sTagName]) && \count($vChildren[$sTagName])==2 && isset($vChildren[$sTagName]["attributes"])) {
+								$vChildren[$sTagName] = [$vChildren[$sTagName]];
 							}
 						}
 
@@ -1499,16 +1498,16 @@ class nglShift extends nglTrunk {
 	
 		if(!empty($sTagName)) { $nLevel++; }
 
-		$sTab = ($nLevel>=0) ? str_repeat("\t", $nLevel) : "";
+		$sTab = ($nLevel>=0) ? \str_repeat("\t", $nLevel) : "";
 		
 		$sXML = ($sTagName) ? $sTab."<".$sTagName." level=\"".$nLevel."\">\n" : "";
 		foreach($aData as $mKey => $mValue) {
-			if(is_array($mValue)) {
-				$sTag = (!is_numeric($mKey)) ? $mKey : "row";
-				$sXML .= $this->xmlEncode($mValue, array("tag"=>$sTag, "level"=>$nLevel));
+			if(\is_array($mValue)) {
+				$sTag = (!\is_numeric($mKey)) ? $mKey : "row";
+				$sXML .= $this->xmlEncode($mValue, ["tag"=>$sTag, "level"=>$nLevel]);
 			} else {
-				$sTag = (!is_numeric($mKey)) ? $mKey : $sTagName.":".$mKey;
-				$sXML .= $sTab."\t<".$sTag.">".((is_numeric($mValue) || $mValue==="") ? $mValue : "<![CDATA[".$mValue."]]>")."</".$sTag.">\n";
+				$sTag = (!\is_numeric($mKey)) ? $mKey : $sTagName.":".$mKey;
+				$sXML .= $sTab."\t<".$sTag.">".((\is_numeric($mValue) || $mValue==="") ? $mValue : "<![CDATA[".$mValue."]]>")."</".$sTag.">\n";
 			}
 		}
 		$sXML .= ($sTagName) ? $sTab."</".$sTagName.">\n" : "";
@@ -1538,11 +1537,11 @@ class nglShift extends nglTrunk {
 	public function xmlToArray($sXML, $vOptions=null) {
 		$bAttributes = (isset($vOptions["xml_attributes"])) ? self::call()->isTrue($vOptions["xml_attributes"]) : false;
 	
-		$hXML = xml_parser_create();
-		xml_parser_set_option($hXML, XML_OPTION_CASE_FOLDING, 0);
-		xml_parser_set_option($hXML, XML_OPTION_SKIP_WHITE, 0);
-		xml_parse_into_struct($hXML, $sXML, $aValues, $aTags);
-		xml_parser_free($hXML);
+		$hXML = \xml_parser_create();
+		\xml_parser_set_option($hXML, XML_OPTION_CASE_FOLDING, 0);
+		\xml_parser_set_option($hXML, XML_OPTION_SKIP_WHITE, 0);
+		\xml_parse_into_struct($hXML, $sXML, $aValues, $aTags);
+		\xml_parser_free($hXML);
 
 		$x = -1;
 		$aArray = $this->XMLChildren($aValues, $bAttributes, $x);
@@ -1550,23 +1549,23 @@ class nglShift extends nglTrunk {
 		return $aArray;
 	}
 
-	public function textTable($aData, $vOptions=array()) {
-		$sHeaderAlign	= (isset($vOptions["tthalign"])) ? strtolower($vOptions["tthalign"]) : "center";
-		$sBodyAlign		= (isset($vOptions["ttdalign"])) ? strtolower($vOptions["ttdalign"]) : "left";
+	public function textTable($aData, $vOptions=[]) {
+		$sHeaderAlign	= (isset($vOptions["tthalign"])) ? \strtolower($vOptions["tthalign"]) : "center";
+		$sBodyAlign		= (isset($vOptions["ttdalign"])) ? \strtolower($vOptions["ttdalign"]) : "left";
 		$nHeaderAlign	= ($sHeaderAlign=="left") ? STR_PAD_RIGHT : ($sHeaderAlign=="right" ? STR_PAD_LEFT : STR_PAD_BOTH);
 		$nBodyAlign		= ($sBodyAlign=="left") ? STR_PAD_RIGHT : ($sBodyAlign=="right" ? STR_PAD_LEFT : STR_PAD_BOTH);
 
-		if(!self::call()->isarrayarray($aData)) { $aData = array($aData); }
+		if(!self::call()->isarrayarray($aData)) { $aData = [$aData]; }
 		
-		$aCells = array_fill_keys(array_keys(current($aData)), 0);
-		$nCells = count($aCells);
+		$aCells = \array_fill_keys(\array_keys(\current($aData)), 0);
+		$nCells = \count($aCells);
 		foreach($aCells AS $sColname => $nLength) {
-			$aCells[$sColname] = self::call("unicode")->strlen(trim($sColname, "\t"));
+			$aCells[$sColname] = self::call("unicode")->strlen(\trim($sColname, "\t"));
 		}
 		foreach($aData as $i => $aRow) {
 			foreach($aRow as $sColname=>$sCell) {
-				$sCell = str_replace("\t", "\\t", $sCell);
-				$aCells[$sColname] = max($aCells[$sColname], self::call("unicode")->strlen($sCell));
+				$sCell = \str_replace("\t", "\\t", $sCell);
+				$aCells[$sColname] = \max($aCells[$sColname], self::call("unicode")->strlen($sCell));
 				$aData[$i][$sColname] = $sCell;
 			}
 		}
@@ -1574,22 +1573,22 @@ class nglShift extends nglTrunk {
 		$sBar = "+";
 		$sHeader = "|";
 		foreach($aCells as $sColname => $nLength) {
-			$sBar .= str_pad("", $nLength + 2, "-")."+";
+			$sBar .= \str_pad("", $nLength + 2, "-")."+";
 			$sHeader .= " ".self::call("unicode")->strpad($sColname, $nLength, " ", $nHeaderAlign) . " |";
 		}
 
-		$aCells = array_values($aCells);
+		$aCells = \array_values($aCells);
 		$sTable = "";
 		$sTable .= $sBar."\n";
 		$sTable .= $sHeader."\n";
 		$sTable .= $sBar."\n";
 		foreach($aData as $aRow) {
 			$sTable .= "|";
-			if(count($aRow) < $nCells) { $aRow = array_pad($aRow, $nCells, "NULL"); }
+			if(\is_array($aRow) && \count($aRow) < $nCells) { $aRow = \array_pad($aRow, $nCells, "NULL"); }
 			$x = 0;
 			foreach($aRow as $sCell) {
-				$sCell = trim($sCell, "\t");
-				$sCell = preg_replace('/[\x00-\x1F\x80-\xFF]/', "?", $sCell);
+				$sCell = \trim($sCell, "\t");
+				$sCell = \preg_replace('/[\x00-\x1F\x80-\xFF]/', "?", $sCell);
 				if($sCell===null) {
 					$sCell = "NULL";
 				} else if($sCell===false) {
@@ -1607,34 +1606,34 @@ class nglShift extends nglTrunk {
 		return $sTable;
 	}
 
-	public function textTableToArray($sTable, $vOptions=array()) {
+	public function textTableToArray($sTable, $vOptions=[]) {
 		$bMultiline = (isset($vOptions["multiline"])) ? $vOptions["multiline"] : false;
-		$aTable = explode("\n", $sTable);
-		array_shift($aTable);
-		$aHeaders = self::call()->explodeTrim("|", array_shift($aTable));
-		$aHeaders = array_slice($aHeaders, 1, -1);
+		$aTable = \explode("\n", $sTable);
+		\array_shift($aTable);
+		$aHeaders = self::call()->explodeTrim("|", \array_shift($aTable));
+		$aHeaders = \array_slice($aHeaders, 1, -1);
 
 		if($bMultiline) {
-			array_shift($aTable);
-			$aMultilineEmpty = $aMultiline = array_fill_keys(array_keys($aHeaders), "");
+			\array_shift($aTable);
+			$aMultilineEmpty = $aMultiline = \array_fill_keys(\array_keys($aHeaders), "");
 		} else {
-			$aTable = array_slice($aTable, 1, -1);
+			$aTable = \array_slice($aTable, 1, -1);
 		}
 
-		$aReturn = array();
-		if(count($aTable)) {
+		$aReturn = [];
+		if(\is_array($aTable) && \count($aTable)) {
 			foreach($aTable as $sRow) {
-				$sRow = trim($sRow);
+				$sRow = \trim($sRow);
 				if($bMultiline) {
 					if($sRow[0]=="+") {
-						$aReturn[] = array_combine($aHeaders, $aMultiline);
+						$aReturn[] = \array_combine($aHeaders, $aMultiline);
 						$aMultiline = $aMultilineEmpty;
 						continue;
 					}
-					$aMultiline = self::call()->arrayConcat(array($aMultiline, array_slice(self::call()->explodeTrim("|", $sRow), 1, -1)), " ");
+					$aMultiline = self::call()->arrayConcat([$aMultiline, \array_slice(self::call()->explodeTrim("|", $sRow), 1, -1)], " ");
 				} else {
 					if($sRow[0]=="+") { continue; }
-					$aReturn[] = array_combine($aHeaders, array_slice(self::call()->explodeTrim("|", $sRow), 1, -1));
+					$aReturn[] = \array_combine($aHeaders, \array_slice(self::call()->explodeTrim("|", $sRow), 1, -1));
 				}
 			}
 		}

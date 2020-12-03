@@ -1,6 +1,6 @@
 [checksum]
-md5 = "7229e1250251584767ac87c121a904db"
-sha1 = "3c18ac3071a0405e23868ec9edb8dcb11ffdf1d6"
+md5 = "94f8874c337ab257d2edfd4e49c8d3de"
+sha1 = "d264681fb61e3eb1d103b6b3d9b3237e9191d1de"
 
 [documentation]
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/dates.md"

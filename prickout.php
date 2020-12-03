@@ -1,4 +1,4 @@
-<?php defined("NGL_SOWED") || exit();
+<?php \defined("NGL_SOWED") || exit();
 
 if(NGL_TERMINAL) { $_SERVER["REDIRECT_URL"] = $argv[1]; }
 if(isset($_SERVER["REDIRECT_URL"]) || isset($_SERVER["REDIRECT_SCRIPT_URL"])) {
@@ -13,7 +13,7 @@ if(isset($_SERVER["REDIRECT_URL"]) || isset($_SERVER["REDIRECT_SCRIPT_URL"])) {
 
 	// redirecciones 
 	$REDIRECTURL = (isset($_SERVER["REDIRECT_SCRIPT_URL"]) ? $_SERVER["REDIRECT_SCRIPT_URL"] : $_SERVER["REDIRECT_URL"]);
-	if(file_exists(NGL_PATH_PROJECT.NGL_DIR_SLASH."re-prickout.php")) {
+	if(\file_exists(NGL_PATH_PROJECT.NGL_DIR_SLASH."re-prickout.php")) {
 		include_once(NGL_PATH_PROJECT.NGL_DIR_SLASH."re-prickout.php");
 	}
 
@@ -35,21 +35,21 @@ if(isset($_SERVER["REDIRECT_URL"]) || isset($_SERVER["REDIRECT_SCRIPT_URL"])) {
 		require_once($PRICKOUT[0]);
 		exit();
 	} else {
-		if(substr($PRICKOUT[1], -1)==NGL_DIR_SLASH) {
-			$PRICKOUT = array("dirname"=>$PRICKOUT[1]);
+		if(\substr($PRICKOUT[1], -1)==NGL_DIR_SLASH) {
+			$PRICKOUT = ["dirname"=>$PRICKOUT[1]];
 			$PRICKOUT["filename"] = $PRICKOUT["basename"] = "index";
 			$PRICKOUT["extension"] = "html";
 		} else {
-			$PRICKOUT = pathinfo($PRICKOUT[1]);
+			$PRICKOUT = \pathinfo($PRICKOUT[1]);
 		}
 
-		if(file_exists($PRICKOUT["dirname"].NGL_DIR_SLASH."__container.php")) {
+		if(\file_exists($PRICKOUT["dirname"].NGL_DIR_SLASH."__container.php")) {
 			require_once($PRICKOUT["dirname"].NGL_DIR_SLASH."__container.php");
 			exit();
-		} else if(file_exists(NGL_PATH_PRICKOUT.NGL_DIR_SLASH."__container.php")) {
+		} else if(\file_exists(NGL_PATH_PRICKOUT.NGL_DIR_SLASH."__container.php")) {
 			require_once(NGL_PATH_PRICKOUT.NGL_DIR_SLASH."__container.php");
 			exit();
-		} else if(file_exists($PRICKOUT["dirname"].NGL_DIR_SLASH.$PRICKOUT["basename"])) {
+		} else if(\file_exists($PRICKOUT["dirname"].NGL_DIR_SLASH.$PRICKOUT["basename"])) {
 			require_once($PRICKOUT[1]);
 			exit();
 		}

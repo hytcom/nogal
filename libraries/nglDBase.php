@@ -27,24 +27,24 @@ class nglDBase extends nglBranch implements iNglDataBase {
 	private $bUTF8;
 
 	final protected function __declareArguments__() {
-		$vArguments							= array();
-		$vArguments["autoconn"]				= array('self::call()->istrue($mValue)', false);
-		$vArguments["base"]					= array('(string)$mValue', null);
-		$vArguments["table"]				= array('(string)$mValue', null);
-		$vArguments["get_mode"]				= array('$this->GetMode($mValue)', 3);
-		$vArguments["utf8"]					= array('$this->UTF8($mValue)', true);
-		$vArguments["deleted"]				= array('self::call()->istrue($mValue)', false);
+		$vArguments							= [];
+		$vArguments["autoconn"]				= ['self::call()->istrue($mValue)', false];
+		$vArguments["base"]					= ['(string)$mValue', null];
+		$vArguments["table"]				= ['(string)$mValue', null];
+		$vArguments["get_mode"]				= ['$this->GetMode($mValue)', 3];
+		$vArguments["utf8"]					= ['$this->UTF8($mValue)', true];
+		$vArguments["deleted"]				= ['self::call()->istrue($mValue)', false];
 		
 		
-		$vArguments["mode"]					= array('(int)$mValue', 2);
-		$vArguments["debug"]				= array('self::call()->istrue($mValue)', false);
-		$vArguments["sql"]					= array('$mValue', null);
+		$vArguments["mode"]					= ['(int)$mValue', 2];
+		$vArguments["debug"]				= ['self::call()->istrue($mValue)', false];
+		$vArguments["sql"]					= ['$mValue', null];
 
 		return $vArguments;
 	}
 
 	final protected function __declareAttributes__() {
-		$vAttributes						= array();
+		$vAttributes						= [];
 		return $vAttributes;
 	}
 
@@ -54,8 +54,8 @@ class nglDBase extends nglBranch implements iNglDataBase {
 	final public function __init__() {
 		$this->aResult = null;
 		$this->nResult = 0;
-		$this->aFields = array();
-		$this->aFieldsUnset = array();
+		$this->aFields = [];
+		$this->aFieldsUnset = [];
 		if($this->argument("autoconn")) {
 			$this->connect();
 		}
@@ -81,11 +81,11 @@ class nglDBase extends nglBranch implements iNglDataBase {
 		"return": "$this"
 	} **/
 	public function connect() {
-		list($sBase,$nMode) = $this->getarguments("base,mode", func_get_args());
+		list($sBase,$nMode) = $this->getarguments("base,mode", \func_get_args());
 		$nMode = ((int)$nMode===0) ? 0 : 2;
 		$sBase = self::call()->sandboxPath($sBase);
-		$this->link = dbase_open($sBase, $nMode);
-		$this->sTable = basename(strtolower($sBase), ".dbf");
+		$this->link = \dbase_open($sBase, $nMode);
+		$this->sTable = \basename(\strtolower($sBase), ".dbf");
 		return $this;
 	}
 
@@ -105,13 +105,13 @@ class nglDBase extends nglBranch implements iNglDataBase {
 	}
 
 	public function query() {
-		list($sQuery) = $this->getarguments("sql", func_get_args());
+		list($sQuery) = $this->getarguments("sql", \func_get_args());
 		$aQuery = self::call("qparser")->query($sQuery);
 		if($aQuery!==false) {
 			switch($aQuery[0]) {
 				case "SELECT":
 					$this->Select($aQuery[1]);
-					$this->nRows = count($this->aResult);
+					$this->nRows = \count($this->aResult);
 					break;
 
 				case "DESCRIBE":
@@ -123,33 +123,33 @@ class nglDBase extends nglBranch implements iNglDataBase {
 	}
 
 	public function get() {
-		list($sColumn,$nMode) = $this->getarguments("column,get_mode", func_get_args());
+		list($sColumn,$nMode) = $this->getarguments("column,get_mode", \func_get_args());
 		if(@$aRow = $this->Fetch($nMode)) {
-			if($sColumn[0]=="#") { $sColumn = substr($sColumn, 1); }
-			return ($sColumn!==null && array_key_exists($sColumn, $aRow)) ? $aRow[$sColumn] : $aRow;
+			if($sColumn[0]=="#") { $sColumn = \substr($sColumn, 1); }
+			return ($sColumn!==null && \array_key_exists($sColumn, $aRow)) ? $aRow[$sColumn] : $aRow;
 		} else {
 			return false;
 		}
 	}
 
 	public function getall() {
-		list($sColumn,$nMode) = $this->getarguments("column,get_mode", func_get_args());
+		list($sColumn,$nMode) = $this->getarguments("column,get_mode", \func_get_args());
 		$bGroupByMode = $bIndexMode = $bKeyValue = false;
 
-		if(is_array($sColumn)) {
+		if(\is_array($sColumn)) {
 			$aGroup = $sColumn;
 			$sColumn = null;
 			$bGroupByMode = true;
 		} else {
 			if($sColumn[0]=="#") {
-				$sColumn = substr($sColumn, 1);
+				$sColumn = \substr($sColumn, 1);
 				$bIndexMode = true;
 			}
 
 			if($sColumn[0]=="@") {
-				$aColumn = explode(";", substr($sColumn, 1));
+				$aColumn = \explode(";", \substr($sColumn, 1));
 				$sColumn = $aColumn[0];
-				$sValue = (count($aColumn)>1) ? $aColumn[1] : $aColumn[0];
+				$sValue = (\count($aColumn)>1) ? $aColumn[1] : $aColumn[0];
 				$bKeyValue = true;
 			}			
 		}
@@ -157,17 +157,17 @@ class nglDBase extends nglBranch implements iNglDataBase {
 		$this->nResult = 0;
 		$aRow = $this->Fetch($nMode);
 
-		$aGetAll = array();
-		if($sColumn!==null && $aRow!==false && $aRow!==null && !array_key_exists($sColumn, $aRow)) { return $aGetAll; }
+		$aGetAll = [];
+		if($sColumn!==null && $aRow!==false && $aRow!==null && !\array_key_exists($sColumn, $aRow)) { return $aGetAll; }
 		$this->nResult = 0;
 
 		if($sColumn!==null) {
 			if($bIndexMode) {
-				$aMultiple = array();
+				$aMultiple = [];
 				while(@$aRow = $this->Fetch($nMode)) {
 					if(isset($aGetAll[$aRow[$sColumn]])) {
 						if(!isset($aMultiple[$aRow[$sColumn]])) {
-							$aGetAll[$aRow[$sColumn]] = array($aGetAll[$aRow[$sColumn]]);
+							$aGetAll[$aRow[$sColumn]] = [$aGetAll[$aRow[$sColumn]]];
 							$aMultiple[$aRow[$sColumn]] = true;
 						}
 						$aGetAll[$aRow[$sColumn]][] = $aRow;
@@ -200,7 +200,7 @@ class nglDBase extends nglBranch implements iNglDataBase {
 	}
 
 	public function allrows() {
-		return dbase_numrecords($this->link);
+		return \dbase_numrecords($this->link);
 	}
 
 	public function rows() {
@@ -240,12 +240,12 @@ class nglDBase extends nglBranch implements iNglDataBase {
 	}
 
 	private function Fetch($nMode) {
-		if(@$aRow = dbase_get_record_with_names($this->link, $this->aResult[$this->nResult])) {
+		if(@$aRow = \dbase_get_record_with_names($this->link, $this->aResult[$this->nResult])) {
 			foreach($this->aFieldsUnset as $sUnset) { unset($aRow[$sUnset]); }
-			if($nMode===2) { $aRow = array_values($aRow); }
-			if($nMode===1) { $aRow = array_merge($aRow, array_values($aRow)); }
+			if($nMode===2) { $aRow = \array_values($aRow); }
+			if($nMode===1) { $aRow = \array_merge($aRow, \array_values($aRow)); }
 			$this->nResult++;
-			return ($this->bUTF8) ? array_map("utf8_encode", $aRow) : $aRow;
+			return ($this->bUTF8) ? \array_map("utf8_encode", $aRow) : $aRow;
 		} else {
 			$this->nResult = 0;
 			return false;
@@ -253,10 +253,10 @@ class nglDBase extends nglBranch implements iNglDataBase {
 	}
 
 	private function Select($aQuery) {
-		$aReturn = array();
+		$aReturn = [];
 
-		$aNames = @dbase_get_record_with_names($this->link, 1);
-		$aFields = $aColumns = ($aNames!==false) ? array_keys($aNames) : false;
+		$aNames = @\dbase_get_record_with_names($this->link, 1);
+		$aFields = $aColumns = ($aNames!==false) ? \array_keys($aNames) : false;
 		if($aFields===false) {
 			$this->aResult = $aReturn;
 			$this->nRows = 0;
@@ -266,13 +266,13 @@ class nglDBase extends nglBranch implements iNglDataBase {
 			$aFields = self::call()->arrayColumn($aQuery["FIELDS"], 1);
 		}
 		if(!$this->argument("deleted")) {
-			if($nDeleted = array_search("deleted", $aColumns)) { unset($aColumns[$nDeleted]); }
+			if($nDeleted = \array_search("deleted", $aColumns)) { unset($aColumns[$nDeleted]); }
 		}
 		$this->aFields = $aFields;
-		$this->aFieldsUnset = array_diff($aFields, $aColumns);
+		$this->aFieldsUnset = \array_diff($aFields, $aColumns);
 
 		$nFrom = $n = 1;
-		$this->nRows = $y = dbase_numrecords($this->link);
+		$this->nRows = $y = \dbase_numrecords($this->link);
 		if(isset($aQuery["LIMIT"])) {
 			if(isset($aQuery["LIMIT"][1])) {
 				$nFrom = (int)$aQuery["LIMIT"][0] + 1;
@@ -286,7 +286,7 @@ class nglDBase extends nglBranch implements iNglDataBase {
 			$sTable = $aQuery["FROM"][0];
 			if($sTable===1) { $sTable = $this->sTable; }
 			for($x=$nFrom; $x<=$y; $x++) {
-				$$sTable = dbase_get_record_with_names($this->link, $x);
+				$$sTable = \dbase_get_record_with_names($this->link, $x);
 				if($$sTable===false) { break; }
 
 				$n++;
@@ -297,7 +297,7 @@ class nglDBase extends nglBranch implements iNglDataBase {
 				if($n==$this->nRows) { break; }
 			}
 		} else {
-			$aReturn = range(1, $this->nRows);
+			$aReturn = \range(1, $this->nRows);
 		}
 
 		$this->aResult = $aReturn;
@@ -312,7 +312,7 @@ class nglDBase extends nglBranch implements iNglDataBase {
 		"return": "int"
 	} **/
 	protected function GetMode($sMode) {
-		$aModes 				= array();
+		$aModes 				= [];
 		$aModes["both"] 		= 1;
 		$aModes["num"] 			= 2;
 		$aModes["assoc"] 		= 3;
@@ -320,7 +320,7 @@ class nglDBase extends nglBranch implements iNglDataBase {
 		$aModes[2] 				= 2;
 		$aModes[1]	 			= 3;
 
-		$sMode = strtolower($sMode);
+		$sMode = \strtolower($sMode);
 		return (isset($aModes[$sMode])) ? $aModes[$sMode] : 3;
 	}
 
@@ -330,7 +330,7 @@ class nglDBase extends nglBranch implements iNglDataBase {
 	}
 
 	private function Describe($aQuery) {
-		return dbase_get_header_info($this->link);
+		return \dbase_get_header_info($this->link);
 	}
 }
 

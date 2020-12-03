@@ -1,6 +1,6 @@
 [checksum]
-md5 = "e08be7c36c6a6f08e7b85ce9a0c455ca"
-sha1 = "66514fd019804858efe9943fd43d8cd394263d46"
+md5 = "2fa1daa377385822d3aac9377b484c12"
+sha1 = "edce3d4cc480e87e7611075477310f5f1f8d95b1"
 
 [documentation]
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/excel.md"

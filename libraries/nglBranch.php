@@ -35,17 +35,17 @@ abstract class nglBranch extends nglTrunk {
 		$this->me					= $vArguments[1];
 		$this->object				= strstr($vArguments[1],".",true);
 
-		$this->aArguments 			= array();
-		$this->aArgumentsSettings	= array();
-		$this->aAttributes			= array();
-		$this->aAttributesSettings	= array();
+		$this->aArguments 			= [];
+		$this->aArgumentsSettings	= [];
+		$this->aAttributes			= [];
+		$this->aAttributesSettings	= [];
 	}
 	
 	final public function __call($sProperty, $aArgs) {
-		if(is_array($aArgs) && count($aArgs)) {
+		if(\is_array($aArgs) && \count($aArgs)) {
 			$mValue = $aArgs[0];
-			if(array_key_exists($sProperty, $this->aArgumentsSettings)) {
-				if(is_array($this->aArgumentsSettings[$sProperty])) {
+			if(\array_key_exists($sProperty, $this->aArgumentsSettings)) {
+				if(\is_array($this->aArgumentsSettings[$sProperty])) {
 					$this->aArguments[$sProperty] = eval("return ".$this->aArgumentsSettings[$sProperty][0].";");
 				}
 			}
@@ -82,7 +82,7 @@ abstract class nglBranch extends nglTrunk {
 	final public function __get($sProperty) {
 		// no atributos privados
 		if($sProperty[0]!="_") {
-			if(array_key_exists($sProperty, $this->aAttributes)) {
+			if(\array_key_exists($sProperty, $this->aAttributes)) {
 				// atributos
 				return $this->aAttributes[$sProperty];
 			} else {
@@ -109,8 +109,8 @@ abstract class nglBranch extends nglTrunk {
 		"return" : "mixed"
 	} **/
 	final public function __set($sProperty, $mValue=null) {
-		if(array_key_exists($sProperty, $this->aArgumentsSettings)) {
-			if(is_array($this->aArgumentsSettings[$sProperty])) {
+		if(\array_key_exists($sProperty, $this->aArgumentsSettings)) {
+			if(\is_array($this->aArgumentsSettings[$sProperty])) {
 				$this->aArguments[$sProperty] = eval("return ".$this->aArgumentsSettings[$sProperty][0].";");
 				return $this->aArguments[$sProperty];
 			}
@@ -156,7 +156,7 @@ abstract class nglBranch extends nglTrunk {
 		"return" : "this"
 	} **/
 	final public function __arguments__($mArguments, $mValue=null) {
-		if(is_string($mArguments)) {
+		if(\is_string($mArguments)) {
 			$this->__set($mArguments, $mValue);
 		} else {
 			foreach($mArguments as $sArgument => $mValue) {
@@ -178,16 +178,16 @@ abstract class nglBranch extends nglTrunk {
 		"return" : "this"
 	} **/
 	final public function args($mArguments, $mValue=null) {
-		if(is_string($mArguments)) {
+		if(\is_string($mArguments)) {
 			if($mArguments[0]=="{") {
 				$mArguments = self::call("fn")->isJSON($mArguments, "array");
-				if(is_array($mArguments)) { return $this->__arguments__($mArguments); }
+				if(\is_array($mArguments)) { return $this->__arguments__($mArguments); }
 
 				return $this;
 			}
 			return $this->__arguments__($mArguments, $mValue);
 		} else {
-			if(is_object($mArguments)) { $mArguments = (array)$mArguments; }
+			if(\is_object($mArguments)) { $mArguments = (array)$mArguments; }
 			return $this->__arguments__($mArguments);
 		}
 	}
@@ -201,7 +201,7 @@ abstract class nglBranch extends nglTrunk {
 	} **/
 	final protected function Argument($sArgument, $mDefault=null) {
 		if($sArgument) {
-			if(array_key_exists($sArgument, $this->aArguments)) {
+			if(\array_key_exists($sArgument, $this->aArguments)) {
 				return ($this->aArguments[$sArgument]!==null) ? $this->aArguments[$sArgument] : $mDefault;
 			}
 		}
@@ -220,7 +220,7 @@ abstract class nglBranch extends nglTrunk {
 	} **/
 	final protected function Attribute($sAttribute, $mValue=NGL_NULL) {
 		if($sAttribute) {
-			if(array_key_exists($sAttribute, $this->aAttributes)) {
+			if(\array_key_exists($sAttribute, $this->aAttributes)) {
 				if($mValue!==NGL_NULL) { $this->aAttributes[$sAttribute] = $mValue; }
 				return $this->aAttributes[$sAttribute];
 			}
@@ -239,10 +239,10 @@ abstract class nglBranch extends nglTrunk {
 		"return" : "array"
 	} **/
 	final public function __config__($sConfigFile=null) {
-		if($sConfigFile===null && !count($this->CONFIG)) { return null; }
+		if($sConfigFile===null && !\count($this->CONFIG)) { return null; }
 
 		if($sConfigFile!==null) {
-			if(!($sConfig = file_get_contents($sConfigFile))) { return false; }
+			if(!($sConfig = \file_get_contents($sConfigFile))) { return false; }
 			$vConfig = self::parseConfigString($sConfig, true);
 		} else {
 			$vConfig = $this->CONFIG;
@@ -257,12 +257,12 @@ abstract class nglBranch extends nglTrunk {
 
 	final public function __defaults__() {
 		$aArgs = $this->__declareArguments__();
-		$aDefault = array();
+		$aDefault = [];
 		foreach($aArgs as $sArg => $mValue) {
-			$aDefault[$sArg] = (array_key_exists(1, $mValue)) ? $mValue[1] : null;
+			$aDefault[$sArg] = (\array_key_exists(1, $mValue)) ? $mValue[1] : null;
 		}
 
-		ksort($aDefault);
+		\ksort($aDefault);
 		return $aDefault;
 	}
 
@@ -294,11 +294,11 @@ abstract class nglBranch extends nglTrunk {
 		"return" : "array"
 	} **/
 	final protected function GetArguments($sArgs, $aPassedArgs) {
-		$aArgs = explode(",", $sArgs);
-		$aArguments = array();
+		$aArgs = \explode(",", $sArgs);
+		$aArguments = [];
 		foreach($aArgs as $nIndex => $sArgument) {
 			$sArgument = trim($sArgument);
-			$aArguments[] = (array_key_exists($nIndex, $aPassedArgs) && $aPassedArgs[$nIndex]!==NGL_NULL) ? $aPassedArgs[$nIndex] : $this->Argument($sArgument);
+			$aArguments[] = (\array_key_exists($nIndex, $aPassedArgs) && $aPassedArgs[$nIndex]!==NGL_NULL) ? $aPassedArgs[$nIndex] : $this->Argument($sArgument);
 		}
 
 		return $aArguments;
@@ -320,8 +320,8 @@ abstract class nglBranch extends nglTrunk {
 		"return" : "array"
 	} **/
 	final public function __info__($sMode="both") {
-		$sMode = strtolower($sMode);
-		$vInfo = array();
+		$sMode = \strtolower($sMode);
+		$vInfo = [];
 
 		if($sMode=="arguments" || $sMode=="both") {
 			foreach($this->aArguments as $sArgument => $mValue) {
@@ -348,7 +348,7 @@ abstract class nglBranch extends nglTrunk {
 		"return" : "mixed"
 	} **/
 	final public function isArgument($sArgument) {
-		return (array_key_exists($sArgument, $this->aArgumentsSettings));
+		return (\array_key_exists($sArgument, $this->aArgumentsSettings));
 	}
 
 	/** FUNCTION {
@@ -359,7 +359,7 @@ abstract class nglBranch extends nglTrunk {
 		"return" : "mixed"
 	} **/
 	final public function isAttribute($sAttribute) {
-		return (array_key_exists($sAttribute, $this->aAttributes));
+		return (\array_key_exists($sAttribute, $this->aAttributes));
 	}
 
 	/** FUNCTION {
@@ -369,9 +369,9 @@ abstract class nglBranch extends nglTrunk {
 		"return" : "void"
 	} **/
 	final public function __reset__() {
-		if(method_exists($this, "__declareAttributes__")) { $this->__SetupAttributes__($this->__declareAttributes__()); }
-		if(method_exists($this, "__declareArguments__")) { $this->__SetupArguments__($this->__declareArguments__()); }
-		if(method_exists($this, "__declareVariables__")) { $this->__declareVariables__(); }
+		if(\method_exists($this, "__declareAttributes__")) { $this->__SetupAttributes__($this->__declareAttributes__()); }
+		if(\method_exists($this, "__declareArguments__")) { $this->__SetupArguments__($this->__declareArguments__()); }
+		if(\method_exists($this, "__declareVariables__")) { $this->__declareVariables__(); }
 		$this->config();
 	}
 
@@ -388,10 +388,10 @@ abstract class nglBranch extends nglTrunk {
 		"return" : "void"
 	} **/
 	final protected function __SetupArguments__($aArgumentsSettings) {
-		$aArguments = array();
+		$aArguments = [];
 		foreach($aArgumentsSettings as $sProperty => $mArgument) {
-			$sProperty = strtolower($sProperty);
-			if(is_array($mArgument)) {
+			$sProperty = \strtolower($sProperty);
+			if(\is_array($mArgument)) {
 				if(isset($mArgument[1])) {
 					$aArguments[$sProperty] = $mArgument[1];
 				}
@@ -419,11 +419,11 @@ abstract class nglBranch extends nglTrunk {
 		},
 		"return" : "void"
 	} **/
-	final protected function __SetupAttributes__($aAttributesSettings=array()) {
+	final protected function __SetupAttributes__($aAttributesSettings=[]) {
 		// atributos
-		$aAttributes = array();
+		$aAttributes = [];
 		foreach($aAttributesSettings as $sAttribute => $mValue) {
-			$aAttributes[strtolower($sAttribute)] = $mValue;
+			$aAttributes[\strtolower($sAttribute)] = $mValue;
 		}
 		$this->aAttributes = $aAttributes;
 	}
@@ -439,7 +439,7 @@ abstract class nglBranch extends nglTrunk {
 	} **/
 	final public function __whoami__() {
 		$vDescribe = $this->__info__();
-		$aMethods = array("__destroy__","__info__", "__me__", "__reset__", "__whoami__");
+		$aMethods = ["__destroy__","__info__", "__me__", "__reset__", "__whoami__"];
 		$reflection = new \ReflectionClass(__NAMESPACE__."\\".$this->class);
 		$aThisMethods = $reflection->getMethods(\ReflectionMethod::IS_PUBLIC);
 		foreach($aThisMethods as $method) {
@@ -447,7 +447,7 @@ abstract class nglBranch extends nglTrunk {
 				$aMethods[] = $method->name;
 			}
 		}
-		sort($aMethods);
+		\sort($aMethods);
 		$vDescribe["methods"] = $aMethods;
 		
 		return $vDescribe;

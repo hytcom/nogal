@@ -65,20 +65,20 @@ class nglSet extends nglBranch implements inglBranch {
 	private $bZero;
 
 	final protected function __declareArguments__() {
-		$vArguments					= array();
-		$vArguments["data"]			= array('(string)$mValue');
-		$vArguments["splitter"]		= array('(string)$mValue', ",");
-		$vArguments["item"]			= array('$mValue');
-		$vArguments["index"]		= array('(int)$mValue', null);
-		$vArguments["referer"]		= array('(int)$mValue', null);
-		$vArguments["place"]		= array('$mValue', "last");
-		$vArguments["needle"]		= array('$mValue', null);
-		$vArguments["regex"]		= array('self::call()->isTrue($mValue)', false);
+		$vArguments					= [];
+		$vArguments["data"]			= ['(string)$mValue'];
+		$vArguments["splitter"]		= ['(string)$mValue', ","];
+		$vArguments["item"]			= ['$mValue'];
+		$vArguments["index"]		= ['(int)$mValue', null];
+		$vArguments["referer"]		= ['(int)$mValue', null];
+		$vArguments["place"]		= ['$mValue', "last"];
+		$vArguments["needle"]		= ['$mValue', null];
+		$vArguments["regex"]		= ['self::call()->isTrue($mValue)', false];
 		return $vArguments;
 	}
 
 	final protected function __declareAttributes__() {
-		$vAttributes 				= array();
+		$vAttributes 				= [];
 		$vAttributes["text"]		= null;
 		$vAttributes["array"]		= null;
 		$vAttributes["length"]		= null;
@@ -106,21 +106,21 @@ class nglSet extends nglBranch implements inglBranch {
 	}
 
 	public function find() {
-		list($sNeedle,$bReGex) = $this->getarguments("needle,regex", func_get_args());
+		list($sNeedle,$bReGex) = $this->getarguments("needle,regex", \func_get_args());
 		$aSet = $this->attribute("array");
-		$sNeedle = ($bReGex) ? $sNeedle : "/(.*)".preg_quote($sNeedle)."(.*)/is";
-		return preg_grep($sNeedle, $aSet);
+		$sNeedle = ($bReGex) ? $sNeedle : "/(.*)".\preg_quote($sNeedle)."(.*)/is";
+		return \preg_grep($sNeedle, $aSet);
 	}
 
 	public function get($sWhich=null) {
-		list($sWhich) = $this->getarguments("item", func_get_args());
+		list($sWhich) = $this->getarguments("item", \func_get_args());
 		$aSet = $this->attribute("array");
 
 		if($sWhich===null) {
 			return $aSet;
-		} else if(!is_numeric($sWhich)) {
+		} else if(!\is_numeric($sWhich)) {
 			$nIndex = $this->attribute("current");
-			$sWhich = strtolower($sWhich);
+			$sWhich = \strtolower($sWhich);
 			switch($sWhich) {
 				case "first": $nIndex = 0; break;
 				case "last": $nIndex = $this->attribute("length")-1; break;
@@ -157,7 +157,7 @@ class nglSet extends nglBranch implements inglBranch {
 	}
 
 	public function jump() {
-		list($nCurrent) = $this->getarguments("index", func_get_args());
+		list($nCurrent) = $this->getarguments("index", \func_get_args());
 		$this->Index($nCurrent);
 		$nLength = $this->attribute("length");
 		if($nCurrent>=$nLength || $nCurrent<0) { return false; }
@@ -167,28 +167,28 @@ class nglSet extends nglBranch implements inglBranch {
 
 	public function shuffle() {
 		$aSet = $this->attribute("array");
-		shuffle($aSet);
+		\shuffle($aSet);
 		$this->attribute("array", $aSet);
 		return $this;
 	}
 
 	public function sort() {
 		$aSet = $this->attribute("array");
-		natcasesort($aSet);
+		\natcasesort($aSet);
 		$this->attribute("array", $aSet);
 		return $this;
 	}
 
 	public function rsort() {
 		$aSet = $this->attribute("array");
-		natcasesort($aSet);
-		$aSet = array_reverse($aSet);
+		\natcasesort($aSet);
+		$aSet = \array_reverse($aSet);
 		$this->attribute("array", $aSet);
 		return $this;
 	}
 
 	public function swap() {
-		list($nItem1,$nItem2) = $this->getarguments("index,referer", func_get_args());
+		list($nItem1,$nItem2) = $this->getarguments("index,referer", \func_get_args());
 		$aSet = $this->attribute("array");
 		$this->Index($nItem1);
 		$this->Index($nItem2);
@@ -210,27 +210,27 @@ class nglSet extends nglBranch implements inglBranch {
 		$nReferer = posicion de referencia cuando $sPlace = (before|after);
 	**/
 	public function insert() {
-		list($sCurrent, $sPlace, $nReferer) = $this->getarguments("item,place,referer", func_get_args());
+		list($sCurrent, $sPlace, $nReferer) = $this->getarguments("item,place,referer", \func_get_args());
 
 		$aSet = $this->attribute("array");
 		$this->Index($nReferer);
 
 		// ordenamiento
-		$sPlace = strtolower($sPlace);
+		$sPlace = \strtolower($sPlace);
 		switch(1) {
 			case ($sPlace=="first"):
-				array_unshift($aSet, $sCurrent);
+				\array_unshift($aSet, $sCurrent);
 				break;
 		
 			case ($sPlace=="before" && $nReferer!==null):
-				$aSet = array_reverse($aSet, true);
+				$aSet = \array_reverse($aSet, true);
 
 			case ($sPlace=="after" && $nReferer!==null):
 				foreach($aSet as $nKey => $mItem) {
 					$aNewSequence[] = $mItem;
 					if($nKey==$nReferer) { $aNewSequence[] = $sCurrent; }
 				}
-				$aSet = ($sPlace=="before") ? array_reverse($aNewSequence, true) : $aNewSequence;
+				$aSet = ($sPlace=="before") ? \array_reverse($aNewSequence, true) : $aNewSequence;
 				break;
 			
 			case ($sPlace=="last"):
@@ -248,7 +248,7 @@ class nglSet extends nglBranch implements inglBranch {
 	Cuando la posicion del puntero sea igual al rango de la lista, el metodo reseteara el puntero y retornara false
 	*/
 	public function delete() {
-		list($nIndex) = $this->getarguments("index", func_get_args());
+		list($nIndex) = $this->getarguments("index", \func_get_args());
 		if($nIndex==null) {
 			$nIndex = $this->attribute("current");
 		} else {
@@ -268,7 +268,7 @@ class nglSet extends nglBranch implements inglBranch {
 	}
 
 	public function update() {
-		list($sItem,$nIndex) = $this->getarguments("item,index", func_get_args());
+		list($sItem,$nIndex) = $this->getarguments("item,index", \func_get_args());
 		if($nIndex==null) {
 			$nIndex = $this->attribute("current");
 		} else {
@@ -287,11 +287,11 @@ class nglSet extends nglBranch implements inglBranch {
 	}
 
 	public function indexOf() {
-		list($sItem) = $this->getarguments("item", func_get_args());
+		list($sItem) = $this->getarguments("item", \func_get_args());
 
 		$aSet = $this->attribute("array");
-		if(count($aSet)) {
-			$nIndex = array_search($sItem, $aSet);
+		if(\is_array($aSet) && \count($aSet)) {
+			$nIndex = \array_search($sItem, $aSet);
 			return ($nIndex!==false) ? ($this->bZero ? $nIndex : ++$nIndex) : false;
 		} else {
 			return false;
@@ -300,30 +300,30 @@ class nglSet extends nglBranch implements inglBranch {
 
 	private function RebuildAttributes($aSet, $nCurrent=0) {
 		$nCurrent = $this->Index($nCurrent);
-		$aSet = array_values($aSet);
+		$aSet = \array_values($aSet);
 		$this->attribute("array", $aSet);
-		$this->attribute("length", count($aSet));
+		$this->attribute("length", \count($aSet));
 		$this->attribute("current", $nCurrent);
 		$sSet = $this->text();
 		$this->attribute("text", $sSet);
 	}
 
 	public function load() {
-		list($mData, $sSplitter) = $this->getarguments("data,splitter", func_get_args());
+		list($mData, $sSplitter) = $this->getarguments("data,splitter", \func_get_args());
 
-		$aSet = array();
-		if($mData!==null) { $aSet = (!is_array($mData)) ? explode($sSplitter, $mData) : $mData; }
+		$aSet = [];
+		if($mData!==null) { $aSet = (!\is_array($mData)) ? \explode($sSplitter, $mData) : $mData; }
 		$this->RebuildAttributes($aSet);
 
 		return $this;
 	}
 
 	public function text() {
-		list($sGlue) = $this->getarguments("splitter", func_get_args());
+		list($sGlue) = $this->getarguments("splitter", \func_get_args());
 
 		$sSet = "";
 		$mData = $this->attribute("array");
-		if($mData!==null) { $sSet = implode($sGlue, $mData); }
+		if($mData!==null) { $sSet = \implode($sGlue, $mData); }
 		return $sSet;
 	}
 }

@@ -1,6 +1,6 @@
 [checksum]
-md5 = "6b3572543117f5313cd39678fb82b486"
-sha1 = "d6444c8bad4d2d083ae55fa7f12b57e9f8669873"
+md5 = "bbca375432b073e367623214097dd92f"
+sha1 = "f99e5e2a0007a9472d4f405b9b075effb5400c0f"
 
 [documentation]
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/nut.md"

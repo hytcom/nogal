@@ -66,8 +66,8 @@ class nglValidate extends nglTrunk {
 	public function __builder__() {
 		$this->vRegex = self::call("sysvar")->REGEX;
 
-		if(file_exists(NGL_PATH_CONF.NGL_DIR_SLASH."validate.conf")) {
-			$sConfig = file_get_contents(NGL_PATH_CONF.NGL_DIR_SLASH."validate.conf");
+		if(\file_exists(NGL_PATH_CONF.NGL_DIR_SLASH."validate.conf")) {
+			$sConfig = \file_get_contents(NGL_PATH_CONF.NGL_DIR_SLASH."validate.conf");
 			$vConfig = self::parseConfigString($sConfig, true);
 
 			if(isset($vConfig["request"])) {
@@ -138,13 +138,13 @@ class nglValidate extends nglTrunk {
 		"return" : "mixed"
 	} **/
 	private function CheckValue($mSource, $vRules) {
-		if(!isset($vRules["options"])) { $vRules["options"] = array(); }
+		if(!isset($vRules["options"])) { $vRules["options"] = []; }
 		
 		if(isset($vRules["options"]["multiple"])) {
-			$aValues = preg_split("/".$vRules["options"]["multiple"]."/s", $mSource);
+			$aValues = \preg_split("/".$vRules["options"]["multiple"]."/s", $mSource);
 			unset($vRules["options"]["multiple"]);
 			
-			$mValue = array();
+			$mValue = [];
 			foreach($aValues as $mSource) {
 				$mValue[] = $this->validate($mSource, $vRules);
 			}
@@ -152,14 +152,14 @@ class nglValidate extends nglTrunk {
 			$mValue = $mSource;
 
 			if(isset($vRules["options"]["decode"])) {
-				if(strtolower($vRules["options"]["decode"])=="urldecode") {
-					$mValue = urldecode($mValue);
-				} else if(strtolower($vRules["options"]["decode"])=="rawurldecode ") {
-					$mValue = rawurldecode($mValue);
+				if(\strtolower($vRules["options"]["decode"])=="urldecode") {
+					$mValue = \urldecode($mValue);
+				} else if(\strtolower($vRules["options"]["decode"])=="rawurldecode ") {
+					$mValue = \rawurldecode($mValue);
 				}
 			}
 
-			$mSource = (isset($vRules["options"]["striptags"])) ? strip_tags($mSource, $vRules["options"]["striptags"]) : $mSource;
+			$mSource = (isset($vRules["options"]["striptags"])) ? \strip_tags($mSource, $vRules["options"]["striptags"]) : $mSource;
 			$mValue = $this->ValidateByType($mSource, $vRules["type"], $vRules["options"]);
 
 			if(empty($mValue) && !empty($mSource)) {
@@ -198,16 +198,16 @@ class nglValidate extends nglTrunk {
 			// in
 			if(isset($vRules["in"])) {
 				$aIn = self::call("unicode")->explode(",", $vRules["in"]);
-				if(!in_array($mValue, $aIn)) { $this->bCheckError = true; return "in"; }
+				if(!\in_array($mValue, $aIn)) { $this->bCheckError = true; return "in"; }
 			}
 		}
 
 		if(isset($vRules["options"]["addslashes"]) && self::call()->istrue($vRules["options"]["addslashes"])) {
-			$mValue = addslashes($mValue);
+			$mValue = \addslashes($mValue);
 		}
 
 		if(isset($vRules["options"]["quotemeta"]) && self::call()->istrue($vRules["options"]["quotemeta"])) {
-			$mValue = quotemeta($mValue);
+			$mValue = \quotemeta($mValue);
 		}
 		
 		return $mValue;
@@ -226,10 +226,10 @@ class nglValidate extends nglTrunk {
 	} **/
 	private function ClearCharacters1($sString, $aToClean, $bInvert=false) {
 		$sNewString = $sInvertString = $sChar = "";
-		$nString = strlen($sString);
+		$nString = \strlen($sString);
 		for($x=0; $x<$nString; $x++) {
-			if((ord($sString[$x])&0xC0)!=0x80) {
-				if(strlen($sChar)) {
+			if((\ord($sString[$x])&0xC0)!=0x80) {
+				if(\strlen($sChar)) {
 					$nOrd = self::call("unicode")->ord($sChar);
 					if(!isset($aToClean[$nOrd])) {
 						$sNewString .= $sChar;
@@ -264,10 +264,10 @@ class nglValidate extends nglTrunk {
 		"return" : "array"
 	} **/
 	private function GetRulesFile($sRulesFile) {
-		if(file_exists(NGL_PATH_VALIDATE.NGL_DIR_SLASH.$sRulesFile.".json")) {
-			$sRules = file_get_contents(NGL_PATH_VALIDATE.NGL_DIR_SLASH.$sRulesFile.".json");
-			$sRules = trim($sRules);
-			return json_decode($sRules, true);
+		if(\file_exists(NGL_PATH_VALIDATE.NGL_DIR_SLASH.$sRulesFile.".json")) {
+			$sRules = \file_get_contents(NGL_PATH_VALIDATE.NGL_DIR_SLASH.$sRulesFile.".json");
+			$sRules = \trim($sRules);
+			return \json_decode($sRules, true);
 		}
 		
 		return null;
@@ -299,11 +299,11 @@ class nglValidate extends nglTrunk {
 	public function request($sFrom="LOCAL") {
 		$bProccess = false;
 		if(isset($_SERVER["HTTP_REFERER"])) {
-			$aURL = parse_url($_SERVER["HTTP_REFERER"]);
+			$aURL = \parse_url($_SERVER["HTTP_REFERER"]);
 			$sRequestHost = $aURL["host"];
-			$sIP = gethostbyname($sRequestHost);
+			$sIP = \gethostbyname($sRequestHost);
 			
-			$aHost = parse_url($_SERVER["HTTP_HOST"]);
+			$aHost = \parse_url($_SERVER["HTTP_HOST"]);
 			$sHost = (isset($aHost["host"])) ? $aHost["host"] : $aHost["path"];
 			if($sHost==$sRequestHost) {
 				$bProccess = true;
@@ -323,7 +323,7 @@ class nglValidate extends nglTrunk {
 		if($bProccess || !isset($_SERVER["HTTP_REFERER"])) {
 			$_REQUEST = $this->validate($_REQUEST, "REQUEST");
 		} else {
-			$_REQUEST = array();
+			$_REQUEST = [];
 		}
 	}
 
@@ -335,14 +335,14 @@ class nglValidate extends nglTrunk {
 		"return" : "array"
 	} **/
 	private function RequestFrom($sFrom) {
-		$aRequestsFroms = array("LOCAL" => true);
+		$aRequestsFroms = ["LOCAL" => true];
 		if(!empty($sFrom)) {
-			$sFrom = strtoupper($sFrom);
-			$sFrom = trim($sFrom);
+			$sFrom = \strtoupper($sFrom);
+			$sFrom = \trim($sFrom);
 			if($sFrom!="ALL" && $sFrom!="LOCAL") {
 				$aRequestsFroms = self::call()->explodeTrim(",", $sFrom);
 			} else {
-				$aRequestsFroms = array($sFrom => true);
+				$aRequestsFroms = [$sFrom => true];
 			}
 		}
 
@@ -356,7 +356,7 @@ class nglValidate extends nglTrunk {
 		"return" : "void"
 	} **/
 	public function resetvars() {
-		$this->vVariables = array();
+		$this->vVariables = [];
 	}
 
 	/** FUNCTION {
@@ -435,9 +435,9 @@ class nglValidate extends nglTrunk {
 			",
 
 			"Reglas en Array" : "
-				$rules = array();
+				$rules = [];
 				$rules["type"] = "html";
-				$rules["options"] = array(
+				$rules["options"] = [
 					\"htmlentities" => \"ENT_COMPAT,ENT_HTML401,ENT_QUOTES\",
 					\"striptags\" => \"<i>\"
 				);
@@ -481,9 +481,9 @@ class nglValidate extends nglTrunk {
 			",
 			
 			"Tipo all customizado" : "
-				$rules = array();
+				$rules = [];
 				$rules["type"] = "all";
-				$rules["options"] = array(
+				$rules["options"] = [
 					\"allow\" => \"LATIN_BASIC_LOWERCASE,LATIN_BASIC_NUMBERS\",
 					\"striptags\" => true
 				);
@@ -498,10 +498,10 @@ class nglValidate extends nglTrunk {
 		"return" : "mixed"
 	} **/
 	public function validate($mVariables, $mRules, $bIgnoreDefault=false) {
-		if(is_array($mRules)) {
+		if(\is_array($mRules)) {
 			$aRules = $mRules;
 		} else {
-			$sRules = trim($mRules);
+			$sRules = \trim($mRules);
 
 			$aRules = self::call()->isJson($sRules, "array");
 			if($aRules===false) {
@@ -511,23 +511,23 @@ class nglValidate extends nglTrunk {
 
 		if($aRules===null) { return null; }
 		
-		if(!is_array($mVariables)) {
+		if(!\is_array($mVariables)) {
 			$this->bCheckError = false;
 			$mCheck = $this->CheckValue($mVariables, $aRules);
 
-			if($this->bCheckError && !is_array($mCheck)) {
+			if($this->bCheckError && !\is_array($mCheck)) {
 				$mCheck = "error => ".$mCheck;
 			}
 
 			return $mCheck;
 		}
 
-		$vReport = $vValidated = array();
+		$vReport = $vValidated = [];
 		foreach($aRules as $sField => $vRules) {
 			unset($mValue);
 			foreach($vRules as $sRule => $mRule) {
-				if(is_string($mRule) && preg_match("/^\{".self::call("sysvar")->REGEX["phpvar"]."\}$/s", $mRule)) {
-					$sVarname = substr($mRule, 2, -1);
+				if(\is_string($mRule) && \preg_match("/^\{".self::call("sysvar")->REGEX["phpvar"]."\}$/s", $mRule)) {
+					$sVarname = \substr($mRule, 2, -1);
 					$vRules[$sRule] = (isset($this->vVariables[$sVarname])) ? $this->vVariables[$sVarname] : $mRule;
 				}
 			}
@@ -539,7 +539,7 @@ class nglValidate extends nglTrunk {
 
 			if(isset($mVariables[$sField])) {
 				$mValue = $mVariables[$sField];
-				if(is_array($mValue)) {
+				if(\is_array($mValue)) {
 					$bError = false;
 					foreach($mValue as $mKey => $mSubValue) {
 						$this->bCheckError = false;
@@ -583,11 +583,11 @@ class nglValidate extends nglTrunk {
 			if(isset($mValue)) { $vValidated[$sField] = $mValue; }
 		}
 
-		$vCheck 			= array();
+		$vCheck 			= [];
 		$vCheck["source"]	= $mVariables;
 		$vCheck["rules"]	= $aRules;
 		$vCheck["values"]	= $vValidated;
-		$vCheck["errors"]	= count($vReport);
+		$vCheck["errors"]	= \count($vReport);
 		$vCheck["report"]	= $vReport;
 
 		return $vCheck;
@@ -604,14 +604,14 @@ class nglValidate extends nglTrunk {
 		},
 		"return" : "string"
 	} **/
-	private function ValidateByType($mValue, $sType, $vOptions=array()) {
-		if((function_exists("get_magic_quotes_gpc") && get_magic_quotes_gpc()) || (ini_get("magic_quotes_sybase") && (strtolower(ini_get("magic_quotes_sybase"))!="off"))) {
-			$mValue = stripslashes($mValue);
+	private function ValidateByType($mValue, $sType, $vOptions=[]) {
+		if((\function_exists("get_magic_quotes_gpc") && \get_magic_quotes_gpc()) || (\ini_get("magic_quotes_sybase") && (\strtolower(\ini_get("magic_quotes_sybase"))!="off"))) {
+			$mValue = \stripslashes($mValue);
 		}
 	
-		$aParams = array();
+		$aParams = [];
 		$mNewValue = "";
-		$sType = strtolower($sType);
+		$sType = \strtolower($sType);
 		switch($sType) {
 			case "all":
 				if(isset($vOptions["allow"])) {
@@ -625,17 +625,17 @@ class nglValidate extends nglTrunk {
 				if(isset($bDeny)) {
 					$bSpaces = false;
 					foreach($aToClean as $sValue) {
-						$sValue = strtoupper($sValue);
+						$sValue = \strtoupper($sValue);
 
 						if($sValue=="SPACES") { $bSpaces = true; }
-						if(strlen($sValue)==3) {
+						if(\strlen($sValue)==3) {
 							$aParams["types"][$sValue] = true;
 						} else {
 							$aParams["groups"][$sValue] = true;
 						}
 					}
 
-					if($bSpaces) { $aParams["chars"] = array(9=>true,10=>true,13=>true,32=>true); }
+					if($bSpaces) { $aParams["chars"] = [9=>true,10=>true,13=>true,32=>true]; }
 					$mNewValue = $this->ClearCharacters($mValue, $aParams, $bDeny);
 				} else {
 					$mNewValue = $mValue;
@@ -643,7 +643,7 @@ class nglValidate extends nglTrunk {
 				break;
 
 			case "html":
-				$vFlags 					= array();
+				$vFlags 					= [];
 				$vFlags["ENT_COMPAT"]		= ENT_COMPAT;
 				$vFlags["ENT_QUOTES"]		= ENT_QUOTES;
 				$vFlags["ENT_NOQUOTES"]		= ENT_NOQUOTES;
@@ -656,21 +656,21 @@ class nglValidate extends nglTrunk {
 				$vFlags["ENT_HTML5"]		= ENT_HTML5;
 				
 				$sFlags = (isset($vOptions["htmlentities"])) ? $vOptions["htmlentities"] : "ENT_COMPAT,ENT_HTML401";
-				$aFlags = explode(",", $sFlags);
+				$aFlags = \explode(",", $sFlags);
 
 				$nFlag = 0;
 				foreach($aFlags as $sFlag) {
-					$sFlag = trim($sFlag);
-					$nFlag |= $vFlags[strtoupper($sFlag)];
+					$sFlag = \trim($sFlag);
+					$nFlag |= $vFlags[\strtoupper($sFlag)];
 				}
 				
 				$sEncoding = (isset($vOptions["encoding"])) ? $vOptions["encoding"] : "UTF-8";
-				$mNewValue = htmlentities($mValue, $nFlag, $sEncoding);
+				$mNewValue = \htmlentities($mValue, $nFlag, $sEncoding);
 				break;
 
 			case "regex":
 				if(isset($vOptions["pattern"])) {
-					if(preg_match("/".$vOptions["pattern"]."/s", $mValue)) {
+					if(\preg_match("/".$vOptions["pattern"]."/s", $mValue)) {
 						$mNewValue = $mValue;
 					}
 				}
@@ -678,7 +678,7 @@ class nglValidate extends nglTrunk {
 
 			case "base64file":
 				$sType = "base64";
-				$mValue = substr($mValue, strpos($mValue, ",")+1);
+				$mValue = \substr($mValue, \strpos($mValue, ",")+1);
 			case "base64":
 			case "color":
 			case "date":
@@ -690,51 +690,51 @@ class nglValidate extends nglTrunk {
 			case "ipv6":
 			case "time":
 			case "url":
-				if(preg_match("/^".$this->vRegex[$sType]."$/s", $mValue)) {
+				if(\preg_match("/^".$this->vRegex[$sType]."$/s", $mValue)) {
 					$mNewValue = $mValue;
 				}
 				break;
 				
 			case "int":
-				$mNewValue = preg_replace("/^[^0-9]+$/s", "", $mValue);
+				$mNewValue = \preg_replace("/^[^0-9]+$/s", "", $mValue);
 				$mNewValue = (int)$mNewValue;
 				break;
 
 			case "coords":
-				$mNewValue = preg_replace("/^[^0-9\.\-](,|;)[^0-9\.\-]+$/s", "", $mValue);
+				$mNewValue = \preg_replace("/^[^0-9\.\-](,|;)[^0-9\.\-]+$/s", "", $mValue);
 				break;
 
 			case "number":
-				$mNewValue = preg_replace("/^[^0-9\.\,]+$/s", "", $mValue);
-				if(!is_numeric($mNewValue)) { $mNewValue = 0; }
+				$mNewValue = \preg_replace("/^[^0-9\.\,]+$/s", "", $mValue);
+				if(!\is_numeric($mNewValue)) { $mNewValue = 0; }
 				$mNewValue *= 1;
 				break;
 
 			case "alpha":
-				$aParams["types"] = array("ABC"=>true, "ABU"=>true);
-				$aParams["groups"] = array();
-				$aParams["chars"] = array(9=>true,10=>true,13=>true,32=>true);
+				$aParams["types"] = ["ABC"=>true, "ABU"=>true];
+				$aParams["groups"] = [];
+				$aParams["chars"] = [9=>true,10=>true,13=>true,32=>true];
 				$mNewValue = $this->ClearCharacters($mValue, $aParams);
 				break;
 
 			case "string":
-				$aParams["types"] = array("ABC"=>true, "ABU"=>true, "NUM"=>true);
-				$aParams["groups"] = array();
-				$aParams["chars"] = array(9=>true,10=>true,13=>true,32=>true);
+				$aParams["types"] = ["ABC"=>true, "ABU"=>true, "NUM"=>true];
+				$aParams["groups"] = [];
+				$aParams["chars"] = [9=>true,10=>true,13=>true,32=>true];
 				$mNewValue = $this->ClearCharacters($mValue, $aParams);
 				break;
 
 			case "text":
-				$aParams["types"] = array("ABC"=>true, "ABU"=>true, "SYL"=>true, "NUM"=>true, "SYM"=>true);
-				$aParams["groups"] = array("BASIC_LATIN_SYMBOLS"=>true);
-				$aParams["chars"] = array(9=>true,10=>true,13=>true,32=>true);
+				$aParams["types"] = ["ABC"=>true, "ABU"=>true, "SYL"=>true, "NUM"=>true, "SYM"=>true];
+				$aParams["groups"] = ["BASIC_LATIN_SYMBOLS"=>true];
+				$aParams["chars"] = [9=>true,10=>true,13=>true,32=>true];
 				$mNewValue = $this->ClearCharacters($mValue, $aParams);
 				break;
 
 			case "symbols":
-				$aParams["types"] = array("SYM"=>true);
-				$aParams["groups"] = array();
-				$aParams["chars"] = array(9=>true,10=>true,13=>true,32=>true);
+				$aParams["types"] = ["SYM"=>true];
+				$aParams["groups"] = [];
+				$aParams["chars"] = [9=>true,10=>true,13=>true,32=>true];
 				$mNewValue = $this->ClearCharacters($mValue, $aParams, true);
 				break;
 		}
@@ -744,10 +744,10 @@ class nglValidate extends nglTrunk {
 		
 	private function ClearCharacters($sString, $aParams=null, $bInvert=false) {
 		$sNewString = $sInvertString = $sChar = "";
-		$nString = strlen($sString);
+		$nString = \strlen($sString);
 		for($x=0; $x<$nString; $x++) {
-			if((ord($sString[$x])&0xC0)!=0x80) {
-				if(strlen($sChar)) {
+			if((\ord($sString[$x])&0xC0)!=0x80) {
+				if(\strlen($sChar)) {
 					$aIs = self::call("unicode")->ischr($sChar);
 					if(isset($aParams["types"][$aIs[0]]) || isset($aParams["groups"][$aIs[1]]) || isset($aParams["chars"][$aIs[2]])) {
 						$sNewString .= $sChar;

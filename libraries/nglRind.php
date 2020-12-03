@@ -113,7 +113,7 @@ namespace nogal {
 		private $aRindFunctions;
 
 		// variable global _SET
-		private $SET = array();
+		private $SET = [];
 		
 		// palabras reservadas
 		private $aReservedWords;
@@ -123,50 +123,47 @@ namespace nogal {
 		private $vVarsAllow;
 
 		private $aLoadedCollections;
-		private $aLoops = array();
-		private $aLoopsStack = array();
+		private $aLoops = [];
+		private $aLoopsStack = [];
 		private $sPHPFile = null;
 		private $aFilePath = null;
 
 		private $sMergeFiles = "";
-		private $aMergeTail = array();
+		private $aMergeTail = [];
 
 		final protected function __declareArguments__() {
-			$vArguments							= array();
-			$vArguments["root"] 				= array('$mValue', null);
-			$vArguments["cache"] 				= array('$mValue', null);
-			$vArguments["gui"] 					= array('$mValue', null);
-			$vArguments["curdir"] 				= array('$mValue', null);
-			$vArguments["scheme"] 				= array('$mValue', "http");
-
-			$vArguments["template"] 			= array('(string)$mValue', null);
-			$vArguments["source"] 				= array('(string)$mValue', null);
-			$vArguments["cache_file"] 			= array('(string)$mValue', null);
-			$vArguments["vars_deny"]			= array('$this->VarsDenyAllow("deny", $mValue)', "NONE");
-			$vArguments["vars_allow"]			= array('$this->VarsDenyAllow("allow", $mValue)', "ALL");
-			$vArguments["constants"]			= array('$this->ConstantsAllowed($mValue)', "NGL_NULL, NGL_STRING_LINEBREAK, NGL_STRING_SPLITTER, NGL_STRING_SPLITTER_NUMBERS");
-			$vArguments["php_code"]				= array('$mValue', null);
-			$vArguments["php_functions"]		= array('$this->PHPFunctions($mValue)', "base64_encode, base64_decode, htmlentities, md5, nl2br, sha1, str_replace, strip_tags, strtolower, strtoupper, substr, trim, urlencode, urldecode, abs, ceil, floor, pow, round");
-			$vArguments["loops_limit"]			= array('(int)$mValue', 10000);
-
-			$vArguments["var_needle"]			= array('(string)$mValue', null);
-			$vArguments["set_index"]			= array('(string)$mValue', null);
-			$vArguments["set_value"]			= array('(string)$mValue', null);
-			$vArguments["set_request_index"]	= array('(string)$mValue', null);
-
-			$vArguments["cache_mode"]			= array('(string)($mValue)', "none");
-			$vArguments["fill_urls"]			= array('self::call()->isTrue($mValue)', false);
-			$vArguments["http_support"]			= array('self::call()->isTrue($mValue)', true);
-			$vArguments["include_support"]		= array('self::call()->isTrue($mValue)', true);
-			$vArguments["clear_utf8_bom"]		= array('self::call()->isTrue($mValue)', true);
-			$vArguments["trim_stamp"]			= array('self::call()->isTrue($mValue)', true);
-			$vArguments["alvin_mode"]			= array('$this->SetAlvinMode($mValue)', "all");
+			$vArguments							= [];
+			$vArguments["root"] 				= ['$mValue', null];
+			$vArguments["cache"] 				= ['$mValue', null];
+			$vArguments["gui"] 					= ['$mValue', null];
+			$vArguments["curdir"] 				= ['$mValue', null];
+			$vArguments["scheme"] 				= ['$mValue', "http"];
+			$vArguments["template"] 			= ['(string)$mValue', null];
+			$vArguments["source"] 				= ['(string)$mValue', null];
+			$vArguments["cache_file"] 			= ['(string)$mValue', null];
+			$vArguments["vars_deny"]			= ['$this->VarsDenyAllow("deny", $mValue)', "NONE"];
+			$vArguments["vars_allow"]			= ['$this->VarsDenyAllow("allow", $mValue)', "ALL"];
+			$vArguments["constants"]			= ['$this->ConstantsAllowed($mValue)', "NGL_NULL, NGL_STRING_LINEBREAK, NGL_STRING_SPLITTER, NGL_STRING_SPLITTER_NUMBERS"];
+			$vArguments["php_code"]				= ['$mValue', null];
+			$vArguments["php_functions"]		= ['$this->PHPFunctions($mValue)', "base64_encode, base64_decode, htmlentities, md5, nl2br, sha1, str_replace, strip_tags, strtolower, strtoupper, substr, trim, urlencode, urldecode, abs, ceil, floor, pow, round"];
+			$vArguments["loops_limit"]			= ['(int)$mValue', 10000];
+			$vArguments["var_needle"]			= ['(string)$mValue', null];
+			$vArguments["set_index"]			= ['(string)$mValue', null];
+			$vArguments["set_value"]			= ['(string)$mValue', null];
+			$vArguments["set_request_index"]	= ['(string)$mValue', null];
+			$vArguments["cache_mode"]			= ['(string)($mValue)', "none"];
+			$vArguments["fill_urls"]			= ['self::call()->isTrue($mValue)', false];
+			$vArguments["http_support"]			= ['self::call()->isTrue($mValue)', true];
+			$vArguments["include_support"]		= ['self::call()->isTrue($mValue)', true];
+			$vArguments["clear_utf8_bom"]		= ['self::call()->isTrue($mValue)', true];
+			$vArguments["trim_stamp"]			= ['self::call()->isTrue($mValue)', true];
+			$vArguments["alvin_mode"]			= ['$this->SetAlvinMode($mValue)', "all"];
 			
 			return $vArguments;
 		}
 
 		final protected function __declareAttributes__() {
-			$vAttributes 						= array();
+			$vAttributes 						= [];
 			$vAttributes["alvin_type"]			= null;
 			$vAttributes["root_url"]			= null;
 			$vAttributes["project_path"]		= null;
@@ -209,19 +206,19 @@ namespace nogal {
 			$this->attribute("word_breaker", $sWordBreaker);
 
 			// funciones especiales
-			$this->aRindFunctions = array(
+			$this->aRindFunctions = [
 				"alvin", "dump", "eco", "get", "halt", "heredoc", "ifcase", 
 				"incfile", "join", "json", "length", "loop", "mergefile", "once", 
 				"rtn", "set", "split", "unique", "unset"
-			);
+			];
 
 			// palabras reservadas
-			$this->aReservedWords = array(
+			$this->aReservedWords = [
 				"\bbreak\b", "\bcontinue\b", "\bdeclare\b", "\beval\b", "\bexit\b", "\bdie\b",
 				"\bfor\b", "\bforeach\b", "\bgoto\b", "\bif\b", "\binclude\b", "\brequire\b",
 				"\binclude_once\b", "\bnew\b", "\brequire_once\b", "\breturn\b", "\bsleep\b", 
 				"\bswitch\b", "\bwhile\b"
-			);
+			];
 
 			// variables denegadas
 			if(!$this->bInitVarsDenyAllow) {
@@ -249,7 +246,7 @@ namespace nogal {
 			}
 			
 			// variable SET
-			$this->aLoops = array("self"=>$this->dynVar(), "parent"=>$this->dynVar());
+			$this->aLoops = ["self"=>$this->dynVar(), "parent"=>$this->dynVar()];
 			// $this->aLoops = array("self"=>"\$self", "parent"=>"\$parent");
 		}
 		
@@ -257,7 +254,7 @@ namespace nogal {
 			// includes
 			if(isset($this->CONFIG["includes"])) {
 				if($this->CONFIG["includes"]["use"]) {
-					$aIncludes = array();
+					$aIncludes = [];
 					foreach($this->CONFIG["includes"] as $sKey => $sFilePath) {
 						$aIncludes[$sKey] = self::call()->sandboxPath($sFilePath);
 					}
@@ -281,13 +278,13 @@ namespace nogal {
 		}
 
 		protected function SetAlvinMode($sMode) {
-			$aConstants = array();
-			if(strtolower($sMode)!="none" && strtolower($sMode)!="all") {
+			$aConstants = [];
+			if(\strtolower($sMode)!="none" && \strtolower($sMode)!="all") {
 				$sMode = self::call()->explodeTrim(",", $sMode);
 				$this->attribute("alvin_type", $sMode);
-				$sMode = implode(",", $sMode);
+				$sMode = \implode(",", $sMode);
 			} else {
-				$this->attribute("alvin_type", strtolower($sMode));
+				$this->attribute("alvin_type", \strtolower($sMode));
 			}
 
 			return $sMode;
@@ -315,47 +312,47 @@ namespace nogal {
 		} **/
 		private function ClearCode(&$sSource) {
 			// reemplazo de la variable $_GLOBALS["_SET"] por $RindObject->SET
-			$sSource = str_replace(
-				array("\$GLOBALS[".$this->RIND_QUOTE."_SET".$this->RIND_QUOTE."]", "\$GLOBALS['_SET']"),
+			$sSource = \str_replace(
+				["\$GLOBALS[".$this->RIND_QUOTE."_SET".$this->RIND_QUOTE."]", "\$GLOBALS['_SET']"],
 				'Rind::this('.$this->RIND_ME.')->SET',
 				$sSource
 			);
 
 			// reemplazo del hash $this->RIND_HTML_QUOTE por comillas doble
-			$sSource = str_replace(array($this->RIND_HTML_QUOTE.'""', '""'.$this->RIND_HTML_QUOTE), "\x22\x22", $sSource);
+			$sSource = \str_replace([$this->RIND_HTML_QUOTE.'""', '""'.$this->RIND_HTML_QUOTE], "\x22\x22", $sSource);
 
 			// reemplazo del hash $this->RIND_QUOTE por comillas doble
-			$sSource = str_replace($this->RIND_QUOTE, "\x22", $sSource);
+			$sSource = \str_replace($this->RIND_QUOTE, "\x22", $sSource);
 
 			// limpieza de doble comillas concatenadas
-			$sSource = str_replace(array("\x22\x22.", ".\x22\x22"), "", $sSource);
+			$sSource = \str_replace(["\x22\x22.", ".\x22\x22"], "", $sSource);
 
 			// restitucion de caracteres RIND
 			$sSource = $this->TagConverter($sSource, true);
 
 			// restitucion de palabras reservadas, variables y funciones denegadas fuera del codigo PHP
-			preg_match_all("/<\?(php|php3)(.*?)\?>/is", $sSource, $aPHPCode);
+			\preg_match_all("/<\?(php|php3)(.*?)\?>/is", $sSource, $aPHPCode);
 			
 			$x = 0;
-			$aMD5 = array();
+			$aMD5 = [];
 			foreach($aPHPCode[0] as $sCode) {
-				$sUnique = microtime();
-				$aMD5[] = $x.md5($sUnique);
+				$sUnique = \microtime();
+				$aMD5[] = $x.\md5($sUnique);
 				$x++;
 			}
 
-			$sSource = str_replace($aPHPCode[0], $aMD5, $sSource);
-			$sSource = str_replace(array("false/*".$this->RIND_RESERVED,"/*".$this->RIND_RESERVED,$this->RIND_RESERVED."*/array",$this->RIND_RESERVED."*/"), "", $sSource);
-			$sSource = str_replace($this->RIND_DOLLAR_SIGN, "\$", $sSource);
-			$sSource = preg_replace("/(\x7b)(\x7b[a-z0-9_\$@#\*%:\.]+\x7d)(\x7d)/i", "\\2", $sSource); // llaves dobles
-			$sSource = str_replace($aMD5, $aPHPCode[0], $sSource);
+			$sSource = \str_replace($aPHPCode[0], $aMD5, $sSource);
+			$sSource = \str_replace(["false/*".$this->RIND_RESERVED,"/*".$this->RIND_RESERVED,$this->RIND_RESERVED."*/array",$this->RIND_RESERVED."*/"], "", $sSource);
+			$sSource = \str_replace($this->RIND_DOLLAR_SIGN, "\$", $sSource);
+			$sSource = \preg_replace("/(\x7b)(\x7b[a-z0-9_\$@#\*%:\.]+\x7d)(\x7d)/i", "\\2", $sSource); // llaves dobles
+			$sSource = \str_replace($aMD5, $aPHPCode[0], $sSource);
 			
 			// correccion de sintaxis JSON como argumento de metodos
-			$sSource = preg_replace("/(\"|\')[\s]*<<<RINDJSON\n/is", "<<<RINDJSON\n", $sSource);
-			$sSource = preg_replace("/RINDJSON[\s]*(\"|\')/is", "RINDJSON\n", $sSource);
+			$sSource = \preg_replace("/(\"|\')[\s]*<<<RINDJSON\n/is", "<<<RINDJSON\n", $sSource);
+			$sSource = \preg_replace("/RINDJSON[\s]*(\"|\')/is", "RINDJSON\n", $sSource);
 
 			// marcas nowdoc;
-			$sSource = str_replace("\x14", "", $sSource);
+			$sSource = \str_replace("\x14", "", $sSource);
 		}
 
 		/** FUNCTION {
@@ -367,7 +364,7 @@ namespace nogal {
 		} **/
 		private function ClearHyphenArguments(&$aArguments) {
 			foreach($aArguments as $sIndex => $mValue) {
-				if(strpos($sIndex,"-")) { unset($aArguments[$sIndex]); }
+				if(\strpos($sIndex,"-")) { unset($aArguments[$sIndex]); }
 			}
 		}
 
@@ -392,7 +389,7 @@ namespace nogal {
 			"return" : "array"
 		} **/
 		private function CommentReservedFunctions($aMatchs) {
-			if(function_exists($aMatchs[1])) {
+			if(\function_exists($aMatchs[1])) {
 				return "/*".$this->RIND_RESERVED.$aMatchs[1].$aMatchs[2].$this->RIND_RESERVED."*/array(";
 			} else {
 				return $aMatchs[0];
@@ -419,7 +416,7 @@ namespace nogal {
 			"return" : "string"
 		} **/
 		private function ProcessConstants(&$sCode) {
-			$sCode = preg_replace_callback("/\{@([a-z_][a-z0-9_]*)\}/is", array($this, "ReplaceConstants"), $sCode);
+			$sCode = \preg_replace_callback("/\{@([a-z_][a-z0-9_]*)\}/is", [$this, "ReplaceConstants"], $sCode);
 		}
 
 		/** FUNCTION {
@@ -430,7 +427,7 @@ namespace nogal {
 			"return" : "void"
 		} **/
 		protected function ConstantsAllowed($sConstantsAllowed) {
-			$aConstants = array();
+			$aConstants = [];
 			if(!empty($sConstantsAllowed)) {
 				$aConstants = self::call("shift")->csvToArray($sConstantsAllowed);
 				$aConstants = self::call()->truelize($aConstants[0]);
@@ -438,7 +435,7 @@ namespace nogal {
 
 			$this->setSET("CONSTANTS", $aConstants);
 			$this->bInitConstants = true;
-			return implode(",", array_keys($aConstants));
+			return \implode(",", \array_keys($aConstants));
 		}
 
 		/** FUNCTION {
@@ -450,14 +447,14 @@ namespace nogal {
 			"return" : "string"
 		} **/
 		public function dynVar() {
-			list($sNeedle) = $this->getarguments("var_needle", func_get_args());
+			list($sNeedle) = $this->getarguments("var_needle", \func_get_args());
 			if(!$sNeedle) {
 				$sNeedle = $this->varName(8);
 			} else {
-				$sNeedle = sha1($sNeedle);
-				$sNeedle = strrev($sNeedle);
-				$sNeedle = md5($sNeedle);
-				$sNeedle = "Ox".substr($sNeedle,0,6);
+				$sNeedle = \sha1($sNeedle);
+				$sNeedle = \strrev($sNeedle);
+				$sNeedle = \md5($sNeedle);
+				$sNeedle = "Ox".\substr($sNeedle,0,6);
 			}
 
 			return "\$".$sNeedle;
@@ -474,10 +471,10 @@ namespace nogal {
 			$sURLSelf = $this->attribute("gui_url")."/";
 			$sTemplateURL = $this->attribute("template_url")."/";
 
-			preg_match_all("/(<link)(.*?)(href\s*=\s*)(".$this->RIND_HTML_QUOTE."|')?(.*?)(".$this->RIND_HTML_QUOTE."|'| )(.*?)(>)/i", $sSource, $aMatchs);
+			\preg_match_all("/(<link)(.*?)(href\s*=\s*)(".$this->RIND_HTML_QUOTE."|')?(.*?)(".$this->RIND_HTML_QUOTE."|'| )(.*?)(>)/i", $sSource, $aMatchs);
 			$this->FillURLParser($sSource, $aMatchs, $sURLSelf, $sTemplateURL);
 
-			preg_match_all("/([^\.]src|background)(\s*=\s*)(".$this->RIND_HTML_QUOTE."|')?(.*?)(".$this->RIND_HTML_QUOTE."|'| )/i", $sSource, $aMatchs);
+			\preg_match_all("/([^\.]src|background)(\s*=\s*)(".$this->RIND_HTML_QUOTE."|')?(.*?)(".$this->RIND_HTML_QUOTE."|'| )/i", $sSource, $aMatchs);
 			$this->FillURLParser($sSource, $aMatchs, $sURLSelf, $sTemplateURL);
 
 			return $sSource;
@@ -497,18 +494,18 @@ namespace nogal {
 			"return" : "string"
 		} **/
 		private function FillURLParser(&$sSource, $aURLs, $sURLSelf, $sTemplateURL) {
-			$nMatchs = count($aURLs[0]);
+			$nMatchs = \count($aURLs[0]);
 			if($nMatchs) {
 				for($x=0; $x<$nMatchs; $x++) {
 					$aMatchs[$x] = $aURLs[0][$x];
 
-					$sProtocol	= parse_url($aURLs[4][$x], PHP_URL_SCHEME);
-					$sProtocol	= strtolower($sProtocol);
-					$sProtocol2	= parse_url($aURLs[5][$x], PHP_URL_SCHEME);
-					$sProtocol2	= strtolower($sProtocol2);
+					$sProtocol	= \parse_url($aURLs[4][$x], PHP_URL_SCHEME);
+					$sProtocol	= \strtolower($sProtocol);
+					$sProtocol2	= \parse_url($aURLs[5][$x], PHP_URL_SCHEME);
+					$sProtocol2	= \strtolower($sProtocol2);
 					
-					$sSubURL0a11 = strtolower(substr($aURLs[4][$x],0,11));
-					if(strtolower($aURLs[1][$x])=="href") {
+					$sSubURL0a11 = \strtolower(\substr($aURLs[4][$x],0,11));
+					if(\strtolower($aURLs[1][$x])=="href") {
 						if(!empty($aURLs[4][$x])) {
 							if($sProtocol!="http" && $sProtocol!="https" && $aURLs[4][$x][0].$aURLs[4][$x][1]!="//" && $aURLs[4][$x][0].$aURLs[4][$x][1]!="<?") {
 								$aReplaces[$x] = $aURLs[1][$x].$aURLs[2][$x].$aURLs[3][$x].$sURLSelf.$aURLs[4][$x].$aURLs[5][$x];
@@ -516,7 +513,7 @@ namespace nogal {
 								$aReplaces[$x] = $aURLs[0][$x];
 							}
 						}
-					} elseif(strtolower($aURLs[1][$x])=="<link")  {
+					} elseif(\strtolower($aURLs[1][$x])=="<link")  {
 						if(!empty($aURLs[5][$x])) {
 							if($sProtocol2!="http" && $sProtocol2!="https" && $aURLs[5][$x][0].$aURLs[5][$x][1]!="//" && $aURLs[5][$x][0].$aURLs[5][$x][1]!="<?") {
 								$aReplaces[$x] = $aURLs[1][$x].$aURLs[2][$x].$aURLs[3][$x].$aURLs[4][$x].$sTemplateURL.$aURLs[5][$x].$aURLs[6][$x].$aURLs[7][$x].$aURLs[8][$x];
@@ -533,7 +530,7 @@ namespace nogal {
 					}
 				}
 				if(isset($aMatchs, $aReplaces)) {
-					$sSource = str_replace($aMatchs, $aReplaces ,$sSource);
+					$sSource = \str_replace($aMatchs, $aReplaces ,$sSource);
 				}
 			}
 		}
@@ -551,18 +548,18 @@ namespace nogal {
 		private function FixCode($aCode, $sType="FUN") {
 			$nOpened = 0;
 			$bOpened = false;
-			$aCleanCode = array();
+			$aCleanCode = [];
 
 			$bQuote = false;	/* comilla doble */
 			$bNDoc	= false;
 			$bPHP	= false;
 			
-			$vStringType["FUN"] = array();
-			$vStringType["VAR"] = array();
-			$vStringType["PHP"] = array();
+			$vStringType["FUN"] = [];
+			$vStringType["VAR"] = [];
+			$vStringType["PHP"] = [];
 
-			array_push($aCode, ".", ".", ".", ".", ".", ".");
-			$nCode = count($aCode) - 6;
+			\array_push($aCode, ".", ".", ".", ".", ".", ".");
+			$nCode = \count($aCode) - 6;
 			for($x=0; $x<$nCode; $x++) {
 				$sChar = $aCode[$x];
 				$nOrd = self::call("unicode")->ord($sChar);
@@ -586,30 +583,30 @@ namespace nogal {
 					// fuera de una cadena
 					if($sSpcTag=="<[FUN[") {
 						if($bPHP) {
-							$vStringType["FUN"][] = array(".\x22\x22", null, null);
+							$vStringType["FUN"][] = [".\x22\x22", null, null];
 							$sChar = "\x22\x22.";
 						} else {
-							$vStringType["FUN"][] = array(";?>", null, false);
+							$vStringType["FUN"][] = [";?>", null, false];
 							$sChar = "<?php echo ";
 							$bPHP = true;
 						}
 						$x += 5;
 					} else if($sSpcTag=="<[VAR[") {
 						if($bPHP) {
-							$vStringType["VAR"][] = array(".\x22\x22", null, null);
+							$vStringType["VAR"][] = [".\x22\x22", null, null];
 							$sChar = "\x22\x22.";
 						} else {
-							$vStringType["VAR"][] = array(";?>", null, false);
+							$vStringType["VAR"][] = [";?>", null, false];
 							$sChar = "<?php echo ";
 							$bPHP = true;
 						}
 						$x += 5;
 					} else if($sSpcTag=="<[PHP[") {
 						if($bPHP) {
-							$vStringType["PHP"][] = array(".\x22\x22", null, null);
+							$vStringType["PHP"][] = [".\x22\x22", null, null];
 							$sChar = "\x22\x22.";
 						} else {
-							$vStringType["PHP"][] = array("?>", null, false);
+							$vStringType["PHP"][] = ["?>", null, false];
 							$sChar = "<?php ";
 							$bPHP = true;
 						}
@@ -620,15 +617,15 @@ namespace nogal {
 					if($sSpcTag=="<[FUN[") {
 						if($bPHP) {
 							if($aCode[$x-2].$aCode[$x-1]!="\x22.") {
-								$vStringType["FUN"][] = array(".\x22", true, null);
+								$vStringType["FUN"][] = [".\x22", true, null];
 								$sChar = "\x22.";
 								$bQuote = false;
 							} else {
-								$vStringType["FUN"][] = array("", null, null);
+								$vStringType["FUN"][] = ["", null, null];
 								$sChar = "";
 							}
 						} else {
-							$vStringType["FUN"][] = array(";?>", true, false);
+							$vStringType["FUN"][] = [";?>", true, false];
 							$sChar = "<?php echo ";					
 							$bQuote = false;
 							$bPHP = true;
@@ -637,25 +634,25 @@ namespace nogal {
 					} else if($sSpcTag=="<[VAR[") {
 						if($bPHP) {
 							if($aCode[$x-1]=="[") {
-								$vStringType["VAR"][] = array("?", null, null);
+								$vStringType["VAR"][] = ["?", null, null];
 								$sChar = "";
 								$bQuote = false;
 							} else if($aCode[$x-2].$aCode[$x-1]!="\x22.") {
-								$vStringType["VAR"][] = array(".\x22", true, null);
+								$vStringType["VAR"][] = [".\x22", true, null];
 								$sChar = "\x22.";
 								$bQuote = false;
 							} else {
-								$vStringType["VAR"][] = array("", null, null);
+								$vStringType["VAR"][] = ["", null, null];
 								$sChar = "";
 							}
 						} else {
-							$vStringType["VAR"][] = array(";?>", null, false);
+							$vStringType["VAR"][] = [";?>", null, false];
 							$sChar = "<?php echo ";
 							$bPHP = true;
 						}
 						$x += 5;
 					} else if($sSpcTag=="<[PHP[") {
-						$vStringType["PHP"][] = array(" echo \x22", true, null);
+						$vStringType["PHP"][] = [" echo \x22", true, null];
 						$sChar = "\x22; ";
 						$bQuote = false;
 						$x += 5;
@@ -664,11 +661,11 @@ namespace nogal {
 
 				// cierres
 				if($sSpcTag=="]FUN]>") {
-					$aClose = array_pop($vStringType["FUN"]);
+					$aClose = \array_pop($vStringType["FUN"]);
 				} else if($sSpcTag=="]VAR]>") {
-					$aClose = array_pop($vStringType["VAR"]);
+					$aClose = \array_pop($vStringType["VAR"]);
 				} else if($sSpcTag=="]PHP]>") {
-					$aClose = array_pop($vStringType["PHP"]);
+					$aClose = \array_pop($vStringType["PHP"]);
 				}
 
 				if(isset($aClose)) {
@@ -688,8 +685,8 @@ namespace nogal {
 			}
 		
 			unset($aCode, $vStringType);
-			$sCleanCode = implode($aCleanCode);
-			$sCleanCode = str_replace(array("<[HDV[", "]HDV]>"), "", $sCleanCode);
+			$sCleanCode = \implode($aCleanCode);
+			$sCleanCode = \str_replace(["<[HDV[", "]HDV]>"], "", $sCleanCode);
 
 			return $sCleanCode;
 		}
@@ -701,15 +698,14 @@ namespace nogal {
 			"return" : "array"
 		} **/
 		public function flushCache() {
-			list($sCacheFile) = $this->getarguments("cache_file", func_get_args());
-			// if(empty($sCacheFile)) { return false; }
+			list($sCacheFile) = $this->getarguments("cache_file", \func_get_args());
 			$this->SetPaths();
 			$sCachePath = ($sCacheFile===true) ? $this->attribute("cache_path") : $this->attribute("cache_path").NGL_DIR_SLASH.$sCacheFile;
 			$sCachePath = self::call()->clearPath($sCachePath, false, NGL_DIR_SLASH, true);
-			if(is_dir($sCachePath)) {
+			if(\is_dir($sCachePath)) {
 				return self::call("files")->unlinkr($sCachePath.NGL_DIR_SLASH);
-			} else if(is_file($sCachePath)) {
-				return unlink($sCachePath);
+			} else if(\is_file($sCachePath)) {
+				return \unlink($sCachePath);
 			}
 		}
 
@@ -723,23 +719,23 @@ namespace nogal {
 			$aTree = self::call("files")->ls($sGuiPath, "*.html", "single", true);
 			foreach($aTree as $sFile) {
 				$sSource		= $this->readTemplate($sFile);
-				$sFileHash		= md5($sSource);
+				$sFileHash		= \md5($sSource);
 				$sSource		= $this->rind2php($sSource);
-				$sSourceCode 	= "<?php /*rind-".$sFileHash."-".$this->RIND_UID."-".$sCacheMode."-".date("YmdHis")."*/ ?>\n";
+				$sSourceCode 	= "<?php /*rind-".$sFileHash."-".$this->RIND_UID."-".$sCacheMode."-".\date("YmdHis")."*/ ?>\n";
 				$sSourceCode 	.= "<?php ".$this->RIND_TEMPLATES."=[];\n ".$this->sMergeFiles." ?>\n";
 				$sSourceCode 	.= $sSource;
 
-				$sCacheFile 	= str_replace($sGuiPath."/", "", $sFile);
-				$aCacheFile		= pathinfo($sCacheFile);
-				if(!is_dir($aCacheFile["dirname"])) {
-					$aFolders = explode(NGL_DIR_SLASH, $aCacheFile["dirname"]);
+				$sCacheFile 	= \str_replace($sGuiPath."/", "", $sFile);
+				$aCacheFile		= \pathinfo($sCacheFile);
+				if(!\is_dir($aCacheFile["dirname"])) {
+					$aFolders = \explode(NGL_DIR_SLASH, $aCacheFile["dirname"]);
 					$sFolders = "";
 					foreach($aFolders as $sDir) {
 						if($sDir!="") {
 							$sFolders .= $sDir.NGL_DIR_SLASH;
-							if(!is_dir($sCachePath.NGL_DIR_SLASH.$sFolders)) {
-								@mkdir($sCachePath.NGL_DIR_SLASH.$sFolders);
-								@chmod($sCachePath.NGL_DIR_SLASH.$sFolders, NGL_CHMOD_FOLDER);
+							if(!\is_dir($sCachePath.NGL_DIR_SLASH.$sFolders)) {
+								@\mkdir($sCachePath.NGL_DIR_SLASH.$sFolders);
+								@\chmod($sCachePath.NGL_DIR_SLASH.$sFolders, NGL_CHMOD_FOLDER);
 							}
 						}
 					}
@@ -747,11 +743,11 @@ namespace nogal {
 
 				$sCacheFile = $sCachePath.NGL_DIR_SLASH.$sCacheFile;
 				self::call("file.".$this->RIND_UID)->load($sCacheFile);
-				self::call("file.".$this->RIND_UID)->context(array("http"=>array("method"=>"GET","header"=>"Content-Type: text/xml; charset=".NGL_CHARSET)));
+				self::call("file.".$this->RIND_UID)->context(["http"=>["method"=>"GET","header"=>"Content-Type: text/xml; charset=".NGL_CHARSET]]);
 				if(!self::call("file.".$this->RIND_UID)->write($sSourceCode)) {
 					self::errorMessage($this->object, 1006, $sCacheFile);
 				} else {
-					@chmod($sCacheFile, NGL_CHMOD_FILE);
+					@\chmod($sCacheFile, NGL_CHMOD_FILE);
 				}
 			}
 
@@ -786,19 +782,19 @@ namespace nogal {
 			//$vArguments["string"] = "";
 			$vContent = $this->TagReader($aCode, $nArgIni, $sFunctionClose, $vFunction["string"]);
 
-			$vCommand					= array();
+			$vCommand					= [];
 			$vCommand["cmd_ini"]		= $nFrom;
 			$vCommand["cmd_end"]		= $vContent["char"];
 			$vCommand["function"]		= $sFunction;
-			$vCommand["content"]		= implode(array_slice($aCode, $nFrom+($nFunction+2), $vContent["char"]-($nFrom+4+$nFunction*2)));
-			$vCommand["source"]			= implode(array_slice($aCode, $nFrom, $vContent["char"]-$nFrom+1));
+			$vCommand["content"]		= \implode(\array_slice($aCode, $nFrom+($nFunction+2), $vContent["char"]-($nFrom+4+$nFunction*2)));
+			$vCommand["source"]			= \implode(\array_slice($aCode, $nFrom, $vContent["char"]-$nFrom+1));
 
-			if(!count($vContent["arguments"])) { $vContent["arguments"]["content"] = $vCommand["content"]; }
+			if(!\count($vContent["arguments"])) { $vContent["arguments"]["content"] = $vCommand["content"]; }
 			$vCommand["arguments"] = $vContent["arguments"];
 
-			$vArguments = array();
+			$vArguments = [];
 			foreach($vCommand["arguments"] as $sKey => $mValue) {
-				$vArguments[strtolower($sKey)] = $this->VarsEscape($mValue);
+				$vArguments[\strtolower($sKey)] = $this->VarsEscape($mValue);
 			}
 			$vCommand["arguments"] = $vArguments;
 
@@ -816,7 +812,7 @@ namespace nogal {
 			"return" : "mixed"
 		} **/
 		public function getSET() {
-			list($sIndex) = $this->getarguments("set_index", func_get_args());
+			list($sIndex) = $this->getarguments("set_index", \func_get_args());
 			return ($sIndex==null) ? $this->SET : $this->SET[$sIndex];
 		}
 
@@ -854,7 +850,7 @@ namespace nogal {
 			"return" : "mixed"
 		} **/
 		public function getRINDVariable($sVarName=null) {
-			switch(strtoupper($sVarName)) {
+			switch(\strtoupper($sVarName)) {
 				case "RIND_UID": return $this->RIND_UID; break;
 				case "RIND_ME": return $this->RIND_ME; break;
 				case "RIND_DOLLAR_SIGN": return $this->RIND_DOLLAR_SIGN; break;
@@ -889,10 +885,10 @@ namespace nogal {
 			"return" : "string"
 		} **/
 		private function IfcaseInline($sString) {
-			$aReturn = array();
-			$sString = ltrim($sString, " \t\n\r\0\x0B");
+			$aReturn = [];
+			$sString = \ltrim($sString, " \t\n\r\0\x0B");
 			if($sString[0]!="(") {
-				$sEmpty = trim($sString, " \t\n\r\0\x0B");
+				$sEmpty = \trim($sString, " \t\n\r\0\x0B");
 				$sEmpty = "\x12heredoc>".$sEmpty."\x12\x11heredoc>";
 				$aReturn[] = "!empty(".$sEmpty.")";
 				$aReturn[] = $sString;
@@ -909,7 +905,7 @@ namespace nogal {
 			if($sString[1]=="+") { $sString[1] = " "; $bEmptyIsTrue = true; }
 
 			$aCode 			= self::call("unicode")->split($sString);
-			$nCode 			= count($aCode);
+			$nCode 			= \count($aCode);
 			$bSave 			= false;
 			$bQuotes		= false;
 			$bCondition		= false;
@@ -921,7 +917,7 @@ namespace nogal {
 				if(!$bCondition) {
 					// 40 = (
 					// 41 = )
-					$nChar = ord($aCode[$x]);
+					$nChar = \ord($aCode[$x]);
 					
 					if(isset($aCode[$x+5])) {
 						$sQuote = $aCode[$x].$aCode[$x+1].$aCode[$x+2].$aCode[$x+3].$aCode[$x+4].$aCode[$x+5];
@@ -951,13 +947,13 @@ namespace nogal {
 				}
 			}
 
-			$sCondition = trim($sCondition, " \t\n\r\0\x0B");
+			$sCondition = \trim($sCondition, " \t\n\r\0\x0B");
 			if($sStatements===null) { $sStatements = $sCondition; }
 
 			if($bIsset) {
 				$aReturn[] = $this->IssetArgument($sCondition);
 			} else if($bLength) {
-				$aReturn[] = $this->rindLength(array("content"=>$sCondition));
+				$aReturn[] = $this->rindLength(["content"=>$sCondition]);
 			} else if($bEmptyIsFalse) {
 				$aReturn[] = "<[FUN[Rind::ifempty(".$this->RIND_QUOTE.$sCondition.$this->RIND_QUOTE.", 'false')]FUN]>";
 			} else if($bEmptyIsTrue) {
@@ -987,9 +983,9 @@ namespace nogal {
 			$sDelimiter = $this->dynVar();
 			
 			$sPreIf  = $sHaystack.' = "'.$aHayStack.'"; '.$sNeedle.' = "'.$sSearch.'"; '.$sDelimiter.' = "'.$sBreaker.'";';
-			$sPreIf .= 'if(!is_array('.$sHaystack.')) { '.$sHaystack.' = explode('.$sDelimiter.', '.$sHaystack.'); }';
+			$sPreIf .= 'if(!\is_array('.$sHaystack.')) { '.$sHaystack.' = \explode('.$sDelimiter.', '.$sHaystack.'); }';
 
-			return array($sPreIf, "in_array(".$sNeedle.", ".$sHaystack.")");
+			return [$sPreIf, "\in_array(".$sNeedle.", ".$sHaystack.")"];
 		}
 
 		/** FUNCTION {
@@ -1003,9 +999,9 @@ namespace nogal {
 		private function IssetArgument($sIssetArgument) {
 			$nOpen = 0;
 			$sIsset = "";
-			$nIsset = strlen($sIssetArgument);
+			$nIsset = \strlen($sIssetArgument);
 			for($x=0;$x<$nIsset;$x++) {
-				$sMatch = substr($sIssetArgument, $x, 6);
+				$sMatch = \substr($sIssetArgument, $x, 6);
 				if($sMatch=="<[VAR[") {
 					$nOpen++;
 					if($nOpen==1) { $sIsset .= "isset("; }
@@ -1036,9 +1032,9 @@ namespace nogal {
 		private function IsTemplateFile($sTemplateFile) {
 			$sFilePath = self::call("files")->absPath($sTemplateFile);
 
-			if(preg_match("/^http(s)?:\/\/(.*)\.(.*)$/", $sTemplateFile)) {
+			if(\preg_match("/^http(s)?:\/\/(.*)\.(.*)$/", $sTemplateFile)) {
 				return true;
-			} else if(is_file($sFilePath)) {
+			} else if(\is_file($sFilePath)) {
 				return true;
 			} else {
 				return false;
@@ -1058,7 +1054,7 @@ namespace nogal {
 		} **/
 		private function LoopVarName($sSource, $sLoopName) {
 			// atributos del loop
-			$aAttribs				= array();
+			$aAttribs				= [];
 			$aAttribs["current"]	= true;
 			$aAttribs["data"]		= true;
 			$aAttribs["first"]		= true;
@@ -1078,32 +1074,32 @@ namespace nogal {
 			$aAttribs["min"]		= true;
 			$aAttribs["max"]		= true;
 
-			preg_match_all("/(\{)(?!".$this->RIND_HTML_QUOTE.")((\(\{)?[a-zA-Z0-9_@:#\.\(\)]+(\}\))?)+(\})/i", $sSource, $aVarsSources, PREG_SET_ORDER);
-			if(count($aVarsSources) && count($aVarsSources[0])) {
-				usort($aVarsSources, function($a, $b) { return (strlen($a[0]) < strlen($b[0])); });
+			\preg_match_all("/(\{)(?!".$this->RIND_HTML_QUOTE.")((\(\{)?[a-zA-Z0-9_@:#\.\(\)]+(\}\))?)+(\})/i", $sSource, $aVarsSources, PREG_SET_ORDER);
+			if(\is_array($aVarsSources) && \count($aVarsSources) && \is_array($aVarsSources[0]) && \count($aVarsSources[0])) {
+				\usort($aVarsSources, function($a, $b) { return (\strlen($a[0]) < \strlen($b[0])); });
 				foreach($aVarsSources as $aVarSource) {
 					$sLoop = $sLoopName;
 					$sVarSource = $sReturn = $aVarSource[0];
 
-					$sVarDotted = preg_replace_callback("/(\()([a-z0-9\#\.\{\}]+)(\))/", function($aMatchs) {
-						return "?".base64_encode($aMatchs[2]);
+					$sVarDotted = \preg_replace_callback("/(\()([a-z0-9\#\.\{\}]+)(\))/", function($aMatchs) {
+						return "?".\base64_encode($aMatchs[2]);
 					}, $sVarSource);
 
-					$aVarSource = explode(".", substr($sVarDotted, 1, -1));
-					$sVarName = ($aVarSource[0][0]=="#") ? substr($aVarSource[0], 1) : $aVarSource[0];
+					$aVarSource = \explode(".", \substr($sVarDotted, 1, -1));
+					$sVarName = ($aVarSource[0][0]=="#") ? \substr($aVarSource[0], 1) : $aVarSource[0];
 
-					if(count($aVarSource)>1 && $aVarSource[0][0]!="?" && $aVarSource[0][0]!="#") {
+					if(\is_array($aVarSource) && \count($aVarSource)>1 && $aVarSource[0][0]!="?" && $aVarSource[0][0]!="#") {
 						if(!isset($this->aLoops[$sVarName])) { $this->aLoops[$sVarName] = $this->dynvar(); }
 					}
 
-					if(isset($this->aLoops[$sVarName])) { $sLoop = $this->aLoops[$sVarName]; array_shift($aVarSource); }
+					if(isset($this->aLoops[$sVarName])) { $sLoop = $this->aLoops[$sVarName]; \array_shift($aVarSource); }
 					// if(!isset($aVarSource[0])) { exit($sVarDotted); }
-					if($aVarSource[0][0]!="?" && $aVarSource[0][0]!="#" && $aVarSource[0]!="data") { array_unshift($aVarSource, "data"); }
+					if($aVarSource[0][0]!="?" && $aVarSource[0][0]!="#" && $aVarSource[0]!="data") { \array_unshift($aVarSource, "data"); }
 
 					foreach($aVarSource as &$sSourcePart) {
-						$sPartName = substr($sSourcePart, 1);
+						$sPartName = \substr($sSourcePart, 1);
 						if($sSourcePart[0]=="?") {
-							$sSourcePart = "[".base64_decode($sPartName)."]";
+							$sSourcePart = "[".\base64_decode($sPartName)."]";
 						} else if($sSourcePart[0]=="#" && isset($aAttribs[$sPartName])) {
 							$sSourcePart = "[".$this->RIND_QUOTE.$sPartName.$this->RIND_QUOTE."]";
 						} else {
@@ -1111,11 +1107,11 @@ namespace nogal {
 						}
 					}
 
-					$sReturn = "<[VAR[".$sLoop.implode($aVarSource)."]VAR]>";
+					$sReturn = "<[VAR[".$sLoop.\implode($aVarSource)."]VAR]>";
 
 					// echo $sLoopName." => ".$sLoop.$this->EOL;
 					// echo $sVarSource." => ".$sReturn."\n\n";
-					$sSource = str_replace($sVarSource, $sReturn, $sSource);
+					$sSource = \str_replace($sVarSource, $sReturn, $sSource);
 				}
 			}
 
@@ -1140,7 +1136,7 @@ namespace nogal {
 				$aMatch[] = $sBaseName."[".$sCounter."+".$x."]";
 			}
 			
-			return ("return ".implode(".", $aMatch).";");
+			return ("return ".\implode(".", $aMatch).";");
 		}
 
 		/** FUNCTION {
@@ -1151,13 +1147,13 @@ namespace nogal {
 			"return" : "string"
 		} **/
 		protected function PathBuilder($sFileName) {
-			$sScheme = parse_url($sFileName, PHP_URL_SCHEME);
-			$sScheme = strtolower($sScheme);
+			$sScheme = \parse_url($sFileName, PHP_URL_SCHEME);
+			$sScheme = \strtolower($sScheme);
 			$sTemplatePath = $this->attribute("template_path");
 
 			// aborción por HTTP
-			if((!ini_get("allow_url_fopen") || !$this->argument("http_support")) && $sScheme=="http") {
-				if(ini_get("allow_url_fopen")) {
+			if((!\ini_get("allow_url_fopen") || !$this->argument("http_support")) && $sScheme=="http") {
+				if(\ini_get("allow_url_fopen")) {
 					self::errorMessage($this->object, 1001, $sFileName);
 				} else {
 					self::errorMessage($this->object, 1002, $sFileName);
@@ -1167,10 +1163,10 @@ namespace nogal {
 			// ruta del archivo a leer
 			// die($sTemplatePath." ---- ".$sFileName);
 			$sBasePaths = self::call("files")->basePaths($sTemplatePath, $sFileName);
-			if($sScheme=="http" || $sScheme=="https" || strlen($sBasePaths)) {
+			if($sScheme=="http" || $sScheme=="https" || \strlen($sBasePaths)) {
 				$sFilePath = $sFileName;
 			} else {
-				$sBasePath = (!strpos($this->attribute("root_url"), "//www.")) ? str_replace("//www.", "//", $this->attribute("root_url")) : $this->attribute("root_url");
+				$sBasePath = (!\strpos($this->attribute("root_url"), "//www.")) ? \str_replace("//www.", "//", $this->attribute("root_url")) : $this->attribute("root_url");
 				$sFilePath = $sTemplatePath.NGL_DIR_SLASH.$sFileName;
 			}
 
@@ -1185,16 +1181,16 @@ namespace nogal {
 			"return" : "void"
 		} **/
 		protected function PHPFunctions($sAllowedPHPFunctions) {
-			$aAllowedPHPFunctions = array();
+			$aAllowedPHPFunctions = [];
 			if(!empty($sAllowedPHPFunctions)) {
-				$sAllowedPHPFunctions = preg_replace("/\s+/is", "", $sAllowedPHPFunctions);
+				$sAllowedPHPFunctions = \preg_replace("/\s+/is", "", $sAllowedPHPFunctions);
 				$aAllowedPHPFunctions = self::call("shift")->csvToArray($sAllowedPHPFunctions);
 				$aAllowedPHPFunctions = self::call()->truelize($aAllowedPHPFunctions[0]);
 			}
 
 			$this->setSET("PHP_FUNCTIONS", $aAllowedPHPFunctions);
 			$this->bInitPHPFunctions = true;
-			return implode(",", array_keys($aAllowedPHPFunctions));
+			return \implode(",", \array_keys($aAllowedPHPFunctions));
 		}
 
 		/** FUNCTION {
@@ -1210,33 +1206,33 @@ namespace nogal {
 			"return" : "string"
 		} **/
 		public function process() {
-			list($sFileName,$sCacheMode) = $this->getarguments("template,cache_mode", func_get_args());
-			$sCacheMode = strtolower($sCacheMode);
+			list($sFileName,$sCacheMode) = $this->getarguments("template,cache_mode", \func_get_args());
+			$sCacheMode = \strtolower($sCacheMode);
 
 			$sCacheFile = $this->argument("cache_file");
 			if($this->sPHPFile===null) {
-				$aBacktrace = debug_backtrace(false);
+				$aBacktrace = \debug_backtrace(false);
 				$sPHPFile = $aBacktrace[0]["file"];
 			} else {
 				$sPHPFile = $this->sPHPFile;
 			}
-			$vItSelf = pathinfo($sPHPFile);
+			$vItSelf = \pathinfo($sPHPFile);
 
 			// si no se especifica un nombre de plantilla se intentará leer el archivo HTML
 			// con el mismo nombre de archivo PHP, dentro de la carpeta GUI correspondiente
 			if(empty($sFileName)) { $sFileName = $vItSelf["filename"].".html"; }
 
 			$sFilePath			= $this->PathBuilder($sFileName);
-			$this->aFilePath	= pathinfo($sFilePath);
+			$this->aFilePath	= \pathinfo($sFilePath);
 			$sDirName 			= self::call()->clearPath($this->aFilePath["dirname"]);
 			$sGUIPath 			= $this->attribute("gui_path");
 			$sBaseDir 			= self::call("files")->basePaths($sGUIPath, $sDirName);
-			$sFolder			= str_replace($sBaseDir, "", $sDirName);
+			$sFolder			= \str_replace($sBaseDir, "", $sDirName);
 			$sCachePath			= $this->attribute("cache_path");
 
 			$sCacheDir			= self::call()->clearPath($sCachePath.NGL_DIR_SLASH.$sFolder);
 
-			if(strtolower($sCacheFile)==="self") {
+			if(\strtolower($sCacheFile)==="self") {
 				$sCacheFile	= $vItSelf["basename"];
 			} else if(empty($sCacheFile)) {
 				$sCacheFile	= $sFileName;
@@ -1245,19 +1241,19 @@ namespace nogal {
 			$this->attribute("cache_file", $sCacheFile);
 
 			// chequeo de existencia de cache
-			if($sCacheMode!="none" && file_exists($sCacheFile)) {
-				$sign = fopen($sCacheFile, "r");
-				$sSign = fgets($sign);
-				fclose($sign);
-				$aSign = explode("-", trim($sSign));
+			if($sCacheMode!="none" && \file_exists($sCacheFile)) {
+				$sign = \fopen($sCacheFile, "r");
+				$sSign = \fgets($sign);
+				\fclose($sign);
+				$aSign = \explode("-", \trim($sSign));
 				$this->RIND_UID = $aSign[2];
 				$this->RIND_ME = $this->RIND_QUOTE.$this->RIND_UID.$this->RIND_QUOTE;
 				\Rind::$Rinds[$aSign[2]] = $this;
 				return $sCacheFile;
-			} else if($sCacheMode=="none" || ($sCacheMode=="use" && !file_exists($sCacheFile))) {
+			} else if($sCacheMode=="none" || ($sCacheMode=="use" && !\file_exists($sCacheFile))) {
 				$sSource = $this->readTemplate($sFilePath);
 				if($sSource===false) { return false; }
-				$sFileHash = md5($sSource);
+				$sFileHash = \md5($sSource);
 			} else {
 				return false;
 			}
@@ -1265,15 +1261,15 @@ namespace nogal {
 			\Rind::$Rinds[$this->RIND_UID] = $this;
 
 			// directorio de destino
-			if(!is_dir($sCacheDir)) {
-				$aFolders = explode(NGL_DIR_SLASH, $sFolder);
+			if(!\is_dir($sCacheDir)) {
+				$aFolders = \explode(NGL_DIR_SLASH, $sFolder);
 				$sFolders = "";
 				foreach($aFolders as $sDir) {
 					if($sDir!="") {
 						$sFolders .= $sDir.NGL_DIR_SLASH;
-						if(!is_dir($sCachePath.NGL_DIR_SLASH.$sFolders)) {
-							@mkdir($sCachePath.NGL_DIR_SLASH.$sFolders);
-							@chmod($sCachePath.NGL_DIR_SLASH.$sFolders, NGL_CHMOD_FOLDER);
+						if(!\is_dir($sCachePath.NGL_DIR_SLASH.$sFolders)) {
+							@\mkdir($sCachePath.NGL_DIR_SLASH.$sFolders);
+							@\chmod($sCachePath.NGL_DIR_SLASH.$sFolders, NGL_CHMOD_FOLDER);
 						}
 					}
 				}
@@ -1284,7 +1280,7 @@ namespace nogal {
 			
 			// dodo
 			// firma md5
-			$sSourceCode  = "<?php /*rind-".$sFileHash."-".$this->RIND_UID."-".$sCacheMode."-".date("YmdHis")."*/ ?>\n";
+			$sSourceCode  = "<?php /*rind-".$sFileHash."-".$this->RIND_UID."-".$sCacheMode."-".\date("YmdHis")."*/ ?>\n";
 			$sSourceCode .= "<?php ".$this->RIND_TEMPLATES."=[];\n ".$this->sMergeFiles." ?>\n";
 			$sSourceCode .= $sSource;
 			$sSource = null;
@@ -1293,11 +1289,11 @@ namespace nogal {
 
 			// graba el archivo
 			self::call("file.".$this->RIND_UID)->load($sCacheFile);
-			self::call("file.".$this->RIND_UID)->context(array("http"=>array("method"=>"GET","header"=>"Content-Type: text/xml; charset=".NGL_CHARSET)));
+			self::call("file.".$this->RIND_UID)->context(["http"=>["method"=>"GET","header"=>"Content-Type: text/xml; charset=".NGL_CHARSET]]);
 			if(!self::call("file.".$this->RIND_UID)->write($sSourceCode)) {
 				self::errorMessage($this->object, 1006, $sCacheFile);
 			} else {
-				@chmod($sCacheFile, NGL_CHMOD_FILE);
+				@\chmod($sCacheFile, NGL_CHMOD_FILE);
 			}
 
 			$sSourceCode = null;
@@ -1324,14 +1320,14 @@ namespace nogal {
 			"return" : "string"
 		} **/
 		public function quick() {
-			list($sFileName) = $this->getarguments("template", func_get_args());
+			list($sFileName) = $this->getarguments("template", \func_get_args());
 			\Rind::$Rinds[$this->RIND_UID] = $this;
 			$sSource = $this->readTemplate($sFileName);
 			$sSource = $this->rind2php($sSource);
 
-			ob_start();
+			\ob_start();
 			eval(self::EvalCode("?>".$sSource));
-			return ob_get_clean();
+			return \ob_get_clean();
 		}
 
 		public function rind2php($sSource, $bDebug=false) {
@@ -1340,27 +1336,27 @@ namespace nogal {
 			// file_put_contents($sCacheDir.NGL_DIR_SLASH."rindstamplog_1_".date("is").".txt", $sSource);
 
 			$aSource = self::call("unicode")->split($sSource);
-			$sSource = implode($aSource);
+			$sSource = \implode($aSource);
 			$sSource = $this->ReservedStrings($sSource);
 			// if($bDebug) { die($sSource); }
 			// file_put_contents($sCacheDir.NGL_DIR_SLASH."rindstamplog_2_".date("is").".txt", $sSource);
 
 			// argumento json
-			$sSource = preg_replace(
+			$sSource = \preg_replace(
 				"/\\x13([a-z0-9\:\-]+) json>(.*?)\\x13\\x11\\1>/is",
 				"\x13\\1>\x12json>\\2\x12\x11json>\x13\x11\\1>",
 				$sSource
 			);
 
 			// argumento math
-			$sSource = preg_replace(
+			$sSource = \preg_replace(
 				"/\\x13([a-z0-9\:\-]+) math>(.*?)\\x13\\x11\\1>/is",
 				"\x13\\1>\x12rtn>\\2\x12\x11rtn>\x13\x11\\1>",
 				$sSource
 			);
 
 			// argumento notags
-			$sSource = preg_replace_callback(
+			$sSource = \preg_replace_callback(
 				"/\\x13([a-z0-9\:\-]+) notags>(.*?)\\x13\\x11\\1>/is",
 				function($aMatchs) {
 					return $this->ArgumentsParser($aMatchs, "notags");
@@ -1369,14 +1365,14 @@ namespace nogal {
 			);
 
 			// argumento quotes
-			$sSource = preg_replace(
+			$sSource = \preg_replace(
 				"/\\x13([a-z0-9\:\-]+) quotes>(.*?)\\x13\\x11\\1>/is",
 				"\x13\\1>\x12heredoc>\\2\x12\x11heredoc>\x13\x11\\1>",
 				$sSource
 			);
 
 			// argumento base64
-			$sSource = preg_replace_callback(
+			$sSource = \preg_replace_callback(
 				"/\\x13([a-z0-9\:\-]+) base64>(.*?)\\x13\\x11\\1>/is",
 				function($aMatchs) {
 					return $this->ArgumentsParser($aMatchs, "base64");
@@ -1385,21 +1381,21 @@ namespace nogal {
 			);
 
 			// argumento split
-			$sSource = preg_replace(
+			$sSource = \preg_replace(
 				"/\\x13([a-z0-9\:\-]+) split>(.*?)\\x13\\x11\\1>/is",
 				"\x13\\1>\x12split>\\2\x12\x11split>\x13\x11\\1>",
 				$sSource
 			);
 
 			// argumento join
-			$sSource = preg_replace(
+			$sSource = \preg_replace(
 				"/\\x13([a-z0-9\:\-]+) join>(.*?)\\x13\\x11\\1>/is",
 				"\x13\\1>\x12join>\\2\x12\x11join>\x13\x11\\1>",
 				$sSource
 			);
 
 			// argumento erroneo
-			$sSource = preg_replace(
+			$sSource = \preg_replace(
 				"/\\x13([a-z0-9\:\-]+) [a-z0-9]+>(.*?)\\x13\\x11\\1>/is",
 				"\x13\\1>\\2\x13\x11\\1>",
 				$sSource
@@ -1407,7 +1403,7 @@ namespace nogal {
 
 			// if($bDebug) { die($sSource); }
 			$aSource = $this->ProcessCode($sSource, $bDebug);
-			if($bDebug) { die(implode($aSource)); }
+			if($bDebug) { die(\implode($aSource)); }
 			// file_put_contents($sCacheDir.NGL_DIR_SLASH."rindstamplog_3_".date("is").".txt", implode($aSource));
 
 			$sSource = $this->FixCode($aSource);
@@ -1431,7 +1427,7 @@ namespace nogal {
 
 			$sPHPCode = $this->argument("php_code");
 			if(!empty($sPHPCode)) {
-				$sPHPCode = preg_replace("/^(<\?(php)?[\s]*)(.*?)([\s]*\?>)$/is", "\\3", $sPHPCode);
+				$sPHPCode = \preg_replace("/^(<\?(php)?[\s]*)(.*?)([\s]*\?>)$/is", "\\3", $sPHPCode);
 				$sSource = "<?php ".$sPHPCode."?>".$sSource;
 			}
 			
@@ -1447,7 +1443,7 @@ namespace nogal {
 		private function ArgumentsParser($aMatchs, $sFunction) {
 			switch($sFunction) {
 				case "notags": return "\x13".$aMatchs[1].">\x12php.strip_tags>".$aMatchs[2]."\x12\x11.php.strip_tags>\x13\x11".$aMatchs[1].">";
-				case "base64": return "\x13".$aMatchs[1].">".base64_encode($this->ReservedStrings($this->TagConverter($aMatchs[2], true), true))."\x13\x11".$aMatchs[1].">";
+				case "base64": return "\x13".$aMatchs[1].">".\base64_encode($this->ReservedStrings($this->TagConverter($aMatchs[2], true), true))."\x13\x11".$aMatchs[1].">";
 			}
 		}
 
@@ -1476,14 +1472,14 @@ namespace nogal {
 
 			$sPHPCode = $this->argument("php_code");
 			if(!empty($sPHPCode)) {
-				$sPHPCode = preg_replace("/^(<\?(php)?[\s]*)(.*?)([\s]*\?>)$/is", "\\3", $sPHPCode);
+				$sPHPCode = \preg_replace("/^(<\?(php)?[\s]*)(.*?)([\s]*\?>)$/is", "\\3", $sPHPCode);
 				$sSource = "<?php ".$sPHPCode."?>".$sSource;
 			}
 
 			// die($sSource);
 			$sQUOTE = $this->RIND_QUOTE;
-			$sSource = preg_replace_callback('/(<\?php echo )(Rind::this('.$this->RIND_ME.')\->SET[a-z0-9\_\-\"\[\]]+)(;\?>)/is',
-				function($aMatchs) use ($sQUOTE) { return "{".str_replace('"', $sQUOTE, $aMatchs[2])."}"; },
+			$sSource = \preg_replace_callback('/(<\?php echo )(Rind::this('.$this->RIND_ME.')\->SET[a-z0-9\_\-\"\[\]]+)(;\?>)/is',
+				function($aMatchs) use ($sQUOTE) { return "{".\str_replace('"', $sQUOTE, $aMatchs[2])."}"; },
 				$sSource
 			);
 			
@@ -1509,7 +1505,7 @@ namespace nogal {
 		} **/
 		private function ProcessCode($sCode, $bDebug=false) {
 			// limpieza de comentarios
-			$sCode = preg_replace("/\x12\/\*(.*?)\*\/>/is", "", $sCode);
+			$sCode = \preg_replace("/\x12\/\*(.*?)\*\/>/is", "", $sCode);
 			// if($bDebug) { die($sCode); }
 
 			// comandos simples
@@ -1526,7 +1522,7 @@ namespace nogal {
 
 			// variables
 			$this->VarsParser($aCode);
-			$nCode = count($aCode);
+			$nCode = \count($aCode);
 			// if($bDebug) { die(implode($aCode)); }
 
 			for($x=0; $x<$nCode; $x++) {
@@ -1537,11 +1533,11 @@ namespace nogal {
 
 					$aCode = $this->ReplaceCommands($aCode, $vCommand);
 					// if($bDebug) { print(implode($aCode)); }
-					$nCode = count($aCode);
+					$nCode = \count($aCode);
 				}
 			}
 
-			if($bDebug) { die(implode($aCode)); }
+			if($bDebug) { die(\implode($aCode)); }
 			$sCode = null;
 			return $aCode;
 		}
@@ -1555,8 +1551,8 @@ namespace nogal {
 			"return" : "string"
 		} **/
 		private function PutSlashes($sString) {
-			$sString = addcslashes($sString, "'\\");
-			$sString = str_replace("\\\\".$this->RIND_HTML_QUOTE, "\\".$this->RIND_HTML_QUOTE, $sString);
+			$sString = \addcslashes($sString, "'\\");
+			$sString = \str_replace("\\\\".$this->RIND_HTML_QUOTE, "\\".$this->RIND_HTML_QUOTE, $sString);
 			return $sString;
 		}
 
@@ -1569,8 +1565,8 @@ namespace nogal {
 		} **/
 		private function QuoteArguments($aArguments) {
 			foreach($aArguments as $sName => $mValue) {
-				$sValue = trim($mValue);
-				if(strlen($sValue) && $sValue[0]==="\x12") {
+				$sValue = \trim($mValue);
+				if(\strlen($sValue) && $sValue[0]==="\x12") {
 					$aArguments[$sName] = $sValue;
 				} else {
 					$aArguments[$sName] = "\x22".$mValue."\x22";
@@ -1596,10 +1592,10 @@ namespace nogal {
 			// lectura del archivo
 			if($this->IsTemplateFile($sFileToInc)) {
 				// aborción por HTTP
-				$sScheme = parse_url($sFileName, PHP_URL_SCHEME);
-				$sScheme = strtolower($sScheme);
-				if((!ini_get("allow_url_fopen") || !$this->argument("http_support")) && ($sScheme=="http" || $sScheme=="https")) {
-					if(ini_get("allow_url_fopen")) {
+				$sScheme = \parse_url($sFileName, PHP_URL_SCHEME);
+				$sScheme = \strtolower($sScheme);
+				if((!\ini_get("allow_url_fopen") || !$this->argument("http_support")) && ($sScheme=="http" || $sScheme=="https")) {
+					if(\ini_get("allow_url_fopen")) {
 						self::errorMessage($this->object, 1001, $sFileToInc);
 					} else {
 						self::errorMessage($this->object, 1002, $sFileToInc);
@@ -1607,17 +1603,17 @@ namespace nogal {
 				}
 
 				$sTemplate = "";
-				if(@$hFr = fopen($sFileToInc, "rb")) {
-					while(!feof($hFr)) {
-						$sTemplate .= fread($hFr, 4096);
+				if(@$hFr = \fopen($sFileToInc, "rb")) {
+					while(!\feof($hFr)) {
+						$sTemplate .= \fread($hFr, 4096);
 					}
-					fclose($hFr);
+					\fclose($hFr);
 				} else {
 					self::errorMessage($this->object, 1003, $sFileToInc);
 				}
 
 				if($this->argument("clear_utf8_bom")) {
-					$sTemplate = preg_replace("/^\xEF\xBB\xBF/s", "", $sTemplate);
+					$sTemplate = \preg_replace("/^\xEF\xBB\xBF/s", "", $sTemplate);
 				}
 
 				return $sTemplate;
@@ -1643,20 +1639,20 @@ namespace nogal {
 				$sReturn = self::call("unicode")->substr($aCode, 0, $vCommand["cmd_ini"]);
 			}
 
-			if(in_array($fFunction, $this->aRindFunctions)) {
+			if(\in_array($fFunction, $this->aRindFunctions)) {
 				$fRindFunction = "rind".$fFunction;
 				$sReturn .= $this->$fRindFunction($vCommand["arguments"]);
-			} else if(substr($fFunction,0,4)=="php.") {
-				$fFunction = substr($fFunction,4);
-				if(function_exists($fFunction) && isset($this->SET["PHP_FUNCTIONS"][$fFunction])) {
+			} else if(\substr($fFunction,0,4)=="php.") {
+				$fFunction = \substr($fFunction,4);
+				if(\function_exists($fFunction) && isset($this->SET["PHP_FUNCTIONS"][$fFunction])) {
 					$aArguments = $this->QuoteArguments($vCommand["arguments"]);
-					$sFunctionCode = "<[FUN[".$fFunction."(".implode(", ", $aArguments).")]FUN]>";
-					$sFunctionCode = preg_replace_callback("/(.{0,6})(\<\[VAR\[(.*?)\]VAR\]\>)(.{0,6})/i", array($this, "EnquoteVars"), $sFunctionCode);
+					$sFunctionCode = "<[FUN[".$fFunction."(".\implode(", ", $aArguments).")]FUN]>";
+					$sFunctionCode = \preg_replace_callback("/(.{0,6})(\<\[VAR\[(.*?)\]VAR\]\>)(.{0,6})/i", [$this, "EnquoteVars"], $sFunctionCode);
 					$sReturn .= $sFunctionCode;
 				}
-			} else if(substr($fFunction,0,4)=="nut." && class_exists(__NAMESPACE__."\\nglNut")) {
-				$aFunction = explode(".", $fFunction, 3);
-				if(count($aFunction)==3) {
+			} else if(\substr($fFunction,0,4)=="nut." && \class_exists(__NAMESPACE__."\\nglNut")) {
+				$aFunction = \explode(".", $fFunction, 3);
+				if(\is_array($aFunction) && \count($aFunction)==3) {
 					$sObject = $aFunction[1];
 					$sMethod = $aFunction[2];
 				} else {
@@ -1665,12 +1661,12 @@ namespace nogal {
 				}
 
 				$aArguments = $this->QuoteArguments($vCommand["arguments"]);
-				$sFunctionCode = "<[FUN[Rind::nut(".$this->RIND_QUOTE.$sObject.$this->RIND_QUOTE.",".$this->RIND_QUOTE.$sMethod.$this->RIND_QUOTE.", array_combine(array(".$this->RIND_QUOTE.implode($this->RIND_QUOTE.", ".$this->RIND_QUOTE, array_keys($aArguments)).$this->RIND_QUOTE."), array(".implode(", ", $aArguments).")))]FUN]>";
-				$sFunctionCode = preg_replace_callback("/(.{0,6})(\<\[VAR\[(.*?)\]VAR\]\>)(.{0,6})/i", array($this, "EnquoteVars"), $sFunctionCode);
+				$sFunctionCode = "<[FUN[Rind::nut(".$this->RIND_QUOTE.$sObject.$this->RIND_QUOTE.",".$this->RIND_QUOTE.$sMethod.$this->RIND_QUOTE.", \array_combine([".$this->RIND_QUOTE.\implode($this->RIND_QUOTE.", ".$this->RIND_QUOTE, \array_keys($aArguments)).$this->RIND_QUOTE."], [".\implode(", ", $aArguments)."]))]FUN]>";
+				$sFunctionCode = \preg_replace_callback("/(.{0,6})(\<\[VAR\[(.*?)\]VAR\]\>)(.{0,6})/i", [$this, "EnquoteVars"], $sFunctionCode);
 				$sReturn .= $sFunctionCode;
 			} else {
 				$sMessageError = $this->TagConverter($vCommand["source"], true);
-				self::errorMessage($this->object, 1004, htmlentities($sMessageError));
+				self::errorMessage($this->object, 1004, \htmlentities($sMessageError));
 			}
 			
 			$sReturn .= self::call("unicode")->substr($aCode, ($vCommand["cmd_end"]+1));
@@ -1680,12 +1676,12 @@ namespace nogal {
 		private function EnquoteVars($aMatchs) {
 			// print_r($aMatchs);
 			if($aMatchs[1]!=$this->RIND_QUOTE && $aMatchs[4]!=$this->RIND_QUOTE) {
-				$sOpen = substr($aMatchs[1], -2);
-				$sClose = substr($aMatchs[1], 0, 2);
+				$sOpen = \substr($aMatchs[1], -2);
+				$sClose = \substr($aMatchs[1], 0, 2);
 				if($sOpen!='".' && $sClose!='."') {
 					$aMatchs[2] = '".'.$aMatchs[2].'."';
 					unset($aMatchs[0], $aMatchs[3]);
-					return implode($aMatchs);
+					return \implode($aMatchs);
 				}
 			}
 			return $aMatchs[0];
@@ -1745,7 +1741,7 @@ namespace nogal {
 
 				$aStrings[] = "^{";
 				$aStrings[] = "^}";
-				$sCode = str_replace($aStrings, $aRINDKeys, $sCode);
+				$sCode = \str_replace($aStrings, $aRINDKeys, $sCode);
 			} else {
 				$aRINDKeys[] = $this->RIND_LC_BRACKET;
 				$aRINDKeys[] = $this->RIND_RC_BRACKET;
@@ -1759,7 +1755,7 @@ namespace nogal {
 				$aStrings[] = "";
 				$aStrings[] = "";
 
-				$sCode = str_replace($aRINDKeys, $aStrings, $sCode);
+				$sCode = \str_replace($aRINDKeys, $aStrings, $sCode);
 			}
 			
 			return $sCode;
@@ -1775,23 +1771,23 @@ namespace nogal {
 		private function ReservedWords($sCode) {
 
 			// salvando funciones
-			$sCode = preg_replace_callback("/([a-z0-9_]+)([^a-z0-9_\.]*?)(\()/is", array(&$this,"CommentReservedFunctions"), $sCode);
+			$sCode = \preg_replace_callback("/([a-z0-9_]+)([^a-z0-9_\.]*?)(\()/is", [&$this,"CommentReservedFunctions"], $sCode);
 			
 			// salvando otras palabras reservadas
-			$sReservedWords = implode("|", $this->aReservedWords);
-			$sCode = preg_replace_callback("/$sReservedWords/is", array(&$this,"CommentReservedWords"), $sCode);
+			$sReservedWords = \implode("|", $this->aReservedWords);
+			$sCode = \preg_replace_callback("/$sReservedWords/is", [&$this,"CommentReservedWords"], $sCode);
 
 			// salvando constantes
-			$aConstants = array();
-			$vGetConstants = get_defined_constants(true);
-			$vGetConstants = array_keys($vGetConstants["user"]);
+			$aConstants = [];
+			$vGetConstants = \get_defined_constants(true);
+			$vGetConstants = \array_keys($vGetConstants["user"]);
 			foreach($vGetConstants as $sConstant) {
 				if(!isset($this->SET["CONSTANTS"][$sConstant])) {
 					$aConstants[] = $sConstant;
 				}
 			}
-			$sConstants = implode("|", $aConstants);
-			$sCode = preg_replace_callback("/$sConstants/is", array(&$this,"CommentReservedConstants"), $sCode);
+			$sConstants = \implode("|", $aConstants);
+			$sCode = \preg_replace_callback("/$sConstants/is", [&$this,"CommentReservedConstants"], $sCode);
 
 			return $sCode;
 		}
@@ -1808,9 +1804,9 @@ namespace nogal {
 			"return" : "$this"
 		} **/
 		private function SetPaths() {
-			$sRoot = $this->argument("root", getcwd());
-			$sGUI = $this->argument("gui", getcwd());
-			$sCache = $this->argument("cache", getcwd());
+			$sRoot = $this->argument("root", \getcwd());
+			$sGUI = $this->argument("gui", \getcwd());
+			$sCache = $this->argument("cache", \getcwd());
 			$sCurrentDir = $this->argument("curdir");
 			$sScheme = $this->argument("scheme");
 
@@ -1826,13 +1822,13 @@ namespace nogal {
 
 			// ruta del archivo .php que hace la peticion
 			if($sCurrentDir===null) {
-				$sCurrentDir = self::call()->clearPath(dirname($this->sPHPFile), false, NGL_DIR_SLASH, true);
+				$sCurrentDir = self::call()->clearPath(\dirname($this->sPHPFile), false, NGL_DIR_SLASH, true);
 			}
 			// die($sCurrentDir);
 
 			// rutas relativas
-			$sRelativePath	= self::call()->clearPath(str_replace($sRoot, "", $sCurrentDir));
-			$sRelativeGUI	= self::call()->clearPath(str_replace($sRoot, "", $sGUIPath));
+			$sRelativePath	= self::call()->clearPath(\str_replace($sRoot, "", $sCurrentDir));
+			$sRelativeGUI	= self::call()->clearPath(\str_replace($sRoot, "", $sGUIPath));
 			//  die($sRelativePath." --- ".$sRelativeGUI);
 			
 			// ruta del archivo template
@@ -1840,7 +1836,7 @@ namespace nogal {
 
 			// URLs
 			// protocolo
-			$sScheme = ($sScheme!==null) ? strtolower($sScheme) : "http";
+			$sScheme = ($sScheme!==null) ? \strtolower($sScheme) : "http";
 			
 			// url del archivo .php que hace la peticion
 			//$sURLSelf = self::call()->clearPath($sScheme."://".$_SERVER["HTTP_HOST"].$sRelativePath);
@@ -1851,17 +1847,17 @@ namespace nogal {
 
 			// root url
 			$sRootURLPath = $url->path;
-			$sRootURLPath = str_replace("/", NGL_DIR_SLASH, $sRootURLPath);
-			$sRootURLPath = str_replace($sRelativePath, "", $sRootURLPath);
+			$sRootURLPath = \str_replace("/", NGL_DIR_SLASH, $sRootURLPath);
+			$sRootURLPath = \str_replace($sRelativePath, "", $sRootURLPath);
 			$url->update("path", $sRootURLPath);
 			$sRootURL = $url->unparse();
 			$sRootURL = self::call()->clearPath($sRootURL);
 
 			// gui url
 			$sGUIURL = $url->path;
-			$sGUIURL = str_replace("/", NGL_DIR_SLASH, $sGUIURL);
+			$sGUIURL = \str_replace("/", NGL_DIR_SLASH, $sGUIURL);
 			$sGUIURL = $sGUIURL.NGL_DIR_SLASH.$sRelativeGUI;
-			$sGUIURL = str_replace(NGL_DIR_SLASH, "/", $sGUIURL);
+			$sGUIURL = \str_replace(NGL_DIR_SLASH, "/", $sGUIURL);
 			$url->update("path", $sGUIURL);
 			$sGUIURL = $url->unparse();
 			$sGUIURL = self::call()->clearPath($sGUIURL);
@@ -1873,10 +1869,10 @@ namespace nogal {
 			$sTemplateURL	= self::call()->clearPath($sTemplateURL);
 
 			// atributos
-			$sProjectPath 	= realpath(NGL_PATH_PROJECT);
-			$nProjectPath 	= strlen($sProjectPath);
-			$sGUIPath 		= realpath($sGUIPath);
-			$sGUIPath 		= $sProjectPath.substr($sGUIPath, $nProjectPath);
+			$sProjectPath 	= \realpath(NGL_PATH_PROJECT);
+			$nProjectPath 	= \strlen($sProjectPath);
+			$sGUIPath 		= \realpath($sGUIPath);
+			$sGUIPath 		= $sProjectPath.\substr($sGUIPath, $nProjectPath);
 			$sGUIPath 		= self::call()->clearPath($sGUIPath, false, NGL_DIR_SLASH, true);
 			$sProjectPath	= self::call()->clearPath($sProjectPath, false, NGL_DIR_SLASH, true);
 
@@ -1908,7 +1904,7 @@ namespace nogal {
 			"return" : "$this"
 		} **/
 		public function setSESS() {
-			$SESS = (isset($_SESSION[NGL_SESSION_INDEX]["SESS"])) ? $_SESSION[NGL_SESSION_INDEX]["SESS"] : array();
+			$SESS = (isset($_SESSION[NGL_SESSION_INDEX]["SESS"])) ? $_SESSION[NGL_SESSION_INDEX]["SESS"] : [];
 			$this->setSET("SESS", $SESS);
 			return $this;
 		}
@@ -1931,12 +1927,12 @@ namespace nogal {
 			"return" : "$this"
 		} **/
 		public function setSET() {
-			list($sIndex, $mValue, $sRequested) = $this->getarguments("set_index,set_value,set_request_index", func_get_args());
+			list($sIndex, $mValue, $sRequested) = $this->getarguments("set_index,set_value,set_request_index", \func_get_args());
 			$this->SET[$sIndex] = $mValue;
 			if($sRequested!==null && isset($_REQUEST)) {
-				if(array_key_exists($sRequested, $_REQUEST)) {
+				if(\array_key_exists($sRequested, $_REQUEST)) {
 					$this->SET[$sIndex] = $_REQUEST[$sRequested];
-				} else if(isset($_REQUEST["values"]) && array_key_exists($sRequested, $_REQUEST["values"])) {
+				} else if(isset($_REQUEST["values"]) && \array_key_exists($sRequested, $_REQUEST["values"])) {
 					$this->SET[$sIndex] = $_REQUEST["values"][$sRequested];
 				}
 			}
@@ -1952,14 +1948,14 @@ namespace nogal {
 		} **/
 		public function showPaths() {
 			$this->SetPaths();
-			return array(
+			return [
 				"root_url" => $this->attribute("root_url"),
 				"gui_path" => $this->attribute("gui_path"),
 				"gui_url" => $this->attribute("gui_url"),
 				"template_path" => $this->attribute("template_path"),
 				"template_url" => $this->attribute("template_url"),
 				"cache_path" => $this->attribute("cache_path")
-			);
+			];
 		}
 
 		/** FUNCTION {
@@ -1970,10 +1966,10 @@ namespace nogal {
 			"return" : "string"
 		} **/
 		private function SingleCommands(&$sCode) {
-			$sCode = preg_replace("/\x12skip( )*\/>/is", "<[PHP[ c".$this->attribute("word_breaker")."ontinue; ]PHP]>", $sCode);
-			$sCode = preg_replace("/\x12abort( )*\/>/is", "<[PHP[ b".$this->attribute("word_breaker")."reak; ]PHP]>", $sCode);
-			$sCode = preg_replace("/\x12once( )*\/>/is", "<[FUN[Rind::once()]FUN]>", $sCode);
-			$sCode = preg_replace("/\x12unique( )*\/>/is", "<[FUN[Rind::unique()]FUN]>", $sCode);
+			$sCode = \preg_replace("/\x12skip( )*\/>/is", "<[PHP[ c".$this->attribute("word_breaker")."ontinue; ]PHP]>", $sCode);
+			$sCode = \preg_replace("/\x12abort( )*\/>/is", "<[PHP[ b".$this->attribute("word_breaker")."reak; ]PHP]>", $sCode);
+			$sCode = \preg_replace("/\x12once( )*\/>/is", "<[FUN[Rind::once()]FUN]>", $sCode);
+			$sCode = \preg_replace("/\x12unique( )*\/>/is", "<[FUN[Rind::unique()]FUN]>", $sCode);
 		}
 
 		/** FUNCTION {
@@ -1989,21 +1985,21 @@ namespace nogal {
 			"return" : "string"
 		} **/
 		public function stamp() {
-			$aBacktrace = debug_backtrace(false);
+			$aBacktrace = \debug_backtrace(false);
 			$this->sPHPFile = $aBacktrace[0]["file"];
 			$this->SetPaths();
-			$sCacheFile = call_user_func_array(array($this, "process"), func_get_args());
+			$sCacheFile = \call_user_func_array(array($this, "process"), \func_get_args());
 			if($sCacheFile===false) { return false; }
 			$this->sPHPFile = null;
-			ob_start();
+			\ob_start();
 			include($sCacheFile);
-			$sContent = ob_get_clean();
-			return $this->argument("trim_stamp") ? trim($sContent) : $sContent;
+			$sContent = \ob_get_clean();
+			return $this->argument("trim_stamp") ? \trim($sContent) : $sContent;
 		}
 
 		public function stampstr() {
-			list($sSource) = $this->getarguments("source", func_get_args());
-			$aBacktrace = debug_backtrace(false);
+			list($sSource) = $this->getarguments("source", \func_get_args());
+			$aBacktrace = \debug_backtrace(false);
 			//$this->sPHPFile = $aBacktrace[0]["file"];
 			$this->SetPaths();
 			
@@ -2030,8 +2026,8 @@ namespace nogal {
 			
 			$bSave = true;
 			$nOpened = 0;
-			$aCleanCode = array();
-			$nCode = count($aCode) - 6;
+			$aCleanCode = [];
+			$nCode = \count($aCode) - 6;
 
 			for($x=0; $x<$nCode; $x++) {
 				$sChar = $aCode[$x];
@@ -2054,7 +2050,7 @@ namespace nogal {
 				if($bSave) { $aCleanCode[] = $sChar; }
 			}
 
-			$aReturn = array_merge($aCleanCode, array_slice($aCode, -6, 6));
+			$aReturn = \array_merge($aCleanCode, \array_slice($aCode, -6, 6));
 			unset($aCode, $aCleanCode);
 			return $aReturn;
 		}
@@ -2067,8 +2063,8 @@ namespace nogal {
 			"return" : "string"
 		} **/
 		protected function stripQuotes($sArgument) {
-			$sArgument = str_replace($this->RIND_HTML_QUOTE, '"', $sArgument);
-			$sArgument = trim($sArgument, "\t\n\r\0\x0B");
+			$sArgument = \str_replace($this->RIND_HTML_QUOTE, '"', $sArgument);
+			$sArgument = \trim($sArgument, "\t\n\r\0\x0B");
 			
 			if(isset($sArgument[1])) {
 				$nLength = self::call("unicode")->strlen($sArgument);
@@ -2076,12 +2072,12 @@ namespace nogal {
 					$sArgument[0] = "\x20";
 					$sArgument[$nLength-1] = "\x20";
 				} else if($sArgument[0]=="\x22" && $sArgument[$nLength-1]=="\x22") {
-					$sArgument = trim($sArgument);
-					$sArgument = trim($sArgument, "\x22");
+					$sArgument = \trim($sArgument);
+					$sArgument = \trim($sArgument, "\x22");
 				}
 			}
 
-			$sArgument = str_replace('"', $this->RIND_HTML_QUOTE, $sArgument);
+			$sArgument = \str_replace('"', $this->RIND_HTML_QUOTE, $sArgument);
 			return $sArgument;
 		}
 
@@ -2097,21 +2093,21 @@ namespace nogal {
 		} **/
 		private function TagConverter($sCode, $bRevert=false) {
 			if(!$bRevert) {
-				$sCode = str_replace("\x11", $this->RIND_DC1, $sCode);
-				$sCode = str_replace("\x12", $this->RIND_DC2, $sCode);
-				$sCode = str_replace("\x13", $this->RIND_DC3, $sCode);
-				$sCode = str_replace("<rind:", "\x12", $sCode);
-				$sCode = str_replace("</rind:", "\x12\x11", $sCode);
-				$sCode = str_replace("<@", "\x13", $sCode);
-				$sCode = str_replace("</@", "\x13\x11", $sCode);
+				$sCode = \str_replace("\x11", $this->RIND_DC1, $sCode);
+				$sCode = \str_replace("\x12", $this->RIND_DC2, $sCode);
+				$sCode = \str_replace("\x13", $this->RIND_DC3, $sCode);
+				$sCode = \str_replace("<rind:", "\x12", $sCode);
+				$sCode = \str_replace("</rind:", "\x12\x11", $sCode);
+				$sCode = \str_replace("<@", "\x13", $sCode);
+				$sCode = \str_replace("</@", "\x13\x11", $sCode);
 			} else {
-				$sCode = str_replace("\x12\x11", "</rind:", $sCode);
-				$sCode = str_replace("\x12", "<rind:", $sCode);
-				$sCode = str_replace("\x13\x11", "</@", $sCode);
-				$sCode = str_replace("\x13", "<@", $sCode);
-				$sCode = str_replace($this->RIND_DC1, "\x11", $sCode);
-				$sCode = str_replace($this->RIND_DC2, "\x12", $sCode);
-				$sCode = str_replace($this->RIND_DC3, "\x13", $sCode);			
+				$sCode = \str_replace("\x12\x11", "</rind:", $sCode);
+				$sCode = \str_replace("\x12", "<rind:", $sCode);
+				$sCode = \str_replace("\x13\x11", "</@", $sCode);
+				$sCode = \str_replace("\x13", "<@", $sCode);
+				$sCode = \str_replace($this->RIND_DC1, "\x11", $sCode);
+				$sCode = \str_replace($this->RIND_DC2, "\x12", $sCode);
+				$sCode = \str_replace($this->RIND_DC3, "\x13", $sCode);			
 			}
 			
 			return $sCode;
@@ -2131,8 +2127,8 @@ namespace nogal {
 		} **/
 		private function TagReader($aCode, $nFrom, $sBreaker, $sJumper=null) {
 			$sNewStr		= "";	 			/* nueva cadena resultante */
-			$aAttributes	= array(); 			/* array con los posibles atributos */
-			$nLen			= count($aCode);	/* longuitud del codigo */
+			$aAttributes	= []; 			/* array con los posibles atributos */
+			$nLen			= \count($aCode);	/* longuitud del codigo */
 			$nJump			= 0;				/* anidamientos */
 
 			// delimitador
@@ -2173,7 +2169,7 @@ namespace nogal {
 				}
 				
 				// sin atributos
-				if($aCode[$nFrom]=="\x12" && $nInit < $nFrom && !count($aAttributes) ) {
+				if($aCode[$nFrom]=="\x12" && $nInit < $nFrom && !\count($aAttributes) ) {
 					$bAttributes = false;
 					$sNewStr .= $sChar;
 				} else if($bAttributes && $aCode[$nFrom]=="\x13" && $aCode[$nFrom+1]!="\x11" && $nJump==0) {
@@ -2189,10 +2185,10 @@ namespace nogal {
 					if(!isset($aAttributes[$sAttribute])) {
 						$aAttributes[$sAttribute] = $vAttrib["string"];
 					} else {
-						$sAttribute .= "_".md5(microtime());
+						$sAttribute .= "_".\md5(\microtime());
 						$aAttributes[$sAttribute] = $vAttrib["string"];
 					}
-					$sNewStr .= implode(array_slice($aCode, $nFrom, $vAttrib["char"]-$nFrom+1));
+					$sNewStr .= \implode(\array_slice($aCode, $nFrom, $vAttrib["char"]-$nFrom+1));
 					$nFrom = $vAttrib["char"];
 				} else {
 					$sNewStr .= $sChar;
@@ -2222,9 +2218,9 @@ namespace nogal {
 			if($nLength<1) { $nLength = 1; }
 			if($nLength>32) { $nLength = 32; }
 
-			$sVarName = microtime();
-			$sVarName = md5($sVarName);
-			return "Ox".substr($sVarName,0,$nLength);
+			$sVarName = \microtime();
+			$sVarName = \md5($sVarName);
+			return "Ox".\substr($sVarName,0,$nLength);
 		}
 
 		/** FUNCTION {
@@ -2241,18 +2237,18 @@ namespace nogal {
 			"return" : "void"
 		} **/
 		protected function VarsDenyAllow($sType, $sVariables=null) {
-			$sType = strtolower($sType);
-			$aVarsDenyAllow = array();
+			$sType = \strtolower($sType);
+			$aVarsDenyAllow = [];
 
 			if($sVariables!==null) {
-				$sAllNone = strtoupper($sVariables);
-				$sAllNone = trim($sAllNone);
+				$sAllNone = \strtoupper($sVariables);
+				$sAllNone = \trim($sAllNone);
 				if($sAllNone!="NONE" && $sAllNone!="ALL") {
 					$aVariables = self::call("shift")->csvToArray($sVariables);
 					$aVarsDenyAllow = self::call()->truelize($aVariables[0]);
 					foreach($aVarsDenyAllow as $sVariable => $bTrue) {
 						if($sVariable[0]=="$") {
-							$sVariable = substr($sVariable, 1);
+							$sVariable = \substr($sVariable, 1);
 							$aVarsDenyAllow[$sVariable] = ttue;
 						}
 					}
@@ -2262,10 +2258,10 @@ namespace nogal {
 			}
 
 			if($sType=="deny") {
-				if(!count($aVarsDenyAllow)) { $aVarsDenyAllow["ALL"] = true; }
+				if(!\count($aVarsDenyAllow)) { $aVarsDenyAllow["ALL"] = true; }
 				$this->vVarsDeny = $aVarsDenyAllow;
 			} else {
-				if(!count($aVarsDenyAllow)) { $aVarsDenyAllow["NONE"] = true; }
+				if(!\count($aVarsDenyAllow)) { $aVarsDenyAllow["NONE"] = true; }
 				$this->vVarsAllow = $aVarsDenyAllow;
 			}
 			
@@ -2281,7 +2277,7 @@ namespace nogal {
 		} **/
 		private function VarsEscape($sCode) {
 			$aCode		= self::call("unicode")->split($sCode);
-			$nCode 		= count($aCode);
+			$nCode 		= \count($aCode);
 			$bSave 		= false;
 			$nIndex		= false;
 			$sVarName	= "";
@@ -2291,11 +2287,11 @@ namespace nogal {
 				// 65 - 90	= mayúsculas 
 				// 95		= guión bajo
 				// 97 - 122	= minúsculas
-				$nNextChar = (isset($aCode[$x+1])) ? ord($aCode[$x+1]) : null;
+				$nNextChar = (isset($aCode[$x+1])) ? \ord($aCode[$x+1]) : null;
 				$bSlash = (isset($aCode[$x-1]) && $aCode[$x-1]=="\\");
 				
 				if(!$bSave) {
-					if($aCode[$x]=="\$" && !$bSlash && (!isset($aCode[$x-6]) || implode(array_slice($aCode, $x-6, 6))!="<[VAR[") && ($nNextChar!==null && ($nNextChar<48 || $nNextChar>57))) {
+					if($aCode[$x]=="\$" && !$bSlash && (!isset($aCode[$x-6]) || \implode(\array_slice($aCode, $x-6, 6))!="<[VAR[") && ($nNextChar!==null && ($nNextChar<48 || $nNextChar>57))) {
 						$bSave = $x;
 						continue;
 					}
@@ -2307,10 +2303,10 @@ namespace nogal {
 					if(!$bToName || ($x+1)>=$nCode) {
 						$sVarName	= $this->RIND_DOLLAR_SIGN.$sVarName;
 						$aVariable	= self::call("unicode")->split($sVarName);
-						$aBefore	= array_slice($aCode, 0, $bSave);
-						$aAfter		= array_slice($aCode, $x+1);
-						$aCode		= array_merge($aBefore, $aVariable, $aAfter);
-						$nCode		= count($aCode);
+						$aBefore	= \array_slice($aCode, 0, $bSave);
+						$aAfter		= \array_slice($aCode, $x+1);
+						$aCode		= \array_merge($aBefore, $aVariable, $aAfter);
+						$nCode		= \count($aCode);
 
 						$x = $bSave;
 						$sVarName = "";
@@ -2319,7 +2315,7 @@ namespace nogal {
 				}
 			}
 
-			return implode($aCode);
+			return \implode($aCode);
 		}
 
 		/** FUNCTION {
@@ -2330,7 +2326,7 @@ namespace nogal {
 			"return" : "array"
 		} **/
 		private function VarsParser(&$aCode) {
-			$nCode 		= count($aCode);
+			$nCode 		= \count($aCode);
 			$bSave 		= false;
 			$sVarName 	= "";
 			$nKeys 		= 0;
@@ -2354,10 +2350,10 @@ namespace nogal {
 							$aVariable = $this->VarsProcessor($sVarName);
 
 							if($aVariable) {
-								$aBefore	= array_slice($aCode, 0, $bSave);
-								$aAfter		= array_slice($aCode, $x+1);
-								$aCode		= array_merge($aBefore, $aVariable, $aAfter);
-								$nCode		= count($aCode);
+								$aBefore	= \array_slice($aCode, 0, $bSave);
+								$aAfter		= \array_slice($aCode, $x+1);
+								$aCode		= \array_merge($aBefore, $aVariable, $aAfter);
+								$nCode		= \count($aCode);
 							}
 
 							$x = $bSave+1;
@@ -2379,34 +2375,34 @@ namespace nogal {
 		} **/
 		private function VarsProcessor($sVarName) {
 			if(strpos($sVarName, ".")) {
-				$sVarName = str_replace(
-					array("(", ")", "."),
-					array("[{","}]",'"]["'),
+				$sVarName = \str_replace(
+					["(", ")", "."],
+					["[{","}]",'"]["'],
 					$sVarName
 				);
-				$sVarName = preg_replace("/([a-z0-9_]+)/is", '["\\0"]', $sVarName);
-				$sVarName = str_replace(
-					array('[["'.$this->RIND_HTML_QUOTE, $this->RIND_HTML_QUOTE.'"]]', '["[', ']"]', '$["'),
-					array('["', '"]', "[", "]", '$'),
+				$sVarName = \preg_replace("/([a-z0-9_]+)/is", '["\\0"]', $sVarName);
+				$sVarName = \str_replace(
+					['[["'.$this->RIND_HTML_QUOTE, $this->RIND_HTML_QUOTE.'"]]', '["[', ']"]', '$["'],
+					['["', '"]', "[", "]", '$'],
 					$sVarName
 				);
-				$sVarName = preg_replace("/^\[\"([a-z0-9_]+)\"\]/", "\\1", $sVarName);
-				$sVarName = preg_replace("/\->\[\"([a-z0-9_]+)\"\]/", "->\\1", $sVarName);
-				$sVarName = preg_replace("/([^a-z0-9_\"])([a-z0-9_]+)(\"\])/is", '\\1\\2', $sVarName);
+				$sVarName = \preg_replace("/^\[\"([a-z0-9_]+)\"\]/", "\\1", $sVarName);
+				$sVarName = \preg_replace("/\->\[\"([a-z0-9_]+)\"\]/", "->\\1", $sVarName);
+				$sVarName = \preg_replace("/([^a-z0-9_\"])([a-z0-9_]+)(\"\])/is", '\\1\\2', $sVarName);
 			}
 			
-			$sVarString = str_replace("\x5C", "", $sVarName);
-			$sVarString = str_replace("\x27", "\x22", $sVarName);
-			$sVarString = substr($sVarString, 2, -1);
+			$sVarString = \str_replace("\x5C", "", $sVarName);
+			$sVarString = \str_replace("\x27", "\x22", $sVarName);
+			$sVarString = \substr($sVarString, 2, -1);
 
-			if(strpos($sVarString, "->")) {
+			if(\strpos($sVarString, "->")) {
 				// objetos
-				$sName = substr($sVarString, 0, strpos($sVarString,"-"));
-				$sVariable = "\$GLOBALS[".$this->RIND_QUOTE.$sName.$this->RIND_QUOTE."]-".substr($sVarString, strpos($sVarString,">"));
-			} else if(strpos($sVarString, "[")) {
+				$sName = \substr($sVarString, 0, \strpos($sVarString,"-"));
+				$sVariable = "\$GLOBALS[".$this->RIND_QUOTE.$sName.$this->RIND_QUOTE."]-".\substr($sVarString, \strpos($sVarString,">"));
+			} else if(\strpos($sVarString, "[")) {
 				// arrays
-				$sName = substr($sVarString, 0, strpos($sVarString,"["));
-				$sVariable = "\$GLOBALS[".$this->RIND_QUOTE.$sName.$this->RIND_QUOTE."]".substr($sVarString, strpos($sVarString,"["));
+				$sName = \substr($sVarString, 0, \strpos($sVarString,"["));
+				$sVariable = "\$GLOBALS[".$this->RIND_QUOTE.$sName.$this->RIND_QUOTE."]".\substr($sVarString, \strpos($sVarString,"["));
 			} else {
 				$sName = $sVarString;
 				$sVariable = "\$GLOBALS[".$this->RIND_QUOTE.$sVarString.$this->RIND_QUOTE."]";
@@ -2424,7 +2420,7 @@ namespace nogal {
 			}
 
 			$sVariable = ($bAllow) ? "<[VAR[$sVariable]VAR]>" : "false/*".$this->RIND_RESERVED."\$".$sVarString.$this->RIND_RESERVED."*/";
-			return str_split($sVariable);
+			return \str_split($sVariable);
 		}
 
 		/** FUNCTION {
@@ -2442,11 +2438,11 @@ namespace nogal {
 
 			$sReturn = '<[PHP[eval(\'
 				'.$sVarname.' = '.$vArguments["content"].';
-				ob_start();
-				if(is_object('.$sVarname.')) {
-					if(method_exists('.$sVarname.', '.$this->RIND_QUOTE.'get'.$this->RIND_QUOTE.') && method_exists('.$sVarname.', '.$this->RIND_QUOTE.'reset'.$this->RIND_QUOTE.')) {
-						Rind::nut('.$this->RIND_QUOTE.'owl'.$this->RIND_QUOTE.','.$this->RIND_QUOTE.'reset'.$this->RIND_QUOTE.',array('.$this->RIND_QUOTE.'content'.$this->RIND_QUOTE.'=>'.$sVarname.')); 
-						'.$sVarname.' = Rind::nut('.$this->RIND_QUOTE.'owl'.$this->RIND_QUOTE.','.$this->RIND_QUOTE.'get'.$this->RIND_QUOTE.',array('.$this->RIND_QUOTE.'content'.$this->RIND_QUOTE.'=>'.$sVarname.'));
+				\ob_start();
+				if(\is_object('.$sVarname.')) {
+					if(\method_exists('.$sVarname.', '.$this->RIND_QUOTE.'get'.$this->RIND_QUOTE.') && \method_exists('.$sVarname.', '.$this->RIND_QUOTE.'reset'.$this->RIND_QUOTE.')) {
+						Rind::nut('.$this->RIND_QUOTE.'owl'.$this->RIND_QUOTE.','.$this->RIND_QUOTE.'reset'.$this->RIND_QUOTE.',['.$this->RIND_QUOTE.'content'.$this->RIND_QUOTE.'=>'.$sVarname.']); 
+						'.$sVarname.' = Rind::nut('.$this->RIND_QUOTE.'owl'.$this->RIND_QUOTE.','.$this->RIND_QUOTE.'get'.$this->RIND_QUOTE.',['.$this->RIND_QUOTE.'content'.$this->RIND_QUOTE.'=>'.$sVarname.']);
 						Rind::dump('.$sVarname.');
 					} else {
 						Rind::dump('.$sVarname.');
@@ -2454,10 +2450,10 @@ namespace nogal {
 				} else {
 					Rind::dump('.$sVarname.');
 				}
-				'.$sVarname.' = ob_get_clean();
+				'.$sVarname.' = \ob_get_clean();
 				
 				'.$sOutput.' = "<pre>";
-				'.$sOutput.' .= htmlentities('.$sVarname.', ENT_IGNORE);
+				'.$sOutput.' .= \htmlentities('.$sVarname.', ENT_IGNORE);
 				'.$sOutput.' .= "</pre>";'
 			;
 			$sReturn .= ($bReturn) ? 'return '.$sOutput.';' : 'echo '.$sOutput.';';
@@ -2482,39 +2478,39 @@ namespace nogal {
 		}
 
 		private function GetDataArguments($vArguments, $sFilePath=false, $aSubMerge=false) {
-			$aDataArguments = $aGlobalDataArguments = array();
+			$aDataArguments = $aGlobalDataArguments = [];
 			foreach($vArguments as $sKey => $sValue) {
-				if(strpos($sKey, "data-")!==false) {
-					$sEncoded = base64_encode(base64_decode($sValue, true));
-					$sValue = ($sEncoded===$sValue) ? base64_decode($sValue) : $sValue;
-					$aGlobalDataArguments[substr($sKey, 5)] = base64_encode($this->rind2php($sValue));
+				if(\strpos($sKey, "data-")!==false) {
+					$sEncoded = \base64_encode(\base64_decode($sValue, true));
+					$sValue = ($sEncoded===$sValue) ? \base64_decode($sValue) : $sValue;
+					$aGlobalDataArguments[\substr($sKey, 5)] = \base64_encode($this->rind2php($sValue));
 				}
 			}
 
 			if(isset($vArguments["data"])) {
-				$aGetData = current($this->GetDataArgumentsMultiple($vArguments["data"]));
+				$aGetData = \current($this->GetDataArgumentsMultiple($vArguments["data"]));
 				foreach($aGetData[1] as $sKey => $sValue) {
-					$aString = self::call("unicode")->split(base64_decode($sValue));
-					$aGlobalDataArguments[$sKey] = base64_encode($this->FixCode($aString));
+					$aString = self::call("unicode")->split(\base64_decode($sValue));
+					$aGlobalDataArguments[$sKey] = \base64_encode($this->FixCode($aString));
 				}
 			}
-			$aTemplates = array(array($sFilePath, $aGlobalDataArguments));
+			$aTemplates = [[$sFilePath, $aGlobalDataArguments]];
 
 			if(isset($vArguments["multiple"])) {
 				$aMultiple = $this->GetDataArgumentsMultiple($vArguments["multiple"]);
-				if($aSubMerge) { $aTemplates[$aSubMerge[0]] = array(); }
+				if($aSubMerge) { $aTemplates[$aSubMerge[0]] = []; }
 				if($aMultiple!==false) {
 					foreach($aMultiple as $nIdx => $aTemplate) {
-						$aTemplateData = array();
+						$aTemplateData = [];
 						foreach($aTemplate[1] as $sKey => $sValue) {
-							$aString = self::call("unicode")->split(base64_decode($sValue));
-							$aTemplateData[$sKey] = base64_encode($this->FixCode($aString));
+							$aString = self::call("unicode")->split(\base64_decode($sValue));
+							$aTemplateData[$sKey] = \base64_encode($this->FixCode($aString));
 						}
 
 						if($aSubMerge) {
-							$aTemplates[$aSubMerge[0]][] = array($aSubMerge[1].$aTemplate[0], array_merge($aGlobalDataArguments, $aTemplateData));
+							$aTemplates[$aSubMerge[0]][] = [$aSubMerge[1].$aTemplate[0], \array_merge($aGlobalDataArguments, $aTemplateData)];
 						} else {
-							$aTemplates[] = array($aTemplate[0], array_merge($aGlobalDataArguments, $aTemplateData));
+							$aTemplates[] = [$aTemplate[0], \array_merge($aGlobalDataArguments, $aTemplateData)];
 						}
 					}
 				}
@@ -2526,43 +2522,43 @@ namespace nogal {
 		}
 
 		private function GetDataArgumentsPrepare($sString, $bBase64Encode=true) {
-			return preg_replace_callback(
+			return \preg_replace_callback(
 				"/".$this->RIND_HTML_QUOTE."(.*?)".$this->RIND_HTML_QUOTE."/is", 
 				function($aMatchs) use ($bBase64Encode) {
-					$sCode = trim($aMatchs[1]);
-					$sCode = str_replace($this->RIND_QUOTE, '"', $sCode);
-					$sCode = preg_replace_callback(
+					$sCode = \trim($aMatchs[1]);
+					$sCode = \str_replace($this->RIND_QUOTE, '"', $sCode);
+					$sCode = \preg_replace_callback(
 						"/\{\*[a-z0-9\-\_\.]+\}/is", 
 						function($aMatch) use ($bBase64Encode) {
-							$sVar = substr($aMatch[0], 2, -1);
-							$sVar = ($bBase64Encode) ? base64_encode($sVar) : $sVar;
-							$sRindID = str_replace($this->RIND_QUOTE, '', $this->RIND_ME);
+							$sVar = \substr($aMatch[0], 2, -1);
+							$sVar = ($bBase64Encode) ? \base64_encode($sVar) : $sVar;
+							$sRindID = \str_replace($this->RIND_QUOTE, '', $this->RIND_ME);
 							// return "<[VARSET[".$sVar."|".$sRindID."]VARSET]>";
 							return "<?php echo Rind::getset('".$sVar."|".$sRindID."');?>";
 						},
 						$sCode
 					);
-					return ($bBase64Encode) ? '"'.base64_encode($sCode).'"' : '"'.$sCode.'"';
+					return ($bBase64Encode) ? '"'.\base64_encode($sCode).'"' : '"'.$sCode.'"';
 				}, $sString
 			);
 		}
 
 		private function GetDataArgumentsMultiple($sString) {
-			$nCurly = strpos($sString, "{");
-			$nSquare = strpos($sString, "[");
+			$nCurly = \strpos($sString, "{");
+			$nSquare = \strpos($sString, "[");
 			if($nCurly===false && $nSquare===false) {
-				$sString = str_replace(array("\x12json>", "\x12\x11json>"), "", $sString);
-				if(strlen($sString)) {
+				$sString = \str_replace(["\x12json>", "\x12\x11json>"], "", $sString);
+				if(\strlen($sString)) {
 					$sGUIPath = ($sString[0]==NGL_DIR_SLASH) ? $this->attribute("project_path") : $this->aFilePath["dirname"].NGL_DIR_SLASH;
 					$sString = $sGUIPath.$sString;
 					$sString = $this->readTemplate($sString);
 					$sString = $this->TagConverter($sString);
 					$aString = self::call("unicode")->split($sString);
-					$sString = implode($aString);
+					$sString = \implode($aString);
 					$sString = $this->ReservedStrings($sString);
-					$sString = implode($this->ProcessCode($sString));
-					$nCurly = strpos($sString, "{");
-					$nSquare = strpos($sString, "[");
+					$sString = \implode($this->ProcessCode($sString));
+					$nCurly = \strpos($sString, "{");
+					$nSquare = \strpos($sString, "[");
 				}
 			}
 			
@@ -2577,30 +2573,30 @@ namespace nogal {
 				$sClose = "]";
 			}
 
-			$nEnd = strrpos($sString, $sClose);
-			$sString = substr($sString, $nStart, ($nEnd-$nStart)+1);
+			$nEnd = \strrpos($sString, $sClose);
+			$sString = \substr($sString, $nStart, ($nEnd-$nStart)+1);
 			$sString = $this->GetDataArgumentsPrepare($sString);
-			$aData = json_decode($sString, true);
+			$aData = \json_decode($sString, true);
 			if($aData===null) { return false; }
 
-			if(!is_int(key($aData))) { $aData = array(array(null, $aData)); }
-			$aDataArguments = array();
+			if(!\is_int(\key($aData))) { $aData = [[null, $aData]]; }
+			$aDataArguments = [];
 			foreach($aData as $nIndex => $aArgument) {
-				$aDataArguments[$nIndex] = array();
-				$aDataArguments[$nIndex][0] = base64_decode($aArgument[0]);
-				$aDataArguments[$nIndex][1] = array();
-				if(isset($aArgument[1]) && is_array($aArgument[1]) && count($aArgument[1])) {
+				$aDataArguments[$nIndex] = [];
+				$aDataArguments[$nIndex][0] = \base64_decode($aArgument[0]);
+				$aDataArguments[$nIndex][1] = [];
+				if(isset($aArgument[1]) && \is_array($aArgument[1]) && \count($aArgument[1])) {
 					foreach($aArgument[1] as $sKey => $mValue) {
-						if(is_array($mValue)) {
+						if(\is_array($mValue)) {
 							$aValues = $this->GetDataArgumentsMultipleArrays($mValue);
-							$mValue = base64_encode(json_encode($aValues));
+							$mValue = \base64_encode(\json_encode($aValues));
 						} else {
-							$sCode = base64_decode($mValue);
+							$sCode = \base64_decode($mValue);
 							$aCode = self::call("unicode")->split($sCode);
-							$mValue = base64_encode($this->FixCode($aCode));
+							$mValue = \base64_encode($this->FixCode($aCode));
 						}
 
-						$aDataArguments[$nIndex][1][base64_decode($sKey)] = $mValue;
+						$aDataArguments[$nIndex][1][\base64_decode($sKey)] = $mValue;
 					}
 				}
 			}
@@ -2609,13 +2605,13 @@ namespace nogal {
 		}
 
 		private function GetDataArgumentsMultipleArrays($aData) {
-			$aValues = array();
+			$aValues = [];
 			foreach($aData as $sValKey => $mValVal) {
-				$mIndex = (is_int($sValKey)) ? $sValKey : base64_decode($sValKey);
-				if(is_array($mValVal)) {
+				$mIndex = (\is_int($sValKey)) ? $sValKey : \base64_decode($sValKey);
+				if(\is_array($mValVal)) {
 					$aValues[$mIndex] = $this->GetDataArgumentsMultipleArrays($mValVal);
 				} else {
-					$sValVal = base64_decode($mValVal);
+					$sValVal = \base64_decode($mValVal);
 					$aCode = self::call("unicode")->split($sValVal);
 					$aValues[$mIndex] = $this->FixCode($aCode);
 				}
@@ -2632,7 +2628,7 @@ namespace nogal {
 		} **/
 		private function rindHalt($vArguments) {
 			$sReturn = "";
-			if(isset($vArguments["url"])) { $sReturn .= '<[PHP[header("location:'.$vArguments["url"].'");]PHP]>'; }
+			if(isset($vArguments["url"])) { $sReturn .= '<[PHP[\header("location:'.$vArguments["url"].'");]PHP]>'; }
 			if(isset($vArguments["content"])) {
 				$sReturn .= '<[PHP[die("'.$vArguments["content"].'");]PHP]>';
 			} else {
@@ -2650,8 +2646,8 @@ namespace nogal {
 		} **/
 		private function rindJson($vArguments) {
 			$sReturn = $vArguments["content"];
-			$sReturn = str_replace(array('".<[VAR[', ']VAR]>."'), array('<[VAR[', ']VAR]>'), $sReturn);
-			$sReturn = str_replace(array('<[VAR[', ']VAR]>'), array('<[HDV[{', '}]HDV]>'), $sReturn);
+			$sReturn = \str_replace(['".<[VAR[', ']VAR]>."'],['<[VAR[', ']VAR]>'], $sReturn);
+			$sReturn = \str_replace(['<[VAR[', ']VAR]>'],['<[HDV[{', '}]HDV]>'], $sReturn);
 			$sReturn = "<[PHP[Rind::json(<<<RINDJSON\n".$sReturn."\nRINDJSON\n, $this->RIND_ME)]PHP]>";
 			return $sReturn;
 		}
@@ -2666,34 +2662,34 @@ namespace nogal {
 		private function rindIfcase($vArguments) {
 			if(!isset($vArguments["content"])) { $vArguments["content"] = ""; }
 			$sPreIf = $sSign = "";
-			$aKeys = array_keys($vArguments);
-			$sKeys = implode($aKeys);
+			$aKeys = \array_keys($vArguments);
+			$sKeys = \implode($aKeys);
 			
-			if(strpos($sKeys, "then")==-1 && !isset($vArguments["content"])) { return false; }
+			if(\strpos($sKeys, "then")==-1 && !isset($vArguments["content"])) { return false; }
 
-			$aReturn = array();
-			$aConditions = array();
-			$aIfStatements = array();
+			$aReturn = [];
+			$aConditions = [];
+			$aIfStatements = [];
 
-			if(strpos($sKeys, "iff:")!==false || strpos($sKeys, "isset:")!==false || strpos($sKeys, "noempty:")!==false || strpos($sKeys, "in:")!==false) {
-				$aIfStatements = array();
+			if(\strpos($sKeys, "iff:")!==false || \strpos($sKeys, "isset:")!==false || \strpos($sKeys, "noempty:")!==false || \strpos($sKeys, "in:")!==false) {
+				$aIfStatements = [];
 				foreach($vArguments as $sKey => $mValue) {
-					$aKeys = explode(":", $sKey);
+					$aKeys = \explode(":", $sKey);
 					if(isset($aKeys[1], $vArguments["then:".$aKeys[1]])) {
 						switch($aKeys[0]) {
 							case "iff":
-								$sCaseCondition = trim($mValue, " \t\n\r\0\x0B");
+								$sCaseCondition = \trim($mValue, " \t\n\r\0\x0B");
 								break;
 
 							case "empty":
 							case "noempty":
-								$mValue = trim($mValue, " \t\n\r\0\x0B");
+								$mValue = \trim($mValue, " \t\n\r\0\x0B");
 								$mValue = "\x12heredoc>".$mValue."\x12\x11heredoc>";
 								$sCaseCondition = ($aKeys[0]=="noempty") ? "!empty(".$mValue.")" : "empty(".$mValue.")";
 								break;
 
 							case "isset":
-								$sIssetArgument = trim($mValue, " \t\n\r\0\x0B");
+								$sIssetArgument = \trim($mValue, " \t\n\r\0\x0B");
 								$sCaseCondition = $this->IssetArgument($sIssetArgument);
 								break;
 							
@@ -2723,10 +2719,10 @@ namespace nogal {
 				}
 			} else {
 				if(isset($vArguments["iff"])) {
-					$aConditions[] = trim($vArguments["iff"], " \t\n\r\0\x0B");
+					$aConditions[] = \trim($vArguments["iff"], " \t\n\r\0\x0B");
 					$aIfStatements[] = (isset($vArguments["then"])) ? $vArguments["then"] : $vArguments["content"];
 				} else {
-					$aIfStatements[] = (strpos($sKeys, "then")>-1) ? $vArguments["then"] : $vArguments["content"];
+					$aIfStatements[] = (\strpos($sKeys, "then")>-1) ? $vArguments["then"] : $vArguments["content"];
 				}
 
 				if(isset($vArguments["empty"]) || isset($vArguments["noempty"])) {
@@ -2735,24 +2731,24 @@ namespace nogal {
 						$vArguments["empty"] = $vArguments["noempty"];
 						$sSign = "!";
 					}
-					$sEmpty = trim($vArguments["empty"], " \t\n\r\0\x0B");
+					$sEmpty = \trim($vArguments["empty"], " \t\n\r\0\x0B");
 					$sEmpty = "\x12heredoc>".$sEmpty."\x12\x11heredoc>";
 					$sEmpty = $sSign."empty(".$sEmpty.")";
 
-					if(!count($aConditions)) {
+					if(!\count($aConditions)) {
 						$aConditions[] = $sEmpty;
-					} else if(count($aConditions)==1) {
+					} else if(\is_array($aConditions) && \count($aConditions)==1) {
 						$aConditions[0] = "(".$sEmpty.") && (".$aConditions[0].")";
 					}
 				}
 
 				if(isset($vArguments["isset"])) {
-					$sIssetArgument = trim($vArguments["isset"], " \t\n\r\0\x0B");
+					$sIssetArgument = \trim($vArguments["isset"], " \t\n\r\0\x0B");
 					
 					$sIsset = $this->IssetArgument($sIssetArgument);
-					if(!count($aConditions)) {
+					if(!\count($aConditions)) {
 						$aConditions[] = $sIsset;
-					} else if(count($aConditions)==1) {
+					} else if(\is_array($aConditions) && \count($aConditions)==1) {
 						$aConditions[0] = "(".$sIsset.") && (".$aConditions[0].")";
 					}
 				}
@@ -2765,16 +2761,16 @@ namespace nogal {
 					$sBreaker = (isset($vArguments["splitter"])) ? $vArguments["splitter"] : ";";
 					$aInNotIn = $this->InNotInArgument($vArguments["in"], $vArguments["needle"], $sBreaker);
 					$sPreIf = $aInNotIn[0];
-					if(!count($aConditions)) {
+					if(!\count($aConditions)) {
 						$aConditions[] = $sSign.$aInNotIn[1];
-					} else if(count($aConditions)==1) {
+					} else if(\is_array($aConditions) && \count($aConditions)==1) {
 						$aConditions[0] = "(".$sSign.$aInNotIn[1].") && (".$aConditions[0].")";
 					}
 				}
 			}
 
 			$sReturn = $sPreIf;
-			if(!count($aConditions)) {
+			if(!\count($aConditions)) {
 				$aInline = $this->IfcaseInline($aIfStatements[0]);
 				$aConditions[0] = $aInline[0];
 				$aIfStatements[0] = $aInline[1];
@@ -2784,17 +2780,17 @@ namespace nogal {
 			
 			$sStatementsOpen	= (!$bSetMode) ? "]PHP]>" : " return (\"";
 			$sStatementsClose	= (!$bSetMode) ? "<[PHP[" : "\"); ";
-			if(count($aConditions)==1) {
-				$mKey = key($aConditions);
+			if(\is_array($aConditions) && \count($aConditions)==1) {
+				$mKey = \key($aConditions);
 				$sReturn .= 'if('.$aConditions[$mKey].') {'.$sStatementsOpen.$aIfStatements[$mKey].$sStatementsClose.'}';
 			} else {
-				$mKey = key($aConditions);
+				$mKey = \key($aConditions);
 				$sReturn .= 'if('.$aConditions[$mKey].') {'.$sStatementsOpen.$aIfStatements[$mKey].$sStatementsClose.'}';
-				next($aConditions);
-				while($mCondition = current($aConditions)) {
-					$mKey = key($aConditions);
+				\next($aConditions);
+				while($mCondition = \current($aConditions)) {
+					$mKey = \key($aConditions);
 					$sReturn .= 'else if('.$mCondition.') {'.$sStatementsOpen.$aIfStatements[$mKey].$sStatementsClose.'}';
-					next($aConditions);
+					\next($aConditions);
 				}
 			}
 
@@ -2803,7 +2799,7 @@ namespace nogal {
 			}
 			
 			if($bSetMode) {
-				$sReturn = '".eval(\''.str_replace("'", "\'", $sReturn).'\')."';
+				$sReturn = '".eval(\''.\str_replace("'", "\'", $sReturn).'\')."';
 			} else {
 				$sReturn = '<[PHP['.$sReturn .']PHP]>';
 			}
@@ -2821,9 +2817,9 @@ namespace nogal {
 		private function rindIncFile($vArguments) {
 			$sReturn	= "";
 			$sFileName	= $vArguments["content"];
-			$sFileName	= trim($sFileName);
+			$sFileName	= \trim($sFileName);
 			if(!empty($sFileName)) {
-				$sReturn  = '<[PHP[ if(isset(Rind::this('.$this->RIND_ME.')->SET["INCLUDES"]["'.$sFileName.'"]) && file_exists(Rind::this('.$this->RIND_ME.')->SET["INCLUDES"]["'.$sFileName.'"])) { include(Rind::this('.$this->RIND_ME.')->SET["INCLUDES"]["'.$sFileName.'"]); }]PHP]>';
+				$sReturn  = '<[PHP[ if(isset(Rind::this('.$this->RIND_ME.')->SET["INCLUDES"]["'.$sFileName.'"]) && \file_exists(Rind::this('.$this->RIND_ME.')->SET["INCLUDES"]["'.$sFileName.'"])) { include(Rind::this('.$this->RIND_ME.')->SET["INCLUDES"]["'.$sFileName.'"]); }]PHP]>';
 			}
 
 			return $sReturn;
@@ -2842,13 +2838,13 @@ namespace nogal {
 
 			$sReturn = '<[FUN[eval(\'
 				'.$sVarname.' = '.$vArguments["content"].';
-				if(is_array('.$sVarname.') || is_object('.$sVarname.')) {
-					return count('.$sVarname.');
-				} else if(is_string('.$sVarname.')) {
-					return strlen('.$sVarname.');
-				} else if(is_numeric('.$sVarname.')) {
+				if(\is_array('.$sVarname.') || \is_object('.$sVarname.')) {
+					return \count('.$sVarname.');
+				} else if(\is_string('.$sVarname.')) {
+					return \strlen('.$sVarname.');
+				} else if(\is_numeric('.$sVarname.')) {
 					return '.$sVarname.';
-				} else if(is_bool('.$sVarname.')) {
+				} else if(\is_bool('.$sVarname.')) {
 					return ('.$sVarname.') ? 1 : 0;
 				}
 			\')]FUN]>';
@@ -2868,11 +2864,11 @@ namespace nogal {
 				if(empty($sKey)) {
 					$vArguments[$sKey] = $this->stripQuotes($sArgument);
 				} else {
-					preg_match("/^([ \t\n\r\x0B]*)(.*?)([ \t\n\r\x0B]*)$/", $sArgument, $aSpaces);
+					\preg_match("/^([ \t\n\r\x0B]*)(.*?)([ \t\n\r\x0B]*)$/", $sArgument, $aSpaces);
 					if(!isset($aSpaces[1])) { $aSpaces[1] = ""; }
 					if(!isset($aSpaces[3])) { $aSpaces[3] = ""; }
-					$sArgument = trim($sArgument);
-					$vArguments[$sKey] = trim($sArgument, "\x22");
+					$sArgument = \trim($sArgument);
+					$vArguments[$sKey] = \trim($sArgument, "\x22");
 					$vArguments[$sKey] = $aSpaces[1].$vArguments[$sKey].$aSpaces[3];
 				}
 			}
@@ -2895,10 +2891,11 @@ namespace nogal {
 			$sTreeIndex		= $this->dynVar();
 			$sTreeTmp		= $this->dynVar();
 			$sNut			= $this->dynVar();
-			$sCalc			=  $this->dynVar();
-			$sCalcIdx		=  $this->dynVar();
+			$sCalc			= $this->dynVar();
+			$sCalcIdx		= $this->dynVar();
 			$sLoops			= $this->RIND_LOOPS;
 			
+			// para debug ----
 			// $sDataVar		= '$aData';
 			// $sDataBackVar	= '$aData';
 			// $sRowVar			= '$aRow';
@@ -2925,9 +2922,9 @@ namespace nogal {
 
 			// nombre del loop
 			if(isset($vArguments["name"])) {
-				$sName = strtolower($vArguments["name"]);
+				$sName = \strtolower($vArguments["name"]);
 			} else {
-				$sName = strtolower(self::call()->unique(8));
+				$sName = \strtolower(self::call()->unique(8));
 			}
 			
 			if($sName=="self" || $sName=="parent") {
@@ -2947,8 +2944,8 @@ namespace nogal {
 
 			// tipo de origen de datos
 			if(isset($vArguments["type"])) {
-				$sType = strtolower($vArguments["type"]);
-				if(!in_array($sType, array("array", "owl", "element", "number", "object", "vector"))) {
+				$sType = \strtolower($vArguments["type"]);
+				if(!\in_array($sType, ["array", "owl", "element", "number", "object", "vector"])) {
 					$sType = "array";	
 				}
 			} else {
@@ -2973,9 +2970,9 @@ namespace nogal {
 			}
 
 			// armado del nombre del origien de datos
-			$sDataArgument = str_replace($this->RIND_HTML_QUOTE, '"', $vArguments["source"]);
-			$sDataArgument = trim($sDataArgument);
-			$sDataArgument = trim($sDataArgument, "\x22");
+			$sDataArgument = \str_replace($this->RIND_HTML_QUOTE, '"', $vArguments["source"]);
+			$sDataArgument = \trim($sDataArgument);
+			$sDataArgument = \trim($sDataArgument, "\x22");
 			$sSourceData = $sDataVar.' = '.$sDataArgument.';'.$this->EOL;
 
 			switch($sType) {
@@ -2986,26 +2983,26 @@ namespace nogal {
 					break;
 
 				case "owl":
-					$sChkType = 'is_object('.$sDataVar.')';
-					$sSetting = $sEndVar.' = Rind::nut('.$sNut.','.$this->RIND_QUOTE.'rows'.$this->RIND_QUOTE.', array('.$this->RIND_QUOTE.'content'.$this->RIND_QUOTE.'=>'.$sDataVar.'));';
-					$sRowSource = 'Rind::nut('.$sNut.','.$this->RIND_QUOTE.'get'.$this->RIND_QUOTE.', array('.$this->RIND_QUOTE.'content'.$this->RIND_QUOTE.'=>'.$sDataVar.'))';
+					$sChkType = '\is_object('.$sDataVar.')';
+					$sSetting = $sEndVar.' = Rind::nut('.$sNut.','.$this->RIND_QUOTE.'rows'.$this->RIND_QUOTE.', ['.$this->RIND_QUOTE.'content'.$this->RIND_QUOTE.'=>'.$sDataVar.']);';
+					$sRowSource = 'Rind::nut('.$sNut.','.$this->RIND_QUOTE.'get'.$this->RIND_QUOTE.', ['.$this->RIND_QUOTE.'content'.$this->RIND_QUOTE.'=>'.$sDataVar.'])';
 					break;
 
 				case "element":
-					$sChkType = 'is_object('.$sDataVar.')';
-					$sSetting = $sEndVar.' = (method_exists('.$sDataVar.', '.$this->RIND_QUOTE.'rows'.$this->RIND_QUOTE.')) ? '.$sDataVar.'->rows() : 0;';
-					$sRowSource = '(method_exists('.$sDataVar.', '.$this->RIND_QUOTE.'get'.$this->RIND_QUOTE.')) ? '.$sDataVar.'->get() : array()';
+					$sChkType = '\is_object('.$sDataVar.')';
+					$sSetting = $sEndVar.' = (\method_exists('.$sDataVar.', '.$this->RIND_QUOTE.'rows'.$this->RIND_QUOTE.')) ? '.$sDataVar.'->rows() : 0;';
+					$sRowSource = '(\method_exists('.$sDataVar.', '.$this->RIND_QUOTE.'get'.$this->RIND_QUOTE.')) ? '.$sDataVar.'->get() : []';
 					break;
 
 				default:
 					if($sType=="object") {
 						$sSourceData = $sDataVar.' = Rind::obj2array("'.$vArguments["source"].'");';
 					} else if($sType=="vector") {
-						$sSourceData .= $sDataVar.' = array('.$sDataVar.');';
+						$sSourceData .= $sDataVar.' = ['.$sDataVar.'];';
 					}
 
-					$sChkType = 'is_array('.$sDataVar.')';
-					$sSetting = $sEndVar.' = count('.$sDataVar.');';
+					$sChkType = '\is_array('.$sDataVar.')';
+					$sSetting = $sEndVar.' = \count('.$sDataVar.');';
 					$sRowSource = $sDataVar.'['.$sKeysVar.'['.$sCountVar.']];';
 					break;
 			}
@@ -3013,21 +3010,21 @@ namespace nogal {
 			// order de impresion
 			if($sType!="owl" && $sType!="number" && $sType!="element") {
 				if(isset($vArguments["index"])) {
-					$sSetting .= $sIndexVar.' = "'.$vArguments["index"].'"; '.$sKeysVar.' = (is_array('.$sIndexVar.')) ? '.$sIndexVar.' : explode(",",'.$sIndexVar.');'.$this->EOL;
-					$sSetting .= $sIndexVar.' = "'.$vArguments["index"].'";'.$this->EOL.$sKeysVar.' = (is_array('.$sIndexVar.')) ? '.$sIndexVar.' : explode(",",'.$sIndexVar.');'.$this->EOL;
+					$sSetting .= $sIndexVar.' = "'.$vArguments["index"].'"; '.$sKeysVar.' = (\is_array('.$sIndexVar.')) ? '.$sIndexVar.' : \explode(",",'.$sIndexVar.');'.$this->EOL;
+					$sSetting .= $sIndexVar.' = "'.$vArguments["index"].'";'.$this->EOL.$sKeysVar.' = (\is_array('.$sIndexVar.')) ? '.$sIndexVar.' : \explode(",",'.$sIndexVar.');'.$this->EOL;
 				} else {
-					$sSetting .= $sKeysVar.' = array_keys('.$sDataVar.');'.$this->EOL;
+					$sSetting .= $sKeysVar.' = \array_keys('.$sDataVar.');'.$this->EOL;
 				}
 				
 				if(isset($vArguments["order"])) {
-					$sSetting .= $this->EOL.$sOrderVar.' = strtolower("'.$vArguments["order"].'");'.$this->EOL;
-					$sSetting .= 'if('.$sOrderVar.'=="reverse") { '.$sKeysVar.' = array_reverse('.$sKeysVar.'); } '.$this->EOL;
-					$sSetting .= 'else if('.$sOrderVar.'=="random") { shuffle('.$sKeysVar.'); } '.$this->EOL;
-					$sSetting .= 'else if('.$sOrderVar.'=="desc") { rsort('.$sKeysVar.'); } '.$this->EOL;
-					$sSetting .= 'else { sort('.$sKeysVar.'); }'.$this->EOL;
+					$sSetting .= $this->EOL.$sOrderVar.' = \strtolower("'.$vArguments["order"].'");'.$this->EOL;
+					$sSetting .= 'if('.$sOrderVar.'=="reverse") { '.$sKeysVar.' = \array_reverse('.$sKeysVar.'); } '.$this->EOL;
+					$sSetting .= 'else if('.$sOrderVar.'=="random") { \shuffle('.$sKeysVar.'); } '.$this->EOL;
+					$sSetting .= 'else if('.$sOrderVar.'=="desc") { \rsort('.$sKeysVar.'); } '.$this->EOL;
+					$sSetting .= 'else { \sort('.$sKeysVar.'); }'.$this->EOL;
 				}
 				
-				$sSetting .= $sEndVar.' = count('.$sKeysVar.');'.$this->EOL;;
+				$sSetting .= $sEndVar.' = \count('.$sKeysVar.');'.$this->EOL;;
 			}
 
 			//=================
@@ -3036,9 +3033,9 @@ namespace nogal {
 			$sLoop  = '<[PHP['.$this->EOL;
 			$sLoop .= $sSourceData;
 			
-			$sLoop .= 'if(!isset('.$sLoops.')) { '.$sLoops.' = array(); }'.$this->EOL;
-			$sLoop .= 'if(is_array('.$sLoops.') && count('.$sLoops.')) { '.$this->aLoops["parent"].' = Rind::this('.$this->RIND_ME.')->SET[end('.$sLoops.')]; }'.$this->EOL;
-			$sLoop .= 'array_push('.$sLoops.', "'.$sName.'");'.$this->EOL;
+			$sLoop .= 'if(!isset('.$sLoops.')) { '.$sLoops.' = []; }'.$this->EOL;
+			$sLoop .= 'if(\is_array('.$sLoops.') && \count('.$sLoops.')) { '.$this->aLoops["parent"].' = Rind::this('.$this->RIND_ME.')->SET[\end('.$sLoops.')]; }'.$this->EOL;
+			$sLoop .= '\array_push('.$sLoops.', "'.$sName.'");'.$this->EOL;
 
 			$sLoop .= 'if(isset('.$sDataVar.')) { '.$sDataBackVar.' = '.$sDataVar.'; }'.$this->EOL;
 			$sLoop .= 'if('.$sChkType.') {'.$this->EOL;
@@ -3046,20 +3043,20 @@ namespace nogal {
 			// origen de datos
 			if($sType=="owl") {
 				$sLoop .= $sNut.' = Rind::nut('.$this->RIND_QUOTE.'owl'.$this->RIND_QUOTE.');';
-				$sLoop .= 'if(Rind::nut('.$sNut.','.$this->RIND_QUOTE.'rows'.$this->RIND_QUOTE.', array('.$this->RIND_QUOTE.'content'.$this->RIND_QUOTE.'=>'.$sDataVar.'))) { Rind::nut('.$sNut.','.$this->RIND_QUOTE.'reset'.$this->RIND_QUOTE.', array('.$this->RIND_QUOTE.'content'.$this->RIND_QUOTE.'=>'.$sDataVar.')); }'.$this->EOL;
-				$sLoop .= 'Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["allrows"] = Rind::nut('.$sNut.','.$this->RIND_QUOTE.'allrows'.$this->RIND_QUOTE.', array('.$this->RIND_QUOTE.'content'.$this->RIND_QUOTE.'=>'.$sDataVar.'));'.$this->EOL;
+				$sLoop .= 'if(Rind::nut('.$sNut.','.$this->RIND_QUOTE.'rows'.$this->RIND_QUOTE.', ['.$this->RIND_QUOTE.'content'.$this->RIND_QUOTE.'=>'.$sDataVar.'])) { Rind::nut('.$sNut.','.$this->RIND_QUOTE.'reset'.$this->RIND_QUOTE.', ['.$this->RIND_QUOTE.'content'.$this->RIND_QUOTE.'=>'.$sDataVar.']); }'.$this->EOL;
+				$sLoop .= 'Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["allrows"] = Rind::nut('.$sNut.','.$this->RIND_QUOTE.'allrows'.$this->RIND_QUOTE.', ['.$this->RIND_QUOTE.'content'.$this->RIND_QUOTE.'=>'.$sDataVar.']);'.$this->EOL;
 			} else if($sType=="element") {
-				$sLoop .= 'if(method_exists('.$sDataVar.', '.$this->RIND_QUOTE.'reset'.$this->RIND_QUOTE.')) { '.$sDataVar.'->reset(); }'.$this->EOL;
+				$sLoop .= 'if(\method_exists('.$sDataVar.', '.$this->RIND_QUOTE.'reset'.$this->RIND_QUOTE.')) { '.$sDataVar.'->reset(); }'.$this->EOL;
 			} else if($sType!="number") {
-				$sLoop .= 'reset('.$sDataVar.');'.$this->EOL;
+				$sLoop .= '\reset('.$sDataVar.');'.$this->EOL;
 			} else {
 				$sLoop .= "\n";
 			}
 
 			// limites del bucle
 			$bFrom = $bLimit = false;
-			if(isset($vArguments["from"])) { $bFrom = true; $sLoop .= $nFrom.'=abs('.$vArguments["from"].');'; } else { $sLoop .= $nFrom.'=0;'; }
-			if(isset($vArguments["limit"])) { $bLimit = true; $sLoop .= $nLimit.'=abs('.$vArguments["limit"].');'; } else { $sLoop .= $nLimit.'=null;'; }
+			if(isset($vArguments["from"])) { $bFrom = true; $sLoop .= $nFrom.'=\abs('.$vArguments["from"].');'; } else { $sLoop .= $nFrom.'=0;'; }
+			if(isset($vArguments["limit"])) { $bLimit = true; $sLoop .= $nLimit.'=\abs('.$vArguments["limit"].');'; } else { $sLoop .= $nLimit.'=null;'; }
 			if($sType=="number") {
 				$sLoop .= $nLimitMax.'='.$this->argument("loops_limit").';'.$this->EOL;
 				$sLoop .= 'if('.$nLimit.'===null) { '.$nLimit.' = 1; }'.$this->EOL;
@@ -3069,10 +3066,10 @@ namespace nogal {
 			
 			$sLoop .= $sSetting.$this->EOL;
 			$sLoop .= 'if(!'.$sEndVar.') { ]PHP]>'.$sEmpty.'<[PHP[ }'.$this->EOL;
-			$sLoop .= 'Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"] = array(); '.$this->EOL;
+			$sLoop .= 'Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"] = []; '.$this->EOL;
 
 			if($sType=="owl") {
-				$sLoop .= 'Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["allrows"] = Rind::nut('.$sNut.','.$this->RIND_QUOTE.'allrows'.$this->RIND_QUOTE.', array('.$this->RIND_QUOTE.'content'.$this->RIND_QUOTE.'=>'.$sDataVar.'));'.$this->EOL;
+				$sLoop .= 'Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["allrows"] = Rind::nut('.$sNut.','.$this->RIND_QUOTE.'allrows'.$this->RIND_QUOTE.', ['.$this->RIND_QUOTE.'content'.$this->RIND_QUOTE.'=>'.$sDataVar.']);'.$this->EOL;
 			} else {
 				$sLoop .= 'Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["allrows"] = '.$sEndVar.'; '.$this->EOL;
 			}
@@ -3082,7 +3079,7 @@ namespace nogal {
 			
 		
 			// indice para arboles
-			if($bTreeMode) { $sLoop .= $sTreeIndex.' = array();'.$this->EOL; }
+			if($bTreeMode) { $sLoop .= $sTreeIndex.' = [];'.$this->EOL; }
 
 			// loop
 			$sLoop .= $sSign.'= ('.$nLimit.'!==null) ? ((('.$nLimit.'+'.$nFrom.')>'.$nFrom.') ? '.$this->RIND_QUOTE.'<'.$this->RIND_QUOTE.' : '.$this->RIND_QUOTE.'>'.$this->RIND_QUOTE.') : '.$this->RIND_QUOTE.'<'.$this->RIND_QUOTE.";";
@@ -3093,11 +3090,11 @@ namespace nogal {
 
 			// acumulados
 			if(isset($vArguments["aggregate"])) {
-				$sLoop .= $sCalc.'=array("'.implode('","', self::call()->explodeTrim(",",$vArguments["aggregate"])).'");'.$this->EOL;
+				$sLoop .= $sCalc.'=["'.\implode('","', self::call()->explodeTrim(",",$vArguments["aggregate"])).'"];'.$this->EOL;
 				$sLoop .= 'Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["sum"] = '.$this->EOL;
 				$sLoop .= 'Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["avg"] = '.$this->EOL;
-				$sLoop .= 'Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["max"] = array_fill_keys('.$sCalc.', 0);'.$this->EOL;
-				$sLoop .= 'Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["min"] = array_fill_keys('.$sCalc.', PHP_INT_MAX);'.$this->EOL;
+				$sLoop .= 'Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["max"] = \array_fill_keys('.$sCalc.', 0);'.$this->EOL;
+				$sLoop .= 'Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["min"] = \array_fill_keys('.$sCalc.', PHP_INT_MAX);'.$this->EOL;
 			}
 
 			// inicio del loop
@@ -3125,9 +3122,9 @@ namespace nogal {
 						if($sType!="element") {
 							$sLoop .= 'if(!isset('.$sDataVar.'['.$sKeysVar.'['.$sCountVar.']])) { continue; }'.$this->EOL;
 						}
-						$sLoop .= 'Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["data"] = (is_array('.$sRowData.')) ? '.$sRowData.' : array('.$sRowData.');'.$this->EOL;
+						$sLoop .= 'Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["data"] = (\is_array('.$sRowData.')) ? '.$sRowData.' : ['.$sRowData.'];'.$this->EOL;
 					}
-					$sLoop .= 'Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["current"] = current(Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["data"]); reset(Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["data"]);'.$this->EOL;
+					$sLoop .= 'Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["current"] = \current(Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["data"]); \reset(Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["data"]);'.$this->EOL;
 				} else {
 					$sLoop .= 'Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["data"] = '.$sCountVar.';'.$this->EOL;
 					$sLoop .= 'Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["current"] = '.$sCountVar.';'.$this->EOL;
@@ -3138,15 +3135,15 @@ namespace nogal {
 					$sLoop .= "foreach(".$sCalc." as ".$sCalcIdx.") {\n";
 					$sLoop .= 'Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["sum"]['.$sCalcIdx.'] += '.$sRowData.'['.$sCalcIdx.'];'.$this->EOL;
 					$sLoop .= 'Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["avg"]['.$sCalcIdx.'] = (Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["sum"]['.$sCalcIdx.'] / ('.$sCountVar.'+1));'.$this->EOL;
-					$sLoop .= 'Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["min"]['.$sCalcIdx.'] = min('.$sRowData.'['.$sCalcIdx.'], Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["min"]['.$sCalcIdx.']);'.$this->EOL;
-					$sLoop .= 'Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["max"]['.$sCalcIdx.'] = max('.$sRowData.'['.$sCalcIdx.'], Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["max"]['.$sCalcIdx.']);'.$this->EOL;
+					$sLoop .= 'Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["min"]['.$sCalcIdx.'] = \min('.$sRowData.'['.$sCalcIdx.'], Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["min"]['.$sCalcIdx.']);'.$this->EOL;
+					$sLoop .= 'Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["max"]['.$sCalcIdx.'] = \max('.$sRowData.'['.$sCalcIdx.'], Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["max"]['.$sCalcIdx.']);'.$this->EOL;
 					$sLoop .= "}\n";
 				}
 
 				if(isset($vArguments["zerofill"])) {
 					$nZerofill = (int)$vArguments["zerofill"];
-					$sLoop .= 'Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["numrow"] = str_pad('.$sCountVar.', '.$nZerofill.', "0", STR_PAD_LEFT);'.$this->EOL;
-					$sLoop .= 'Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["line"] = str_pad(('.$sCountVar.'+1), '.$nZerofill.', "0", STR_PAD_LEFT);'.$this->EOL;
+					$sLoop .= 'Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["numrow"] = \str_pad('.$sCountVar.', '.$nZerofill.', "0", STR_PAD_LEFT);'.$this->EOL;
+					$sLoop .= 'Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["line"] = \str_pad(('.$sCountVar.'+1), '.$nZerofill.', "0", STR_PAD_LEFT);'.$this->EOL;
 				} else {
 					$sLoop .= 'Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["numrow"] = '.$sCountVar.';'.$this->EOL;
 					$sLoop .= 'Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["line"] = ('.$sCountVar.'+1);'.$this->EOL;
@@ -3171,7 +3168,7 @@ namespace nogal {
 				if((isset($vArguments["debug"]) && self::call()->isTrue($vArguments["debug"]))) {
 					$sLoop .= '<[PHP[';
 					$sLoop .= 'echo "<pre>";';
-					$sLoop .= 'echo htmlentities(print_r(Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"], 1), ENT_IGNORE);';
+					$sLoop .= 'echo \htmlentities(\print_r(Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"], 1), ENT_IGNORE);';
 					$sLoop .= 'echo "</pre>";';
 					$sLoop .= "break;";
 					$sLoop .= ']PHP]>';
@@ -3184,11 +3181,11 @@ namespace nogal {
 				// recursion de arboles
 				if($bTreeMode) {
 					$sLoop .= '<[PHP['.$this->EOL;
-					$sLoop .= '	if(isset('.$sRowVar.'["data"]["'.$sChildrenNode.'"]) && is_array('.$sRowVar.'["data"]["'.$sChildrenNode.'"])) {';
-					$sLoop .= '		'.$sTreeIndex.'[] = array('.$sDataVar.', '.$sCountVar.');';
+					$sLoop .= '	if(isset('.$sRowVar.'["data"]["'.$sChildrenNode.'"]) && \is_array('.$sRowVar.'["data"]["'.$sChildrenNode.'"])) {';
+					$sLoop .= '		'.$sTreeIndex.'[] = ['.$sDataVar.', '.$sCountVar.'];';
 					$sLoop .= '		'.$sDataVar.' = '.$sRowVar.'["data"]["'.$sChildrenNode.'"];';
-					$sLoop .= '		'.$sKeysVar.' = array_keys('.$sDataVar.');';
-					$sLoop .= '		'.$sEndVar.' = count('.$sDataVar.');';
+					$sLoop .= '		'.$sKeysVar.' = \array_keys('.$sDataVar.');';
+					$sLoop .= '		'.$sEndVar.' = \count('.$sDataVar.');';
 					$sLoop .= '		'.$sCountVar.' = -1;';
 
 					$sLoop .= '		]PHP]>'.$sBranchOpen.'<[PHP[';
@@ -3198,11 +3195,11 @@ namespace nogal {
 					$sLoop .= '		]PHP]>'.$sNodeClose.'<[PHP[';
 
 					$sLoop .= '	if('.$sCountVar.'=='.$sEndVar.'-1) {';
-					$sLoop .= '		while(!('.$sEndVar.'>'.$sCountVar.'+1) && count('.$sTreeIndex.')) {';
-					$sLoop .= '			'.$sTreeTmp.' = array_pop('.$sTreeIndex.');';
+					$sLoop .= '		while(!('.$sEndVar.'>'.$sCountVar.'+1) && \count('.$sTreeIndex.')) {';
+					$sLoop .= '			'.$sTreeTmp.' = \array_pop('.$sTreeIndex.');';
 					$sLoop .= '			'.$sDataVar.' = '.$sTreeTmp.'[0];';
-					$sLoop .= '			'.$sKeysVar.' = array_keys('.$sDataVar.');';
-					$sLoop .= '			'.$sEndVar.' = count('.$sDataVar.');';
+					$sLoop .= '			'.$sKeysVar.' = \array_keys('.$sDataVar.');';
+					$sLoop .= '			'.$sEndVar.' = \count('.$sDataVar.');';
 					$sLoop .= '			'.$sCountVar.' = '.$sTreeTmp.'[1];';
 
 					$sLoop .= '			]PHP]>'.$sBranchClose.'<[PHP[';
@@ -3235,10 +3232,10 @@ namespace nogal {
 
 			// vuelta al loop padre
 			$sLoop .= '<[PHP[';
-			$sLoop .= 'array_pop('.$sLoops.');'.$this->EOL;
-			$sLoop .= 'if(is_array('.$sLoops.') && count('.$sLoops.')) {'.$this->EOL;
-			$sLoop .= 		$this->aLoops["self"].' = Rind::this('.$this->RIND_ME.')->SET[end('.$sLoops.')];'.$this->EOL;
-			$sLoop .= 		'if(prev('.$sLoops.')) { end('.$sLoops.'); '.$this->aLoops["parent"].' = Rind::this('.$this->RIND_ME.')->SET[prev('.$sLoops.')]; }'.$this->EOL;
+			$sLoop .= '\array_pop('.$sLoops.');'.$this->EOL;
+			$sLoop .= 'if(\is_array('.$sLoops.') && \count('.$sLoops.')) {'.$this->EOL;
+			$sLoop .= 		$this->aLoops["self"].' = Rind::this('.$this->RIND_ME.')->SET[\end('.$sLoops.')];'.$this->EOL;
+			$sLoop .= 		'if(\prev('.$sLoops.')) { \end('.$sLoops.'); '.$this->aLoops["parent"].' = Rind::this('.$this->RIND_ME.')->SET[\prev('.$sLoops.')]; }'.$this->EOL;
 			$sLoop .= '	}'.$this->EOL;
 			$sLoop .= ']PHP]>'.$this->EOL;
 
@@ -3268,39 +3265,39 @@ namespace nogal {
 			$sDebug				= $this->dynVar();
 
 			$sFilePath	= (isset($vArguments["source"])) ? $vArguments["source"] : ((isset($vArguments["content"])) ? $vArguments["content"] : "");
-			$nSourceDir	= (substr($sFilePath,-1)==NGL_DIR_SLASH) ? "1" : "0";
+			$nSourceDir	= (\substr($sFilePath,-1)==NGL_DIR_SLASH) ? "1" : "0";
 			$sFilePath	= self::call()->clearPath($sFilePath);
 			$sFilePath .= ($nSourceDir) ? NGL_DIR_SLASH : "";
 			if(empty($sFilePath)) { self::errorMessage($this->object, 1003, "mergefile::source = ".$sFilePath); }
 			$sGUIPath	= ($sFilePath[0]==NGL_DIR_SLASH) ? $this->attribute("project_path") : $this->attribute("gui_path");
 			$sGUIPath	= self::call()->clearPath($sGUIPath, true);
-			$sCacheMode = strtolower($this->argument("cache_mode"));
+			$sCacheMode = \strtolower($this->argument("cache_mode"));
 
 			$aSubMerge = false;
 			if(isset($vArguments["submerge"])) {
-				$sSubMerge = base64_decode($vArguments["submerge"]);
-				$aSubMerge = explode(":", $sSubMerge);
+				$sSubMerge = \base64_decode($vArguments["submerge"]);
+				$aSubMerge = \explode(":", $sSubMerge);
 			}
 
 			$aFiles = $this->GetDataArguments($vArguments, $sFilePath, $aSubMerge);
-			$sTemplates = json_encode($aFiles);
+			$sTemplates = \json_encode($aFiles);
 			// echo $sTemplates;
 			// echo $sFilePath;
 			// print_r($aFiles);
 			// exit();
-			array_push($this->aMergeTail,$aFiles[0][1]);
+			\array_push($this->aMergeTail,$aFiles[0][1]);
 
 			// dodo
 			$sReturn  = '<[PHP[';
-			$sReturn .= $sTemplate." = array();".$this->EOL;
-			$sReturn .= $aStructure." = json_decode('".$sTemplates."', true);".$this->EOL;
-			if(is_array($aSubMerge)) { $sReturn .= $sSubTarget.' = "'.$aSubMerge[0].'";'.$this->EOL; }
+			$sReturn .= $sTemplate." = [];".$this->EOL;
+			$sReturn .= $aStructure." = \json_decode('".$sTemplates."', true);".$this->EOL;
+			if(\is_array($aSubMerge)) { $sReturn .= $sSubTarget.' = "'.$aSubMerge[0].'";'.$this->EOL; }
 
 			if($aSubMerge) {
 				foreach($aFiles[$aSubMerge[0]] as $aTpl) {
 					$sNowDoc = self::call()->unique(6);
 					$sTemplatePath = self::call()->unique(6);
-					$sTemplatePath = (substr($aTpl[0],-1)!=NGL_DIR_SLASH && strtolower(substr($aTpl[0],-5))!=".html") ? $aTpl[0].".html" : $aTpl[0];
+					$sTemplatePath = (\substr($aTpl[0],-1)!=NGL_DIR_SLASH && \strtolower(\substr($aTpl[0],-5))!=".html") ? $aTpl[0].".html" : $aTpl[0];
 					if(!isset($this->RIND_TEMPLATESLOG[$aTpl[0]])) {
 						if($nSourceDir) { $sTemplatePath = $sFilePath.NGL_DIR_SLASH.$sTemplatePath; }
 						$sSubTemplateContent = $this->readTemplate($sGUIPath.$sTemplatePath);
@@ -3315,7 +3312,7 @@ namespace nogal {
 				if($mKey===$aSubMerge[0]) { continue; }
 				$sNowDoc = self::call()->unique(6);
 				$sTemplatePath = self::call()->unique(6);
-				$sTemplatePath = (substr($aTpl[0],-1)!=NGL_DIR_SLASH && strtolower(substr($aTpl[0],-5))!=".html") ? $aTpl[0].".html" : $aTpl[0];
+				$sTemplatePath = (\substr($aTpl[0],-1)!=NGL_DIR_SLASH && \strtolower(\substr($aTpl[0],-5))!=".html") ? $aTpl[0].".html" : $aTpl[0];
 				if(!isset($this->RIND_TEMPLATESLOG[$aTpl[0]])) {
 					if($nSourceDir) { $sTemplatePath = $sFilePath.NGL_DIR_SLASH.$sTemplatePath; }
 					$sSubTemplateContent = $this->readTemplate($sGUIPath.$sTemplatePath);
@@ -3329,26 +3326,26 @@ namespace nogal {
 
 			// -- multiple target INI
 			if($aSubMerge) {
-				$sReturn .= 	$sSubTargetContent.' = array();'.$this->EOL;
+				$sReturn .= 	$sSubTargetContent.' = [];'.$this->EOL;
 				$sReturn .= 	'foreach('.$aStructure.'['.$sSubTarget.'] as '.$aTemplate.') {'.$this->EOL;
-				$sReturn .= 		$sSubTargetContent."[] = Rind::mergetemplate(".$aTemplate.", \"".base64_encode(json_encode($this->aMergeTail))."\", array(".$this->RIND_TEMPLATES."));".$this->EOL;
+				$sReturn .= 		$sSubTargetContent."[] = Rind::mergetemplate(".$aTemplate.", \"".\base64_encode(\json_encode($this->aMergeTail))."\", [".$this->RIND_TEMPLATES."]);".$this->EOL;
 				$sReturn .= 	'}'.$this->EOL;
 				$sReturn .= 	'unset('.$aStructure.'['.$sSubTarget.']);'.$this->EOL;
-				$sReturn .= 	$aStructure.'[0][1]['.$sSubTarget.'] = base64_encode(implode(chr(10), '.$sSubTargetContent.'));'.$this->EOL;
+				$sReturn .= 	$aStructure.'[0][1]['.$sSubTarget.'] = \base64_encode(\implode(\chr(10), '.$sSubTargetContent.'));'.$this->EOL;
 			}
 			// -- multiple target END
 
 			$sReturn .= 'foreach('.$aStructure.' as '.$aTemplate.') {'.$this->EOL;
-			$sReturn .= 	$sTemplate."[] = Rind::mergetemplate(".$aTemplate.", \"".base64_encode(json_encode($this->aMergeTail))."\", array(".$this->RIND_TEMPLATES."));".$this->EOL;
+			$sReturn .= 	$sTemplate."[] = Rind::mergetemplate(".$aTemplate.", \"".\base64_encode(\json_encode($this->aMergeTail))."\", [".$this->RIND_TEMPLATES."]);".$this->EOL;
 			$sReturn .= "}";
-			$sReturn .= $sTemplate.' = implode(chr(10), '.$sTemplate.');'.$this->EOL;
-			$sReturn .= $sTemplate." = preg_replace('/\{\%mergeid\%\}/is', Rind::unique(8), ".$sTemplate.");".$this->EOL;
-			$sReturn .= $sTemplate." = preg_replace('/\{\%[a-z0-9\_\-]+\%\}/is', '', ".$sTemplate.");".$this->EOL;
+			$sReturn .= $sTemplate.' = \implode(chr(10), '.$sTemplate.');'.$this->EOL;
+			$sReturn .= $sTemplate." = \preg_replace('/\{\%mergeid\%\}/is', Rind::unique(8), ".$sTemplate.");".$this->EOL;
+			$sReturn .= $sTemplate." = \preg_replace('/\{\%[a-z0-9\_\-]+\%\}/is', '', ".$sTemplate.");".$this->EOL;
 
 			$sReturn .= "eval('?>'.".$sTemplate.");".$this->EOL;
 			$sReturn .= ']PHP]>';
 
-			array_pop($this->aMergeTail);
+			\array_pop($this->aMergeTail);
 			return $sReturn;
 		}
 
@@ -3361,7 +3358,7 @@ namespace nogal {
 		} **/
 		private function rindRtn($vArguments) {
 			$sReturn = $vArguments["content"];
-			$sReturn = str_replace(array('".<[VAR[', ']VAR]>."'), array('"".<[VAR[', ']VAR]>.""'), $sReturn);
+			$sReturn = \str_replace(array('".<[VAR[', ']VAR]>."'), array('"".<[VAR[', ']VAR]>.""'), $sReturn);
 			$sReturn = '<[FUN['.$sReturn.']FUN]>';
 			// die($sReturn);
 			return $sReturn;
@@ -3378,28 +3375,28 @@ namespace nogal {
 			if(!isset($vArguments["name"])) { return false; }
 
 			// nombre (las mayusculas estan reservadas para las variables SET privadas)
-			$sVarName = preg_replace("/[^a-z0-9_\{\}\%]/i", "", $vArguments["name"]);
-			$sVarName = strtolower($sVarName);
+			$sVarName = \preg_replace("/[^a-z0-9_\{\}\%]/i", "", $vArguments["name"]);
+			$sVarName = \strtolower($sVarName);
 			if($sBaseName) { $sVarName = $sBaseName.".".$sVarName; }
 			
 			// valor
 			$sDataVar = $this->dynVar();
 			$mValue = (isset($vArguments["value"])) ? $vArguments["value"] : 'NGL_NULL';
-			$mValue = str_replace($this->RIND_HTML_QUOTE, '"', $mValue);
-			$mValue = trim($mValue);
-			$mValue = trim($mValue, "\x22");
+			$mValue = \str_replace($this->RIND_HTML_QUOTE, '"', $mValue);
+			$mValue = \trim($mValue);
+			$mValue = \trim($mValue, "\x22");
 
 			// metodo
 			if(isset($vArguments["method"])) {
-				if(strpos($vArguments["method"], ",")!==false) {
+				if(\strpos($vArguments["method"], ",")!==false) {
 					$aMethods = self::call()->explodeTrim(",", $vArguments["method"]);
 					$sMethod = $aMethods[0];
 				} else {
 					$sMethod = $vArguments["method"];
-					$aMethods = array($sMethod);
+					$aMethods = [$sMethod];
 				}
 
-				if(preg_match("/^\x12json>(.*)\x12\x11json>$/is", $mValue)) {
+				if(\preg_match("/^\x12json>(.*)\x12\x11json>$/is", $mValue)) {
 					$sReturn = $sDataVar.' = '.$mValue.';';
 				} else {
 					$sReturn = $sDataVar.' = "'.$mValue.'";'.$this->EOL;
@@ -3410,7 +3407,7 @@ namespace nogal {
 				// metodos
 				$vArguments["value"] = $mValue;
 				$sReturn .= $this->rindSetMethods($aMethods, $sDataVar, $vArguments, $sVarName);
-			} else if(preg_match("/^\x12json>(.*)\x12\x11json>$/is", $mValue)) {
+			} else if(\preg_match("/^\x12json>(.*)\x12\x11json>$/is", $mValue)) {
 				$sReturn = $sDataVar.' = '.$mValue.';';
 			} else {
 				$sReturn = $sDataVar.' = "'.$mValue.'";'.$this->EOL;
@@ -3418,7 +3415,7 @@ namespace nogal {
 
 			// operador
 			$sOperator = (!isset($vArguments["operator"])) ? "=" : $vArguments["operator"][0]."=";
-			if(!in_array($sOperator, array("=", ".=", "+=", "-=", "*=", "/=", "%="))) { $sOperator = "="; }
+			if(!\in_array($sOperator, ["=", ".=", "+=", "-=", "*=", "/=", "%="])) { $sOperator = "="; }
 			
 			$sReturn = "<[PHP[\n".$sReturn."\n".'Rind::this('.$this->RIND_ME.')->SET['.$this->RIND_QUOTE.$sVarName.$this->RIND_QUOTE.'] '.$sOperator.' '.$sDataVar.";]PHP]>\n";
 
@@ -3429,7 +3426,7 @@ namespace nogal {
 			$sReturn = "";
 			$sEachVar = $this->dynVar();
 			foreach($aMethods as $mMethod) {
-				if(strtolower($mMethod)=="each") {
+				if(\strtolower($mMethod)=="each") {
 					$sEachKey = $this->dynVar();
 					$sReturn .= '
 						'.$sEachVar.' = '.$sDataVar.";\n".'
@@ -3437,15 +3434,15 @@ namespace nogal {
 					';
 					continue;
 				}
-				if(is_numeric($mMethod) || strpos($mMethod,":") || strpos($mMethod,"|") || $mMethod[0]=="[") {
+				if(\is_numeric($mMethod) || \strpos($mMethod,":") || \strpos($mMethod,"|") || $mMethod[0]=="[") {
 					$nPosition = $this->dynVar();
-					if(strpos($mMethod,":")) {
-						$aMethod = explode(":", $mMethod);
+					if(\strpos($mMethod,":")) {
+						$aMethod = \explode(":", $mMethod);
 						$nIndex = (int)$aMethod[0];
 						$nLength = (int)$aMethod[1];
 					} else if($mMethod[0]=="[") {
-						$sIndex = substr($mMethod, 1, -1);
-					} else if(strpos($mMethod,"|")) {
+						$sIndex = \substr($mMethod, 1, -1);
+					} else if(\strpos($mMethod,"|")) {
 						$aPipes = $this->dynVar();
 					} else {
 						$nIndex = (int)$mMethod;
@@ -3454,41 +3451,41 @@ namespace nogal {
 					
 					if(isset($aPipes)) {
 						$sReturn .= '
-							'.$aPipes.' = explode("|", "'.$mMethod.'");
-							if(end('.$aPipes.')==="") { array_pop('.$aPipes.'); } reset('.$aPipes.'); 
-							'.$aPipes.' = array_map(function ($p) { return (is_numeric($p)) ? ($p-1) : $p; }, '.$aPipes.');
-							if(is_string('.$sDataVar.')) { '.$sDataVar.' = str_split('.$sDataVar.'); }
-							'.$sDataVar.' = array_map(function ($a) use ('.$sDataVar.') { return (array_key_exists($a, '.$sDataVar.')) ? '.$sDataVar.'[$a] : ""; }, '.$aPipes.');
+							'.$aPipes.' = \explode("|", "'.$mMethod.'");
+							if(\end('.$aPipes.')==="") { \array_pop('.$aPipes.'); } \reset('.$aPipes.'); 
+							'.$aPipes.' = \array_map(function ($p) { return (\is_numeric($p)) ? ($p-1) : $p; }, '.$aPipes.');
+							if(\is_string('.$sDataVar.')) { '.$sDataVar.' = \str_split('.$sDataVar.'); }
+							'.$sDataVar.' = \array_map(function ($a) use ('.$sDataVar.') { return (\array_key_exists($a, '.$sDataVar.')) ? '.$sDataVar.'[$a] : ""; }, '.$aPipes.');
 						';
 					} else if(isset($sIndex)) {
 						$sReturn .= $sDataVar.' = isset('.$sDataVar.'["'.$sIndex.'"]) ? '.$sDataVar.'["'.$sIndex.'"] : null;';
 					} else {
 						$sReturn .= '
 							'.$nPosition.' = ('.$nIndex.'<0) ? '.$nIndex.' : ('.$nIndex.'-1);
-							if(is_array('.$sDataVar.')) {
-								'.$sDataVar.' = array_slice('.$sDataVar.', ('.$nPosition.'), '.$nLength.');
-								if('.$nLength.'===1 && !isset('.$sEachVar.')) { '.$sDataVar.' = current('.$sDataVar.'); }
-							} else if(is_string('.$sDataVar.')) {
-								'.$sDataVar.' = substr('.$sDataVar.', ('.$nPosition.'), '.$nLength.');
+							if(\is_array('.$sDataVar.')) {
+								'.$sDataVar.' = \array_slice('.$sDataVar.', ('.$nPosition.'), '.$nLength.');
+								if('.$nLength.'===1 && !isset('.$sEachVar.')) { '.$sDataVar.' = \current('.$sDataVar.'); }
+							} else if(\is_string('.$sDataVar.')) {
+								'.$sDataVar.' = \substr('.$sDataVar.', ('.$nPosition.'), '.$nLength.');
 							}
 						';
 					}
 				} else {
-					switch(strtolower($mMethod)) {
+					switch(\strtolower($mMethod)) {
 						case "file":
 								$sAuthorization = $this->dynVar();
 								$sBodyContent = $this->dynVar();
 								$sFilePath = self::call()->clearPath($vArguments["value"]);
 								$sAuth = (isset($vArguments["userpwd"])) ? $vArguments["userpwd"] : "0";
 								$sBody = (isset($vArguments["body"])) ? $vArguments["body"] : "0";
-								$sReturn .= $sAuthorization.' = base64_encode("'.$sAuth.'");'.$this->EOL;
+								$sReturn .= $sAuthorization.' = \base64_encode("'.$sAuth.'");'.$this->EOL;
 								$sReturn .= $sBodyContent.' = '.$sBody.';'.$this->EOL;
 								$sReturn .= $sDataVar.' = Rind::readFile("'.$sFilePath.'", null, '.$sAuthorization.', '.$sBodyContent.'); ';
 							break;
 
 						case "element":
 							$sReturn .= '
-								if(method_exists('.$sDataVar.', '.$this->RIND_QUOTE.'get'.$this->RIND_QUOTE.')) {
+								if(\method_exists('.$sDataVar.', '.$this->RIND_QUOTE.'get'.$this->RIND_QUOTE.')) {
 									'.$sDataVar.' = '.$sDataVar.'->get();
 								}
 							';
@@ -3496,7 +3493,7 @@ namespace nogal {
 
 						case "elements":
 							$sReturn .= '
-								if(method_exists('.$sDataVar.', '.$this->RIND_QUOTE.'getall'.$this->RIND_QUOTE.')) {
+								if(\method_exists('.$sDataVar.', '.$this->RIND_QUOTE.'getall'.$this->RIND_QUOTE.')) {
 									'.$sDataVar.' = '.$sDataVar.'->getall();
 								}
 							';
@@ -3506,62 +3503,62 @@ namespace nogal {
 							$sBreaker = isset($vArguments["splitter"]) ? $this->RIND_QUOTE.$vArguments["splitter"].$this->RIND_QUOTE : $this->RIND_QUOTE.",".$this->RIND_QUOTE;
 							$sLineBreak = isset($vArguments["linebreak"]) ? $this->RIND_QUOTE.$vArguments["linebreak"].$this->RIND_QUOTE : "\\r\\n";
 							$sReturn .= $sDataVar.' = Rind::stringToArray('.$sDataVar.', '.$sBreaker.', "'.$sLineBreak.'");';
-							if(!isset($vArguments["linebreak"])) { $sReturn .= $sDataVar.' = current('.$sDataVar.');'; }
+							if(!isset($vArguments["linebreak"])) { $sReturn .= $sDataVar.' = \current('.$sDataVar.');'; }
 							break;
 
 						case "implode":
 							$sGlue = isset($vArguments["splitter"]) ? $this->RIND_QUOTE.$vArguments["splitter"].$this->RIND_QUOTE : $this->RIND_QUOTE.",".$this->RIND_QUOTE;
-							$sReturn .= $sDataVar.' = Rind::this('.$this->RIND_ME.')->SET['.$this->RIND_QUOTE.$sVarName.$this->RIND_QUOTE.'] = (is_array('.$sDataVar.')) ? implode('.$sGlue.', '.$sDataVar.') : '.$sDataVar.';';
+							$sReturn .= $sDataVar.' = Rind::this('.$this->RIND_ME.')->SET['.$this->RIND_QUOTE.$sVarName.$this->RIND_QUOTE.'] = (\is_array('.$sDataVar.')) ? \implode('.$sGlue.', '.$sDataVar.') : '.$sDataVar.';';
 							break;
 
 						case "base64enc":
-							$sReturn .= $sDataVar.' = base64_encode('.$sDataVar.');';
+							$sReturn .= $sDataVar.' = \base64_encode('.$sDataVar.');';
 							break;
 
 						case "base64dec":
-							$sReturn .= $sDataVar.' = base64_decode('.$sDataVar.');';
+							$sReturn .= $sDataVar.' = \base64_decode('.$sDataVar.');';
 							break;
 
 						case "serialenc":
-							$sReturn .= $sDataVar.' = serialize('.$sDataVar.');';
+							$sReturn .= $sDataVar.' = \serialize('.$sDataVar.');';
 							break;
 
 						case "serialdec":
-							$sReturn .= $sDataVar.' = unserialize('.$sDataVar.');';
+							$sReturn .= $sDataVar.' = \unserialize('.$sDataVar.');';
 							break;
 
 						case "rawurlenc":
-							$sReturn .= $sDataVar.' = rawurlencode('.$sDataVar.');';
+							$sReturn .= $sDataVar.' = \rawurlencode('.$sDataVar.');';
 							break;
 
 						case "rawurldec":
-							$sReturn .= $sDataVar.' = rawurldecode('.$sDataVar.');';
+							$sReturn .= $sDataVar.' = \rawurldecode('.$sDataVar.');';
 							break;
 
 						case "urlenc":
-							$sReturn .= $sDataVar.' = urlencode('.$sDataVar.');';
+							$sReturn .= $sDataVar.' = \urlencode('.$sDataVar.');';
 							break;
 
 						case "urldec":
-							$sReturn .= $sDataVar.' = urldecode('.$sDataVar.');';
+							$sReturn .= $sDataVar.' = \urldecode('.$sDataVar.');';
 							break;
 
 						case "queryenc":
-							$sReturn .= $sDataVar.' = http_build_query('.$sDataVar.');';
+							$sReturn .= $sDataVar.' = \http_build_query('.$sDataVar.');';
 							break;
 
 						case "querydec":
 							$aParsed = $this->dynVar();
-							$sReturn .= 'parse_str('.$sDataVar.', '.$aParsed.');';
+							$sReturn .= '\parse_str('.$sDataVar.', '.$aParsed.');';
 							$sReturn .= $sDataVar.' = '.$aParsed.';';
 							break;
 
 						case "jsonenc":
-							$sReturn .= $sDataVar.' = json_encode('.$sDataVar.', JSON_HEX_TAG | JSON_NUMERIC_CHECK | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE);';
+							$sReturn .= $sDataVar.' = \json_encode('.$sDataVar.', \JSON_HEX_TAG | \JSON_NUMERIC_CHECK | \JSON_HEX_APOS | \JSON_HEX_QUOT | \JSON_HEX_AMP | \JSON_UNESCAPED_UNICODE);';
 							break;
 
 						case "jsondec":
-							$sReturn .= $sDataVar.' = json_decode('.$sDataVar.', true);';
+							$sReturn .= $sDataVar.' = \json_decode('.$sDataVar.', true);';
 							break;
 
 						case "xml":
@@ -3571,12 +3568,12 @@ namespace nogal {
 						case "group":
 							$sStructure = $this->dynVar();
 							$sJson = (isset($vArguments["structure"])) ? $vArguments["structure"]: "null";
-							$sReturn .= $sStructure.' = (!is_array('.$sJson.')) ? json_decode('.$sJson.', true) : '.$sJson.';';
+							$sReturn .= $sStructure.' = (!\is_array('.$sJson.')) ? \json_decode('.$sJson.', true) : '.$sJson.';';
 							$sReturn .= $sDataVar.' = Rind::arrayGroup('.$sDataVar.', '.$sStructure.');';
 							break;
 
 						case "keys":
-							$sReturn .= $sDataVar.' = array_keys('.$sDataVar.');';
+							$sReturn .= $sDataVar.' = \array_keys('.$sDataVar.');';
 							break;
 
 						case "vector":
@@ -3590,8 +3587,8 @@ namespace nogal {
 							break;
 						
 						case "number":
-							$sReturn .= $sDataVar.' = preg_replace("/[^0-9\-\\'.NGL_NUMBER_SEPARATOR_DECIMAL.']/", "", '.$sDataVar.');';
-							$sReturn .= 'if(!is_numeric('.$sDataVar.')) { '.$sDataVar.' = 0; }';
+							$sReturn .= $sDataVar.' = \preg_replace("/[^0-9\-\\'.NGL_NUMBER_SEPARATOR_DECIMAL.']/", "", '.$sDataVar.');';
+							$sReturn .= 'if(!\is_numeric('.$sDataVar.')) { '.$sDataVar.' = 0; }';
 						
 						case "chkeys":
 							if(isset($vArguments["keys"])) {
@@ -3599,24 +3596,24 @@ namespace nogal {
 								$sKey		= $this->dynVar();
 								$aValue		= $this->dynVar();
 								$sReturn .= '
-								'.$sKeys.' = explode(",", (string)("'.$vArguments["keys"].'"));
-								array_walk('.$sKeys.', function (&'.$sKey.') { '.$sKey.' = trim('.$sKey.', " \t\n\r\0\x0B"); });
-								if(is_array('.$sDataVar.')) {
-									if(is_array(current('.$sDataVar.'))) {
-										if(count('.$sKeys.')==count(current('.$sDataVar.'))) { 
+								'.$sKeys.' = \explode(",", (string)("'.$vArguments["keys"].'"));
+								\array_walk('.$sKeys.', function (&'.$sKey.') { '.$sKey.' = \trim('.$sKey.', " \t\n\r\0\x0B"); });
+								if(\is_array('.$sDataVar.')) {
+									if(\is_array(\current('.$sDataVar.'))) {
+										if(\count('.$sKeys.')==\count(\current('.$sDataVar.'))) { 
 											foreach('.$sDataVar.' as '.$sKey.' => '.$aValue.') {
-												'.$sDataVar.'['.$sKey.'] = array_combine('.$sKeys.', '.$aValue.');
+												'.$sDataVar.'['.$sKey.'] = \array_combine('.$sKeys.', '.$aValue.');
 											}
 										}
 									} else {
-										if(count('.$sKeys.')==count(current('.$sDataVar.'))) { 
-											'.$sDataVar.' = array_combine('.$sKeys.', '.$sDataVar.');
+										if(\count('.$sKeys.')==\count(\current('.$sDataVar.'))) { 
+											'.$sDataVar.' = \array_combine('.$sKeys.', '.$sDataVar.');
 										} else {
-											'.$sDataVar.' = array();
+											'.$sDataVar.' = [];
 										}
 									}
 								} else {
-									'.$sDataVar.' = array();
+									'.$sDataVar.' = [];
 								}
 								';
 							}
@@ -3630,7 +3627,7 @@ namespace nogal {
 						case "filter":
 							if(isset($vArguments["filter"])) {
 								$sFilter = $this->dynVar();
-								$sIfCase = trim($vArguments["filter"], " \t\n\r\0\x0B");
+								$sIfCase = \trim($vArguments["filter"], " \t\n\r\0\x0B");
 								$sReturn .= $sFilter." = '".$sIfCase."';"; 
 								$sReturn .= $sDataVar.' = Rind::arrayFilter('.$sDataVar.', '.$sFilter.');';
 							}
@@ -3640,7 +3637,7 @@ namespace nogal {
 							if(isset($vArguments["relation"])) {
 								$sKeys 	= $this->dynVar();
 								$sReturn .= '
-									'.$sKeys.' = explode(",", (string)("'.$vArguments["relation"].'"));
+									'.$sKeys.' = \explode(",", (string)("'.$vArguments["relation"].'"));
 									'.$sDataVar.' = Rind::listToTree('.$sDataVar.', '.$sKeys.'[1], '.$sKeys.'[0], "nested");
 								';
 							}
@@ -3664,8 +3661,8 @@ namespace nogal {
 		} **/
 		private function rindSplit($vArguments) {
 			$sReturn = $vArguments["content"];
-			$sReturn = str_replace(array('".<[VAR[', ']VAR]>."'), array('<[VAR[', ']VAR]>'), $sReturn);
-			$sReturn = str_replace(array('<[VAR[', ']VAR]>'), array('<[HDV[{', '}]HDV]>'), $sReturn);
+			$sReturn = \str_replace(['".<[VAR[', ']VAR]>."'], ['<[VAR[', ']VAR]>'], $sReturn);
+			$sReturn = \str_replace(['<[VAR[', ']VAR]>'], ['<[HDV[{', '}]HDV]>'], $sReturn);
 			$sReturn = "<[FUN[Rind::split(".$this->RIND_QUOTE.$sReturn.$this->RIND_QUOTE.")]FUN]>";
 			return $sReturn;
 		}
@@ -3679,7 +3676,7 @@ namespace nogal {
 		} **/
 		private function rindJoin($vArguments) {
 			$sReturn = $vArguments["content"];
-			$sReturn = str_replace(array('".<[VAR[', ']VAR]>."'), array('<[VAR[', ']VAR]>'), $sReturn);
+			$sReturn = \str_replace(['".<[VAR[', ']VAR]>."'], ['<[VAR[', ']VAR]>'], $sReturn);
 			$sReturn = "<[FUN[Rind::join(".$sReturn.")]FUN]>";
 			return $sReturn;
 		}
@@ -3693,8 +3690,8 @@ namespace nogal {
 		} **/
 		private function rindHeredoc($vArguments) {
 			$sReturn = $vArguments["content"];
-			$sReturn = str_replace(array('".<[VAR[', ']VAR]>."'), array('<[VAR[', ']VAR]>'), $sReturn);
-			$sReturn = str_replace(array('<[VAR[', ']VAR]>'), array('<[HDV[{', '}]HDV]>'), $sReturn);
+			$sReturn = \str_replace(['".<[VAR[', ']VAR]>."'], ['<[VAR[', ']VAR]>'], $sReturn);
+			$sReturn = \str_replace(['<[VAR[', ']VAR]>'], ['<[HDV[{', '}]HDV]>'], $sReturn);
 			$sNowDoc = self::call()->unique(6);
 			$sReturn = "<[FUN[<<<'".$sNowDoc."'\n".$sReturn."\n".$sNowDoc."\n]FUN]>";
 			return $sReturn;
@@ -3736,7 +3733,7 @@ namespace nogal {
 			"return" : "string"
 		} **/
 		private function rindUnSet($vArguments) {
-			$sVarName = preg_replace("/[^a-z0-9_]/i", "", $vArguments["content"]);
+			$sVarName = \preg_replace("/[^a-z0-9_]/i", "", $vArguments["content"]);
 			$sReturn = '<[PHP[eval(\'unset(Rind::this('.$this->RIND_ME.')->SET['.$this->RIND_QUOTE.$sVarName.$this->RIND_QUOTE.']);\')]PHP]>';
 
 			return $sReturn;
@@ -3749,7 +3746,7 @@ namespace nogal {
 				return 'true';
 			} else if($sString=="true" || $sString=="1") {
 				return 'true';
-			} else if(strtoupper($sString)=="RAW") {
+			} else if(\strtoupper($sString)=="RAW") {
 				if(isset($vArguments["rawindex"])) {
 					if(!isset($vArguments["rawdata"])) {
 						return '<[FUN[Rind::alvin(null, "'.$vArguments["rawindex"].'")]FUN]>';
@@ -3760,9 +3757,9 @@ namespace nogal {
 					return "<[FUN[Rind::alvin()]FUN]>";
 				}
 			} else {
-				$sString = ltrim($sString, " \t\n\r\0\x0B");
-				preg_match("/\((.*?)\)(.*)/is", $sString, $aMatchs);
-				if(!count($aMatchs)) {
+				$sString = \ltrim($sString, " \t\n\r\0\x0B");
+				\preg_match("/\((.*?)\)(.*)/is", $sString, $aMatchs);
+				if(!\count($aMatchs)) {
 					// return 'Rind::alvin("'.$sString.'")';
 					return "Rind::alvin(<<<RINDALVIN\n".$sString."\nRINDALVIN\n, null, null, $this->RIND_ME)";
 				} else if($aMatchs[2]==="") {
@@ -3776,16 +3773,16 @@ namespace nogal {
 		}
 
 		public function viewcache() {
-			list($sCacheFile) = $this->getarguments("cache_file", func_get_args());
+			list($sCacheFile) = $this->getarguments("cache_file", \func_get_args());
 			if(empty($sCacheFile)) { return false; }
 			$this->SetPaths();
 			$sCachePath = ($sCacheFile===true) ? $this->attribute("cache_path") : $this->attribute("cache_path").NGL_DIR_SLASH.$sCacheFile;
 			$sCachePath = self::call()->clearPath($sCachePath, false, NGL_DIR_SLASH, true);
-			if(is_file($sCachePath)) {
-				$sCode = highlight_file($sCachePath, true);
-				$aCode = explode("<br />", $sCode);
+			if(\is_file($sCachePath)) {
+				$sCode = \highlight_file($sCachePath, true);
+				$aCode = \explode("<br />", $sCode);
 				$sNumLines = "";
-				for($x=1;$x<count($aCode)+1;$x++) {
+				for($x=1;$x<\count($aCode)+1;$x++) {
 					$sNumLines .= $x."<br />";
 				}
 				return "<table><tr><td class='rind-cache-numlines' style='text-align:right;padding:4px'>".$sNumLines."</td><td class='rind-cache-code' style='white-space:nowrap;padding:4px'>".$sCode."</td></tr></table>";
@@ -3800,7 +3797,7 @@ namespace {
 	class Rind {
 		
 		public static $Rinds;
-		public static $MergeTail = array();
+		public static $MergeTail = [];
 
 		public static function call($sObjectName) {
 			global $ngl;
@@ -3815,10 +3812,10 @@ namespace {
 			global $ngl;
 			if($ngl()->isarrayarray($mContent)) {
 				$mContent = $ngl()->imploder(";", $mContent);
-			} else if(is_object($mContent)) {
-				$mContent = implode(";", (array)$mContent);
-			} else if(is_array($mContent)) {
-				$mContent = implode(";", $mContent);
+			} else if(\is_object($mContent)) {
+				$mContent = \implode(";", (array)$mContent);
+			} else if(\is_array($mContent)) {
+				$mContent = \implode(";", $mContent);
 			}
 			return print($mContent);
 		}
@@ -3831,33 +3828,33 @@ namespace {
 		public static function json($sString, $sRindID) {
 			global $ngl;
 
-			if(!strlen($sString)) { return ""; }
-			preg_match_all("/\{\*[a-z0-9\-\_\.]+\}/is", $sString, $aMatchs);
+			if(!\strlen($sString)) { return ""; }
+			\preg_match_all("/\{\*[a-z0-9\-\_\.]+\}/is", $sString, $aMatchs);
 
 			$sJson = '{"RINDJSON" : '.$sString.'}';
 			$sRKOpen = $ngl()->unique();
 			$sRKClose = $ngl()->unique();
-			$sJson = str_replace(array("{:", ":}"), array($sRKOpen, $sRKClose), $sJson);
-			$sJson = preg_replace("/[\t\n\r]/","",$sJson);
-			$sJson = preg_replace('/([{,]+)(\s*)([^"]+?)\s*:/','$1"$3":', $sJson);
-			$sJson = preg_replace('/(,)\s*}$/','}',$sJson);
-			$sJson = str_replace(array($sRKOpen, $sRKClose), array("{:", ":}"), $sJson);
-			$aJson = json_decode($sJson, true);
-			if($aJson===null) { $aJson = array("RINDJSON" => $sString); }
+			$sJson = \str_replace(["{:", ":}"], [$sRKOpen, $sRKClose], $sJson);
+			$sJson = \preg_replace("/[\t\n\r]/","",$sJson);
+			$sJson = \preg_replace('/([{,]+)(\s*)([^"]+?)\s*:/','$1"$3":', $sJson);
+			$sJson = \preg_replace('/(,)\s*}$/','}',$sJson);
+			$sJson = \str_replace([$sRKOpen, $sRKClose], ["{:", ":}"], $sJson);
+			$aJson = \json_decode($sJson, true);
+			if($aJson===null) { $aJson = ["RINDJSON" => $sString]; }
 
-			if(count($aMatchs[0])) {
+			if(\is_array($aMatchs[0]) && \count($aMatchs[0])) {
 				$SET = self::this($sRindID)->getSET();
-				$aReplaces = array();
+				$aReplaces = [];
 				foreach($aMatchs[0] as $sMatch) {
-					$sVar = substr($sMatch, 2, -1);
-					$sEval = 'return $SET["'.str_replace('.', '"]["', $sVar).'"];';
+					$sVar = \substr($sMatch, 2, -1);
+					$sEval = 'return $SET["'.\str_replace('.', '"]["', $sVar).'"];';
 					$aReplaces[$sMatch] = eval($ngl()->EvalCode($sEval));
 				}
-				$aSearch = array_keys($aReplaces);
+				$aSearch = \array_keys($aReplaces);
 				
-				array_walk_recursive($aJson,
+				\array_walk_recursive($aJson,
 					function(&$mValue, $mKey) use ($aSearch, $aReplaces) {
-						$mValue = str_replace($aSearch, $aReplaces, $mValue);
+						$mValue = \str_replace($aSearch, $aReplaces, $mValue);
 					}
 				);
 			}
@@ -3882,28 +3879,28 @@ namespace {
 		public static function nut($mNut, $sMethod=null, $aArguments=null) {
 			global $ngl;
 			$sNutID = (isset($aArguments["nutid"]) && !empty($aArguments["nutid"])) ? $aArguments["nutid"] : $ngl()->unique();
-			$nut = (is_string($mNut)) ? $ngl("nut.".$mNut, $sNutID) : $mNut;
+			$nut = (\is_string($mNut)) ? $ngl("nut.".$mNut, $sNutID) : $mNut;
 			return ($sMethod==null) ? $nut : $nut->run($sMethod, $aArguments);
 		}
 		
 		public static function readFile($sFileName, $nLength=null, $sAuth=0, $mBody="") {
 			global $ngl;
-			$aOptions = array("CURLOPT_SSL_VERIFYPEER" => false);
+			$aOptions = ["CURLOPT_SSL_VERIFYPEER" => false];
 			if($sAuth!==0) {
-				$sAuth = base64_decode($sAuth);
-				$aAuth = explode(" ", $sAuth, 2);
-				$sAuthMethod = strtolower($aAuth[0]);
+				$sAuth = \base64_decode($sAuth);
+				$aAuth = \explode(" ", $sAuth, 2);
+				$sAuthMethod = \strtolower($aAuth[0]);
 				if($sAuthMethod=="basic") {
-					$aOptions["CURLOPT_HTTPHEADER"] = array("Authorization: basic ".$aAuth[1]);
+					$aOptions["CURLOPT_HTTPHEADER"] = ["Authorization: basic ".$aAuth[1]];
 				} else if($sAuthMethod=="bearer" || $sAuthMethod=="alvin") {
-					$aOptions["CURLOPT_HTTPHEADER"] = array("Authorization: ".$sAuth);
+					$aOptions["CURLOPT_HTTPHEADER"] = ["Authorization: ".$sAuth];
 				} else {
 					$aOptions["CURLOPT_USERPWD"] = $sAuth;
 				}
 			}
 
 			if($mBody!=="") {
-				if(is_array($mBody)) { $mBody = json_encode($mBody); }
+				if(\is_array($mBody)) { $mBody = \json_encode($mBody); }
 				$aOptions["CURLOPT_POSTFIELDS"] = $mBody;
 				$aOptions["CURLOPT_POST"] = true;
 			}
@@ -3913,7 +3910,7 @@ namespace {
 
 		public static function stringToArray($sString, $sSplitter=",", $sEOL='\\r\\n', $sEnclosure='"') {
 			global $ngl;
-			$aElements = $ngl("shift")->csvToArray($sString, array("splitter"=>$sSplitter, "enclosed"=>$sEnclosure, "eol"=>$sEOL));
+			$aElements = $ngl("shift")->csvToArray($sString, ["splitter"=>$sSplitter, "enclosed"=>$sEnclosure, "eol"=>$sEOL]);
 			return $aElements;
 		}
 
@@ -3923,23 +3920,23 @@ namespace {
 		}
 
 		public static function varLength($mVar) {
-			if(is_array($mVar) || is_object($mVar)) {
-				return count($mVar);
-			} else if(is_string($mVar)) {
-				return strlen($mVar);
-			} else if(is_numeric($mVar)) {
+			if(\is_array($mVar) || \is_object($mVar)) {
+				return \count($mVar);
+			} else if(\is_string($mVar)) {
+				return \strlen($mVar);
+			} else if(\is_numeric($mVar)) {
 				return $mVar;
-			} else if(is_bool($mVar)) {
+			} else if(\is_bool($mVar)) {
 				return ($mVar) ? 1 : 0;
 			}
 		}
 
 		public static function arrayFilter($aData, $sFilter) {
 			global $ngl;
-			return array_filter($aData, function($v, $k) use ($sFilter, $ngl) {
-				$sFilter = "return (".str_replace(array('GLOBALS["v"]', 'GLOBALS["k"]'), array("v", "k"), $sFilter).");";
+			return \array_filter($aData, function($v, $k) use ($sFilter, $ngl) {
+				$sFilter = "return (".\str_replace(['GLOBALS["v"]', 'GLOBALS["k"]'], ["v", "k"], $sFilter).");";
 				return eval($ngl()->EvalCode($sFilter));
-			}, ARRAY_FILTER_USE_BOTH);
+			}, \ARRAY_FILTER_USE_BOTH);
 		}
 
 		public static function listToTree($aData, $sParent, $sId, $sNest) {
@@ -3954,19 +3951,19 @@ namespace {
 
 		public static function arrayGroup($aData, $aStructure=null) {
 			global $ngl;
-			if(!is_array($aData)) { return array(); }
+			if(!\is_array($aData)) { return []; }
 			return $ngl()->arrayGroup($aData, $aStructure);
 		}
 
 		public static function arrayColumn($aData, $mColumnKey, $mIndexKey) {
 			global $ngl;
-			if(!is_array($aData)) { return array(); }
+			if(!\is_array($aData)) { return []; }
 			if($mColumnKey===null) {
-				if(count($aData)) {
-					$aKeys = array_keys(current($aData));
+				if(\is_array($aData) && \count($aData)) {
+					$aKeys = \array_keys(\current($aData));
 					$mColumnKey = $aKeys[0];
 				} else {
-					return array();
+					return [];
 				}
 			}
 			return $ngl()->arrayColumn($aData, $mColumnKey, $mIndexKey);
@@ -3979,14 +3976,14 @@ namespace {
 			if($sRindID!==null) {
 				$rind = self::this($sRindID);
 				$SET = $rind->getSET();
-				$sGrants = preg_replace_callback(
+				$sGrants = \preg_replace_callback(
 					"/<\?php echo Rind::this\(\"[0-9a-z]+\"\)->SET(.*?);\?>/is",
 					function($aMatch) use ($ngl, $SET) {
-						ob_start();
+						\ob_start();
 						$sToEval = '<?php echo $SET'.$aMatch[1].";?>";
 						eval($ngl()->EvalCode("?>".$sToEval));
-						$sEvaluated = ob_get_clean();
-						return (substr($sEvaluated, 0, 15)!="[ NOGAL ERROR @") ? $sEvaluated : false;
+						$sEvaluated = \ob_get_clean();
+						return (\substr($sEvaluated, 0, 15)!="[ NOGAL ERROR @") ? $sEvaluated : false;
 					},
 					$sGrants
 				);
@@ -3994,15 +3991,15 @@ namespace {
 				$mAlvinType = $rind->alvin_type;
 				if(!empty($sGrants)) {
 					if($mAlvinType=="none" || $sUsername=="admin") { return true; }
-					if(is_array($mAlvinType) && in_array($sUsername, $mAlvinType)) { return true; }
+					if(\is_array($mAlvinType) && \in_array($sUsername, $mAlvinType)) { return true; }
 				}
 			}
 
 			if($sGrants==="true") { return true; }
 
-			if(strlen($sGrants) && $sGrants[0]=="@") {
+			if(\strlen($sGrants) && $sGrants[0]=="@") {
 				if($sGrants==="@") { return true; }
-				$sGrants = substr($sGrants, 1);
+				$sGrants = \substr($sGrants, 1);
 			}
 
 			if(NGL_ALVIN!==null) {
@@ -4017,7 +4014,7 @@ namespace {
 					$mRaw = $ngl("alvin")->raw($sRawIndex);
 					if($aData!==null){
 						foreach($aData as $sKey => $sValue) {
-							$mRaw = str_replace("{:".$sKey.":}", $sValue, $mRaw);
+							$mRaw = \str_replace("{:".$sKey.":}", $sValue, $mRaw);
 						}
 					}
 					return $mRaw;
@@ -4032,66 +4029,66 @@ namespace {
 		}
 		
 		public static function split($sString) {
-			if(!is_string($sString)) { return "is not an string"; }
-			return explode(",", $sString);
+			if(!\is_string($sString)) { return "is not an string"; }
+			return \explode(",", $sString);
 		}
 
 		public static function join($aData) {
-			if(!is_array($aData)) { return ""; }
-			return implode(",", $aData);
+			if(!\is_array($aData)) { return ""; }
+			return \implode(",", $aData);
 		}
 
 		public static function ifempty($sCondition, $bReturn) {
 			global $ngl;
-			return (!strlen($sCondition)) ? $bReturn : eval($ngl()->EvalCode("?><?php return (".$sCondition.") ? true : false; ?>"));
+			return (!\strlen($sCondition)) ? $bReturn : eval($ngl()->EvalCode("?><?php return (".$sCondition.") ? true : false; ?>"));
 		}
 
 		public static function getset($sReference) {
 			global $ngl;
-			$aReference = explode("|", $sReference);
+			$aReference = \explode("|", $sReference);
 			$SET = self::this($aReference[1])->getSET();
-			$sIndex = base64_decode($aReference[0]);
-			$sEval = 'return $SET["'.str_replace('.', '"]["', $sIndex).'"];';
+			$sIndex = \base64_decode($aReference[0]);
+			$sEval = 'return $SET["'.\str_replace('.', '"]["', $sIndex).'"];';
 			return eval($ngl()->EvalCode($sEval));
 		}
 
 		public static function mergetemplate($aTemplate, $aParentData, $aSource) {
 			global $ngl;
 
-			if(is_array($aSource[0])) {
+			if(\is_array($aSource[0])) {
 				$sSubTemplate = $aSource[0][$aTemplate[0]];
 			} else {
-				$sFile = (substr($aTemplate[0],-1)!=NGL_DIR_SLASH && strtolower(substr($aTemplate[0],-5))!=".html") ? $aTemplate[0].".html" : $aTemplate[0];
+				$sFile = (\substr($aTemplate[0],-1)!=NGL_DIR_SLASH && \strtolower(\substr($aTemplate[0],-5))!=".html") ? $aTemplate[0].".html" : $aTemplate[0];
 				if($aSource[1]) { $sFile = $aSource[2].NGL_DIR_SLASH.$sFile; }
 				$sSubTemplate = self::this($aSource[0])->readTemplate($aSource[3].$sFile);
 				$sSubTemplate = self::this($aSource[0])->rind2php($sSubTemplate);
 			}
 
-			$aParentData = json_decode(base64_decode($aParentData),true);
-			if(isset($aTemplate[1]) && count($aTemplate[1])) {
-				if($aParentData[count($aParentData)-1]!=$aTemplate[1]) {
+			$aParentData = \json_decode(\base64_decode($aParentData),true);
+			if(isset($aTemplate[1]) && \count($aTemplate[1])) {
+				if($aParentData[\count($aParentData)-1]!=$aTemplate[1]) {
 					$aParentData[] = $aTemplate[1];
 				}
 			}
-			$aParentData = array_reverse($aParentData);
+			$aParentData = \array_reverse($aParentData);
 
 			$ngl()->errorForceReturn(true);
 			foreach($aParentData as $aTemplateKeys) {
 				foreach($aTemplateKeys as $sKey => $sValue) {
-					$sValue = base64_decode($sValue);
-					$sValue = stripslashes($sValue);
-					$sValue = preg_replace_callback(
+					$sValue = \base64_decode($sValue);
+					$sValue = \stripslashes($sValue);
+					$sValue = \preg_replace_callback(
 						"/<\?php echo (\\\$GLOBALS|Rind::getset\()(.*?);?>/is",
 						function($aMatch) use ($ngl) {
-							ob_start();
+							\ob_start();
 							eval($ngl()->EvalCode("?>".$aMatch[0]));
-							$sEvaluated = ob_get_clean();
-							return (substr($sEvaluated, 0, 15)!="[ NOGAL ERROR @") ? $sEvaluated : "";
+							$sEvaluated = \ob_get_clean();
+							return (\substr($sEvaluated, 0, 15)!="[ NOGAL ERROR @") ? $sEvaluated : "";
 						},
 						$sValue
 					);
-					$sSubTemplate = str_replace("{%".$sKey."%}",  $sValue,  $sSubTemplate);
-					$sSubTemplate = preg_replace('/\{\%mergeid\%\}/is', Rind::unique(8), $sSubTemplate);
+					$sSubTemplate = \str_replace("{%".$sKey."%}",  $sValue,  $sSubTemplate);
+					$sSubTemplate = \preg_replace('/\{\%mergeid\%\}/is', Rind::unique(8), $sSubTemplate);
 					
 					// echo "\r\n\n\n\n".$aTemplate[0]."\n";
 					// echo $sSubTemplate."\n\n\n\n\n\n";

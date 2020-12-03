@@ -8,9 +8,9 @@ class nglJSQL extends nglFeeder implements inglFeeder {
 	}
 
 	public function column($mField, $sAliasQuote="'", $sQuote="`", $sTableColumnGlue=".", $sAS="AS") {
-		$aField = (is_array($mField)) ? $mField : array($mField);
-		$aFieldName = explode($sTableColumnGlue, trim($aField[0]));
-		$sFieldName = $sQuote.implode($sQuote.$sTableColumnGlue.$sQuote, $aFieldName).$sQuote;
+		$aField = (\is_array($mField)) ? $mField : [$mField];
+		$aFieldName = \explode($sTableColumnGlue, \trim($aField[0]));
+		$sFieldName = $sQuote.\implode($sQuote.$sTableColumnGlue.$sQuote, $aFieldName).$sQuote;
 		if(isset($aField[1])) {
 			$sFieldName .= " ".$sAS." ".$sAliasQuote.$aField[1].$sAliasQuote." ";
 		}
@@ -18,9 +18,9 @@ class nglJSQL extends nglFeeder implements inglFeeder {
 	}
 
 	public function conditions($aSource, $bSetMode=false) {
-		$aWhere = array();
+		$aWhere = [];
 		foreach($aSource as $mSource) {
-			if(is_string($mSource)) {
+			if(\is_string($mSource)) {
 				if(!$bSetMode) {
 					$aWhere[] = $this->operator($mSource);
 					continue;
@@ -32,7 +32,7 @@ class nglJSQL extends nglFeeder implements inglFeeder {
 			}
 		}
 
-		return ($bSetMode) ? implode(", ", $aWhere) : implode(" ", $aWhere);
+		return ($bSetMode) ? \implode(", ", $aWhere) : \implode(" ", $aWhere);
 	}
 
 	public function operator($sString) {
@@ -41,7 +41,7 @@ class nglJSQL extends nglFeeder implements inglFeeder {
 
 	public function decode($sString) {
 		if(empty($sString)) { return null; }
-		$aJSON = json_decode($sString, true);
+		$aJSON = \json_decode($sString, true);
 		if($aJSON===null) {
 			self::errorMessage("jsql", 1001, $sString);
 			return false;
@@ -51,16 +51,16 @@ class nglJSQL extends nglFeeder implements inglFeeder {
 	}
 
 	public function encode($aArray) {
-		return json_encode($aArray);
+		return \json_encode($aArray);
 	}
 
 	public function value($sString, $bQuoted=true, $bIsSet=false) {
-		$sString = trim($sString);
-		if($sString[0]=="(") { $sString = substr($sString, 1, -1); }
+		$sString = \trim($sString);
+		if($sString[0]=="(") { $sString = \substr($sString, 1, -1); }
 		if($bIsSet) {
-			$sString = "'".str_replace(",", "','", $sString)."'";
+			$sString = "'".\str_replace(",", "','", $sString)."'";
 		} else {
-			$sString = str_replace("'", "\'", $sString);
+			$sString = \str_replace("'", "\'", $sString);
 		}
 		return ($sString==="NULL") ? "NULL" : ($bQuoted ? "'".$sString."'" : $sString);
 	}

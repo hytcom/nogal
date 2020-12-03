@@ -55,7 +55,7 @@ abstract class nglFeeder extends nglTrunk {
 		"return" : "array"
 	} **/
 	final public function __whoami__() {
-		$aMethods = array("__destroy__", "__me__", "__whoami__");
+		$aMethods = ["__destroy__", "__me__", "__whoami__"];
 		$reflection = new \ReflectionClass(__NAMESPACE__."\\".$this->class);
 		$aThisMethods = $reflection->getMethods(\ReflectionMethod::IS_PUBLIC);
 		foreach($aThisMethods as $method) {
@@ -63,7 +63,7 @@ abstract class nglFeeder extends nglTrunk {
 				$aMethods[] = $method->name;
 			}
 		}
-		sort($aMethods);
+		\sort($aMethods);
 		return $aMethods;
 	}
 }

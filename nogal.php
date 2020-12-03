@@ -5,13 +5,13 @@ namespace nogal;
 #===============================================================================
 # CHEQUEOS DE COMPATIBILIDAD
 #===============================================================================
-if(!defined("NGL_RUN_ANYWAY") || (defined("NGL_RUN_ANYWAY") && NGL_RUN_ANYWAY===false)) {
+if(!\defined("NGL_RUN_ANYWAY") || (\defined("NGL_RUN_ANYWAY") && NGL_RUN_ANYWAY===false)) {
 	// version
-	if(version_compare(PHP_VERSION, "5.6") < 0) {
+	if(\version_compare(PHP_VERSION, "5.6") < 0) {
 		if(PHP_SAPI!="cli") {
 			die("
 				<b>Nogal Fatal Error:</b> System require PHP <b>5.6</b> or higher.<br />
-				Current version is: ".phpversion()."<br />
+				Current version is: ".\phpversion()."<br />
 				<br />
 				<small>
 					You can use de <b>NGL_RUN_ANYWAY</b> constant for ignore this check<br />
@@ -29,8 +29,8 @@ if(!defined("NGL_RUN_ANYWAY") || (defined("NGL_RUN_ANYWAY") && NGL_RUN_ANYWAY===
 	}
 
 	// include path
-	$NGL_INCPATH = get_include_path();
-	if(set_include_path($NGL_INCPATH)===false) {
+	$NGL_INCPATH = \get_include_path();
+	if(\set_include_path($NGL_INCPATH)===false) {
 		die("<b>Nogal Fatal Error:</> System requires <b>set_include_path</b> enabled.");
 	}
 	unset($NGL_INCPATH);
@@ -39,16 +39,16 @@ if(!defined("NGL_RUN_ANYWAY") || (defined("NGL_RUN_ANYWAY") && NGL_RUN_ANYWAY===
 #===============================================================================
 # FUNCIONES GLOBALES
 #===============================================================================
-function call($sObjectName=null, $aArguments=array()) {
+function call($sObjectName=null, $aArguments=[]) {
 	return \nogal\nglRoot::call($sObjectName, $aArguments);
 }
 
 function dump() {
-	echo \nogal\nglRoot::call()->dump(...func_get_args());
+	echo \nogal\nglRoot::call()->dump(...\func_get_args());
 }
 
 function dumpc() {
-	echo \nogal\nglRoot::call()->dumpconsole(...func_get_args());
+	echo \nogal\nglRoot::call()->dumpconsole(...\func_get_args());
 }
 
 // retorna true cuando el objeto es un objeto nogal

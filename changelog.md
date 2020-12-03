@@ -1,3 +1,12 @@
+# 2.8.0 - 202012030000
+## general
+- se agregó la *\\* de global namespace a todas las funciones y constantes PHP
+- se modificó la estructura de **grafts**. Se instaló **composer** en esa carpeta y se eliminaron librerías obsoletas
+
+## excel
+- se reescribió el objeto, por migrar de **phpoffice/phpexcel** a **phpoffice/phpspreadsheet**
+
+________________________________________________________________________________
 # 2.7.6 - 202011171600
 ## pecker
 - organización del código

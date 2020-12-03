@@ -87,21 +87,21 @@ class nglTree extends nglBranch implements inglBranch {
 	private $aGrouped;
 
 	final protected function __declareArguments__() {
-		$vArguments							= array();
-		$vArguments["source"]				= array('$aValue');
-		$vArguments["id"]					= array('$mValue');
-		$vArguments["colparent"]			= array('$mValue', "parent");
-		$vArguments["colid"]				= array('$mValue', "id");
-		$vArguments["children"]				= array('$mValue', "_children");
-		$vArguments["column"]				= array('$mValue', "id");
-		$vArguments["nodedata"]				= array('$mValue');
-		$vArguments["separator"]			= array('$mValue', "/");
+		$vArguments							= [];
+		$vArguments["source"]				= ['$aValue'];
+		$vArguments["id"]					= ['$mValue'];
+		$vArguments["colparent"]			= ['$mValue', "parent"];
+		$vArguments["colid"]				= ['$mValue', "id"];
+		$vArguments["children"]				= ['$mValue', "_children"];
+		$vArguments["column"]				= ['$mValue', "id"];
+		$vArguments["nodedata"]				= ['$mValue'];
+		$vArguments["separator"]			= ['$mValue', "/"];
 
 		return $vArguments;
 	}
 
 	final protected function __declareAttributes__() {
-		$vAttributes 						= array();
+		$vAttributes 						= [];
 		$vAttributes["children"]			= null;
 		$vAttributes["flat"]				= null;
 		$vAttributes["id_column"]			= null;
@@ -117,7 +117,7 @@ class nglTree extends nglBranch implements inglBranch {
 	}
 
 	public function loadflat() {
-		list($aSource,$mParentColumn,$mIdColumn,$mChildren) = $this->getarguments("source,colparent,colid,children", func_get_args());
+		list($aSource,$mParentColumn,$mIdColumn,$mChildren) = $this->getarguments("source,colparent,colid,children", \func_get_args());
 		
 		$this->attribute("children", $mChildren);
 		$this->attribute("id_column", $mIdColumn);
@@ -130,9 +130,9 @@ class nglTree extends nglBranch implements inglBranch {
 	}
 
 	public function loadtree() {
-		list($aSource,$mParentColumn,$mIdColumn,$mChildren) = $this->getarguments("source,colparent,colid,children", func_get_args());
+		list($aSource,$mParentColumn,$mIdColumn,$mChildren) = $this->getarguments("source,colparent,colid,children", \func_get_args());
 
-		if(!count($aSource)) { $aSource = array(); }
+		if(is_array($aSource) && !\count($aSource)) { $aSource = []; }
 		$fBuilder = function($aTree) use (&$fBuilder, &$aFlat, $mChildren) {
 			foreach($aTree as $aBranch) {
 				$aChildren = null;
@@ -145,7 +145,7 @@ class nglTree extends nglBranch implements inglBranch {
 				if($aChildren!==null) { $fBuilder($aChildren); }
 			}
 		};
-		$aFlat = array();		
+		$aFlat = [];		
 		$fBuilder($aSource);
 
 		$this->attribute("children", $mChildren);
@@ -163,7 +163,7 @@ class nglTree extends nglBranch implements inglBranch {
 		$mIdColumn =  $this->attribute("id_column");
 		$mParentColumn =  $this->attribute("parent_column");
 		
-		$aFlat = $aGrouped = array();
+		$aFlat = $aGrouped = [];
 		foreach($aSource as $aSubArray) {
 			$aFlat[$aSubArray[$mIdColumn]] = $aSubArray;
 			$aGrouped[$aSubArray[$mParentColumn]][$aSubArray[$mIdColumn]] = $aSubArray;
@@ -179,7 +179,7 @@ class nglTree extends nglBranch implements inglBranch {
 
 		$aGrouped = $this->aGrouped;
 		$fBuilder = function($aSiblings) use (&$fBuilder, $aGrouped, $mIndex, $mChildren) {
-			if(count($aSiblings)) {
+			if(\is_array($aSiblings) && \count($aSiblings)) {
 				foreach($aSiblings as $mKey => $aSibling) {
 					$mCurrent = $aSibling[$mIndex];
 					if(isset($aGrouped[$mCurrent])) {
@@ -192,18 +192,18 @@ class nglTree extends nglBranch implements inglBranch {
 			return $aSiblings;
 		};
 
-		reset($aGrouped);
-		$aTree = (count($aGrouped)) ? $fBuilder(current($aGrouped)) : array();
+		\reset($aGrouped);
+		$aTree = (\count($aGrouped)) ? $fBuilder(\current($aGrouped)) : [];
 
 		$this->attribute("tree", $aTree);
 		return $aTree;
 	}
 	
 	private function NextId() {
-		$aIndex = array_keys($this->aFlat);
-		sort($aIndex, SORT_NATURAL);
-		$mLast = $aIndex[count($aIndex)-1];
-		return (is_numeric($mLast)) ? $mLast+1 : $mLast."0";
+		$aIndex = \array_keys($this->aFlat);
+		\sort($aIndex, SORT_NATURAL);
+		$mLast = $aIndex[\count($aIndex)-1];
+		return (\is_numeric($mLast)) ? $mLast+1 : $mLast."0";
 	}
 
 	public function tree() {
@@ -215,7 +215,7 @@ class nglTree extends nglBranch implements inglBranch {
 	}
 
 	public function parent() {
-		list($mId) = $this->getarguments("id", func_get_args());
+		list($mId) = $this->getarguments("id", \func_get_args());
 
 		if(isset($this->aFlat[$mId])) {
 			$mParent = $this->aFlat[$mId][$this->attribute("parent_column")];
@@ -226,20 +226,20 @@ class nglTree extends nglBranch implements inglBranch {
 	}
 	
 	public function trace() {
-		list($mId) = $this->getarguments("id", func_get_args());
+		list($mId) = $this->getarguments("id", \func_get_args());
 		
 		$mIndex =  $this->attribute("id_column");
-		$aTrace = array();
+		$aTrace = [];
 		while($aParent=$this->parent($mId)) {
 			$mId = $aParent[$mIndex];
 			$aTrace[] = $aParent;
 		}
 		
-		return array_reverse($aTrace);
+		return \array_reverse($aTrace);
 	}
 	
 	public function children() {
-		list($mId) = $this->getarguments("id", func_get_args());
+		list($mId) = $this->getarguments("id", \func_get_args());
 		
 		$aChildren = $this->attribute("tree");
 		if(!$mId) { return $aChildren; }
@@ -248,11 +248,11 @@ class nglTree extends nglBranch implements inglBranch {
 		$mChildren =  $this->attribute("children");
 
 		$aTrace = $this->trace($mId);
-		if(count($aTrace)) {
-			$aFirst = array_shift($aTrace);
+		if(\is_array($aTrace) && count($aTrace)) {
+			$aFirst = \array_shift($aTrace);
 			$aChildren = $aChildren[$aFirst[$mIndex]];
 
-			if(count($aTrace)) {
+			if(\is_array($aTrace) && \count($aTrace)) {
 				foreach($aTrace as $aItem) {
 					$aChildren = $aChildren[$mChildren][$aItem[$mIndex]];
 				}
@@ -266,7 +266,7 @@ class nglTree extends nglBranch implements inglBranch {
 	
 	/* si existe lo modifica, sino lo agrega */
 	public function node() {
-		list($aNode) = $this->getarguments("nodedata", func_get_args());
+		list($aNode) = $this->getarguments("nodedata", \func_get_args());
 		
 		$mIdColumn = $this->attribute("id_column");
 		$mParentColumn = $this->attribute("parent_column");
@@ -294,14 +294,14 @@ class nglTree extends nglBranch implements inglBranch {
 	}
 
 	public function show() {
-		list($sColumn) = $this->getarguments("column", func_get_args());
+		list($sColumn) = $this->getarguments("column", \func_get_args());
 		
 		$aTree = $this->attribute("tree");
 		$mChildren = $this->attribute("children");
 
 		$aPrint = self::call()->treeWalk($aTree, function($aNode, $nLevel, $bFirst, $bLast) use ($sColumn, $mChildren) {
 				$sOutput  = "";
-				$sOutput .= ($nLevel) ? str_repeat("│   ", $nLevel) : "";
+				$sOutput .= ($nLevel) ? \str_repeat("│   ", $nLevel) : "";
 				$sOutput .= ($bLast) ? "└─── " : "├─── ";
 				$sOutput .= $aNode[$sColumn];
 				$sOutput .= "\n";
@@ -309,32 +309,32 @@ class nglTree extends nglBranch implements inglBranch {
 			}
 		);
 
-		return implode($aPrint);
+		return \implode($aPrint);
 	}
 	
 	public function paths() {
-		list($sColumn,$sSeparator) = $this->getarguments("column,separator", func_get_args());
+		list($sColumn,$sSeparator) = $this->getarguments("column,separator", \func_get_args());
 		
 		$aTree = $this->attribute("tree");
 		$mIdColumn = $this->attribute("id_column");
 		$mChildren = $this->attribute("children");
 
-		$aPaths = $aPath = array();
+		$aPaths = $aPath = [];
 		$fBuilder = function($aTree) use (&$fBuilder, &$aPaths, &$aPath, $mChildren, $sColumn, $mIdColumn, $sSeparator) {
 			foreach($aTree as $aBranch) {
-				array_push($aPath, $aBranch[$sColumn]);
-				$aPaths[$aBranch[$mIdColumn]] = implode($sSeparator, $aPath);
+				\array_push($aPath, $aBranch[$sColumn]);
+				$aPaths[$aBranch[$mIdColumn]] = \implode($sSeparator, $aPath);
 				if(isset($aBranch[$mChildren])) {
 					$fBuilder($aBranch[$mChildren]);
 				} else {
-					array_pop($aPath);
+					\array_pop($aPath);
 				}
 			}
-			array_pop($aPath);
+			\array_pop($aPath);
 		};
 		$fBuilder($aTree);
 		
-		natsort($aPaths);
+		\natsort($aPaths);
 		return $aPaths;
 	}
 }

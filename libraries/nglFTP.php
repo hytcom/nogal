@@ -75,26 +75,26 @@ class nglFTP extends nglBranch implements inglBranch {
 	private $aLastDir;
 
 	final protected function __declareArguments__() {
-		$vArguments						= array();
-		$vArguments["filepath"]			= array('(string)$mValue', null);
-		$vArguments["force_create"]		= array('self::call()->isTrue($mValue)', false);
-		$vArguments["host"]				= array('(string)$mValue', "127.0.0.1");
-		$vArguments["local"]			= array('(string)$mValue', null);
-		$vArguments["ls_mode"]			= array('(string)$mValue', "single");
-		$vArguments["mask"]				= array('(string)$mValue');
-		$vArguments["newname"]			= array('(string)$mValue', null);
-		$vArguments["pass"]				= array('(string)$mValue');
-		$vArguments["passive_mode"]		= array('self::call()->isTrue($mValue)', true);
-		$vArguments["port"]				= array('(int)$mValue', 21);
-		$vArguments["recursive"]		= array('self::call()->isTrue($mValue)', false);
-		$vArguments["transfer"]			= array('$mValue', FTP_BINARY);
-		$vArguments["user"]				= array('(string)$mValue', "anonymous");
+		$vArguments						= [];
+		$vArguments["filepath"]			= ['(string)$mValue', null];
+		$vArguments["force_create"]		= ['self::call()->isTrue($mValue)', false];
+		$vArguments["host"]				= ['(string)$mValue', "127.0.0.1"];
+		$vArguments["local"]			= ['(string)$mValue', null];
+		$vArguments["ls_mode"]			= ['(string)$mValue', "single"];
+		$vArguments["mask"]				= ['(string)$mValue'];
+		$vArguments["newname"]			= ['(string)$mValue', null];
+		$vArguments["pass"]				= ['(string)$mValue'];
+		$vArguments["passive_mode"]		= ['self::call()->isTrue($mValue)', true];
+		$vArguments["port"]				= ['(int)$mValue', 21];
+		$vArguments["recursive"]		= ['self::call()->isTrue($mValue)', false];
+		$vArguments["transfer"]			= ['$mValue', FTP_BINARY];
+		$vArguments["user"]				= ['(string)$mValue', "anonymous"];
 		
 		return $vArguments;
 	}
 
 	final protected function __declareAttributes__() {
-		$vAttributes					= array();
+		$vAttributes					= [];
 		$vAttributes["system"]			= null;
 		$vAttributes["windows"]			= null;
 		$vAttributes["list"]			= null;
@@ -105,7 +105,7 @@ class nglFTP extends nglBranch implements inglBranch {
 	}
 
 	final protected function __declareVariables__() {
-		$this->aLastDir = array();
+		$this->aLastDir = [];
 	}
 
 	final public function __init__() {
@@ -122,16 +122,16 @@ class nglFTP extends nglBranch implements inglBranch {
 		"return" : "array"
 	} **/	
 	public function cd() {
-		list($sPath, $bForce) = $this->getarguments("filepath,force_create", func_get_args());
+		list($sPath, $bForce) = $this->getarguments("filepath,force_create", \func_get_args());
 
 		$sPath = self::call()->clearPath($sPath, false, $this->sSlash);
-		$aPath = explode($this->sSlash, $sPath);
-		for($x=0; $x<count($aPath); $x++) {
+		$aPath = \explode($this->sSlash, $sPath);
+		for($x=0; $x<\count($aPath); $x++) {
 			if($aPath[$x]!="") {
-				if(!@ftp_chdir($this->ftp, $aPath[$x])) {
+				if(!@\ftp_chdir($this->ftp, $aPath[$x])) {
 					if($bForce) {
 						if(!$this->makedir($aPath[$x])) { return false; }
-						if(!ftp_chdir($this->ftp, $aPath[$x])) {
+						if(!\ftp_chdir($this->ftp, $aPath[$x])) {
 							$this->Logger(self::errorMessage($this->object, 1003, $aPath[$x]));
 							return false;
 						}
@@ -165,9 +165,9 @@ class nglFTP extends nglBranch implements inglBranch {
 		"return" : "boolean"
 	} **/
 	public function connect() {
-		list($sHost, $nPort) = $this->getarguments("host,port", func_get_args());
+		list($sHost, $nPort) = $this->getarguments("host,port", \func_get_args());
 
-		if(!$ftp = ftp_connect($sHost, (int)$nPort)) {
+		if(!$ftp = \ftp_connect($sHost, (int)$nPort)) {
 			$this->Logger(self::errorMessage($this->object, 1001, $sHost));
 		} else {
 			$this->Logger("CONNECTED TO ".$sHost.":".$nPort);
@@ -185,7 +185,7 @@ class nglFTP extends nglBranch implements inglBranch {
 		"return" : "string"
 	} **/
 	public function curdir() {
-		return ftp_pwd($this->ftp);
+		return \ftp_pwd($this->ftp);
 	}
 
 	/** FUNCTION {
@@ -198,7 +198,7 @@ class nglFTP extends nglBranch implements inglBranch {
 		"return" : "boolean"
 	} **/	
 	public function delete() {
-		list($sPath) = $this->getarguments("filepath", func_get_args());
+		list($sPath) = $this->getarguments("filepath", \func_get_args());
 
 		$bIsDir = ($this->cd($sPath)===false) ? false : true;
 		if($bIsDir) {
@@ -206,13 +206,13 @@ class nglFTP extends nglBranch implements inglBranch {
 			$vDelete = self::call()->treeWalk($aSource,
 				function($aNode, $nLevel, $bFirst, $bLast) {
 					if($aNode["type"]=="file") {
-						if(!@ftp_delete($this->ftp, $aNode["path"])) {
+						if(!@\ftp_delete($this->ftp, $aNode["path"])) {
 							$this->Logger(self::errorMessage($this->object, 1008, $aNode["path"]));
 							return false;
 						}
 						return true;
 					}
-				}, null, array(
+				}, null, [
 					"nodeOpen" => function($aNode) {
 						if($aNode["type"]=="dir") { $this->aLastDir[] = $aNode["path"]; }
 						return true;
@@ -225,14 +225,14 @@ class nglFTP extends nglBranch implements inglBranch {
 						}
 						return true;
 					}
-				)
+				]
 			);
 			
 			foreach($vDelete as $bDelete) { if($bDelete===false) { return false; } }
 			$this->cd("..");
-			return @ftp_rmdir($this->ftp, $sPath);
+			return @\ftp_rmdir($this->ftp, $sPath);
 		} else {
-			if(@ftp_delete($this->ftp, $sPath)) {
+			if(@\ftp_delete($this->ftp, $sPath)) {
 				$this->Logger(self::errorMessage($this->object, 1008));
 				return false;
 			}
@@ -289,42 +289,42 @@ class nglFTP extends nglBranch implements inglBranch {
 		"return" : "boolean"
 	} **/	
 	public function download() {
-		list($sPath, $sLocalPath, $nTransfer) = $this->getarguments("filepath,local,transfer", func_get_args());
+		list($sPath, $sLocalPath, $nTransfer) = $this->getarguments("filepath,local,transfer", \func_get_args());
 
-		$sSource = basename($sPath);
+		$sSource = \basename($sPath);
 		$sDestination = ($sLocalPath!==null) ? $sLocalPath : $sSource;
 
 		$vList = $this->ls(null,null,"info");
 		if($vList[$sSource]["type"]=="dir") {
 			$aSource = $this->ls($sSource, null, "info", true);
-			if(@!chdir($sDestination)) {
-				if(@!mkdir($sDestination, 0755)) {
+			if(@!\chdir($sDestination)) {
+				if(@!\mkdir($sDestination, 0755)) {
 					$this->Logger(self::errorMessage($this->object, 1003));
 				} else {
-					chdir($sDestination);
+					\chdir($sDestination);
 				}
 			}
 
 			$sMainDir = $vList[$sSource]["basename"];
-			if(@!chdir($sMainDir)) {
-				if(@!mkdir($sMainDir, 0755)) {
+			if(@!\chdir($sMainDir)) {
+				if(@!\mkdir($sMainDir, 0755)) {
 					$this->Logger(self::errorMessage($this->object, 1003));
 				} else {
-					chdir($sMainDir);
+					\chdir($sMainDir);
 				}
 			}
 
 			$vDownloads = self::call()->treeWalk($aSource, function($aNode, $nLevel, $bFirst, $bLast) use ($nTransfer) {
 					return $this->DownloadTree($aNode, $nTransfer);
-				}, null, array("branchClose"=>function() { chdir(".."); return true; })
+				}, null, array("branchClose"=>function() { \chdir(".."); return true; })
 			);
-			chdir(getcwd());
+			\chdir(\getcwd());
 			
 			foreach($vDownloads as $bDownload) {
 				if($bDownload===false) { return false; }
 			}
 		} else {
-			if(!@ftp_get($this->ftp, $sDestination, $sSource, $nTransfer)) {
+			if(!@\ftp_get($this->ftp, $sDestination, $sSource, $nTransfer)) {
 				$this->Logger(self::errorMessage($this->object, 1005));
 				return false;
 			}
@@ -346,19 +346,19 @@ class nglFTP extends nglBranch implements inglBranch {
 	} **/
 	private function DownloadTree($vFile, $nTransfer=FTP_ASCII) {
 		if($vFile["type"]=="dir") {
-			if(@!chdir($vFile["basename"])) {
+			if(@!\chdir($vFile["basename"])) {
 				$this->Logger(self::errorMessage($this->object, 1003, $vFile["basename"]));
-				if(@!mkdir($vFile["basename"], 0755)) {
+				if(@!\mkdir($vFile["basename"], 0755)) {
 					$this->Logger(self::errorMessage($this->object, 1004, $vFile["basename"]));
 					return false;
 				} else {
-					chdir($vFile["basename"]);
+					\chdir($vFile["basename"]);
 				}
 			}
 		} else {
 			$sSource = $vFile["path"];
 			$sDestination = $vFile["basename"];
-			if(!@ftp_get($this->ftp, $sDestination, $sSource, $nTransfer)) {
+			if(!@\ftp_get($this->ftp, $sDestination, $sSource, $nTransfer)) {
 				return false;
 			}
 			$this->Logger("DOWNLOAD ".$sSource." -> ".$sDestination);
@@ -382,11 +382,11 @@ class nglFTP extends nglBranch implements inglBranch {
 		$vTrans["w"] = "2";
 		$vTrans["x"] = "1";
 		
-		$sCHMOD = strtolower($sCHMOD);
-		$sCHMOD = substr(strtr($sCHMOD, $vTrans), 1);
-		$aCHMOD = str_split($sCHMOD, 3);
+		$sCHMOD = \strtolower($sCHMOD);
+		$sCHMOD = \substr(\strtr($sCHMOD, $vTrans), 1);
+		$aCHMOD = \str_split($sCHMOD, 3);
 		
-		$nCHMOD = array_sum(str_split($aCHMOD[0])) . array_sum(str_split($aCHMOD[1])) . array_sum(str_split($aCHMOD[2]));
+		$nCHMOD = \array_sum(\str_split($aCHMOD[0])) . \array_sum(\str_split($aCHMOD[1])) . \array_sum(\str_split($aCHMOD[2]));
 		return $nCHMOD;
 	}
 
@@ -402,15 +402,15 @@ class nglFTP extends nglBranch implements inglBranch {
 		"return" : "int"
 	} **/
 	private function GetTimestamp($sYear, $sMonth, $sDay) {
-		$nMonth = date("n", strtotime($sMonth));
-		$nToday = date("n");
+		$nMonth = \date("n", \strtotime($sMonth));
+		$nToday = \date("n");
 
-		if(strpos($sYear,":")===false) {
-			$nTimestamp	= strtotime($sDay." ".$sMonth." ".$sYear);
+		if(\strpos($sYear,":")===false) {
+			$nTimestamp	= \strtotime($sDay." ".$sMonth." ".$sYear);
 		} else {
-			$sNewYear = date("Y");
+			$sNewYear = \date("Y");
 			if($nMonth > $nToday) { $sNewYear--; }
-			$nTimestamp	= strtotime($sDay." ".$sMonth." ".$sNewYear." ".$sYear);
+			$nTimestamp	= \strtotime($sDay." ".$sMonth." ".$sNewYear." ".$sYear);
 		}
 
 		return $nTimestamp;
@@ -429,13 +429,13 @@ class nglFTP extends nglBranch implements inglBranch {
 		"return" : "$this"
 	} **/
 	public function login() {
-		list($sUser, $sPass, $bPassive) = $this->getarguments("user,pass,passive", func_get_args());
+		list($sUser, $sPass, $bPassive) = $this->getarguments("user,pass,passive", \func_get_args());
 		$sPass = self::passwd($sPass, true);
-		if(ftp_login($this->ftp, $sUser, $sPass)) {
-			$nSystem = ftp_systype($this->ftp);
+		if(\ftp_login($this->ftp, $sUser, $sPass)) {
+			$nSystem = \ftp_systype($this->ftp);
 			$this->Logger("LOGIN OK");
 			$this->attribute("system", $nSystem);
-			$this->attribute("windows", preg_match("/windows/i", $nSystem));
+			$this->attribute("windows", \preg_match("/windows/i", $nSystem));
 			$this->sSlash = ($this->attribute("windows")) ? "\\" : "/";
 			$this->passive($bPassive);
 			return $this;
@@ -475,29 +475,29 @@ class nglFTP extends nglBranch implements inglBranch {
 		"return" : "array"
 	} **/
 	public function ls() {
-		list($sDirname, $sMask, $sMode, $bRecursive) = $this->getarguments("filepath,mask,ls_mode,recursive", func_get_args());
+		list($sDirname, $sMask, $sMode, $bRecursive) = $this->getarguments("filepath,mask,ls_mode,recursive", \func_get_args());
 
 		$sCurrentDir = $this->curdir();
 		if($sDirname==null) {
 			$sDirname = self::call()->clearPath($sCurrentDir, false, $this->sSlash);
 		} else {
-			if(strpos($sDirname, $this->sSlash)===false) {
+			if(\strpos($sDirname, $this->sSlash)===false) {
 				$sDirname = self::call()->clearPath($sCurrentDir.$this->sSlash.$sDirname, false, $this->sSlash);
 			}
 		}
-		$aList = ftp_rawlist($this->ftp, $sDirname);
+		$aList = \ftp_rawlist($this->ftp, $sDirname);
 		$this->Logger("LIST (".$sMode.") ".$sDirname);
 
-		$vTree = array();
-		if($aList && count($aList)) {
-			$sMode = strtolower($sMode);
+		$vTree = [];
+		if($aList && \count($aList)) {
+			$sMode = \strtolower($sMode);
 			if($this->attribute("system")=="UNIX") {
 				foreach($aList as $sFile) {
 					if($sMode=="raw") { $vTree[] = $sFile; continue; }
 
 					// $sFile = trim($sFile);
-					$aFileInfo = preg_split("/[\s]+/", $sFile, 9, PREG_SPLIT_NO_EMPTY);
-					if(is_array($aFileInfo)) {
+					$aFileInfo = \preg_split("/[\s]+/", $sFile, 9, PREG_SPLIT_NO_EMPTY);
+					if(\is_array($aFileInfo)) {
 						$sName = $aFileInfo[8];
 						$sFileType = ($aFileInfo[0][0]=="d") ? "dir" : (($aFileInfo[0][0]=="l") ? "link" : "file");
 						$sPath = $sDirname.$this->sSlash.$sName;
@@ -505,8 +505,8 @@ class nglFTP extends nglBranch implements inglBranch {
 						$sLink = null;
 						if($sFileType=="link") {
 							unset($vTree[$sName]);
-							$sLink = substr($sName, strrpos($sName, " -> ")+1);
-							$sName = substr($sName, 0, strpos($sName, " -> "));
+							$sLink = \substr($sName, \strrpos($sName, " -> ")+1);
+							$sName = \substr($sName, 0, \strpos($sName, " -> "));
 						}
 
 						if($sMode=="single") {
@@ -521,10 +521,10 @@ class nglFTP extends nglBranch implements inglBranch {
 							$vTree[$sName]["basename"]	= $sName;
 							$vTree[$sName]["link"]		= $sLink;
 							
-							$aBasename = explode(".", $vTree[$sName]["basename"]);
-							if(count($aBasename)>1 && $sFileType!="dir") {
-								$vTree[$sName]["extension"] = array_pop($aBasename);
-								$vTree[$sName]["filename"] = implode(".", $aBasename);
+							$aBasename = \explode(".", $vTree[$sName]["basename"]);
+							if(\is_array($aBasename) && \count($aBasename)>1 && $sFileType!="dir") {
+								$vTree[$sName]["extension"] = \array_pop($aBasename);
+								$vTree[$sName]["filename"] = \implode(".", $aBasename);
 							} else {
 								$vTree[$sName]["extension"] = "";
 								$vTree[$sName]["filename"] = $vTree[$sName]["basename"];
@@ -534,16 +534,16 @@ class nglFTP extends nglBranch implements inglBranch {
 							$vTree[$sName]["size"]			= self::call()->strSizeEncode($aFileInfo[4]);
 							$vTree[$sName]["chmod"]			= $this->GetChmod($aFileInfo[0]);
 							$vTree[$sName]["timestamp"]		= $this->GetTimestamp($aFileInfo[7], $aFileInfo[5], $aFileInfo[6]);
-							$vTree[$sName]["date"]			= date("Y-m-d H:i:s", $vTree[$sName]["timestamp"]);
+							$vTree[$sName]["date"]			= \date("Y-m-d H:i:s", $vTree[$sName]["timestamp"]);
 							$vTree[$sName]["mime"] 			= ($vTree[$sName]["type"]=="file") ? self::call()->mimeType($vTree[$sName]["extension"]) : "application/x-unknown-content-type";
-							$vTree[$sName]["image"] 		= (strpos($vTree[$sName]["mime"], "image")===0);
+							$vTree[$sName]["image"] 		= (\strpos($vTree[$sName]["mime"], "image")===0);
 						}
 
 						if($bRecursive && $sFileType=="dir") {
 							if(isset($vTree[$sName])) {
 								$vTree[$sName]["_children"] = $this->ls($sPath, $sMask, $sMode, true);
 							} else {
-								$vTree = array_merge($vTree, $this->ls($sPath, $sMask, $sMode, true));
+								$vTree = \array_merge($vTree, $this->ls($sPath, $sMask, $sMode, true));
 							}
 						}
 					}
@@ -552,8 +552,8 @@ class nglFTP extends nglBranch implements inglBranch {
 				foreach($aList as $sFile) {
 					if($sMode=="raw") { $vTree[] = $sFile; continue; }
 
-					preg_match("/([0-9]{2})-([0-9]{2})-([0-9]{2}) +([0-9]{2}):([0-9]{2})(AM|PM) +([0-9]+|<DIR>) +(.+)/is", $sFile, $aFileInfo);
-					if(is_array($aFileInfo)) {
+					\preg_match("/([0-9]{2})-([0-9]{2})-([0-9]{2}) +([0-9]{2}):([0-9]{2})(AM|PM) +([0-9]+|<DIR>) +(.+)/is", $sFile, $aFileInfo);
+					if(\is_array($aFileInfo)) {
 						if($aFileInfo[3]<70) { $aFileInfo[3]+=2000; } else { $aFileInfo[3]+=1900; }
 					
 						$sName = $aFileInfo[8];
@@ -572,10 +572,10 @@ class nglFTP extends nglBranch implements inglBranch {
 							$vTree[$sName]["basename"] 	= $sName;
 							$vTree[$sName]["link"]		= null;
 							
-							$aBasename = explode(".", $sName);
-							if(count($aBasename)>1 && $sFileType!="<DIR>") {
-								$vTree[$sName]["extension"] = array_pop($aBasename);
-								$vTree[$sName]["filename"] = implode(".", $aBasename);
+							$aBasename = \explode(".", $sName);
+							if(\is_array($aBasename) && \count($aBasename)>1 && $sFileType!="<DIR>") {
+								$vTree[$sName]["extension"] = \array_pop($aBasename);
+								$vTree[$sName]["filename"] = \implode(".", $aBasename);
 							} else {
 								$vTree[$sName]["extension"] = "";
 								$vTree[$sName]["filename"] = $vTree[$sName]["basename"];
@@ -585,16 +585,16 @@ class nglFTP extends nglBranch implements inglBranch {
 							$vTree[$sName]["size"] 		= self::call()->strSizeEncode($vTree[$sName]["bytes"]);
 							$vTree[$sName]["chmod"]		= null;
 							$vTree[$sName]["timestamp"]	= $this->GetTimestamp($aFileInfo[3], $aFileInfo[1], $aFileInfo[2]);
-							$vTree[$sName]["date"]		= date("Y-m-d H:i:s", $vTree[$sName]["timestamp"]);
+							$vTree[$sName]["date"]		= \date("Y-m-d H:i:s", $vTree[$sName]["timestamp"]);
 							$vTree[$sName]["mime"] 		= ($vTree[$sName]["type"]=="file") ? self::call()->mimeType($vTree[$sName]["extension"]) : "application/x-unknown-content-type";
-							$vTree[$sName]["image"] 	= (strpos($vTree[$sName]["mime"], "image")===0);
+							$vTree[$sName]["image"] 	= (\strpos($vTree[$sName]["mime"], "image")===0);
 						}
 
 						if($bRecursive && $sFileType=="dir") {
 							if(isset($vTree[$sName])) {
 								$vTree[$sName]["_children"] = $this->ls($sPath, $sMask, $sMode, true);
 							} else {
-								$vTree = array_merge($vTree, $this->ls($sPath, $sMask, $sMode, true));
+								$vTree = \array_merge($vTree, $this->ls($sPath, $sMask, $sMode, true));
 							}
 						}
 					}
@@ -653,26 +653,26 @@ class nglFTP extends nglBranch implements inglBranch {
 		"return" : "$this"
 	} **/	
 	public function mkdir() {
-		list($sPath, $bForce) = $this->getarguments("filepath,force_create", func_get_args());
+		list($sPath, $bForce) = $this->getarguments("filepath,force_create", \func_get_args());
 
 		if(!$bForce) {
-			if(!@ftp_mkdir($this->ftp, $sPath)) {
+			if(!@\ftp_mkdir($this->ftp, $sPath)) {
 				$this->Logger(self::errorMessage($this->object, 1004, $sPath));
 				return false;
 			}
 		} else {
 			$sTestDir = self::call()->unique(16);
-			if(!@ftp_mkdir($this->ftp, $sTestDir)) {
+			if(!@\ftp_mkdir($this->ftp, $sTestDir)) {
 				$this->Logger(self::errorMessage($this->object, 1004, $sPath));
 				return false;
 			} else {
-				ftp_rmdir($this->ftp, $sTestDir);
+				\ftp_rmdir($this->ftp, $sTestDir);
 			}
 
 			$x = 1;
 			$sDirToCreateForced = $sPath;
 			while(1) {
-				if(@ftp_mkdir($this->ftp, $sDirToCreateForced)) {
+				if(@\ftp_mkdir($this->ftp, $sDirToCreateForced)) {
 					$sPath = $sDirToCreateForced;
 					break;
 				}
@@ -695,8 +695,8 @@ class nglFTP extends nglBranch implements inglBranch {
 		"return" : "$this"
 	} **/	
 	public function passive() {
-		list($bPassive) = $this->getarguments("passive_mode", func_get_args());
-		ftp_pasv($this->ftp, $bPassive);
+		list($bPassive) = $this->getarguments("passive_mode", \func_get_args());
+		\ftp_pasv($this->ftp, $bPassive);
 		$this->Logger("PASIVE MODE ".($bPassive ? "ON" : "OFF"));
 		return $this;
 	}
@@ -744,13 +744,13 @@ class nglFTP extends nglBranch implements inglBranch {
 		"return" : "boolean"
 	} **/	
 	public function rename() {
-		list($sPath, $sNewName) = $this->getarguments("filepath,newname", func_get_args());
+		list($sPath, $sNewName) = $this->getarguments("filepath,newname", \func_get_args());
 
-		$sPath = basename($sPath);
-		$sNewName = basename($sNewName);
+		$sPath = \basename($sPath);
+		$sNewName = \basename($sNewName);
 
 		if($sPath=="" || $sNewName=="") { return false; }
-		if(!@ftp_rename($this->ftp, $sPath, $sNewName)) {
+		if(!@\ftp_rename($this->ftp, $sPath, $sNewName)) {
 			$this->Logger(self::errorMessage($this->object, 1007));
 			return false;
 		}
@@ -777,21 +777,21 @@ class nglFTP extends nglBranch implements inglBranch {
 		"return" : "boolean"
 	} **/	
 	public function upload() {
-		list($sLocalPath, $sPath, $nTransfer) = $this->getarguments("local,filepath,transfer", func_get_args());
+		list($sLocalPath, $sPath, $nTransfer) = $this->getarguments("local,filepath,transfer", \func_get_args());
 
-		if(is_dir($sLocalPath)) {
+		if(\is_dir($sLocalPath)) {
 			$this->cd($sPath);
 			$aSource = self::call("files")->ls($sLocalPath, null, "info", true);
 			$vUploads = self::call()->treeWalk($aSource, function($aNode, $nLevel, $bFirst, $bLast) use ($nTransfer) {
 					return $this->UploadTree($aNode, $nTransfer);
-				}, null, array("branchClose"=>function() { $this->cd(".."); return true; })
+				}, null, ["branchClose"=>function() { $this->cd(".."); return true; }]
 			);
 			$this->cd("..");
 			foreach($vUploads as $bUpload) {
 				if($bUpload===false) { return false; }
 			}
 		} else {
-			if(!@ftp_put($this->ftp, $sPath, $sLocalPath, $nTransfer)) {
+			if(!@\ftp_put($this->ftp, $sPath, $sLocalPath, $nTransfer)) {
 				$this->Logger(self::errorMessage($this->object, 1006));
 				return false;
 			}
@@ -817,7 +817,7 @@ class nglFTP extends nglBranch implements inglBranch {
 		} else {
 			$sSource = $vFile["path"];
 			$sDestination = $vFile["basename"];
-			if(!@ftp_put($this->ftp, $sDestination, $sSource, $nTransfer)) {
+			if(!@\ftp_put($this->ftp, $sDestination, $sSource, $nTransfer)) {
 				return false;
 			}
 			$this->Logger("UPLOAD ".$sSource." -> ".$sDestination);

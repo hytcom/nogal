@@ -171,46 +171,41 @@ class nglMail extends nglBranch implements iNglClient {
 	private $sContentKey;
 
 	final protected function __declareArguments__() {
-		$vArguments								= array();
-		$vArguments["from"]						= array('$this->MailAddress((string)$mValue, "from")');
-		$vArguments["reply"]					= array('$this->MailAddress((string)$mValue, "reply")', null);
-		$vArguments["to"]						= array('$mValue', null);
-		$vArguments["cc"]						= array('$mValue', null);
-		$vArguments["bcc"]						= array('$mValue', null);
-
-		$vArguments["subject"]					= array('$this->MailSubject((string)$mValue)', null);
-		$vArguments["message"]					= array('$this->MailMessage((string)$mValue)', null);
-		$vArguments["attach"]					= array('$mValue', null);
-		$vArguments["attach_name"]				= array('$mValue', null);
-		$vArguments["attach_content"]			= array('$mValue', null);
-
-		$vArguments["notify"]					= array('$this->MailNotify((string)$mValue)', null);
-		$vArguments["priority"]					= array('$this->MailPriority((string)$mValue)', null);
-		$vArguments["charset"]					= array('(string)$mValue', "UTF-8"); /* (UTF-8 | iso-8859-1) */
-		$vArguments["timediff"]					= array('$mValue', "0 hours");
-		
-		$vArguments["server"]					= array('$mValue', "smtp"); /* smtp | imap | pop3 */
-		$vArguments["host"]						= array('$mValue');
-		$vArguments["secure"]					= array('(string)$mValue', null);
-		$vArguments["port"]						= array('(int)$mValue');
-		$vArguments["user"]						= array('$mValue');				
-		$vArguments["pass"]						= array('$mValue');
-		$vArguments["timeout"]					= array('(int)$mValue', "20");
-
-		$vArguments["folder"]					= array('$mValue', "INBOX");
-		$vArguments["mail"]						= array('$mValue', null);
-		$vArguments["fields"]					= array('$mValue', null); /* separados por espacios */
-		$vArguments["revert"]					= array('self::call()->isTrue($mValue)', true);
-		$vArguments["limit"]					= array('(int)$mValue', 25);
-
-		$vArguments["smtp_authtype"]			= array('$mValue', null); /* "(CRAM-MD5 | LOGIN | PLAIN)" */
-		$vArguments["localhost"]				= array('$mValue', "localhost");
+		$vArguments								= [];
+		$vArguments["from"]						= ['$this->MailAddress((string)$mValue, "from")'];
+		$vArguments["reply"]					= ['$this->MailAddress((string)$mValue, "reply")', null];
+		$vArguments["to"]						= ['$mValue', null];
+		$vArguments["cc"]						= ['$mValue', null];
+		$vArguments["bcc"]						= ['$mValue', null];
+		$vArguments["subject"]					= ['$this->MailSubject((string)$mValue)', null];
+		$vArguments["message"]					= ['$this->MailMessage((string)$mValue)', null];
+		$vArguments["attach"]					= ['$mValue', null];
+		$vArguments["attach_name"]				= ['$mValue', null];
+		$vArguments["attach_content"]			= ['$mValue', null];
+		$vArguments["notify"]					= ['$this->MailNotify((string)$mValue)', null];
+		$vArguments["priority"]					= ['$this->MailPriority((string)$mValue)', null];
+		$vArguments["charset"]					= ['(string)$mValue', "UTF-8"]; /* (UTF-8 | iso-8859-1) */
+		$vArguments["timediff"]					= ['$mValue', "0 hours"];
+		$vArguments["server"]					= ['$mValue', "smtp"]; /* smtp | imap | pop3 */
+		$vArguments["host"]						= ['$mValue'];
+		$vArguments["secure"]					= ['(string)$mValue', null];
+		$vArguments["port"]						= ['(int)$mValue'];
+		$vArguments["user"]						= ['$mValue'];
+		$vArguments["pass"]						= ['$mValue'];
+		$vArguments["timeout"]					= ['(int)$mValue', "20"];
+		$vArguments["folder"]					= ['$mValue', "INBOX"];
+		$vArguments["mail"]						= ['$mValue', null];
+		$vArguments["fields"]					= ['$mValue', null); /* separados por espacios */
+		$vArguments["revert"]					= ['self::call()->isTrue($mValue)', true];
+		$vArguments["limit"]					= ['(int)$mValue', 25];
+		$vArguments["smtp_authtype"]			= ['$mValue', null]; /* "(CRAM-MD5 | LOGIN | PLAIN)" */
+		$vArguments["localhost"]				= ['$mValue', "localhost"];
 
 		return $vArguments;
 	}
 
 	final protected function __declareAttributes__() {
-		$vAttributes					= array();
+		$vAttributes					= [];
 		$vAttributes["mail_headers"]	= null;
 		$vAttributes["mail_body"]		= null;
 
@@ -242,10 +237,10 @@ class nglMail extends nglBranch implements iNglClient {
 	**/
 	final protected function __declareVariables__() {
 		$this->sBoundary = "NGLBOUNDARY".self::call()->unique(16);
-		$this->aAttachments = array();
+		$this->aAttachments = [];
 		$this->socket = null;
 		$this->sCRLF = "\r\n";
-		$this->nCRLF = strlen($this->sCRLF);
+		$this->nCRLF = \strlen($this->sCRLF);
 		$this->sSMTPUsername = null;
 		$this->sSMTPPassword = null;
 		$this->nSMTPMaxSize = null;
@@ -259,19 +254,19 @@ class nglMail extends nglBranch implements iNglClient {
 	}
 
 	public function attach() {
-		list($sSource, $sName) = $this->getarguments("attach,attach_name", func_get_args());
+		list($sSource, $sName) = $this->getarguments("attach,attach_name", \func_get_args());
 
 		if($sName==null) { $sName = $sSource; }
-		$this->aAttachments[] = array($sSource, $sName);
+		$this->aAttachments[] = [$sSource, $sName];
 
 		return $this;
 	}
 
 	public function attachContent() {
-		list($sSource, $sName) = $this->getarguments("attach_content,attach_name", func_get_args());
+		list($sSource, $sName) = $this->getarguments("attach_content,attach_name", \func_get_args());
 
 		if($sName==null) { $sName = self::call()->unique().".txt"; }
-		$this->aAttachments[] = array($this->sContentKey, $sName, $sSource);
+		$this->aAttachments[] = [$this->sContentKey, $sName, $sSource];
 
 		return $this;
 	}
@@ -281,8 +276,8 @@ class nglMail extends nglBranch implements iNglClient {
 		if($vResponse["code"]!=334) { return false; }
 
 		// username - password
-		$sHMAC = hash_hmac("MD5", $this->sSMTPPassword, $vResponse["text"]);
-		$vResponse = $this->request(base64_encode($this->sSMTPUsername." ".$sHMAC));
+		$sHMAC = \hash_hmac("MD5", $this->sSMTPPassword, $vResponse["text"]);
+		$vResponse = $this->request(\base64_encode($this->sSMTPUsername." ".$sHMAC));
 		if($vResponse["code"]!=235) { return false; }
 		
 		return true;
@@ -293,11 +288,11 @@ class nglMail extends nglBranch implements iNglClient {
 		if($vResponse["code"]!=334) { return false; }
 
 		// username
-		$vResponse = $this->request(base64_encode($this->sSMTPUsername));
+		$vResponse = $this->request(\base64_encode($this->sSMTPUsername));
 		if($vResponse["code"]!=334) { return false; }
 
 		// password
-		$vResponse = $this->request(base64_encode($this->sSMTPPassword));
+		$vResponse = $this->request(\base64_encode($this->sSMTPPassword));
 		if($vResponse["code"]!=235) { return false; }
 		
 		return true;
@@ -308,7 +303,7 @@ class nglMail extends nglBranch implements iNglClient {
 		if($vResponse["code"]!=334) { return false; }
 
 		// username - password
-		$vResponse = $this->request(base64_encode("\0".$this->sSMTPUsername."\0".$this->sSMTPPassword));
+		$vResponse = $this->request(\base64_encode("\0".$this->sSMTPUsername."\0".$this->sSMTPPassword));
 		if($vResponse["code"]!=235) { return false; }
 		
 		return true;
@@ -323,19 +318,19 @@ class nglMail extends nglBranch implements iNglClient {
 		$aCC			= $this->attribute("mail_cc");
 		$sSubject		= $this->attribute("mail_subject");
 		$sCharSet 		= $this->argument("charset");
-		$sEncoding 		= (strtolower($sCharSet)!="us-ascii") ? "8bit" : "7bit";
+		$sEncoding 		= (\strtolower($sCharSet)!="us-ascii") ? "8bit" : "7bit";
 		$sTime			= $this->argument("timediff");
-		$sTime			= strtotime($sTime);
+		$sTime			= \strtotime($sTime);
 
 		if($sReplyTo===null) { $sReplyTo = $sFrom; }
 		
 		// ENCABEZADOS
-		$sHeaders	 = "Date: ".date("l j F Y, G:i", $sTime).$this->sCRLF;
+		$sHeaders	 = "Date: ".\date("l j F Y, G:i", $sTime).$this->sCRLF;
 		$sHeaders	.= "MIME-Version: 1.0".$this->sCRLF;
 		$sHeaders	.= "From: ".$sFrom.$this->sCRLF;
 		$sHeaders	.= "Reply-To: ".$sReplyTo.$this->sCRLF;
 		$sHeaders	.= "To: {{MAILTO}}".$this->sCRLF;
-		$sHeaders	.= "Cc: ".implode(",", $aCC).$this->sCRLF;
+		$sHeaders	.= "Cc: ".\implode(",", $aCC).$this->sCRLF;
 
 		$sHeaders	.= "Subject: ".$sSubject.$this->sCRLF;
 		$sHeaders	.= "Return-Path: <".$sFromMail.">".$this->sCRLF;
@@ -397,13 +392,13 @@ class nglMail extends nglBranch implements iNglClient {
 	}
 
 	public function connect() {
-		list($sServerType,$sHost,$sSecure,$nPort,$nTimeOut) = $this->getarguments("server,host,secure,port,timeout", func_get_args());
+		list($sServerType,$sHost,$sSecure,$nPort,$nTimeOut) = $this->getarguments("server,host,secure,port,timeout", \func_get_args());
 
-		$this->sServerType = strtolower($sServerType);
+		$this->sServerType = \strtolower($sServerType);
 		
 		// hostname
-		$vHost = parse_url($sHost);
-		$sSecure = strtolower($sSecure);
+		$vHost = \parse_url($sHost);
+		$sSecure = \strtolower($sSecure);
 		if($sSecure=="ssl") {
 			$sHost = "ssl://".((!isset($vHost["scheme"])) ? $sHost : $vHost["host"]);
 		} else if($sSecure=="tls") {
@@ -411,7 +406,7 @@ class nglMail extends nglBranch implements iNglClient {
 		}
 
 		$this->Logger("<< ".$sHost.":".$nPort.$this->sCRLF);
-		$this->socket = @fsockopen($sHost, $nPort, $nError, $sError, $nTimeOut);
+		$this->socket = @\fsockopen($sHost, $nPort, $nError, $sError, $nTimeOut);
 		if($this->socket===false) {
 			$this->Logger("-- \t\tERROR #".$nError." (".$sError.")".$this->sCRLF);
 			return false;
@@ -429,18 +424,18 @@ class nglMail extends nglBranch implements iNglClient {
 	}
 
 	private function DecodingType($sContent, $sType="quoted-printable") {
-		$sContent = trim($sContent);
+		$sContent = \trim($sContent);
 		switch($sType) {
-			case "quoted-printable": $sContent = quoted_printable_decode($sContent); break;
-			case "base64": $sContent = base64_decode($sContent); break;
+			case "quoted-printable": $sContent = \quoted_printable_decode($sContent); break;
+			case "base64": $sContent = \base64_decode($sContent); break;
 		}
 
 		// codificacion a UTF-8
 		$sEncoding = self::call()->encoding($sContent);
-		if($sEncoding===false || strtolower($sEncoding)=="utf-8") {
+		if($sEncoding===false || \strtolower($sEncoding)=="utf-8") {
 			return $sContent;
 		} else {
-			return iconv($sEncoding, "UTF-8//TRANSLIT", $sContent);
+			return \iconv($sEncoding, "UTF-8//TRANSLIT", $sContent);
 		}
 	}
 
@@ -456,19 +451,19 @@ class nglMail extends nglBranch implements iNglClient {
 		if($this->attribute("state")=="SELECTED") {
 			if($this->sServerType=="imap") {
 				$vResponse = $this->request("FETCH ".$nMailId." (".$sMessagesFilter.")");
-				$sResponse = trim($vResponse["text"]);
-				$aResponse = explode($this->sCRLF, $sResponse, 2);
-				$nIni = strrpos($aResponse[0], "{")+1;
-				$nEnd = strrpos($aResponse[0], "}");
-				$nLength = substr($aResponse[0], $nIni, $nEnd-$nIni);
+				$sResponse = \trim($vResponse["text"]);
+				$aResponse = \explode($this->sCRLF, $sResponse, 2);
+				$nIni = \strrpos($aResponse[0], "{")+1;
+				$nEnd = \strrpos($aResponse[0], "}");
+				$nLength = \substr($aResponse[0], $nIni, $nEnd-$nIni);
 				if(!isset($aResponse[1])) { return false; }
-				return substr($aResponse[1], 0, (int)$nLength);
+				return \substr($aResponse[1], 0, (int)$nLength);
 			} else {
 				$vResponse = $this->request("RETR ".$nMailId);
 				if($this->FindMark($vResponse["text"])) {
-					$sResponse = trim($vResponse["text"]);
-					$nIni = strpos($sResponse, $this->sCRLF) + $this->nCRLF;
-					return substr($sResponse, $nIni, -1);
+					$sResponse = \trim($vResponse["text"]);
+					$nIni = \strpos($sResponse, $this->sCRLF) + $this->nCRLF;
+					return \substr($sResponse, $nIni, -1);
 				}
 			}
 		}
@@ -478,11 +473,11 @@ class nglMail extends nglBranch implements iNglClient {
 
 	private function FindMark($sResponse, $sMark=null) {
 		$sMark = ($sMark!==null) ? $sMark : (($this->sServerType=="imap") ? $this->Tag() : "+OK");
-		return (strpos($sResponse, $sMark)!==false);
+		return (\strpos($sResponse, $sMark)!==false);
 	}
 
 	public function get() {
-		list($nMailId) = $this->getarguments("mail", func_get_args());
+		list($nMailId) = $this->getarguments("mail", \func_get_args());
 		
 		if($this->sServerType=="imap") {
 			$sResponse = $this->Fetch($nMailId, "BODY[]");
@@ -490,22 +485,22 @@ class nglMail extends nglBranch implements iNglClient {
 			$sResponse = $this->Fetch($nMailId);
 		}
 
-		$vMailParts = explode($this->sCRLF.$this->sCRLF, $sResponse, 2);
+		$vMailParts = \explode($this->sCRLF.$this->sCRLF, $sResponse, 2);
 
 		// mail
-		$aMail = array();
+		$aMail = [];
 
 		// headers
-		$aMail["headers"] = iconv_mime_decode_headers($vMailParts[0], 0, "UTF-8");
-		$sMainContentType = (array_key_exists("Content-Type", $aMail["headers"])) ? strtolower($aMail["headers"]["Content-Type"]) : null;
+		$aMail["headers"] = \iconv_mime_decode_headers($vMailParts[0], 0, "UTF-8");
+		$sMainContentType = (\array_key_exists("Content-Type", $aMail["headers"])) ? \strtolower($aMail["headers"]["Content-Type"]) : null;
 		if($sMainContentType!==null) {
-			$aMainContentType = explode(";", $sMainContentType);
+			$aMainContentType = \explode(";", $sMainContentType);
 			$sMainContentType = $aMainContentType[0];
 		}
-		$sMainEncoding = (array_key_exists("Content-Transfer-Encoding", $aMail["headers"])) ? strtolower($aMail["headers"]["Content-Transfer-Encoding"]) : null;
+		$sMainEncoding = (\array_key_exists("Content-Transfer-Encoding", $aMail["headers"])) ? \strtolower($aMail["headers"]["Content-Transfer-Encoding"]) : null;
 
 		// from, to, subject
-		$aMail["timestamp"] = strtotime($aMail["headers"]["Date"]);
+		$aMail["timestamp"] = \strtotime($aMail["headers"]["Date"]);
 		$aMail["from"] = $this->PrepareMails($aMail["headers"]["From"]);
 		$aMail["from"] = $aMail["from"][0];
 		$aMail["to"] = $this->PrepareMails($aMail["headers"]["To"]);
@@ -513,64 +508,64 @@ class nglMail extends nglBranch implements iNglClient {
 		$aMail["subject"] = $aMail["headers"]["Subject"];
 
 		// body
-		preg_match_all("/boundary=\"?([a-z0-9\'\(\)\+\_\,\-\.\/\:\=\?]+)\"?/is", $sResponse, $aBoundary);
+		\preg_match_all("/boundary=\"?([a-z0-9\'\(\)\+\_\,\-\.\/\:\=\?]+)\"?/is", $sResponse, $aBoundary);
 
-		$aBoundaries = array();		
+		$aBoundaries = [];		
 		foreach($aBoundary[1] as $sBoundary) {
-			$sBoundary = str_replace(array("\"", '"'), "", $sBoundary);
+			$sBoundary = \str_replace(["\"", '"'], "", $sBoundary);
 			$aBoundaries[] = "--".$sBoundary."--";
 			$aBoundaries[] = "--".$sBoundary;
 		}
 		// print_r($aBoundaries);
 
 		$sHash = self::call()->unique(16);
-		$sMailContent = str_replace($aBoundaries, $sHash, $vMailParts[1]);
-		$aMailContent = explode($sHash, $sMailContent);
+		$sMailContent = \str_replace($aBoundaries, $sHash, $vMailParts[1]);
+		$aMailContent = \explode($sHash, $sMailContent);
 		// print_r($aMailContent); exit();
 		
 		foreach($aMailContent as $sFragment) {
 			if(empty($sFragment)) { continue; }
 
-			$aFragment = explode($this->sCRLF, $sFragment);
+			$aFragment = \explode($this->sCRLF, $sFragment);
 			// print_r($aFragment); exit();
 
 			$bSave = false;
 			$sContent = "";
 			$sLastKey = null;
-			$vFragment = array();
-			while(count($aFragment)) {
-				$sLine = array_shift($aFragment);
-				$sLine = trim($sLine);
+			$vFragment = [];
+			while(\count($aFragment)) {
+				$sLine = \array_shift($aFragment);
+				$sLine = \trim($sLine);
 				if($sLine!=="" && !$bSave) { $bSave = true; }
 				if($bSave) {
-					if($sLine==="" || !count($aFragment)) {
-						$sContentType = (array_key_exists("Content-Type", $vFragment)) ? strtolower($vFragment["Content-Type"]) : $sMainContentType;
-						$sEncoding = (array_key_exists("Content-Transfer-Encoding", $vFragment)) ? strtolower($vFragment["Content-Transfer-Encoding"]) : $sMainEncoding;
-						$sFragment = (count($aFragment)) ? implode($this->sCRLF, $aFragment) : $sFragment;
+					if($sLine==="" || !\count($aFragment)) {
+						$sContentType = (\array_key_exists("Content-Type", $vFragment)) ? \strtolower($vFragment["Content-Type"]) : $sMainContentType;
+						$sEncoding = (\array_key_exists("Content-Transfer-Encoding", $vFragment)) ? \strtolower($vFragment["Content-Transfer-Encoding"]) : $sMainEncoding;
+						$sFragment = (\count($aFragment)) ? \implode($this->sCRLF, $aFragment) : $sFragment;
 
 						switch(true) {
-							case ($sContentType && strpos($sContentType, "text/plain")!==false):
+							case ($sContentType && \strpos($sContentType, "text/plain")!==false):
 								if($this->sServerType=="pop3") {
-									$sFragment = preg_replace(array("/\n\.\./s", "/^\.\./s"), array("\n.", "."), $sFragment);
+									$sFragment = \preg_replace(["/\n\.\./s", "/^\.\./s"], ["\n.", "."], $sFragment);
 								}
 								$aMail["text"] = $this->DecodingType($sFragment, $sEncoding);
 								break;
-							case ($sContentType && strpos($sContentType, "text/html")!==false):
+							case ($sContentType && \strpos($sContentType, "text/html")!==false):
 								$aMail["html"] = $this->DecodingType($sFragment, $sEncoding);
 								break;
-							case (isset($vFragment["Content-Type"]) && strpos($vFragment["Content-Type"], "boundary")==false):
-								$sFragment = implode($this->sCRLF, $aFragment);
-								$vFragment["source"] = trim($sFragment);
+							case (isset($vFragment["Content-Type"]) && \strpos($vFragment["Content-Type"], "boundary")==false):
+								$sFragment = \implode($this->sCRLF, $aFragment);
+								$vFragment["source"] = \trim($sFragment);
 								$aMail["attachments"][] = $vFragment;
 								break;
 						}
 						break;
 					}
 
-					if(preg_match("/^([a-z\-]+)(:|=)(.*)/is", $sLine, $aLine)) {
+					if(\preg_match("/^([a-z\-]+)(:|=)(.*)/is", $sLine, $aLine)) {
 						$sLastKey = $aLine[1];
-						$aLine[3] = trim($aLine[3]);
-						$vFragment[$sLastKey] = str_replace(array("\"", '"'), "", $aLine[3]);
+						$aLine[3] = \trim($aLine[3]);
+						$vFragment[$sLastKey] = \str_replace(["\"", '"'], "", $aLine[3]);
 					} else if($sLastKey!==null) {
 						$vFragment[$sLastKey] .= $this->sCRLF.$sLine;
 					}
@@ -612,19 +607,19 @@ class nglMail extends nglBranch implements iNglClient {
 		if($this->sServerType=="smtp") {
 			return false;
 		} else if($this->sServerType=="imap") {
-			list($sSearch,$nLimit) = $this->getarguments("search,limit", func_get_args());
+			list($sSearch,$nLimit) = $this->getarguments("search,limit", \func_get_args());
 			if($sSearch===null) { $sSearch = "ALL"; }
 
 			$vResponse = $this->request("SEARCH ".$sSearch);
-			$sResult = str_replace("* SEARCH ", "", $vResponse["text"]);
+			$sResult = \str_replace("* SEARCH ", "", $vResponse["text"]);
 			if($this->FindMark($vResponse["text"])) {
-				$nTag = strpos($sResult, $this->sTag);
-				$sResult = substr($sResult, 0, $nTag);
+				$nTag = \strpos($sResult, $this->sTag);
+				$sResult = \substr($sResult, 0, $nTag);
 			}
-			$sResult = trim($sResult);
-			$aResult = explode(" ", $sResult);
+			$sResult = \trim($sResult);
+			$aResult = \explode(" ", $sResult);
 		} else {
-			$aResult = array();
+			$aResult = [];
 			$nEnd = $this->attribute("exists")+1;
 			for($x=1; $x<$nEnd; $x++) {
 				$aResult[] = $x;
@@ -632,10 +627,10 @@ class nglMail extends nglBranch implements iNglClient {
 		}
 
 		// mas nuevos primero
-		if($this->argument("revert")) { $aResult = array_reverse($aResult); }
+		if($this->argument("revert")) { $aResult = \array_reverse($aResult); }
 
 		$n = 0;
-		$aSearch = array();
+		$aSearch = [];
 		foreach($aResult as $nMail) {
 			$aHeader = $this->headers($nMail, "date from subject");
 			if($aHeader!==false) { $aSearch[$nMail] = $aHeader; }
@@ -646,7 +641,7 @@ class nglMail extends nglBranch implements iNglClient {
 	}
 
 	public function getraw() {
-		list($nMailId) = $this->getarguments("mail", func_get_args());
+		list($nMailId) = $this->getarguments("mail", \func_get_args());
 		if($this->sServerType=="imap") {
 			return $this->Fetch($nMailId, "BODY[]");
 		} else {
@@ -657,28 +652,28 @@ class nglMail extends nglBranch implements iNglClient {
 	}
 
 	public function headers() {
-		list($nMailId, $sFields) = $this->getarguments("mail,fields", func_get_args());
+		list($nMailId, $sFields) = $this->getarguments("mail,fields", \func_get_args());
 
 		if($this->sServerType=="imap") {
 			if($sFields===null) {
 				$sHeaders = $this->Fetch($nMailId, "BODY[HEADER]");
 			} else {
-				$sHeaders = $this->Fetch($nMailId, "BODY[HEADER.FIELDS (".strtoupper($sFields).")]");
+				$sHeaders = $this->Fetch($nMailId, "BODY[HEADER.FIELDS (".\strtoupper($sFields).")]");
 			}
 		} else {
 			$sHeaders = $this->POP3Header($nMailId);
 		}
 
 		if($sHeaders===false) { return false; }
-		$aHeaders = iconv_mime_decode_headers($sHeaders, 0, "UTF-8");
+		$aHeaders = \iconv_mime_decode_headers($sHeaders, 0, "UTF-8");
 		
 		if($this->sServerType=="pop3" && $sFields!==null) {
-			$sFields = strtolower($sFields);
-			$aFields = explode(" ", $sFields);
+			$sFields = \strtolower($sFields);
+			$aFields = \explode(" ", $sFields);
 			$aFields = self::call()->truelize($aFields);
-			$aHeaderFields = array();
+			$aHeaderFields = [];
 			foreach($aHeaders as $sHeaderName => $sHeader) {
-				if(isset($aFields[strtolower($sHeaderName)])) {
+				if(isset($aFields[\strtolower($sHeaderName)])) {
 					$aHeaderFields[$sHeaderName] = $sHeader;
 				}
 			}
@@ -690,14 +685,14 @@ class nglMail extends nglBranch implements iNglClient {
 	}
 
 	private function HELO($sHELO) {
-		$aHELO = array();
-		$aEHLO = explode($this->sCRLF, $sHELO);
+		$aHELO = [];
+		$aEHLO = \explode($this->sCRLF, $sHELO);
 		foreach($aEHLO as $sRow) {
-			$aRow = preg_split("/[ \-]/is", $sRow, 3);
+			$aRow = \preg_split("/[ \-]/is", $sRow, 3);
 			if(isset($aRow[1])) {
 				if(isset($aRow[2])) {
-					$aValues = explode(" ", $aRow[2]);
-					$aHELO[$aRow[1]] = (count($aValues)>1) ? self::call()->truelize($aValues) : $aValues[0];
+					$aValues = \explode(" ", $aRow[2]);
+					$aHELO[$aRow[1]] = (\count($aValues)>1) ? self::call()->truelize($aValues) : $aValues[0];
 				} else {
 					$aHELO[$aRow[1]] = true;
 				}
@@ -708,11 +703,11 @@ class nglMail extends nglBranch implements iNglClient {
 	}
 
 	public function image() {
-		list($sSource, $sCID, $sName) = $this->getarguments("embed,embed_cid,embed_name", func_get_args());
+		list($sSource, $sCID, $sName) = $this->getarguments("embed,embed_cid,embed_name", \func_get_args());
 		
 		if($sCID==null) { $sCID = $sSource; }
 		if($sName==null) { $sName = $sSource; }
-		$this->aAttachments[] = array($sSource, $sName, $sCID);
+		$this->aAttachments[] = [$sSource, $sName, $sCID];
 
 		return $this;
 	}
@@ -720,17 +715,17 @@ class nglMail extends nglBranch implements iNglClient {
 	private function Logger($sLog) {
 		$sHistory = $this->attribute("log");
 		
-		$sLog = str_replace("\r\n", "\n", $sLog);
-		$sLog = str_replace("\r", "\n", $sLog);
-		$sLog = preg_replace("/\n+/is", $this->sCRLF."   ", $sLog);
-		$sLog = trim($sLog);
+		$sLog = \str_replace("\r\n", "\n", $sLog);
+		$sLog = \str_replace("\r", "\n", $sLog);
+		$sLog = \preg_replace("/\n+/is", $this->sCRLF."   ", $sLog);
+		$sLog = \trim($sLog);
 
 		$sHistory .= $sLog.$this->sCRLF;
 		$this->attribute("log", $sHistory);
 	}
 
 	public function login() {
-		list($sUsername,$sPassword) = $this->getarguments("user,pass", func_get_args());
+		list($sUsername,$sPassword) = $this->getarguments("user,pass", \func_get_args());
 
 		$sPassword = self::passwd($sPassword, true);
 		if($this->attribute("state")=="CONNECTED") {
@@ -758,24 +753,24 @@ class nglMail extends nglBranch implements iNglClient {
 	}
 
 	public function mailbox() {
-		list($sMailBox) = $this->getarguments("folder", func_get_args());
+		list($sMailBox) = $this->getarguments("folder", \func_get_args());
 
 		if($this->attribute("state")=="AUTHENTICATED") {
 			if($this->sServerType=="imap") {
 				$vResponse = $this->request("SELECT ".$sMailBox);
 
 				if($this->FindMark($vResponse["text"], "* OK")) {
-					preg_match("/\* ([\d]+) EXISTS/s", $vResponse["text"], $aExists);
-					preg_match("/\* ([\d]+) RECENT/s", $vResponse["text"], $aRecent);
+					\preg_match("/\* ([\d]+) EXISTS/s", $vResponse["text"], $aExists);
+					\preg_match("/\* ([\d]+) RECENT/s", $vResponse["text"], $aRecent);
 
-					if(array_key_exists(1, $aExists)) { $this->attribute("exists", (int)$aExists[1]); }
-					if(array_key_exists(1, $aRecent)) { $this->attribute("recent", (int)$aRecent[1]); }
+					if(\array_key_exists(1, $aExists)) { $this->attribute("exists", (int)$aExists[1]); }
+					if(\array_key_exists(1, $aRecent)) { $this->attribute("recent", (int)$aRecent[1]); }
 					$this->attribute("state", "SELECTED");
 				}
 			} else {
 				$vResponse = $this->request("STAT");
 				if($this->FindMark($vResponse["text"])) {
-					$aLimit = explode(" ", $vResponse["text"]);
+					$aLimit = \explode(" ", $vResponse["text"]);
 					$this->attribute("exists", (int)$aLimit[1]);
 					$this->attribute("recent", null);
 					$this->attribute("state", "SELECTED");
@@ -789,24 +784,24 @@ class nglMail extends nglBranch implements iNglClient {
 	}
 
 	public function mailboxs($sMailBox=null, $sWildCard=null) {
-		list($sMailBox,$sWildCard ) = $this->getarguments("mailbox,wild_card", func_get_args());
+		list($sMailBox,$sWildCard ) = $this->getarguments("mailbox,wild_card", \func_get_args());
 
-		$aMailboxes = array();
+		$aMailboxes = [];
 		if($this->attribute("state")=="AUTHENTICATED") {
 			if($sMailBox=="") { $sMailBox = "\"\""; }
 			if($sWildCard=="") { $sWildCard = "*"; }
 
 			$vResponse = $this->request("LIST ".$sMailBox." ".$sWildCard);
 			if($this->FindMark($vResponse["text"])) {
-				$aResponse = explode($this->sCRLF, $vResponse["text"]);
+				$aResponse = \explode($this->sCRLF, $vResponse["text"]);
 				$sTag = $this->Tag();
 				foreach($aResponse as $sLine) {
-					if(strpos($sLine, $sTag)===0) { break; }
-					preg_match("/\* LIST \((.*?)\) (\"(.*?)\") (.*)/i", $sLine, $aLine);
-					$vFolder = array();
+					if(\strpos($sLine, $sTag)===0) { break; }
+					\preg_match("/\* LIST \((.*?)\) (\"(.*?)\") (.*)/i", $sLine, $aLine);
+					$vFolder = [];
 					$vFolder["name"] = $aLine[4];
-					$vFolder["flags"] = explode("\\", substr($aLine[1], 1));
-					array_push($aMailboxes, $vFolder);
+					$vFolder["flags"] = \explode("\\", \substr($aLine[1], 1));
+					\array_push($aMailboxes, $vFolder);
 				}
 			}
 		}
@@ -820,32 +815,32 @@ class nglMail extends nglBranch implements iNglClient {
 	}
 
 	protected function MailMessage() {
-		list($sMessage) = $this->getarguments("message", func_get_args());
+		list($sMessage) = $this->getarguments("message", \func_get_args());
 
 		// mensaje HTML
 		$sHTML = $sMessage;
 
 		// mensaje Texto Plano
 		if($sMessage!==null) {
-			$sText = preg_replace("/(<br>|<br \/>)/is", "\n", $sMessage);
-			$sText = strip_tags($sText);
-			$sText = trim($sText);
+			$sText = \preg_replace("/(<br>|<br \/>)/is", "\n", $sMessage);
+			$sText = \strip_tags($sText);
+			$sText = \trim($sText);
 		} else {
 			$sText = "";
 		}
 
 		$sCRLF = $this->sCRLF;
 		$fNormalize = function(&$sMessage) use ($sCRLF) {
-			$sMessage = str_replace("\r\n", "\n", $sMessage);
-			$sMessage = str_replace("\r", "\n", $sMessage);
-			$aMessage = explode("\n", $sMessage);
+			$sMessage = \str_replace("\r\n", "\n", $sMessage);
+			$sMessage = \str_replace("\r", "\n", $sMessage);
+			$aMessage = \explode("\n", $sMessage);
 			foreach($aMessage as $nLine => $sLine) {
 				if($sLine==".") { $sLine .= " "; }
 				$aMessage[$nLine] = $sLine;
 			}
 			
-			$sMessage = implode($sCRLF, $aMessage);
-			return trim($sMessage);
+			$sMessage = \implode($sCRLF, $aMessage);
+			return \trim($sMessage);
 		};
 
 		$fNormalize($sText);
@@ -876,7 +871,7 @@ class nglMail extends nglBranch implements iNglClient {
 	}
 
 	protected function MailPriority($mPriority) {
-		$nPriority = intval($mPriority);
+		$nPriority = \intval($mPriority);
 		switch($nPriority) {
 			case 1: $this->attribute("mail_priority", "1 (Highest)"); break;
 			case 2: $this->attribute("mail_priority", "2 (High)"); break;
@@ -905,11 +900,11 @@ class nglMail extends nglBranch implements iNglClient {
 			$sName = $aAttach[1];
 			$sCID = (isset($aAttach[2])) ? $aAttach[2] : null;
 
-			if(file_exists($sSource)) {
+			if(\file_exists($sSource)) {
 				$file = self::call("file")->load($sSource);
 				$sBuffer = $file->read();
-				$sBuffer = base64_encode($sBuffer);
-				$sBuffer = chunk_split($sBuffer);
+				$sBuffer = \base64_encode($sBuffer);
+				$sBuffer = \chunk_split($sBuffer);
 
 				$sAttachments .= $this->sCRLF."--".$this->sBoundary."MIX".$this->sCRLF;
 
@@ -919,12 +914,12 @@ class nglMail extends nglBranch implements iNglClient {
 				$sAttachments .= "Content-Transfer-Encoding: base64".$this->sCRLF.$this->sCRLF;
 				$sAttachments .= $sBuffer;
 			} else if($sSource==$this->sContentKey) {
-				$sBasename = basename($sName);
-				$aBasename = explode(".", $sBasename);
-				$sExtension = array_pop($aBasename);
+				$sBasename = \basename($sName);
+				$aBasename = \explode(".", $sBasename);
+				$sExtension = \array_pop($aBasename);
 
-				$sBuffer = base64_encode($sCID);
-				$sBuffer = chunk_split($sBuffer);
+				$sBuffer = \base64_encode($sCID);
+				$sBuffer = \chunk_split($sBuffer);
 				$sMime = self::call()->mimeType($sExtension);
 
 				$sAttachments .= $this->sCRLF."--".$this->sBoundary."MIX".$this->sCRLF;
@@ -939,10 +934,10 @@ class nglMail extends nglBranch implements iNglClient {
 	}
 
 	public function request() {
-		list($sMessage,$sMark) = $this->getarguments("command,mark", func_get_args());
+		list($sMessage,$sMark) = $this->getarguments("command,mark", \func_get_args());
 
 		$sMessage = (($this->sServerType=="imap") ? $this->Tag(true)." " : "").$sMessage.$this->sCRLF;
-		@fputs($this->socket, $sMessage);
+		@\fputs($this->socket, $sMessage);
 		$this->Logger("<< ".$sMessage); 
 		return $this->Response($sMark);
 	}
@@ -956,22 +951,22 @@ class nglMail extends nglBranch implements iNglClient {
 			default: return false;
 		}
 
-		$vResponse = array("code"=>null, "text"=>null);
-		if(!is_resource($this->socket)) {
+		$vResponse = ["code"=>null, "text"=>null];
+		if(!\is_resource($this->socket)) {
 			$this->Logger("-- No active connections");
 		} else {
 			$sResponse = "";
 			while(true) {
-				$sGet = fgets($this->socket, 515);
+				$sGet = \fgets($this->socket, 515);
 				$sResponse .= (!empty($sGet)) ? $sGet : "\n";
-				$vMetaData = stream_get_meta_data($this->socket);
+				$vMetaData = \stream_get_meta_data($this->socket);
 				if($vMetaData["unread_bytes"]==0) { break; }
-				if($sMark!=null && strpos($sGet, $sMark)===0) { break; }
+				if($sMark!=null && \strpos($sGet, $sMark)===0) { break; }
 			}
 			
 			$vResponse["text"] = $sResponse;
-			if($bSMTP) { $vResponse["code"] = substr($sResponse, 0, 3); }
-			if($bPOP3) { $vResponse["code"] = substr($sResponse, 0, 4); }
+			if($bSMTP) { $vResponse["code"] = \substr($sResponse, 0, 3); }
+			if($bPOP3) { $vResponse["code"] = \substr($sResponse, 0, 4); }
 			$this->Logger(">> ".$vResponse["text"]);
 		}
 
@@ -979,7 +974,7 @@ class nglMail extends nglBranch implements iNglClient {
 	}
 
 	public function send() {
-		list($mTo, $mCC, $mBCC) = $this->getarguments("to,cc,bcc", func_get_args());
+		list($mTo, $mCC, $mBCC) = $this->getarguments("to,cc,bcc", \func_get_args());
 		if($this->attribute("from")==null) { return self::errorMessage($this->object, 1001); }
 		
 		$aTo = $this->PrepareMails($mTo);
@@ -987,9 +982,9 @@ class nglMail extends nglBranch implements iNglClient {
 		$this->attribute("mail_cc", $this->PrepareMails($mCC));
 		$this->attribute("mail_bcc", $this->PrepareMails($mBCC));
 		
-		$aSentTo = array();
-		if(count($aTo)) {
-			if(!is_array($aTo)) { $aTo = array($aTo); }
+		$aSentTo = [];
+		if(\is_array($aTo) && \count($aTo)) {
+			if(!\is_array($aTo)) { $aTo = [$aTo]; }
 
 			$this->BuildMail();
 			$sMessage = $this->attribute("mail_body");
@@ -997,11 +992,11 @@ class nglMail extends nglBranch implements iNglClient {
 			$sSubject = $this->argument("mail_subject");
 
 			foreach($aTo as $sTo) {
-				$sHeader = str_replace("{{MAILTO}}", $sTo, $sHeaders);
+				$sHeader = \str_replace("{{MAILTO}}", $sTo, $sHeaders);
 				if($this->sServerType=="smtp") {
 					$aSentTo[] = $this->SMTPMail($sTo, $sMessage, $sHeader);
 				} else if($this->sServerType=="php") {
-					$aSentTo[] = mail($sTo, $sSubject, $sMessage, $sHeader);
+					$aSentTo[] = \mail($sTo, $sSubject, $sMessage, $sHeader);
 				}
 			}
 		}
@@ -1031,16 +1026,16 @@ class nglMail extends nglBranch implements iNglClient {
 			$vHELO = $this->HELO($vResponse["text"]);
 
 			// tls
-			if(isset($vHELO["STARTTLS"]) && strtolower($sSecure)=="tls") {
+			if(isset($vHELO["STARTTLS"]) && \strtolower($sSecure)=="tls") {
 				$vResponse = $this->request("STARTTLS");
-				@stream_socket_enable_crypto($this->socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
+				@\stream_socket_enable_crypto($this->socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
 				$this->request("EHLO ".$sLocalhost);
 			}
 
 			// login
 			if($sAuthType!==null) {
-				$sAuthType = strtoupper($sAuthType);
-				$vHELO["AUTH"] = array($sAuthType => true);
+				$sAuthType = \strtoupper($sAuthType);
+				$vHELO["AUTH"] = [$sAuthType => true];
 			}
 
 			$bLogin = false;
@@ -1066,7 +1061,7 @@ class nglMail extends nglBranch implements iNglClient {
 		$sMail = $sHeaders.$this->sCRLF.$this->sCRLF.$sMessage.$this->sCRLF.".";
 
 		// max email sizes
-		if($this->nSMTPMaxSize!==null && strlen($sMail) > $this->nSMTPMaxSize) {
+		if($this->nSMTPMaxSize!==null && \strlen($sMail) > $this->nSMTPMaxSize) {
 			$this->Logger("-- Maximum mail size exceeded: ".$nMail);
 			$this->Disconnect();
 		}
@@ -1076,7 +1071,7 @@ class nglMail extends nglBranch implements iNglClient {
 
 		// to
 		if($vResponse["code"]==250) {
-			$aTo = array_unique(array_merge(array($sTo), $aCC, $aBCC));
+			$aTo = \array_unique(\array_merge([$sTo], $aCC, $aBCC));
 
 			foreach($aTo as $sMailTo) {
 				$vResponse = $this->request("RCPT TO: ".$sMailTo);
@@ -1110,31 +1105,31 @@ class nglMail extends nglBranch implements iNglClient {
 	// test1 <test1@domain.com>,test2 <test2@domain.com>
 	// array("test1", "test1 <test1@domain.com>");
 	private function PrepareMails($mEmails, $bOnce=false) {
-		if(is_string($mEmails)) {
-			$mEmails = str_replace(",", ";", $mEmails);
-			$aMails = explode(";", $mEmails);
+		if(\is_string($mEmails)) {
+			$mEmails = \str_replace(",", ";", $mEmails);
+			$aMails = \explode(";", $mEmails);
 		} else {
 			$aMails = $mEmails;
 		}
 
-		$aValidMails = array();
-		if(is_array($aMails) && count($aMails)) {
+		$aValidMails = [];
+		if(\is_array($aMails) && \count($aMails)) {
 			foreach($aMails as $sEmail) {
-				$sEmail = str_replace(array("<",">"), " ", $sEmail);
-				$sEmail = trim($sEmail);
-				$aEmail = explode(" ", $sEmail);
+				$sEmail = \str_replace(["<",">"], " ", $sEmail);
+				$sEmail = \trim($sEmail);
+				$aEmail = \explode(" ", $sEmail);
 				if(isset($aEmail[1])) {
-					$sEmail = array_pop($aEmail);
-					$sName = implode(" ", $aEmail);
-					$sName = trim($sName)." ";
+					$sEmail = \array_pop($aEmail);
+					$sName = \implode(" ", $aEmail);
+					$sName = \trim($sName)." ";
 				} else {
-					$sEmail = trim($sEmail);
+					$sEmail = \trim($sEmail);
 					$sName = "";
 				}
 
-				if($bOnce) { return array($sName."<".$sEmail.">", $sName, $sEmail); }
+				if($bOnce) { return [$sName."<".$sEmail.">", $sName, $sEmail]; }
 
-				if(preg_match("/".$this->sRegexMail."/is", $sEmail)) {
+				if(\preg_match("/".$this->sRegexMail."/is", $sEmail)) {
 					$aValidMails[] = $sName."<".$sEmail.">";
 				}
 			}

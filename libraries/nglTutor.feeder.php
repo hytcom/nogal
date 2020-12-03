@@ -20,9 +20,9 @@ class nglTutor extends nglTrunk {
 
 	final public function __init__($sTutorID=null, $aMethods=null) {
 		$this->ID = ($sTutorID!==null) ? $sTutorID : self::call()->unique();
-		$this->aNulls = array();
-		$this->aEmpty = array();
-		$this->aZeros = array();
+		$this->aNulls = [];
+		$this->aEmpty = [];
+		$this->aZeros = [];
 		$this->aAllowedMethods = $aMethods;
 		return $this->ID;
 	}
@@ -36,7 +36,7 @@ class nglTutor extends nglTrunk {
 
 		if(!$this->tutor($sTutorName)) {
 			$sTutorFile = self::call()->clearPath(NGL_PATH_TUTORS.NGL_DIR_SLASH.$sTutorName.".php");
-			if(file_exists($sTutorFile)) {
+			if(\file_exists($sTutorFile)) {
 				require_once($sTutorFile);
 				
 				$this->TutorName = $sTutorName;
@@ -45,9 +45,9 @@ class nglTutor extends nglTrunk {
 				// aborta si encuentra metodos publicos en el tutor
 				$reflection = new \ReflectionClass($sClassName);
 				$aMethods = $reflection->getMethods(\ReflectionMethod::IS_PUBLIC);
-				$sClass = strtolower($sClassName);
+				$sClass = \strtolower($sClassName);
 				foreach($aMethods as $vMethod) {
-					$sClassMethod = strtolower($vMethod->class);
+					$sClassMethod = \strtolower($vMethod->class);
 					if($sClassMethod!=$sClass) { break; }
 					if($sClassMethod==$sClass) {
 						self::errorMessage($this->object, 1001);
@@ -55,12 +55,12 @@ class nglTutor extends nglTrunk {
 				}
 				
 				// metodos permitidos del tutor
-				$aAllowedMethods = array("debug"=>true);
+				$aAllowedMethods = ["debug"=>true];
 				$aMethods = $reflection->getMethods(\ReflectionMethod::IS_PROTECTED);
 				foreach($aMethods as $vMethod) {
-					$sClassMethod = strtolower($vMethod->class);
+					$sClassMethod = \strtolower($vMethod->class);
 					if($sClassMethod==$sClass) {
-						$aAllowedMethods[strtolower($vMethod->name)] = true;
+						$aAllowedMethods[\strtolower($vMethod->name)] = true;
 					}
 				}
 				unset($aAllowedMethods["init"]);
@@ -72,14 +72,13 @@ class nglTutor extends nglTrunk {
 
 		$aTutor = $this->tutor($sTutorName);
 		$sClassName = $aTutor[0];
-		if(class_exists($sClassName)) {
+		if(\class_exists($sClassName)) {
 			self::$bLoadAllowed = true;
 			$tutor = new $sClassName();
 			$tutor->TutorName($sTutorName);
-			// $tutor = new $sClassName("tutor".$sTutorName, "tutor");
 			self::$bLoadAllowed = false;
 			$sTutorID = $tutor->__init__($sTutorID, $aTutor[1]);
-			if(method_exists($tutor, "init")) { $tutor->init($mArguments); }
+			if(\method_exists($tutor, "init")) { $tutor->init($mArguments); }
 			self::$aTutorsLoaded[$sTutorID] = $tutor;
 			return $tutor;
 		} else {
@@ -87,14 +86,14 @@ class nglTutor extends nglTrunk {
 		}
 	}
 
-	final public function run($sMethod, $aArguments=array()) {
-		if(!isset($this->aAllowedMethods[strtolower($sMethod)])) { trigger_error("Nonexistent method", E_USER_ERROR); }
-		if($this->bLocked) { trigger_error("Can't run methods from a locked tutor", E_USER_ERROR); }
+	final public function run($sMethod, $aArguments=[]) {
+		if(!isset($this->aAllowedMethods[\strtolower($sMethod)])) { \trigger_error("Nonexistent method", E_USER_ERROR); }
+		if($this->bLocked) { \trigger_error("Can't run methods from a locked tutor", E_USER_ERROR); }
 		if($this->bLockable) { $this->lock(); }
 		
-		if(method_exists($this, $sMethod)) {
+		if(\method_exists($this, $sMethod)) {
 			$this->MethodName($sMethod);
-			return call_user_func(array($this, $sMethod), $aArguments);
+			return \call_user_func([$this, $sMethod], $aArguments);
 		}
 		
 		return null;
@@ -103,7 +102,7 @@ class nglTutor extends nglTrunk {
 	final protected function Alvin() {
 		if(NGL_ALVIN!==null) {
 			if(!isset($_SESSION[NGL_SESSION_INDEX]) || !isset($_SESSION[NGL_SESSION_INDEX]["ALVIN"])) {
-				trigger_error("Only logged users can run this method", E_USER_ERROR);
+				\trigger_error("Only logged users can run this method", E_USER_ERROR);
 			}
 		}
 		return $this;
@@ -113,7 +112,7 @@ class nglTutor extends nglTrunk {
 		$this->bDebug = true;
 		if(!$this->debuggable) { return "[[TUTOR-DEBUG]]<br /><br />Debug is not allowed"; }
 		$fn = self::call("fn");
-		$aArguments = ($this->sMethodName=="debug" && count($_FILES)) ? array_merge(func_get_args(), $_FILES) : func_get_args();
+		$aArguments = ($this->sMethodName=="debug" && \count($_FILES)) ? \array_merge(\func_get_args(), $_FILES) : \func_get_args();
 		return 
 			"[[TUTOR-DEBUG]]".
 			"<br /><br />".
@@ -121,7 +120,7 @@ class nglTutor extends nglTrunk {
 			"METHOD: ".$_SERVER["REQUEST_METHOD"]."\n".
 			"TUTOR: ".$this->sTutorName." / ".$this->sMethodName."\n".
 			"</pre>\n".
-			call_user_func_array(array($fn, "dumphtml"), $aArguments)
+			\call_user_func_array([$fn, "dumphtml"], $aArguments)
 		;
 	}
 
@@ -148,19 +147,19 @@ class nglTutor extends nglTrunk {
 
 	final protected function Nulls($aData, $aNulls=null) {
 		if($aNulls===null) { $aNulls = $this->aNulls; }
-		if(!is_array($aNulls) || !count($aNulls)) { return $aData; }
+		if(!\is_array($aNulls) || !\count($aNulls)) { return $aData; }
 		return self::call()->emptyToNull($aData, $aNulls);
 	}
 
 	final protected function Empty($aData, $aEmpty=null) {
 		if($aEmpty===null) { $aEmpty = $this->aEmpty; }
-		if(!is_array($aEmpty) || !count($aEmpty)) { return $aData; }
+		if(!\is_array($aEmpty) || !\count($aEmpty)) { return $aData; }
 		return self::call()->nullToEmpty($aData, $aEmpty);
 	}
 
 	final protected function Zeros($aData, $aZeros=null) {
 		if($aZeros===null) { $aZeros = $this->aZeros; }
-		if(!is_array($aZeros) || !count($aZeros)) { return $aData; }
+		if(!\is_array($aZeros) || !\count($aZeros)) { return $aData; }
 		return self::call()->emptyToZero($aData, $aZeros);
 	}
 
@@ -172,7 +171,7 @@ class nglTutor extends nglTrunk {
 
 	final private function TutorCaller($sCaller) {
 		if($sCaller!==__FILE__) {
-			trigger_error("Can't instantiate outside of the «tutor» class", E_USER_ERROR);
+			\trigger_error("Can't instantiate outside of the «tutor» class", E_USER_ERROR);
 		}
 	}
 

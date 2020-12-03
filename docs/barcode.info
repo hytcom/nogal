@@ -1,6 +1,6 @@
 [checksum]
-md5 = "be87d4e6264fa5c340e66890ec9ae6b8"
-sha1 = "19b74399b35557182f56cc5ba9f3c097fe0cb0d2"
+md5 = "76f4dba5866acff1d491a866876dcd80"
+sha1 = "a5decdc0b8123be2e62ee8aaea8d7dde01c31177"
 
 [documentation]
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/barcode.md"

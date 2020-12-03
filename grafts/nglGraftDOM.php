@@ -19,20 +19,20 @@ class nglGraftDOM extends nglScion {
 	public $dom = null;
 
 	final protected function __declareArguments__() {
-		$vArguments							= array();
-		$vArguments["content"]				= array('(string)$mValue', "test1234");
-		$vArguments["selector"]				= array('(string)$mValue', "");
-		$vArguments["index"]				= array('(int)$mValue', 0);
-		$vArguments["lowercase"]			= array('(boolean)$mValue', true);
-		$vArguments["tagsclosed"]			= array('(boolean)$mValue', true);
-		$vArguments["charset"]				= array('(string)$mValue', "UTF-8");
-		$vArguments["brtext"]				= array('(string)$mValue', "\r\n");
-		$vArguments["spantext"]				= array('(string)$mValue', " ");
+		$vArguments							= [];
+		$vArguments["content"]				= ['(string)$mValue', "test1234"];
+		$vArguments["selector"]				= ['(string)$mValue', ""];
+		$vArguments["index"]				= ['(int)$mValue', 0];
+		$vArguments["lowercase"]			= ['(boolean)$mValue', true];
+		$vArguments["tagsclosed"]			= ['(boolean)$mValue', true];
+		$vArguments["charset"]				= ['(string)$mValue', "UTF-8"];
+		$vArguments["brtext"]				= ['(string)$mValue', "\r\n"];
+		$vArguments["spantext"]				= ['(string)$mValue', " "];
 		return $vArguments;
 	}
 
 	final protected function __declareAttributes__() {
-		$vAttributes = array();
+		$vAttributes = [];
 		return $vAttributes;
 	}
 
@@ -41,7 +41,7 @@ class nglGraftDOM extends nglScion {
 	}
 
 	public function load() {
-		list($sContent,$bLowerCase,$sBrText,$sSpanText,$bTagsClosed,$sCharset) = $this->getarguments("content,lowercase,brtext,spantext,tagsclosed,charset", func_get_args());
+		list($sContent,$bLowerCase,$sBrText,$sSpanText,$bTagsClosed,$sCharset) = $this->getarguments("content,lowercase,brtext,spantext,tagsclosed,charset", \func_get_args());
 		$this->dom = new \simple_html_dom(
 			null,
 			$bLowerCase,
@@ -54,7 +54,7 @@ class nglGraftDOM extends nglScion {
 	}
 
 	public function get() {
-		list($sSelector, $nIndex) = $this->getarguments("selector,index", func_get_args());
+		list($sSelector, $nIndex) = $this->getarguments("selector,index", \func_get_args());
 		$element = $this->dom->find($sSelector, $nIndex);
 		if($element!==null) {
 			return $this->GetElementData($element,true);
@@ -63,8 +63,8 @@ class nglGraftDOM extends nglScion {
 	}
 
 	public function getall() {
-		list($sSelector) = $this->getarguments("selector", func_get_args());
-		$aElements = array();
+		list($sSelector) = $this->getarguments("selector", \func_get_args());
+		$aElements = [];
 		foreach($this->dom->find($sSelector) as $element) {
 			$aElements[] = $this->GetElementData($element);
 		}
@@ -79,15 +79,15 @@ class nglGraftDOM extends nglScion {
 		$tag->html		= $element->innertext;
 		$tag->text		= $element->plaintext;
 
-		$tag->attr = array();
-		if(is_array($element->attr) && count($element->attr)) {
+		$tag->attr = [];
+		if(\is_array($element->attr) && \count($element->attr)) {
 			foreach($element->attr as $sAttrName => $sAttrValue) {
 				$tag->attr[$sAttrName] = $sAttrValue;
 			}
 		}
 
-		$tag->children = array();
-		if(is_array($element->children) && count($element->children)) {
+		$tag->children = [];
+		if(\is_array($element->children) && \count($element->children)) {
 			foreach($element->children as $nChild => $aChild) {
 				$tag->children[$nChild] = $this->GetElementData($aChild);
 			}

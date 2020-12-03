@@ -23,16 +23,16 @@ class nglGraftMarkdown extends nglScion {
 	public $md = null;
 
 	final protected function __declareArguments__() {
-		$vArguments				= array();
-		$vArguments["content"]	= array('(string)$mValue', "test1234");
-		$vArguments["links"]	= array('$this->SetUrlsLinked($mValue)', true);
-		$vArguments["nl2br"]	= array('$this->SetNewLineToBreak($mValue)', true);
-		$vArguments["html"]		= array('$this->SetMarkupHTML($mValue)', true);
+		$vArguments				= [];
+		$vArguments["content"]	= ['(string)$mValue', "test1234"];
+		$vArguments["links"]	= ['$this->SetUrlsLinked($mValue)', true];
+		$vArguments["nl2br"]	= ['$this->SetNewLineToBreak($mValue)', true];
+		$vArguments["html"]		= ['$this->SetMarkupHTML($mValue)', true];
 		return $vArguments;
 	}
 
 	final protected function __declareAttributes__() {
-		$vAttributes = array();
+		$vAttributes = [];
 		return $vAttributes;
 	}
 
@@ -48,12 +48,12 @@ class nglGraftMarkdown extends nglScion {
 	}
 
 	public function format() {
-		list($sContent) = $this->getarguments("content", func_get_args());
+		list($sContent) = $this->getarguments("content", \func_get_args());
 		return $this->md->text($sContent);
 	}
 
 	public function formatfile() {
-		list($sFileName) = $this->getarguments("filepath", func_get_args());
+		list($sFileName) = $this->getarguments("filepath", \func_get_args());
 		$sFileName = self::call()->sandboxPath($sFileName);
 		$sContent = self::call("file")->load($sFileName)->read();
 		return $this->md->text($sContent);

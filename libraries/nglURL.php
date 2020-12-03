@@ -41,16 +41,16 @@ class nglURL extends nglBranch {
 	private $sURL = null;
 
 	final protected function __declareArguments__() {
-		$vArguments					= array();
-		$vArguments["url"]			= array('$mValue', null);
-		$vArguments["argument"]		= array('$mValue', null);
-		$vArguments["value"]		= array('$mValue', null);
+		$vArguments					= [];
+		$vArguments["url"]			= ['$mValue', null];
+		$vArguments["argument"]		= ['$mValue', null];
+		$vArguments["value"]		= ['$mValue', null];
 
 		return $vArguments;
 	}
 
 	final protected function __declareAttributes__() {
-		$vAttributes 				= array();
+		$vAttributes 				= [];
 		$vAttributes["basename"]	= null;
 		$vAttributes["dirname"]	 	= null;
 		$vAttributes["extension"]	= null;
@@ -126,26 +126,26 @@ class nglURL extends nglBranch {
 		"return" : "$this"
 	} **/
 	public function parse() {
-		list($sURL) = $this->getarguments("url", func_get_args());
+		list($sURL) = $this->getarguments("url", \func_get_args());
 		if(!is_string($sURL)) { return false; }
 		$this->sURL = $sURL;
 	
-		$vURL = parse_url($sURL);
+		$vURL = \parse_url($sURL);
 		if(isset($vURL["query"])) {
-			$vURL["params"] = array();
-			$aPairs = explode("&", $vURL["query"]);
+			$vURL["params"] = [];
+			$aPairs = \explode("&", $vURL["query"]);
 			foreach($aPairs as $sPair) {
-				$sPair = trim($sPair);
+				$sPair = \trim($sPair);
 				if($sPair==="") { continue; }
-				list($sKey, $sValue) = explode("=", $sPair);
-				$vURL["params"][$sKey] = urldecode($sValue);
+				list($sKey, $sValue) = \explode("=", $sPair);
+				$vURL["params"][$sKey] = \urldecode($sValue);
 			}
 		}
 
 		$this->attribute("ssl", false);
 		if(isset($vURL["scheme"]))	{
 			$this->attribute("scheme", $vURL["scheme"]);
-			$this->attribute("ssl", (strtolower($vURL["scheme"])=="https"));
+			$this->attribute("ssl", (\strtolower($vURL["scheme"])=="https"));
 		}
 		
 		if(isset($vURL["user"])) 	{ $this->attribute("user", 		$vURL["user"]); }
@@ -157,13 +157,13 @@ class nglURL extends nglBranch {
 		if(isset($vURL["fragment"])){ $this->attribute("fragment", 	$vURL["fragment"]); }
 		if(isset($vURL["path"])) 	{
 			$this->attribute("path", $vURL["path"]);
-			$vPath = pathinfo($vURL["path"]);
+			$vPath = \pathinfo($vURL["path"]);
 			if(isset($vPath["dirname"])) 	{ $this->attribute("dirname",	$vPath["dirname"]); }
 			if(isset($vPath["basename"])) 	{ $this->attribute("basename",	$vPath["basename"]); }
 			if(isset($vPath["extension"])) 	{ $this->attribute("extension",	$vPath["extension"]); }
 			if(isset($vPath["filename"])) 	{ $this->attribute("filename",	$vPath["filename"]); }
 			
-			$vURL = array_merge($vURL, $vPath);
+			$vURL = \array_merge($vURL, $vPath);
 		}
 
 		return $this;
@@ -201,7 +201,7 @@ class nglURL extends nglBranch {
 		$vURL = $this->__info__("attributes");
 
 		// armado
-		$sScheme	= (isset($vURL["scheme"])) ? strtolower($vURL["scheme"]) : "http";
+		$sScheme	= (isset($vURL["scheme"])) ? \strtolower($vURL["scheme"]) : "http";
 		$sUser		= (isset($vURL["user"])) ? $vURL["user"] : null;
 		$sPass		= (isset($vURL["pass"])) ? $vURL["pass"] : null;
 		$sHost		= (isset($vURL["host"])) ? $vURL["host"] : null;
@@ -230,7 +230,7 @@ class nglURL extends nglBranch {
 		
 		$sURL  = $sScheme."://";
 		$sURL .= ($sUser!==null && $sUser != "" && $sPass!==null) ? $sUser.":".$sPass."@" : "";
-		$sURL .= str_replace("//", "/", $sHost."/".$sPath);
+		$sURL .= \str_replace("//", "/", $sHost."/".$sPath);
 		$sURL .= ($sQuery!==null) ? "?".$sQuery : "";
 		$sURL .= ($sFragment!==null) ? "#".$sFragment : "";
 
@@ -266,7 +266,7 @@ class nglURL extends nglBranch {
 		"return": "$this"
 	} **/
 	public function update() {
-		list($sPart, $mValue) = $this->getarguments("argument,value", func_get_args());
+		list($sPart, $mValue) = $this->getarguments("argument,value", \func_get_args());
 
 		if(!$this->isAttribute($sPart)) { return false; }
 
@@ -274,10 +274,10 @@ class nglURL extends nglBranch {
 			$this->parse();
 		}
 
-		$sPart = strtolower($sPart);
+		$sPart = \strtolower($sPart);
 		if($sPart=="params") {
-			$aOldParams = ($this->attribute("params")) ? $this->attribute("params") : array();
-			$mValue = array_merge($aOldParams, $mValue);
+			$aOldParams = ($this->attribute("params")) ? $this->attribute("params") : [];
+			$mValue = \array_merge($aOldParams, $mValue);
 		}
 		$this->attribute($sPart, $mValue);
 
@@ -292,11 +292,11 @@ class nglURL extends nglBranch {
 		"return" : "string"
 	} **/
 	private function QueryString($aParts) {
-		$aPairs = array();
+		$aPairs = [];
 		foreach($aParts as $sKey=>$sValue) {
-			$aPairs[] = $sKey."=".urlencode(stripslashes($sValue));
+			$aPairs[] = $sKey."=".\urlencode(\stripslashes($sValue));
 		}
-		$sQuery = implode("&", $aPairs);
+		$sQuery = \implode("&", $aPairs);
 		
 		return $sQuery;
 	}

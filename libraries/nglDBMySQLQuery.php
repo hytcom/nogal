@@ -20,20 +20,20 @@ class nglDBMySQLQuery extends nglBranch implements iNglDBQuery {
 	private $cursor = null;
 	
 	final protected function __declareArguments__() {
-		$vArguments							= array();
+		$vArguments							= [];
 
-		$vArguments["column"]				= array('$mValue', null);
-		$vArguments["get_mode"]				= array('$this->GetMode($mValue)', MYSQLI_ASSOC);
-		$vArguments["link"]					= array('$mValue', null);
-		$vArguments["query"]				= array('$mValue', null);
-		$vArguments["sentence"]				= array('(string)$mValue', null);
-		$vArguments["query_time"]			= array('$mValue', null);
+		$vArguments["column"]				= ['$mValue', null];
+		$vArguments["get_mode"]				= ['$this->GetMode($mValue)', \MYSQLI_ASSOC];
+		$vArguments["link"]					= ['$mValue', null];
+		$vArguments["query"]				= ['$mValue', null];
+		$vArguments["sentence"]				= ['(string)$mValue', null];
+		$vArguments["query_time"]			= ['$mValue', null];
 
 		return $vArguments;
 	}
 
 	final protected function __declareAttributes__() {
-		$vAttributes						= array();
+		$vAttributes						= [];
 		$vAttributes["sql"]					= null;
 		$vAttributes["time"]				= null;
 		$vAttributes["crud"]				= null;
@@ -56,14 +56,14 @@ class nglDBMySQLQuery extends nglBranch implements iNglDBQuery {
 		$nRows = null;
 		if($this->attribute("crud")=="SELECT") {
 			$sSQL = $sSQLCheck = $this->attribute("sql");
-			$sSQLCheck = preg_replace("/(\t|\n|\r)/i", "", $sSQLCheck);
-			$sSQLCheck = preg_replace("/(\"(.*?)\"|'(.*?)'|`(.*?)`)/", "", $sSQLCheck);
-			if(preg_match("/(FOUND_ROWS)/i", $sSQLCheck)) { return null; }
+			$sSQLCheck = \preg_replace("/(\t|\n|\r)/i", "", $sSQLCheck);
+			$sSQLCheck = \preg_replace("/(\"(.*?)\"|'(.*?)'|`(.*?)`)/", "", $sSQLCheck);
+			if(\preg_match("/(FOUND_ROWS)/i", $sSQLCheck)) { return null; }
 
 			$sSQL = trim($sSQL);
 			if(preg_match("/LIMIT *[0-9]+ *,? *[0-9]*$/i", $sSQL)) {
-				$sSQL = preg_replace("/LIMIT *[0-9]+ *,? *[0-9]*$/i", "", $sSQL);
-				$sSQL = preg_replace("/SELECT/i", "SELECT SQL_CALC_FOUND_ROWS", $sSQL, 1);
+				$sSQL = \preg_replace("/LIMIT *[0-9]+ *,? *[0-9]*$/i", "", $sSQL);
+				$sSQL = \preg_replace("/SELECT/i", "SELECT SQL_CALC_FOUND_ROWS", $sSQL, 1);
 				$foundrows = $this->db->query($sSQL);
 			
 				$sRowsAlias = self::call()->unique();
@@ -89,7 +89,7 @@ class nglDBMySQLQuery extends nglBranch implements iNglDBQuery {
 	public function columns() {
 		if($this->attribute("_columns")!==null) { return $this->attribute("_columns"); }
 
-		$aGetColumns = array();
+		$aGetColumns = [];
 		$aCols = $this->cursor->fetch_fields();
 		foreach($aCols as $column) {
 			$aGetColumns[] = $column->name;
@@ -101,7 +101,7 @@ class nglDBMySQLQuery extends nglBranch implements iNglDBQuery {
 
 	public function count() {
 		if($this->attribute("_rows")!==null) { return $this->attribute("_rows"); }
-		if(in_array($this->attribute("crud"), array("INSERT", "UPDATE", "REPLACE", "DELETE"))) {
+		if(\in_array($this->attribute("crud"), ["INSERT", "UPDATE", "REPLACE", "DELETE"])) {
 			$nRows = $this->db->affected_rows;
 		} else {
 			$nRows = $this->cursor->num_rows;
@@ -112,7 +112,7 @@ class nglDBMySQLQuery extends nglBranch implements iNglDBQuery {
 	}
 
 	public function destroy() {
-		if(!is_bool($this->cursor)) { $this->free(); }
+		if(!\is_bool($this->cursor)) { $this->free(); }
 		$this->db = null;
 		$this->cursor = null;
 		return parent::__destroy__();
@@ -124,30 +124,30 @@ class nglDBMySQLQuery extends nglBranch implements iNglDBQuery {
 	}
 
 	public function get() {
-		list($sColumn,$nMode) = $this->getarguments("column,get_mode", func_get_args());
+		list($sColumn,$nMode) = $this->getarguments("column,get_mode", \func_get_args());
 		$aRow = $this->cursor->fetch_array($nMode);
-		if($sColumn[0]=="#") { $sColumn = substr($sColumn, 1); }
-		return ($sColumn!==null && $aRow!==false && $aRow!==null && array_key_exists($sColumn, $aRow)) ? $aRow[$sColumn] : $aRow;
+		if($sColumn[0]=="#") { $sColumn = \substr($sColumn, 1); }
+		return ($sColumn!==null && $aRow!==false && $aRow!==null && \array_key_exists($sColumn, $aRow)) ? $aRow[$sColumn] : $aRow;
 	}
 
 	public function getall() {
-		list($sColumn,$nMode) = $this->getarguments("column,get_mode", func_get_args());
+		list($sColumn,$nMode) = $this->getarguments("column,get_mode", \func_get_args());
 		$bGroupByMode = $bIndexMode = $bKeyValue = false;
 
-		if(is_array($sColumn)) {
+		if(\is_array($sColumn)) {
 			$aGroup = $sColumn;
 			$sColumn = null;
 			$bGroupByMode = true;
 		} else {
 			if($sColumn[0]=="#") {
-				$sColumn = substr($sColumn, 1);
+				$sColumn = \substr($sColumn, 1);
 				$bIndexMode = true;
 			}
 
 			if($sColumn[0]=="@") {
-				$aColumn = explode(";", substr($sColumn, 1));
+				$aColumn = \explode(";", \substr($sColumn, 1));
 				$sColumn = $aColumn[0];
-				$sValue = (count($aColumn)>1) ? $aColumn[1] : $aColumn[0];
+				$sValue = (\count($aColumn)>1) ? $aColumn[1] : $aColumn[0];
 				$bKeyValue = true;
 			}			
 		}
@@ -155,17 +155,17 @@ class nglDBMySQLQuery extends nglBranch implements iNglDBQuery {
 		$this->reset();
 		$aRow = $this->cursor->fetch_array($nMode);
 
-		$aGetAll = array();
-		if($sColumn!==null && $aRow!==false && $aRow!==null && !array_key_exists($sColumn, $aRow)) { return $aGetAll; }
+		$aGetAll = [];
+		if($sColumn!==null && $aRow!==false && $aRow!==null && !\array_key_exists($sColumn, $aRow)) { return $aGetAll; }
 		$this->reset();
 
 		if($sColumn!==null) {
 			if($bIndexMode) {
-				$aMultiple = array();
+				$aMultiple = [];
 				while($aRow = $this->cursor->fetch_array($nMode)) {
 					if(isset($aGetAll[$aRow[$sColumn]])) {
 						if(!isset($aMultiple[$aRow[$sColumn]])) {
-							$aGetAll[$aRow[$sColumn]] = array($aGetAll[$aRow[$sColumn]]);
+							$aGetAll[$aRow[$sColumn]] = [$aGetAll[$aRow[$sColumn]]];
 							$aMultiple[$aRow[$sColumn]] = true;
 						}
 						$aGetAll[$aRow[$sColumn]][] = $aRow;
@@ -209,7 +209,7 @@ class nglDBMySQLQuery extends nglBranch implements iNglDBQuery {
 	}
 
 	public function load() {
-		list($link, $query, $sQuery, $nQueryTime) = $this->getarguments("link,query,sentence,query_time", func_get_args());
+		list($link, $query, $sQuery, $nQueryTime) = $this->getarguments("link,query,sentence,query_time", \func_get_args());
 		
 		$this->db = $link;
 		$this->cursor = $query;
@@ -217,11 +217,11 @@ class nglDBMySQLQuery extends nglBranch implements iNglDBQuery {
 		$this->attribute("time", $nQueryTime);
 
 		$sSQL = $sQuery;
-		$sSQL = preg_replace("/^[^A-Z]*/i", "", $sSQL);
-		$sSQLCommand = strtok($sSQL, " ");
-		$sSQLCommand = strtoupper($sSQLCommand);
+		$sSQL = \preg_replace("/^[^A-Z]*/i", "", $sSQL);
+		$sSQLCommand = \strtok($sSQL, " ");
+		$sSQLCommand = \strtoupper($sSQLCommand);
 		
-		if(in_array($sSQLCommand, array("SELECT", "INSERT", "UPDATE", "REPLACE", "DELETE"))) {
+		if(\in_array($sSQLCommand, ["SELECT", "INSERT", "UPDATE", "REPLACE", "DELETE"])) {
 			$this->attribute("crud", $sSQLCommand);
 		} else {
 			$this->attribute("crud", false);
@@ -241,8 +241,8 @@ class nglDBMySQLQuery extends nglBranch implements iNglDBQuery {
 
 	public function toArray() {
 		$this->reset();
-		$aGetAll = array();
-		while($aRow = $this->cursor->fetch_array(MYSQLI_ASSOC)) {
+		$aGetAll = [];
+		while($aRow = $this->cursor->fetch_array(\MYSQLI_ASSOC)) {
 			$aGetAll[] = $aRow;
 		}
 		$this->reset();
@@ -250,16 +250,16 @@ class nglDBMySQLQuery extends nglBranch implements iNglDBQuery {
 	}
 
 	protected function GetMode($nMode) {
-		$aModes 				= array();
-		$aModes["both"] 		= MYSQLI_BOTH;
-		$aModes["num"] 			= MYSQLI_NUM;
-		$aModes["assoc"] 		= MYSQLI_ASSOC;
-		$aModes[3] 				= MYSQLI_BOTH;
-		$aModes[2] 				= MYSQLI_NUM;
-		$aModes[1] 				= MYSQLI_ASSOC;
+		$aModes 				= [];
+		$aModes["both"] 		= \MYSQLI_BOTH;
+		$aModes["num"] 			= \MYSQLI_NUM;
+		$aModes["assoc"] 		= \MYSQLI_ASSOC;
+		$aModes[3] 				= \MYSQLI_BOTH;
+		$aModes[2] 				= \MYSQLI_NUM;
+		$aModes[1] 				= \MYSQLI_ASSOC;
 
-		$nMode = strtolower($nMode);
-		return (isset($aModes[$nMode])) ? $aModes[$nMode] : MYSQLI_ASSOC;
+		$nMode = \strtolower($nMode);
+		return (isset($aModes[$nMode])) ? $aModes[$nMode] : \MYSQLI_ASSOC;
 	}
 }
 

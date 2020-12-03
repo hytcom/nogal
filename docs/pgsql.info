@@ -1,6 +1,6 @@
 [checksum]
-md5 = "0b9b59aa05f0d427445e9da8665dad54"
-sha1 = "cc8036df5c708537b2f8365ca23f73a21f64a4e6"
+md5 = "88700e8659f48a05e96b85b3e53eeadc"
+sha1 = "c7eedb86a7f8465339de0518dddae00df35f93d8"
 
 [documentation]
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/pgsql.md"

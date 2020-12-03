@@ -1,6 +1,6 @@
 [checksum]
-md5 = "af2ace187b84be381a2c76c216bac99c"
-sha1 = "5509dbb6485814af76abd25ca1b2314c5204b2b1"
+md5 = "0ce22a8d2eb462ebc96531dc04b1619a"
+sha1 = "4a622401ed4b0f20678c2757c0a8f3600089247e"
 
 [documentation]
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/graft.md"

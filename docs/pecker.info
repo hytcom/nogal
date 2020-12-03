@@ -1,6 +1,6 @@
 [checksum]
-md5 = "616164cc04ffb0a19c8ee5b36570707a"
-sha1 = "0fd5d5ba827c4f729120ba04a3c6bbe5994dfad3"
+md5 = "ca6ccd2fec25e9f37962955c1f9339be"
+sha1 = "1ed1d4a804308e86e58d73dafa86846e4bd5ad9e"
 
 [documentation]
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/pecker.md"
@@ -63,7 +63,7 @@ rules = "array con las reglas para la unificación de datos\
 	join = une los valores si son diferentes\
 	longer = valor de mayor longuitud. Si tienen igual longuitud, hace join\
 "
-skip = "booleano que determina si el método hash debe rehashear todo"
+skip = "booleano que determina si el método hash debe rehashear todo o unicamente registros que nunca fueron hasheados"
 splitter = "separador de campos"
 table = "nombre de la tabla activa"
 tables = "array con nombres de tablas para operaciones en bloque"

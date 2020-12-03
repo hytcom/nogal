@@ -35,16 +35,16 @@ class nglGraftQR extends nglScion {
 	public $qr = null;
 
 	final protected function __declareArguments__() {
-		$vArguments					= array();
-		$vArguments["content"]		= array('(string)$mValue', "test1234");
-		$vArguments["eclevel"]		= array('$this->SetECLevel($mValue)', "L");
-		$vArguments["size"]			= array('$this->SetPointSize($mValue)', 4);
-		$vArguments["margin"]		= array('$this->SetMargin($mValue)', 0);
+		$vArguments					= [];
+		$vArguments["content"]		= ['(string)$mValue', "test1234"];
+		$vArguments["eclevel"]		= ['$this->SetECLevel($mValue)', "L"];
+		$vArguments["size"]			= ['$this->SetPointSize($mValue)', 4];
+		$vArguments["margin"]		= ['$this->SetMargin($mValue)', 0];
 		return $vArguments;
 	}
 
 	final protected function __declareAttributes__() {
-		$vAttributes = array();
+		$vAttributes = [];
 		return $vAttributes;
 	}
 
@@ -72,27 +72,27 @@ class nglGraftQR extends nglScion {
 		"return": "image resource"
 	} **/
 	public function image() {
-		list($sContent, $nMargin, $nPointSize, $sECLevel) = $this->getarguments("content,margin,size,eclevel", func_get_args());
-		ob_start();
+		list($sContent, $nMargin, $nPointSize, $sECLevel) = $this->getarguments("content,margin,size,eclevel", \func_get_args());
+		\ob_start();
 		$this->qr->png($sContent, false, $sECLevel, $nPointSize, $nMargin);
-		@header("Content-Type: ".NGL_CONTENT_TYPE);
-		$sSource = ob_get_contents();
-		ob_end_clean();
-		return imagecreatefromstring($sSource);
+		@\header("Content-Type: ".NGL_CONTENT_TYPE);
+		$sSource = \ob_get_contents();
+		\ob_end_clean();
+		return \imagecreatefromstring($sSource);
 	}
 
 	public function png() {
-		list($sContent, $nMargin, $nPointSize, $sECLevel) = $this->getarguments("content,margin,size,eclevel", func_get_args());
+		list($sContent, $nMargin, $nPointSize, $sECLevel) = $this->getarguments("content,margin,size,eclevel", \func_get_args());
 		return $this->qr->png($sContent, false, $sECLevel, $nPointSize, $nMargin);
 	}
 
 	public function text() {
-		list($sContent, $nMargin, $nPointSize, $sECLevel) = $this->getarguments("content,margin,size,eclevel", func_get_args());
+		list($sContent, $nMargin, $nPointSize, $sECLevel) = $this->getarguments("content,margin,size,eclevel", \func_get_args());
 		return $this->qr->text($sContent, false, $sECLevel, $nPointSize, $nMargin);
 	}
 
 	public function raw() {
-		list($sContent, $nMargin, $nPointSize, $sECLevel) = $this->getarguments("content,margin,size,eclevel", func_get_args());
+		list($sContent, $nMargin, $nPointSize, $sECLevel) = $this->getarguments("content,margin,size,eclevel", \func_get_args());
 		return $this->qr->raw($sContent, false, $sECLevel, $nPointSize, $nMargin);
 	}
 
@@ -103,8 +103,8 @@ class nglGraftQR extends nglScion {
 	}
 	
 	protected function SetECLevel($sECLevel) {
-		$sECLevel = strtoupper($sECLevel[0]);
-		if(!in_array($sECLevel, array("L","M","Q","H"))) { $sECLevel = "L"; }
+		$sECLevel = \strtoupper($sECLevel[0]);
+		if(!\in_array($sECLevel, ["L","M","Q","H"])) { $sECLevel = "L"; }
 		return $sECLevel;
 	}
 

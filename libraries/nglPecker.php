@@ -34,49 +34,50 @@ class nglPecker extends nglBranch implements inglBranch {
 	private $aSavedData;
 
 	final protected function __declareArguments__() {
-		$vArguments							= array();
-		$vArguments["analyse_datatype"]		= array('self::call()->isTrue($mValue)', false);
-		$vArguments["col"]					= array('(int)$mValue', null);
-		$vArguments["cols"]					= array('$this->SetCols($mValue)', null);
-		$vArguments["datafile"]				= array('$this->SetDataFile($mValue)', "pecker");
-		$vArguments["db"]					= array('$this->SetDb($mValue)', null);
-		$vArguments["exec"]					= array('$mValue', false);
-		$vArguments["features"]				= array('$this->SetFeatures($mValue)', null);
-		$vArguments["file"]					= array('$mValue', null);
-		$vArguments["file_eol"]				= array('$mValue', "\\r\\n");
-		$vArguments["force"]				= array('self::call()->isTrue($mValue)', false);
-		$vArguments["grouper"]				= array('$this->SetGrouper($mValue)', null);
-		$vArguments["hashappend"]			= array('self::call()->isTrue($mValue)', false);
-		$vArguments["hittest"]				= array('$mValue', false); // test | show | true
-		$vArguments["id"]					= array('$mValue', null);
-		$vArguments["inverse"]				= array('self::call()->isTrue($mValue)', false);
-		$vArguments["key"]					= array('$this->SecureName($mValue)', null);
-		$vArguments["length"]				= array('$mValue', 32);
-		$vArguments["limit"]				= array('$mValue', 20);
-		$vArguments["markas"]				= array('$mValue', "1");
-		$vArguments["markon"]				= array('$mValue', "pecked");
-		$vArguments["newnames"]				= array('(array)$mValue', null);
-		$vArguments["output"]				= array('strtolower($mValue)', "print"); // print | table | data
-		$vArguments["overwrite"]			= array('self::call()->isTrue($mValue)', true);
-		$vArguments["policy"]				= array('(array)$mValue', null);
-		$vArguments["rules"]				= array('(array)$mValue', null);
-		$vArguments["skip"]					= array('self::call()->isTrue($mValue)', true);
-		$vArguments["splitter"]				= array('$mValue', "\\t");
-		$vArguments["table"]				= array('$this->SetTable($mValue)', null);
-		$vArguments["tables"]				= array('(array)$mValue', null);
-		$vArguments["truncate"]				= array('self::call()->isTrue($mValue)', false);
-		$vArguments["where"]				= array('$mValue', null);
-		$vArguments["xtable"]				= array('$this->SecureName($mValue)', null);
+		$vArguments							= [];
+		$vArguments["analyse_datatype"]		= ['self::call()->isTrue($mValue)', false];
+		$vArguments["bridge"]				= ['$mValue', null];
+		$vArguments["col"]					= ['(int)$mValue', null];
+		$vArguments["cols"]					= ['$this->SetCols($mValue)', null];
+		$vArguments["colscols"]				= ['(array)$mValue', null];
+		$vArguments["datafile"]				= ['$this->SetDataFile($mValue)', "pecker"];
+		$vArguments["db"]					= ['$this->SetDb($mValue)', null];
+		$vArguments["exec"]					= ['$mValue', false];
+		$vArguments["features"]				= ['$this->SetFeatures($mValue)', null];
+		$vArguments["file"]					= ['$mValue', null];
+		$vArguments["file_eol"]				= ['$mValue', "\\r\\n"];
+		$vArguments["force"]				= ['self::call()->isTrue($mValue)', false];
+		$vArguments["grouper"]				= ['$this->SetGrouper($mValue)', null];
+		$vArguments["hashappend"]			= ['self::call()->isTrue($mValue)', false];
+		$vArguments["hittest"]				= ['$mValue', false); // test | show | tr]e
+		$vArguments["id"]					= ['$mValue', null];
+		$vArguments["key"]					= ['$this->SecureName($mValue)', null];
+		$vArguments["length"]				= ['$mValue', 32];
+		$vArguments["limit"]				= ['$mValue', 20];
+		$vArguments["markas"]				= ['$mValue', "1"];
+		$vArguments["markon"]				= ['$mValue', "pecked"];
+		$vArguments["newnames"]				= ['(array)$mValue', null];
+		$vArguments["output"]				= ['strtolower($mValue)', "print"]; // print | table | data
+		$vArguments["overwrite"]			= ['self::call()->isTrue($mValue)', true];
+		$vArguments["policy"]				= ['(array)$mValue', null];
+		$vArguments["rules"]				= ['(array)$mValue', null];
+		$vArguments["skip"]					= ['self::call()->isTrue($mValue)', false];
+		$vArguments["splitter"]				= ['$mValue', "\\t"];
+		$vArguments["table"]				= ['$this->SetTable($mValue)', null];
+		$vArguments["tables"]				= ['(array)$mValue', null];
+		$vArguments["truncate"]				= ['self::call()->isTrue($mValue)', false];
+		$vArguments["where"]				= ['$mValue', null];
+		$vArguments["xtable"]				= ['$this->SecureName($mValue)', null];
 		return $vArguments;
 
 	}
 
 	final protected function __declareAttributes__() {
-		$vAttributes						= array();
+		$vAttributes						= [];
 		$vAttributes["analysis"]			= null;
 		$vAttributes["colstr"]				= null;
 		$vAttributes["features_schema"]		= null;
-		$vAttributes["grouper_str"]			= null;
+		$vAttributes["grouperstr"]			= null;
 		return $vAttributes;
 	}
 
@@ -89,20 +90,20 @@ class nglPecker extends nglBranch implements inglBranch {
 
 	// analiza la tabla y sugiere el mejor tipo de dato para cada columna
 	public function analyse() {
-		list($sTable,$bForce) = $this->getarguments("table,force", func_get_args());
+		list($sTable,$bForce) = $this->getarguments("table,force", \func_get_args());
 		$this->ChkSource($sTable);
 		if(isset($this->aSavedData["ANALYSIS"], $this->aSavedData["ANALYSIS"][$sTable]) && !$bForce) {
 			$this->attribute("analysis", $this->aSavedData["ANALYSIS"][$sTable]);
 			return $this->Output($this->attribute("analysis"));
 		} else {
-			if(!isset($this->aSavedData["ANALYSIS"])) { $this->aSavedData["ANALYSIS"] = array(); }
+			if(!isset($this->aSavedData["ANALYSIS"])) { $this->aSavedData["ANALYSIS"] = []; }
 			return $this->Output($this->BuildAnalysis($sTable));
 		}
 	}
 
 	public function analyseAll() {
-		list($aTables,$bForce) = $this->getarguments("tables,force", func_get_args());
-		if(count($aTables)) {
+		list($aTables,$bForce) = $this->getarguments("tables,force", \func_get_args());
+		if(\is_array($aTables) && \count($aTables)) {
 			foreach($aTables as $sTable) {
 				$this->analyse($sTable, $bForce);
 			}
@@ -111,19 +112,19 @@ class nglPecker extends nglBranch implements inglBranch {
 	}
 
 	public function backup() {
-		list($sTable) = $this->getarguments("table", func_get_args());
+		list($sTable) = $this->getarguments("table", \func_get_args());
 		$this->ChkSource($sTable);
 		$sCreate = $this->db->query("SHOW CREATE TABLE `".$sTable."`")->get("Create Table");
-		$sDate = date("YmdHi");
-		$sCreate = str_replace("TABLE `".$sTable."` (", "TABLE `".$sTable."_".$sDate."` (", $sCreate);
+		$sDate = \date("YmdHis");
+		$sCreate = \str_replace("TABLE `".$sTable."` (", "TABLE `".$sTable."_".$sDate."` (", $sCreate);
 		$this->db->query($sCreate);
 		$insert = $this->db->query("INSERT INTO `".$sTable."_".$sDate."` SELECT * FROM `".$sTable."`");
-		$this->Output(array(array("table"=> $sTable."_".$sDate, "rows"=>$insert->rows())));
+		$this->Output(["table"=> $sTable."_".$sDate, "rows"=>$insert->rows()]]);
 	}
 
 	public function backupAll() {
-		list($aTables) = $this->getarguments("tables", func_get_args());
-		if(count($aTables)) {
+		list($aTables) = $this->getarguments("tables", \func_get_args());
+		if(\is_array($aTables) && \count($aTables)) {
 			foreach($aTables as $sTable) {
 				$this->backup($sTable);
 			}
@@ -132,11 +133,11 @@ class nglPecker extends nglBranch implements inglBranch {
 	}
 
 	public function clear() {
-		list($bRun) = $this->getarguments("exec", func_get_args());
+		list($bRun) = $this->getarguments("exec", \func_get_args());
 		$sTable = $this->ChkSource();
 		$this->ChkHash();
 		$nClean = 0;
-		$clear = $this->db->query("SELECT `__pecker__`, (COUNT(*)-1) AS `count` FROM `".$sTable."` WHERE `__pecker__` IS NOT NULL GROUP BY `__pecker__` HAVING COUNT(*) > 1");
+		$clear = $this->db->query("SELECT `__pecker__`, (COUNT(*)-1) AS 'rows' FROM `".$sTable."` WHERE `__pecker__` IS NOT NULL GROUP BY `__pecker__` HAVING COUNT(*) > 1");
 		if($clear->rows()) {
 			while($aClear = $clear->get()) {
 				$nClean += (int)$aClear["count"];
@@ -145,12 +146,12 @@ class nglPecker extends nglBranch implements inglBranch {
 		}
 
 		$sTitle = ($bRun) ? "cleaned" : "to clean";
-		return $this->Output(array(array($sTitle=>$nClean)));
+		return $this->Output([[$sTitle=>$nClean]]);
 	}
 
 	public function clearAll() {
 		$this->ChkHash();
-		$clear = $this->db->query("SELECT `__pecker__`, (COUNT(*)-1) AS `count` FROM `".$this->sTable."` WHERE `__pecker__` IS NOT NULL GROUP BY `__pecker__` HAVING COUNT(*) > 1");
+		$clear = $this->db->query("SELECT `__pecker__`, (COUNT(*)-1) AS 'rows' FROM `".$this->sTable."` WHERE `__pecker__` IS NOT NULL GROUP BY `__pecker__` HAVING COUNT(*) > 1");
 		if($clear->rows()) {
 			$this->db->query("DELETE FROM `".$this->sTable."` WHERE `__pecker__` IN (SELECT `__pecker__` FROM `".$this->sTable."` WHERE `__pecker__` IS NOT NULL GROUP BY `__pecker__` HAVING COUNT(*) > 1)");
 		}
@@ -158,23 +159,23 @@ class nglPecker extends nglBranch implements inglBranch {
 	}
 
 	public function clearWano() {
-		list($sField) = $this->getarguments("field", func_get_args());
+		list($sField) = $this->getarguments("field", \func_get_args());
 		$sTable = $this->ChkSource();
 		$this->ChkHash();
 		$blank = $this->db->query("DELETE FROM `".$sTable."` WHERE `__wano__` = '1'");
-		return $this->Output(array(array("affected"=>$blank->rows())));
+		return $this->Output([["affected"=>$blank->rows()]]);
 	}
 
 	public function colsid() {
-		list($sXTable) = $this->getarguments("xtable", func_get_args());
+		list($sXTable) = $this->getarguments("xtable", \func_get_args());
 		$aAnalysis = $this->ChkAnalysis();
-		$aCols = array();
+		$aCols = [];
 		
-		if($sXTable!==null && isset($this->aSavedData["ANALYSIS"][$sXTable])) {
+		if($sXTable!==null) {
 			$aXAnalysis = $this->ChkAnalysis($sXTable);
-			$n = (count($aXAnalysis) > count($aAnalysis)) ? count($aXAnalysis) : count($aAnalysis);
+			$n = (\count($aXAnalysis) > \count($aAnalysis)) ? \count($aXAnalysis) : \count($aAnalysis);
 			for($x=0; $x<$n; $x++) {
-				$aCol = array("col"=>$x);
+				$aCol = ["col"=>$x];
 				$aCol["field"] = (isset($aAnalysis[$x])) ? $this->GetCols($x) : "";
 				$aCol["x_col"] = $x;
 				$aCol["x_field"] = (isset($aXAnalysis[$x])) ? $this->GetCols($x, $sXTable) : "";
@@ -182,7 +183,7 @@ class nglPecker extends nglBranch implements inglBranch {
 			}
 		} else {
 			foreach($aAnalysis as $aRow) {
-				$aCols[] = array("col"=>$aRow["col"], "field"=>$aRow["field"]);
+				$aCols[] = ["col"=>$aRow["col"], "field"=>$aRow["field"]];
 			}
 		}
 
@@ -191,64 +192,66 @@ class nglPecker extends nglBranch implements inglBranch {
 
 	// completa campos de xtable con datos de la tabla principal
 	public function complete() {
-		list($sDestine,$aCols,$bOverwrite) = $this->getarguments("xtable,cols,overwrite", func_get_args());
+		list($sDestine,$aCols,$bOverwrite) = $this->getarguments("xtable,colscols,overwrite", \func_get_args());
 		$sTable = $this->ChkSource();
 		$chk = $this->db->query("SELECT COUNT(*) AS 'chk' FROM `".$sTable."` WHERE `__pecked__` IS NOT NULL");
-		$sKey = $this->argument("key");
 
-		if($chk->get("chk") && $sKey) {
-			$aAnalysis = $this->ChkAnalysis();
-			$aXAnalysis = $this->ChkAnalysis($sDestine);
-			$sWhere = (!$bOverwrite) ? " (".$sXField." = '' OR ".$sXField." IS NULL) AND " : "";
+		if($chk->get("chk")) {
+			$aSource = $this->GetCols(\array_keys($aCols));
+			$aDestine = $this->GetCols($aCols, $sDestine);
+			$aFields = \array_combine($aSource, $aDestine);
+
 			$nCount = 0;
-			foreach($aCols as $x => $y) {
-				$sXField = "`a`.`".$aXAnalysis[$y]["field"]."`";
-				$sField = "`b`.`".$aAnalysis[$x]["field"]."`";
+			foreach($aFields as $sField => $sXField) {
+				$sXField = "`a`.`".$sXField."`";
+				$sField = "`b`.`".$sField."`";
+				$sWhere = (!$bOverwrite) ? " (".$sXField." = '' OR ".$sXField." IS NULL) AND " : "";
 				$sSQL = "
 					UPDATE `".$sDestine."` a, `".$sTable."` b 
 						SET ".$sXField." = ".$sField." 
 					WHERE 
 						".$sWhere." 
-						(".$sField." != '' AND ".$sField." IS NOT NULL) AND 
-						`a`.`".$sKey."` = `b`.`__pecked__`
+						(".$sField." IS NOT NULL) AND 
+						`a`.`__pecked__` = `b`.`__pecked__`
 				";
 				$nCount += $this->db->query($sSQL)->rows();
 			}
 		}
 
-		$this->Output(array(array("completed"=>$nCount)));
+		$this->Output([["completed"=>$nCount]]);
 	}
 
 	public function concat() {
-		list($aCols,$nCol,$sSeparator,$sWhere) = $this->getarguments("cols,col,splitter,where", func_get_args());
+		list($aCols,$nCol,$sSeparator,$sWhere) = $this->getarguments("cols,col,splitter,where", \func_get_args());
 		$sTable = $this->ChkSource();
+		if($sWhere===null) { $sWhere = " 1 "; }
 		$chk = $this->db->query("SELECT COUNT(*) AS 'chk' FROM `".$sTable."` WHERE ".$sWhere);
 		if($chk->get("chk")) {
-			$sSeparator = addslashes($sSeparator);
-			$aConcat = array();
+			$sSeparator = \addslashes($sSeparator);
+			$aConcat = [];
 			$aColumns = $this->GetCols($aCols);
 			foreach($aColumns as $sColname) {
 				$aConcat[] = " IF(`".$sColname."`!='' AND `".$sColname."` IS NOT NULL, CONCAT(`".$sColname."`,'".$sSeparator."'), '') ";
 			}
-			$sConcat = " CONCAT(".implode(",", $aConcat).") ";
+			$sConcat = " CONCAT(".\implode(",", $aConcat).") ";
 			$sField = $this->GetCols($nCol);
 			$concat = $this->db->query("UPDATE `".$sTable."` SET `".$sField."` = ".$sConcat." WHERE ".$sWhere);
-			return $this->Output(array(array("affected"=>$concat->rows())));
+			return $this->Output([["affected"=>$concat->rows()]]);
 		}
 
-		return $this->Output(array(array("message"=>"empty result")));
+		return $this->Output([["message"=>"empty result"]]);
 	}
 
 	public function drop($mCols) {
 		$sTable = $this->ChkSource();
 		$this->ChkAnalysis();
-		if(!is_array($mCols)) { $mCols = array($mCols); }
+		if(!\is_array($mCols)) { $mCols = [$mCols]; }
 
-		$aDrop = array();
+		$aDrop = [];
 		foreach($mCols as $nCol) {
 			$aDrop[] = "DROP COLUMN `".$this->aAnalysis[$nCol]["field"]."`";
 		}
-		$sDrop = "ALTER TABLE `".$this->sTable."` ".implode(" , ", $aDrop)." ;";
+		$sDrop = "ALTER TABLE `".$this->sTable."` ".\implode(" , ", $aDrop)." ;";
 
 		if($this->db->query($sDrop)!==null) {
 			unset($this->aAnalysis[$nCol]);
@@ -259,10 +262,8 @@ class nglPecker extends nglBranch implements inglBranch {
 
 	// resumen de registros duplicados
 	public function duplicates() {
-		list($sTable) = $this->getarguments("table", func_get_args());
-		$this->ChkSource();
+		$sTable = $this->ChkSource();
 		$this->ChkHash();
-		$this->ChkKey();
 		$all = $this->db->query("SELECT COUNT(*) 'all' FROM `".$sTable."`");
 		$aDuplicates = $all->get();
 		$duplicates = $this->db->query("SELECT COUNT(DISTINCT `__pecker__`) 'uniques' FROM `".$sTable."` WHERE `__pecker__` IS NOT NULL");
@@ -272,53 +273,109 @@ class nglPecker extends nglBranch implements inglBranch {
 		return $this->Output($aDuplicates);
 	}
 
-	public function fill() {
-		list($sDestine,$aCols,$bInverse) = $this->getarguments("xtable,cols,inverse", func_get_args());
+	public function equalizable() {
+		list($sLimit) = $this->getarguments("limit", \func_get_args());
 		$sTable = $this->ChkSource();
-		$sWhere = (!$bInverse) ? "IS NOT NULL" : "IS NULL";
-		$chk = $this->db->query("SELECT COUNT(*) AS 'chk' FROM `".$sTable."` WHERE `__pecked__` ".$sWhere);
+		$total = $this->db->query("
+			SELECT SUM(`counter`.`total`) AS 'total' FROM (
+				SELECT COUNT(DISTINCT `__pecker__`) AS 'total' 
+				FROM `".$sTable."` 
+				WHERE 
+					`__pecker__` IN (
+						SELECT 
+							`__pecker__`
+						FROM `".$sTable."` 
+						WHERE 
+							`__pecker__` IS NOT NULL 
+						GROUP BY 
+							`__pecker__` HAVING COUNT(*) > 1
+					)
+				GROUP BY `__pecker__` 
+					HAVING (SUM(IF(`__pecked__` IS NULL, 0, 1)) BETWEEN 1 AND (COUNT(*)-1))
+			) counter
+		");
+		$nTotal = $total->get("total");
+
+		$chk = $this->db->query("
+			SELECT 
+				`__pecker__`, 
+				COUNT(*) AS '__equalizable__', 
+				'".$nTotal."' AS 'rows' 
+			FROM `".$sTable."` 
+			WHERE 
+				`__pecker__` IN (
+					SELECT 
+						`__pecker__`
+					FROM `".$sTable."` 
+					WHERE 
+						`__pecker__` IS NOT NULL 
+					GROUP BY 
+						`__pecker__` HAVING COUNT(*) > 1
+				)
+			GROUP BY `__pecker__` 
+				HAVING (SUM(IF(`__pecked__` IS NULL, 0, 1)) BETWEEN 1 AND (COUNT(*)-1))
+			ORDER BY 2 DESC
+			LIMIT ".$sLimit."
+		");
+		return $this->Output($chk->getall());
+	}
+
+	public function equate() {
+		$sTable = $this->ChkSource();
+		$sEqTable = self::call()->unique();
+		$this->db->query("
+			CREATE TABLE `".$sEqTable."` 
+				SELECT 
+					`__pecker__`, `__pecked__` 
+				FROM `".$sTable."` 
+				WHERE 
+					`__pecked__` IS NOT NULL AND 
+					`__pecker__` IN (
+						SELECT 
+							`__pecker__`
+						FROM `".$sTable."` 
+						WHERE 
+							`__pecker__` IS NOT NULL 
+						GROUP BY 
+							`__pecker__` HAVING COUNT(*) > 1
+					)
+		");
+		$this->db->query("ALTER TABLE `".$sEqTable."` ADD INDEX `__pecker__` (`__pecker__`), ADD INDEX `__pecked__` (`__pecked__`)");
+		$equate = $this->db->query("UPDATE `".$sTable."`, `".$sEqTable."` SET `".$sTable."`.`__pecker__` = `".$sEqTable."`.`__pecked__` WHERE `".$sTable."`.`__pecked__` IS NULL AND `".$sTable."`.`__pecker__` = `".$sEqTable."`.`__pecker__`");
+		$this->db->query("DROP TABLE `".$sEqTable."`");
+
+		return $this->Output($equate->affected());
+	}
+
+	public function fill() {
+		list($sDestine,$aCols) = $this->getarguments("xtable,colscols", \func_get_args());
+		$sTable = $this->ChkSource();
+		$chk = $this->db->query("SELECT COUNT(*) AS 'chk' FROM `".$sTable."` WHERE `__pecked__` IS NOT NULL");
 
 		if($chk->get("chk")) {
-			$aSelect = $this->GetCols(array_keys($aCols));
+			$this->ChkAnalysis($sDestine);
+			$aSelect = $this->GetCols(\array_keys($aCols));
 			$aInsert = $this->GetCols($aCols, $sDestine);
-			if($bInverse) {
-				$sImyaField = self::call()->unique(8);
-				$this->db->query("ALTER TABLE `".$sTable."` ADD COLUMN `".$sImyaField."` CHAR(32) NULL DEFAULT NULL FIRST, ADD INDEX `".$sImyaField."` (`".$sImyaField."`)");
-				$this->db->query("UPDATE `".$sTable."` SET `".$sImyaField."` = func.imya() WHERE `__pecked__` ".$sWhere);
-				$fill = $this->db->query("
-					INSERT INTO `".$sDestine."` (`id`, `imya`, `state`, `".implode("`,`", $aInsert)."`) 
-						SELECT NULL, `".$sImyaField."`, '1', `".implode("`,`", $aSelect)."` FROM `".$sTable."` WHERE `__pecked__` ".$sWhere
-				);
-				$this->db->query("UPDATE `".$sTable."` a, `".$sDestine."` b SET `a`.`__pecked__` = `b`.`id` WHERE `a`.`".$sImyaField."` = `b`.`imya`");
-				$this->db->query("ALTER TABLE `".$sTable."` DROP COLUMN `".$sImyaField."`");
-			} else {
-				$sSQL = "INSERT INTO `".$sDestine."` (`id`, `imya`, `state`, `".implode("`,`", $aInsert)."`) ";
-				$sSQL .= "SELECT NULL, func.imya(), '1', `".implode("`,`", $aSelect)."` FROM `".$sTable."` WHERE `__pecked__` ".$sWhere;
-				$fill = $this->db->query($sSQL);
+
+			$sOwlFields = $sOwlValues = "";
+			if($this->IsOwlTable($sFeaturesTable)) {
+				$sOwlFields = " `id`, `imya`, `state`, ";
+				$sOwlValues = " NULL, func.imya(), '1', ";
 			}
+
+			$sSQL = "INSERT INTO `".$sDestine."` (`__pecked__`, ".$sOwlFields." `".\implode("`,`", $aInsert)."`) ";
+			$sSQL .= "SELECT `__pecked__`, ".$sOwlValues." `".\implode("`,`", $aSelect)."` FROM `".$sTable."` WHERE `__pecked__` IS NOT NULL GROUP BY `__pecked__`";
+			$fill = $this->db->query($sSQL);
 		}
 
-		$this->Output(array(array("inserted"=>$fill->rows())));
+		$this->Output([["inserted"=>$fill->rows()]]);
 	}
 
-	public function filltest() {
-		list($sDestine,$aCols,$bInverse) = $this->getarguments("xtable,cols,inverse", func_get_args());
-		$sTable = $this->ChkSource();
-		$sWhere = (!$bInverse) ? "IS NOT NULL" : "IS NULL";
-		$chk = $this->db->query("SELECT COUNT(*) AS 'chk' FROM `".$sTable."` WHERE `__pecked__` ".$sWhere);
-		$this->Output(array(array("to insert"=>$chk->get("chk"))));
-	}
-
-	public function filter($lambda=null) {
-		if($lambda===null) { return array_keys($this->aAnalysis); }
-		return array_keys(array_filter($this->aAnalysis, $lambda));
-	}
-
-	public function getfeatures() {
-		list($mCols,$sDestine) = $this->getarguments("cols,xtable", func_get_args());
+	public function fillfeatures() {
+		list($mCols,$sDestine,$sBridge) = $this->getarguments("cols,xtable,bridge", \func_get_args());
 		$sTable = $this->ChkSource();
 		if($mCols===null) { self::errorMessage($this->object, 1005); }
-		if(is_int($mCols)) { $mCols = array($mCols); }
+		if(\is_int($mCols)) { $mCols = [$mCols]; }
 		$aColumns = $this->GetCols($mCols);
 
 		if(!$sDestine) { self::errorMessage($this->object, 1010); }
@@ -327,48 +384,67 @@ class nglPecker extends nglBranch implements inglBranch {
 		$sFeaturesId = $aFeatures["id"];
 		$sFeaturesMatch = $aFeatures["match"];
 
-		$sSelect = ($this->IsOwlTable($sDestine)) ? " NULL, func.imya(), '1', " : "";
+		$sOwlFields = $sOwlValues = "";
+		if($this->IsOwlTable($sFeaturesTable)) {
+			// $sOwlFields = " `id`, `imya`, `state`, ";
+			$sOwlValues = " NULL, func.imya(), '1', ";
+		}
+
+		$sSelect = " `t`.`__pecked__`, "; $sFrom = "";
+		if($sBridge!==null) { list($sSelect, $sFrom) = $this->SetBridge($sBridge); }
 
 		$nAffected = 0;
 		foreach($aColumns as $sField) {
 			$features = $this->db->query("
 				INSERT INTO `".$sDestine."` 
-					SELECT ".$sSelect." `p`.`__pecked__`, `f`.`".$sFeaturesId."` 
-					FROM `".$sTable."` p 
-						LEFT JOIN `".$sFeaturesTable."` f ON `f`.`".$sFeaturesMatch."` = `p`.`".$sField."`
+					SELECT ".$sOwlValues." ".$sSelect." `f`.`".$sFeaturesId."` 
+					FROM `".$sTable."` t 
+						".$sFrom." 
+						LEFT JOIN `".$sFeaturesTable."` f ON `f`.`".$sFeaturesMatch."` = `t`.`".$sField."`
 					WHERE 
-						`p`.`__pecked__` IS NOT NULL AND 
-						`p`.`".$sField."` != '' AND 
-						`p`.`".$sField."` IS NOT NULL 
-					GROUP BY `p`.`__pecked__`
+						`t`.`__pecked__` IS NOT NULL AND 
+						`t`.`".$sField."` != '' AND 
+						`t`.`".$sField."` IS NOT NULL 
+					GROUP BY `t`.`__pecked__`
 			");
 
 			$nAffected += $features->rows();
 		}
 
-		$this->Output(array(array("affected"=>$nAffected)));
+		$this->Output([["affected"=>$nAffected]]);
+	}
+
+	public function filltest() {
+		$sTable = $this->ChkSource();
+		$chk = $this->db->query("SELECT COUNT(DISTINCT `__pecked__`) AS 'chk' FROM `".$sTable."` WHERE `__pecked__` IS NOT NULL");
+		$this->Output([["to insert"=>$chk->get("chk")]]);
+	}
+
+	public function filter($lambda=null) {
+		if($lambda===null) { return \array_keys($this->aAnalysis); }
+		return \array_keys(\array_filter($this->aAnalysis, $lambda));
 	}
 
 	public function getgrouper() {
-		return $this->Output($this->attribute("grouper_str"));
+		return $this->Output($this->attribute("grouperstr"));
 	}
 
 	// crea la columa __pecker__
 	public function hash() {
-		list($sTable,$aGrouper,$aPolicy) = $this->getarguments("table,grouper,policy", func_get_args());
+		list($sTable,$aGrouper,$aPolicy) = $this->getarguments("table,grouper,policy", \func_get_args());
 
-		$sGrouper = $this->attribute("grouper_str");
+		$sGrouper = $this->attribute("grouperstr");
 		if(!$sGrouper) { self::errorMessage($this->object, 1004); }
 
 		$chk = $this->db->query("SELECT * FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA`='".$this->db->base."' AND `TABLE_NAME`='".$sTable."' AND `COLUMN_NAME`='__pecker__'");
 		if(!$chk->rows()) {
 			$this->db->query("ALTER TABLE `".$sTable."` ADD COLUMN `__wano__` TINYINT(1) NULL DEFAULT NULL FIRST, ADD INDEX `__wano__` (`__wano__`)");
-			$this->db->query("ALTER TABLE `".$sTable."` ADD COLUMN `__pecked__` INT NULL DEFAULT NULL FIRST, ADD INDEX `__pecked__` (`__pecked__`)");
+			$this->db->query("ALTER TABLE `".$sTable."` ADD COLUMN `__pecked__` CHAR(32) NULL DEFAULT NULL FIRST, ADD INDEX `__pecked__` (`__pecked__`)");
 			$this->db->query("ALTER TABLE `".$sTable."` ADD COLUMN `__pecker__` CHAR(32) NULL DEFAULT NULL FIRST, ADD INDEX `__pecker__` (`__pecker__`)");
 		}
 
-		$sToHash = (strstr($sGrouper, ",")) ? "CONCAT(".$sGrouper.")" : $sGrouper;
-		if(is_array($aPolicy)) {
+		$sToHash = (\strstr($sGrouper, ",")) ? "CONCAT(".$sGrouper.")" : $sGrouper;
+		if(\is_array($aPolicy)) {
 			$sToHash = $this->Sanitizer($sToHash, $aPolicy);
 		}
 
@@ -380,22 +456,22 @@ class nglPecker extends nglBranch implements inglBranch {
 		}
 		$this->ClearAnalysis();
 		$this->BuildAnalysis($sTable);
-		return $this->Output(array(array("affected"=>$hashing->rows())));
+		return $this->Output([["affected"=>$hashing->rows()]]);
 	}
 
 	// marca los registros de la tabla principal con el campo key de la tabla secundaria,
 	// donde los campos __pecker__ de ambas tablas sean iguales
 	public function hit() {
-		list($sXTable,$sHitTest,$sLimit,$aCols) = $this->getarguments("xtable,hittest,limit,cols", func_get_args());
-		$sHitTest = trim(strtolower($sHitTest));
+		list($sXTable,$sHitTest,$sLimit,$aCols) = $this->getarguments("xtable,hittest,limit,cols", \func_get_args());
+		$sHitTest = \trim(\strtolower($sHitTest));
 		$sTable = $this->ChkSource();
 		$this->ChkHash();
 		$this->ChkHash($sXTable);
 
 		if($sHitTest==="test") {
-			$nRows = $this->db->query("SELECT COUNT(*) AS 'count' FROM `".$sTable."`")->get("count");
+			$nRows = $this->db->query("SELECT COUNT(*) AS 'rows' FROM `".$sTable."`")->get("count");
 			$test = $this->db->query("
-				SELECT COUNT(DISTINCT `".$sTable."`.`__pecker__`) AS 'hits', '".$nRows."' AS 'count'  
+				SELECT COUNT(DISTINCT `".$sTable."`.`__pecker__`) AS 'hits', '".$nRows."' AS 'rows'  
 				FROM `".$sTable."`, `".$sXTable."` 
 				WHERE 
 					`".$sTable."`.`__pecker__` IS NOT NULL AND 
@@ -405,7 +481,7 @@ class nglPecker extends nglBranch implements inglBranch {
 			return $this->Output($test->getall());
 		} else if($sHitTest==="show") {
 			if(!isset($this->aSavedData["GROUPER"][$sTable], $this->aSavedData["GROUPER"][$sXTable])) { self::errorMessage($this->object, 1004); }
-			$aFields = array();
+			$aFields = [];
 			foreach($this->aSavedData["GROUPER"][$sTable] as $sField) {
 				$aFields[] = "`".$sTable."`.`".$sField."`";
 			}
@@ -413,7 +489,7 @@ class nglPecker extends nglBranch implements inglBranch {
 				$aFields[] = "`".$sXTable."`.`".$sField."` AS 'x_".$sField."'";
 			}
 
-			if(is_array($aCols)) {
+			if(\is_array($aCols)) {
 				$this->ChkAnalysis();
 				$this->ChkAnalysis($sXTable);
 
@@ -426,7 +502,7 @@ class nglPecker extends nglBranch implements inglBranch {
 
 			$test = $this->db->query("
 				SELECT 
-					".implode(", ", $aFields)." 
+					".\implode(", ", $aFields)." 
 				FROM `".$sTable."`, `".$sXTable."` 
 				WHERE 
 					`".$sTable."`.`__pecked__` IS NULL AND 
@@ -445,25 +521,26 @@ class nglPecker extends nglBranch implements inglBranch {
 						`".$sTable."`.`__pecker__` IS NOT NULL AND 
 						`".$sTable."`.`__pecker__` = `".$sXTable."`.`__pecker__`
 			");
-			return $this->Output(array(array("affected"=>$pecked->rows())));
+			return $this->Output([["affected"=>$pecked->rows()]]);
 		}
 	}
 
 	// analiza mejores tipos de campos para las columnas
 	public function improve() {
-		list($aCols) = $this->getarguments("cols", func_get_args());
+		list($mCols) = $this->getarguments("cols", \func_get_args());
 		$sTable = $this->ChkSource();
 		$this->ChkAnalysis();
 		$aAnalysis = $this->attribute("analysis");
+		$aCols = $this->GetCols($mCols);
 
-		$aChange = array();
-		foreach($aCols as $nCol) {
-			$sChange  = "CHANGE COLUMN `".$aAnalysis[$nCol]["field"]."` `".$aAnalysis[$nCol]["field"]."` ";
+		$aChange = [];
+		foreach($aCols as $nCol => $sField) {
+			$sChange  = "CHANGE COLUMN `".$sField."` `".$sField."` ";
 			$sChange .= $aAnalysis[$nCol]["improve"];
 			if($aAnalysis[$nCol]["improve"]=="char" || $aAnalysis[$nCol]["improve"]=="varchar") {
-				$aLengths = array(4,8,16,32,64,128,255,$aAnalysis[$nCol]["length"]);
-				sort($aLengths);
-				$nIdx = array_search($aAnalysis[$nCol]["length"], $aLengths);
+				$aLengths = [4,8,16,32,64,128,255,$aAnalysis[$nCol]["length"]];
+				\sort($aLengths);
+				$nIdx = \array_search($aAnalysis[$nCol]["length"], $aLengths);
 				$sChange .= " (".$aLengths[$nIdx+1].") ";
 			}
 			$sChange .= " NULL DEFAULT NULL";
@@ -476,18 +553,18 @@ class nglPecker extends nglBranch implements inglBranch {
 	}
 
 	public function loadfile() {
-		list($sFileName,$bTruncate) = $this->getarguments("file,truncate", func_get_args());
+		list($sFileName,$bTruncate) = $this->getarguments("file,truncate", \func_get_args());
 		$sFileName = self::call()->sandboxPath($sFileName);
-		if(file_exists($sFileName)) {
+		if(\file_exists($sFileName)) {
 			$sLoadFile = $sFileName;
-			$sType = strtolower(pathinfo($sFileName, PATHINFO_EXTENSION));
+			$sType = \strtolower(\pathinfo($sFileName, PATHINFO_EXTENSION));
 			
 			$sSplitter = $this->argument("splitter");
 			if($sType=="xls" || $sType=="xlsx") {
 				$sLoadFile = "/tmp/".self::call()->unique(8).".csv";
 				self::call("excel")->load($sFileName)->csv_splitter($sSplitter)->write($sLoadFile);
 			}
-			chmod($sLoadFile, 0777);
+			\chmod($sLoadFile, 0777);
 			
 			$sTable = $this->argument("table");
 			if($bTruncate) {
@@ -502,23 +579,23 @@ class nglPecker extends nglBranch implements inglBranch {
 	}
 
 	public function mark() {
-		list($sWhere,$mMark,$sType) = $this->getarguments("where,markas,markon", func_get_args());
+		list($sWhere,$mMark,$sType) = $this->getarguments("where,markas,markon", \func_get_args());
 		$sTable = $this->ChkSource();
 
 		$chk = $this->db->query("SELECT COUNT(*) AS 'chk' FROM `".$sTable."` WHERE ".$sWhere);
 		if($chk->get("chk")) {
-			$sType = (strtolower($sType)=="pecked") ? "__pecked__" : "__wano__";
+			$sType = (\strtolower($sType)=="pecked") ? "__pecked__" : "__wano__";
 			$sMark = ($mMark===null) ? "NULL" : 1;
 			$pecked = $this->db->query("UPDATE `".$sTable."` SET `".$sType."` = ".$sMark." WHERE ".$sWhere);
-			return $this->Output(array(array("affected"=>$pecked->rows())));
+			return $this->Output([["affected"=>$pecked->rows()]]);
 		}
-		return $this->Output(array(array("message"=>"empty result")));
+		return $this->Output([["message"=>"empty result"]]);
 	}
 
 	// normaliza los datos de una columna basandose en la tabla features
 	// antes de normalizar, agrega a features los valores inexistentes
 	public function normalize() {
-		list($nCol) = $this->getarguments("col", func_get_args());
+		list($nCol) = $this->getarguments("col", \func_get_args());
 		$sTable = $this->ChkSource();
 		$sField = $this->GetCols($nCol);
 		$aFeatures = $this->ChkFeatures();
@@ -526,53 +603,68 @@ class nglPecker extends nglBranch implements inglBranch {
 		$sFeaturesId = $aFeatures["id"];
 		$sFeaturesMatch = $aFeatures["match"];
 
-		$this->uniques(array($nCol), true);
+		$this->uniques([$nCol], true);
 
 		$sFieldBack = $sField."_".self::call()->unique(6);
 		$this->db->query("ALTER TABLE `".$sTable."` RENAME COLUMN `".$sField."` TO `".$sFieldBack."`");
-		$this->db->query("ALTER TABLE `".$sTable."` ADD COLUMN `".$sField."` INT NULL DEFAULT NULL, ADD INDEX `".$sField."` (`".$sField."`)");
+		$this->db->query("ALTER TABLE `".$sTable."` ADD COLUMN `".$sField."` INT NULL DEFAULT NULL, ADD INDEX `".$sField."` (`".$sField."`), ADD INDEX `".$sFieldBack."` (`".$sFieldBack."`)");
+		$nLength = $this->db->query("SELECT `CHARACTER_MAXIMUM_LENGTH` FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA`='".$this->db->base."' AND `TABLE_NAME`='".$sFeaturesTable."' AND `COLUMN_NAME` = '".$sFeaturesMatch."'")->get("CHARACTER_MAXIMUM_LENGTH");
 		$normalize = $this->db->query("
 			UPDATE 
-				`".$sTable."` p, `".$sFeaturesTable."` f 
-				SET `p`.`".$sField."` = `f`.`".$sFeaturesId."` 
+				`".$sTable."` t, `".$sFeaturesTable."` f 
+				SET `t`.`".$sField."` = `f`.`".$sFeaturesId."` 
 			WHERE 
-				`p`.`".$sFieldBack."` != '' AND 
-				`p`.`".$sFieldBack."` IS NOT NULL AND 
-				`p`.`".$sFieldBack."` = `f`.`".$sFeaturesMatch."`
+				`t`.`".$sFieldBack."` != '' AND 
+				`t`.`".$sFieldBack."` IS NOT NULL AND 
+				LEFT(`t`.`".$sFieldBack."`, ".$nLength.") = `f`.`".$sFeaturesMatch."`
 		");
 
 		$this->BuildAnalysis($sTable);
-		$this->Output(array(array("normalized"=>$normalize->rows())));
+		$this->Output([["normalized"=>$normalize->rows()]]);
 	}
 
 	public function notpecked() {
 		$sTable = $this->ChkSource();
 		$this->ChkHash();
-		$not = $this->db->query("SELECT SUM(IF(`__pecked__` IS NULL, 1, 0)) AS 'not', COUNT(*) AS `count` FROM `".$sTable."`");
+		$not = $this->db->query("SELECT SUM(IF(`__pecked__` IS NULL, 1, 0)) AS 'not', COUNT(*) AS 'rows' FROM `".$sTable."`");
 		if($not->rows()) {
 			return $this->Output($not->getall());
 		}
+	}
+
+	public function peck() {
+		$sTable = $this->ChkSource();
+		$this->ChkHash();
+		$peck = $this->db->query("UPDATE `".$sTable."` SET `__pecked__` = `__pecker__` WHERE `__pecker__` IS NOT NULL AND `__pecked__` IS NULL");
+		return $this->Output($peck->affected());
 	}
 
 	public function pecked() {
 		$sTable = $this->ChkSource();
 		$this->ChkHash();
-		$not = $this->db->query("SELECT SUM(IF(`__pecked__` IS NOT NULL, 1, 0)) AS 'pecked', COUNT(*) AS `count` FROM `".$sTable."`");
+		$not = $this->db->query("SELECT SUM(IF(`__pecked__` IS NOT NULL, 1, 0)) AS 'pecked', COUNT(*) AS 'rows' FROM `".$sTable."`");
 		if($not->rows()) {
 			return $this->Output($not->getall());
 		}
 	}
 
+	public function pecknulls() {
+		$sTable = $this->ChkSource();
+		$this->ChkHash();
+		$peck = $this->db->query("UPDATE `".$sTable."` SET `__pecked__` = func.imya() WHERE `__pecked__` IS NULL");
+		return $this->Output($peck->affected());
+	}
+
 	public function rename() {
-		list($aRename) = $this->getarguments("newnames", func_get_args());
+		list($aRename) = $this->getarguments("newnames", \func_get_args());
 		$sTable = $this->ChkSource();
 		$aAnalysis = $this->ChkAnalysis();
 
-		$aRen = array();
+		$aRen = [];
 		foreach($aRename as $nCol => $sNewName) {
 			$aRen[] = "RENAME COLUMN `".$aAnalysis[$nCol]["field"]."` TO `".$sNewName."`";
 		}
-		$sRename = "ALTER TABLE `".$sTable."` ".implode(" , ", $aRen)." ;";
+		$sRename = "ALTER TABLE `".$sTable."` ".\implode(" , ", $aRen)." ;";
 
 		if($this->db->query($sRename)!==null) {
 			foreach($aRename as $nCol => $sNewName) {
@@ -586,7 +678,7 @@ class nglPecker extends nglBranch implements inglBranch {
 
 	// resetea la columna __pecker__
 	public function reset() {
-		list($sTable,$sWhere) = $this->getarguments("table,where", func_get_args());
+		list($sTable,$sWhere) = $this->getarguments("table,where", \func_get_args());
 		$this->ChkSource();
 		if($sWhere===null) { $sWhere = " 1 "; } 
 		if($this->ChkHash(null, false)) { $this->db->query("UPDATE `".$sTable."` SET `__pecker__` = NULL WHERE ".$sWhere); }
@@ -595,7 +687,7 @@ class nglPecker extends nglBranch implements inglBranch {
 
 	// resetea las columnas __pecker__, __pecked__ y __wano__
 	public function resetAll() {
-		list($sTable,$sWhere) = $this->getarguments("table,where", func_get_args());
+		list($sTable,$sWhere) = $this->getarguments("table,where", \func_get_args());
 		$this->ChkSource();
 		if($sWhere===null) { $sWhere = " 1 "; } 
 		if($this->ChkHash(null, false)) { $this->db->query("UPDATE `".$sTable."` SET `__pecker__` = NULL, `__pecked__` = NULL, `__wano__` = NULL WHERE ".$sWhere); }
@@ -603,51 +695,54 @@ class nglPecker extends nglBranch implements inglBranch {
 	}
 
 	public function sanitize() {
-		list($mCols,$aPolicy,$sWhere) = $this->getarguments("cols,policy,where", func_get_args());
+		list($mCols,$aPolicy,$sWhere) = $this->getarguments("cols,policy,where", \func_get_args());
 		if($sWhere===null) { $sWhere = 1; }
 		$sTable = $this->ChkSource();
 		$chk = $this->db->query("SELECT COUNT(*) AS 'chk' FROM `".$sTable."` WHERE ".$sWhere);
 		if($chk->get("chk")) {
-			$aToUpdate = array();
+			$aToUpdate = [];
 			$mFields = $this->GetCols($mCols);
-			if(!is_array($mFields)) { $mFields = array($mFields); }
+			if(!\is_array($mFields)) { $mFields = [$mFields]; }
 			foreach($mFields as $sField) {
 				$aToUpdate[] = "`".$sField."` = ".$this->Sanitizer($sField, $aPolicy);
 			}
 			// die("UPDATE `".$sTable."` SET ".implode(",", $aToUpdate)." WHERE ".$sWhere);
 			$sanitized = $this->db->query("UPDATE `".$sTable."` SET ".implode(",", $aToUpdate)." WHERE ".$sWhere);
-			return $this->Output(array(array("affected"=>$sanitized->rows())));
+			return $this->Output([["affected"=>$sanitized->rows()]]);
 		}
 
-		return $this->Output(array(array("message"=>"empty result")));	
+		return $this->Output([["message"=>"empty result"]]);	
 	}
 
-	// muestra los registros donde key = id
+	// muestra los registros donde __pecker__ = id
 	public function show() {
-		list($sId) = $this->getarguments("id", func_get_args());
+		list($sId) = $this->getarguments("id", \func_get_args());
 		$sTable = $this->ChkSource();
 		$sKey = $this->ChkKey();
+		$sKey = ($sKey!==null) ? "`".$sKey."`, " : "";
 		$this->ChkHash();
 		$sFields = ($this->attribute("colstr")!==null) ? $this->attribute("colstr") : "`".$sTable."`.* ";
 		$sId = $this->db->escape($sId);
 		$show = $this->db->query("
 			SELECT 
-				`".$sKey."`, ".$sFields." 
+				`__pecker__`, ".$sKey." ".$sFields." 
 			FROM `".$sTable."` 
-			WHERE `".$sKey."` = '".$sId."'
+			WHERE `__pecker__` = '".$sId."'
 		");
 		return $this->Output($show->getall());
 	}
 
 	// muestra los duplicados
 	public function twins() {
-		list($sLimit) = $this->getarguments("limit", func_get_args());
+		list($sLimit) = $this->getarguments("limit", \func_get_args());
 		$sTable = $this->ChkSource();
 		$this->ChkHash();
-		$sKey = ($this->argument("key")!==null) ? "`".$this->argument("key")."`, " : "";
+		$sKey = $this->ChkKey();
+		$sKey = ($sKey!==null) ? "`".$sKey."`, " : "";
 		$sFields = ($this->attribute("colstr")!==null) ? $this->attribute("colstr") : "`".$sTable."`.* ";
 		$show = $this->db->query("
 			SELECT 
+				`__pecker__`,
 				COUNT(`__pecker__`) AS '__duplicates__', 
 				".$sKey." ".$sFields." 
 			FROM `".$sTable."` 
@@ -662,7 +757,7 @@ class nglPecker extends nglBranch implements inglBranch {
 
 	// muestra todos los duplicados
 	public function twinsAll() {
-		list($sLimit) = $this->getarguments("limit", func_get_args());
+		list($sLimit) = $this->getarguments("limit", \func_get_args());
 		$sTable = $this->ChkSource();
 		$this->ChkHash();
 		$sKey = ($this->argument("key")!==null) ? "`".$this->argument("key")."`, " : "";
@@ -680,7 +775,7 @@ class nglPecker extends nglBranch implements inglBranch {
 
 	// elimina la columna __pecker__
 	public function unhash() {
-		list($sTable) = $this->getarguments("table", func_get_args());
+		list($sTable) = $this->getarguments("table", \func_get_args());
 		$this->ChkSource();
 		$this->ChkHash();
 		$drop = $this->db->query("ALTER TABLE `".$sTable."` DROP COLUMN `__pecker__`,  DROP COLUMN `__pecked__`,  DROP COLUMN `__wano__`");
@@ -688,181 +783,197 @@ class nglPecker extends nglBranch implements inglBranch {
 	}
 
 	public function unify() {
-		list($aUnify) = $this->getarguments("rules", func_get_args());
+		list($aUnify,$sWhere) = $this->getarguments("rules,where", \func_get_args());
 		$sTable = $this->ChkSource();
 		$this->ChkHash();
 		$aAnalysis = $this->attribute("analysis");
 
-		$aFields = $aRules = array();
+		$aFields = $aRules = [];
 		foreach($aUnify as $nCol => $sRule) {
 			$aFields[] = $aAnalysis[$nCol]["field"];
 			$aRules[$aAnalysis[$nCol]["field"]] = $sRule;
 		}
-		$sFields = "`".implode("`,`", $aFields)."`";
+		$sFields = "`".\implode("`,`", $aFields)."`";
 
+		$sWhere = ($sWhere===null) ? "" : "(".$sWhere.") AND ";
 		$unify = $this->db->query("
-			SELECT `__pecker__`, ".$sFields." 
+			SELECT `__pecked__`, ".$sFields." 
 			FROM `".$sTable."` 
-				WHERE `__pecker__` IN (
-					SELECT `__pecker__` 
-					FROM `".$sTable."` 
-						WHERE `__pecker__` IS NOT NULL 
-					GROUP BY `__pecker__`
-						HAVING COUNT(*) > 1
+			WHERE ".$sWhere." `__pecked__` IN (
+				SELECT `__pecked__` 
+				FROM `".$sTable."` 
+					WHERE `__pecked__` IS NOT NULL 
+				GROUP BY `__pecked__`
+					HAVING COUNT(*) > 1
 			) ORDER BY 1
 		");
 
 		if($unify->rows()) {
 			$sCurrent = null;
-			$aUnify = array();
+			$aUnify = [];
 			while($aRow = $unify->get()) {
-				if($sCurrent===null) { $sCurrent = $aRow["__pecker__"]; }
-				if($sCurrent!=$aRow["__pecker__"]) {
+				if($sCurrent===null) { $sCurrent = $aRow["__pecked__"]; }
+				if($sCurrent!=$aRow["__pecked__"]) {
 					$aMixed = $this->Mixer($aUnify, $aFields, $aRules);
-					$sCurrent = $aMixed["__pecker__"];
-					unset($aMixed["id"], $aMixed["__pecker__"]);
-					$this->db->update($sTable, $aMixed, "`__pecker__`='".$sCurrent."'");
-					$sCurrent = $aRow["__pecker__"];
-					$aUnify = array();
+					$sCurrent = $aMixed["__pecked__"];
+					unset($aMixed["id"], $aMixed["__pecked__"]);
+					$aMixed = $this->db->escape($aMixed);
+					$this->db->update($sTable, $aMixed, "`__pecked__`='".$sCurrent."'");
+					$sCurrent = $aRow["__pecked__"];
+					$aUnify = [];
 				}
 				$aUnify[] = $aRow;
 			}
 
 			$aMixed = $this->Mixer($aUnify, $aFields, $aRules);
-			$sCurrent = $aMixed["__pecker__"];
-			unset($aMixed["id"], $aMixed["__pecker__"]);
-			$this->db->update($sTable, $aMixed, "`__pecker__`='".$sCurrent."'");
+			$sCurrent = $aMixed["__pecked__"];
+			unset($aMixed["id"], $aMixed["__pecked__"]);
+			$aMixed = $this->db->escape($aMixed);
+			$this->db->update($sTable, $aMixed, "`__pecked__`='".$sCurrent."'");
 		}
 
-		return $this->Output(array(array("unified"=>$unify->rows())));
+		return $this->Output([["unified"=>$unify->rows()]]);
 	}
 
 	// muestra/inserta los valores unicos de una columna
 	public function uniques() {
-		list($mCols,$bInsert) = $this->getarguments("cols,exec", func_get_args());
+		list($mCols,$bInsert) = $this->getarguments("cols,exec", \func_get_args());
 		$sTable = $this->ChkSource();
 		if($mCols===null) { self::errorMessage($this->object, 1005); }
-		if(is_int($mCols)) { $mCols = array($mCols); }
+		if(\is_int($mCols)) { $mCols = [$mCols]; }
 		$aColumns = $this->GetCols($mCols);
 
 		if(!$bInsert) {
-			$aOutput = array();
+			$aOutput = [];
 			foreach($aColumns as $sField) {
 				$uniques = $this->db->query("SELECT DISTINCT `".$sField."` AS 'unique' FROM `".$sTable."` WHERE TRIM(`".$sField."`) != '' ORDER BY 1");
-				$aOutput = array_merge($aOutput, $uniques->getall("#unique"));
+				$aOutput = \array_merge($aOutput, $uniques->getall("#unique"));
 			}
 			return $this->Output($aOutput);
 		} else {
 			$aFeatures = $this->ChkFeatures();
 			$sFeaturesTable = $aFeatures["table"];
 			$sColName = $aFeatures["match"];
-			$sSelect = ($aFeatures["imya"]) ? " NULL, func.imya(), '1', NULL, " : " NULL, ";
+			$sSelect = ($this->IsOwlTable($sFeaturesTable)) ? " NULL, func.imya(), '1', NULL, " : "";
+			$nLength = $this->db->query("SELECT `CHARACTER_MAXIMUM_LENGTH` FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA`='".$this->db->base."' AND `TABLE_NAME`='".$sFeaturesTable."' AND `COLUMN_NAME` = '".$sColName."'")->get("CHARACTER_MAXIMUM_LENGTH");
 
-			$aNew = array();
+			$aNew = [];
 			foreach($aColumns as $sField) {
 				$new = $this->db->query("
-					SELECT `".$sField."` AS 'unique'  
+					SELECT LEFT(`".$sField."`, ".$nLength.")  AS 'unique'  
 					FROM `".$sTable."` 
 					WHERE 
 						TRIM(`".$sField."`) != '' AND 
-						`".$sField."` NOT IN (SELECT `".$sColName."` FROM `".$sFeaturesTable."`) 
-					GROUP BY `".$sField."` 
+						LEFT(`".$sField."`, ".$nLength.") NOT IN (SELECT `".$sColName."` FROM `".$sFeaturesTable."`) 
+					GROUP BY LEFT(`".$sField."`, ".$nLength.") 
 					ORDER BY 1
 				");
-				$aNew = array_merge($aNew, $new->getall("#unique"));
+				$aNew = \array_merge($aNew, $new->getall("#unique"));
 			}
-
-			if(count($aNew)) {
+			
+			if(\is_array($aNew) && \count($aNew)) {
 				foreach($aNew as $aNewValue) {
-					$this->db->query("INSERT INTO `".$sFeaturesTable."` () VALUES (".$sSelect." '".$aNewValue["unique"]."');");
+					$this->db->query("INSERT INTO `".$sFeaturesTable."` () VALUES (".$sSelect." '".$this->db->escape($aNewValue["unique"])."');");
 				}
 				return $this->Output($aNew);
 			}
 
-			return $this->Output(array(array("message"=>"empty result")));
+			return $this->Output([["message"=>"empty result"]]);
 		}
 
 		return false;
 	}
 
 	private function BuildAnalysis($sTable) {
+		$aColumns = [];
 		$nRows = $this->db->query("SELECT COUNT(*) AS 'rows' FROM `".$sTable."`")->get("rows");
-		if(!$nRows) { self::errorMessage($this->object, 1009, $sTable); }
-		$aColumns = array();
-
 		$structure = $this->db->query("SELECT `COLUMN_NAME`, `DATA_TYPE`, `COLUMN_TYPE` FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA`='".$this->db->base."' AND `TABLE_NAME`='".$sTable."'");
 		$aStructure = $structure->getall("#COLUMN_NAME"); 
 
-		$aAnalyse = $this->db->query("SELECT * FROM `".$sTable."` PROCEDURE ANALYSE (".$nRows.")")->getall();
+		$aAnalyse = $this->db->query("SELECT * FROM `".$sTable."` PROCEDURE ANALYSE ()")->getall();
 		$bAnalyseDataType = $this->argument("analyse_datatype");
+		if($bAnalyseDataType && !$nRows) { self::errorMessage($this->object, 1009, $sTable); }
 
 		$x = 0;
 		$nLength = $this->argument("length");
-		foreach($aAnalyse as $aTable) {
-			$sField = substr($aTable["Field_name"], strrpos($aTable["Field_name"], ".")+1);
+		foreach($aStructure as $aStructureField) {
+			$sField = $aStructureField["COLUMN_NAME"];
+
+			$sFieldComplete = $this->db->base.".".$sTable.".".$sField;
+			$aField = (\array_key_exists($sFieldComplete, $aAnalyse)) ? $aAnalyse[$sFieldComplete] : null;
+			
 			if($sField=="__pecker__" || $sField=="__pecked__" || $sField=="__wano__") { continue; }
 			$aColumns[$x]["col"] = $x;
 			$aColumns[$x]["field"] = $sField;
-			$aColumns[$x]["type"] = $aStructure[$sField]["COLUMN_TYPE"];
+			$aColumns[$x]["type"] = $aStructureField["COLUMN_TYPE"];
 			$aColumns[$x]["improve"] = "text";
-			$aColumns[$x]["length"] = $aTable["Max_length"];
-			$aColumns[$x]["min"] = substr($aTable["Min_value"], 0, $nLength);
-			$aColumns[$x]["max"] = substr($aTable["Max_value"], 0, $nLength);
-			$aColumns[$x]["empties"] = $aTable["Empties_or_zeros"];
-			$aColumns[$x]["nulls"] = $aTable["Nulls"];
+			$aColumns[$x]["length"] = $aField["Max_length"];
+			if($aField!==null) {
+				$aColumns[$x]["min"] = \substr($aField["Min_value"], 0, $nLength);
+				$aColumns[$x]["max"] = \substr($aField["Max_value"], 0, $nLength);
+				$aColumns[$x]["empties"] = $aField["Empties_or_zeros"];
+				$aColumns[$x]["nulls"] = $aField["Nulls"];
+			} else {
+				$aColumns[$x]["min"] = "";
+				$aColumns[$x]["max"] = "";
+				$aColumns[$x]["empties"] = 0;
+				$aColumns[$x]["nulls"] = 0;
+			}
 			$aColumns[$x]["normalizable"] = 0;
 			$aColumns[$x]["rows"] = $nRows;
 	
-			if($aTable["Max_length"]>255) {
-				$aColumns[$x]["improve"] = "text";
-			} else if($aTable["Max_length"]==-1) {
-				$aColumns[$x]["improve"] = "varchar";
-			} else {
-				$aColumns[$x]["improve"] = "varchar";
-				if($bAnalyseDataType) {
-					$aTypes = $this->db->query("
-						SELECT 
-							COUNT(`".$sField."` REGEXP '^-?[1-9][0-9]*$' OR NULL) AS 'int',
-							COUNT(REPLACE(`".$sField."`, ',', '') REGEXP '^-?[0-9]+\\\.[0-9]+$' OR NULL) AS 'decimal', 
-							COUNT(REPLACE(`".$sField."`, '/', '-') REGEXP '^[0-9]{2,4}-([0-9]{2}|[a-z]{3})(-[0-9]{2,4})?$' OR NULL) AS 'date', 
-							COUNT(`".$sField."` REGEXP '^[0-9]{1,2}:[0-9]{1,2}(:[0-9]{1,2})?$' OR NULL) AS 'time' 
-						FROM `".$sTable."`
-					")->get();
-					arsort($aTypes);
-
-					$aType = array(key($aTypes), current($aTypes));
-					if($aType[1]>0 && ($aType[1]*100/$nRows) > 85) {
-						$aColumns[$x]["improve"] = $aType[0];
-						$aColumns[$x]["length"] = $aTable["Max_length"];
-					}
-			
-					if($aColumns[$x]["improve"]=="varchar") {
-						$aDistincts = $this->db->query("
+			if($nRows) {
+				if($aField["Max_length"]>255) {
+					$aColumns[$x]["improve"] = "text";
+				} else if($aField["Max_length"]==-1) {
+					$aColumns[$x]["improve"] = "varchar";
+				} else {
+					$aColumns[$x]["improve"] = "varchar";
+					if($bAnalyseDataType) {
+						$aTypes = $this->db->query("
 							SELECT 
-								COUNT(DISTINCT `".$sField."`) AS 'distincts', 
-								COUNT(*) AS 'total' 
-							FROM `".$sTable."` 
-							WHERE `".$sField."` IS NOT NULL AND `".$sField."`!=''
+								COUNT(`".$sField."` REGEXP '^-?[1-9][0-9]*$' OR NULL) AS 'int',
+								COUNT(REPLACE(`".$sField."`, ',', '') REGEXP '^-?[0-9]+\\\.[0-9]+$' OR NULL) AS 'decimal', 
+								COUNT(REPLACE(`".$sField."`, '/', '-') REGEXP '^[0-9]{2,4}-([0-9]{2}|[a-z]{3})(-[0-9]{2,4})?$' OR NULL) AS 'date', 
+								COUNT(`".$sField."` REGEXP '^[0-9]{1,2}:[0-9]{1,2}(:[0-9]{1,2})?$' OR NULL) AS 'time' 
+							FROM `".$sTable."`
 						")->get();
-			
-						if($aDistincts["distincts"]==1 && $aDistincts["total"]<=$nRows) {
-							if($aTable["Max_length"]>5) {
+						arsort($aTypes);
+
+						$aType = [\key($aTypes), \current($aTypes)];
+						if($aType[1]>0 && ($aType[1]*100/$nRows) > 85) {
+							$aColumns[$x]["improve"] = $aType[0];
+							$aColumns[$x]["length"] = $aField["Max_length"];
+						}
+				
+						if($aColumns[$x]["improve"]=="varchar") {
+							$aDistincts = $this->db->query("
+								SELECT 
+									COUNT(DISTINCT `".$sField."`) AS 'distincts', 
+									COUNT(*) AS 'total' 
+								FROM `".$sTable."` 
+								WHERE `".$sField."` IS NOT NULL AND `".$sField."`!=''
+							")->get();
+				
+							if($aDistincts["distincts"]==1 && $aDistincts["total"]<=$nRows) {
+								if($aField["Max_length"]>5) {
+									$aColumns[$x]["improve"] = "int";
+									$aColumns[$x]["normalizable"] = (int)$aDistincts["distincts"];
+								} else {
+									$aColumns[$x]["improve"] = "boolean";
+								}
+							} else if($aDistincts["total"] > 0 && ($aDistincts["distincts"]*100/$aDistincts["total"]) < 10) {
 								$aColumns[$x]["improve"] = "int";
 								$aColumns[$x]["normalizable"] = (int)$aDistincts["distincts"];
-							} else {
-								$aColumns[$x]["improve"] = "boolean";
 							}
-						} else if($aDistincts["total"] > 0 && ($aDistincts["distincts"]*100/$aDistincts["total"]) < 10) {
-							$aColumns[$x]["improve"] = "int";
-							$aColumns[$x]["normalizable"] = (int)$aDistincts["distincts"];
-						}
-					} else if($aColumns[$x]["improve"]=="int") {
-						$nValue = $aTable["Max_value"];
-						switch(true) {
-							case ($nValue >= -128 && $nValue <= 127): $aColumns[$x]["improve"] = "tinyint"; break;
-							case ($nValue >= -32768 && $nValue <= 32767): $aColumns[$x]["improve"] = "smallint"; break;
-							case ($nValue >= -8388608 && $nValue <= 8388607): $aColumns[$x]["improve"] = "mediumint"; break;
-							case ($nValue > 2147483647): $aColumns[$x]["improve"] = "bigint"; break;
+						} else if($aColumns[$x]["improve"]=="int") {
+							$nValue = $aField["Max_value"];
+							switch(true) {
+								case ($nValue >= -128 && $nValue <= 127): $aColumns[$x]["improve"] = "tinyint"; break;
+								case ($nValue >= -32768 && $nValue <= 32767): $aColumns[$x]["improve"] = "smallint"; break;
+								case ($nValue >= -8388608 && $nValue <= 8388607): $aColumns[$x]["improve"] = "mediumint"; break;
+								case ($nValue > 2147483647): $aColumns[$x]["improve"] = "bigint"; break;
+							}
 						}
 					}
 				}
@@ -903,8 +1014,10 @@ class nglPecker extends nglBranch implements inglBranch {
 	private function ChkKey() {
 		$sTable = $this->argument("table");
 		$sKey = $this->argument("key");
-		$chk = $this->db->query("SELECT * FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA`='".$this->db->base."' AND `TABLE_NAME`='".$sTable."' AND `COLUMN_NAME`='".$sKey."'");
-		if(!$chk->rows()) { self::errorMessage($this->object, 1008, $sTable.".".$sKey); }
+		if($sKey!==null) {
+			$chk = $this->db->query("SELECT * FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA`='".$this->db->base."' AND `TABLE_NAME`='".$sTable."' AND `COLUMN_NAME`='".$sKey."'");
+			if(!$chk->rows()) { self::errorMessage($this->object, 1008, $sTable.".".$sKey); }
+		}
 		return $sKey;
 	}
 
@@ -925,10 +1038,17 @@ class nglPecker extends nglBranch implements inglBranch {
 	private function GetCols($mCols, $sTable=null) {
 		if($sTable===null) { $sTable = $this->ChkSource(); }
 		$aAnalysis = $this->ChkAnalysis($sTable);
-		if(!is_array($mCols)) { return $aAnalysis[$mCols]["field"]; }
-		$aColumns = array();
+		if(!\is_array($mCols)) {
+			if(\strpos($mCols, "-")!==false) {
+				$aRange = \explode("-", $mCols, 2);
+				$mCols = \range((int)$aRange[0], (int)$aRange[1]);
+			} else {
+				return $aAnalysis[$mCols]["field"];
+			}
+		}
+		$aColumns = [];
 		foreach($mCols as $nCol) {
-			$aColumns[] = $aAnalysis[$nCol]["field"];
+			$aColumns[$nCol] = $aAnalysis[$nCol]["field"];
 		}
 		return $aColumns;
 	}
@@ -948,19 +1068,19 @@ class nglPecker extends nglBranch implements inglBranch {
 	}
 
 	private function Mixer($aUnify, $aFields, $aRules) {
-		$aUnique = array_shift($aUnify);
+		$aUnique = \array_shift($aUnify);
 		$sSplitter = $this->argument("splitter");
 		foreach($aFields as $sField) {
 			if($aRules[$sField]===false) { continue; }
 			
-			$sSaveIdx = trim(strtolower($aUnique[$sField]));
-			$nSaveIdx = strlen($sSaveIdx);
+			$sSaveIdx = \trim(\strtolower($aUnique[$sField]));
+			$nSaveIdx = \strlen($sSaveIdx);
 			if($aRules[$sField]=="join") {
-				$aToSave = array(md5($sSaveIdx) => $aUnique[$sField]);
+				$aToSave = [\md5($sSaveIdx) => $aUnique[$sField]];
 			} else if($aRules[$sField]=="longer") {
-				$aToSave = array($nSaveIdx => array(md5($sSaveIdx) => $aUnique[$sField]));
+				$aToSave = [$nSaveIdx => [\md5($sSaveIdx) => $aUnique[$sField]]];
 			} else {
-				$aToSave = array();
+				$aToSave = [];
 			}
 
 			foreach($aUnify as $aRow) {
@@ -974,24 +1094,31 @@ class nglPecker extends nglBranch implements inglBranch {
 						break;
 					
 					case "join":
-						$aToSave[md5(trim(strtolower($aRow[$sField])))] = $aRow[$sField];
+						$aToSave[\md5(\trim(\strtolower($aRow[$sField])))] = $aRow[$sField];
 						break;
 					
 					case "longer":
-						$sVal = trim(strtolower($aRow[$sField]));
-						$nVal = strlen($sVal);
-						if(!isset($aToSave[$nVal])) { $aToSave[$nVal] = array(); }
-						$aToSave[$nVal][md5($sVal)] = $aRow[$sField];
+					case "longerjoin":
+						$sVal = \trim(\strtolower($aRow[$sField]));
+						$nVal = \strlen($sVal);
+						if(!isset($aToSave[$nVal])) { $aToSave[$nVal] = []; }
+						$aToSave[$nVal][\md5($sVal)] = $aRow[$sField];
 						break;
 				}
 			}
 
-			if(count($aToSave)) {
+			if(\is_array($aToSave) && \count($aToSave)) {
 				if($aRules[$sField]=="longer") {
+					\krsort($aToSave);
+					$aToSave = \current($aToSave);
+					$aUnique[$sField] = \current($aToSave);
+				} if($aRules[$sField]=="longerjoin") {
 					krsort($aToSave);
-					$aToSave = current($aToSave);
+					$aToSave = \current($aToSave);
+					$aUnique[$sField] = \implode($sSplitter, $aToSave);
+				} else if($aRules[$sField]=="join") {
+					$aUnique[$sField] = \implode($sSplitter, $aToSave);
 				}
-				$aUnique[$sField] = implode($sSplitter, $aToSave);
 			}
 		}
 		
@@ -1000,7 +1127,7 @@ class nglPecker extends nglBranch implements inglBranch {
 
 	private function Output($mData) {
 		$sOutputMode = $this->argument("output");
-		if(is_array($mData) && count($mData)) {
+		if(\is_array($mData) && \count($mData)) {
 			if($sOutputMode=="print") {
 				echo self::call("shift")->convert($mData, "array-ttable");
 			} else if($sOutputMode=="table") {
@@ -1013,8 +1140,8 @@ class nglPecker extends nglBranch implements inglBranch {
 
 	private function Sanitizer($sField, $aPolicy) {
 		foreach($aPolicy as $sPolicy) {
-			if(strstr($sPolicy, ":")) {
-				$aPolParts = explode(":", $sPolicy, 2);
+			if(\strstr($sPolicy, ":")) {
+				$aPolParts = \explode(":", $sPolicy, 2);
 				$sPolicy = $aPolParts[0];
 				$sPolicyArg = $aPolParts[1];
 			}
@@ -1028,10 +1155,12 @@ class nglPecker extends nglBranch implements inglBranch {
 					break;
 				case "lcase": $sField = "LCASE(".$sField.")"; break;
 				case "ucase": $sField = "UCASE(".$sField.")"; break;
+				case "ucfirst": $sField = "func.ucfirst(".$sField.")"; break;
+				case "ucwords": $sField = "func.ucwords(".$sField.")"; break;
 				case "letters": $sField = "REGEXP_REPLACE(".$sField.", '[^A-Za-z]', '')"; break;
 				case "digits": $sField = "REGEXP_REPLACE(".$sField.", '[^0-9]', '')"; break;
 				case "numbers": $sField = "REGEXP_REPLACE(".$sField.", '[^0-9\\,\\.\\-]', '')"; break;
-				case "email": $sField = "REGEXP_REPLACE(".$sField.", '[^0-9a-zA-Z\\@\\_\\.\\-]', '')"; break;
+				case "email": $sField = "LCASE(REGEXP_REPLACE(".$sField.", '[^0-9a-zA-Z\\@\\_\\.\\-]', ''))"; break;
 				case "words": $sField = "REGEXP_REPLACE(".$sField.", '[^0-9a-zA-Z]', '')"; break;
 				case "nospaces": $sField = "REGEXP_REPLACE(".$sField.", '\s', '')"; break;
 				case "consonants": $sField = "REGEXP_REPLACE(".$sField.", '([^B-Zb-z]|[eiouEIOU])', '')"; break;
@@ -1048,14 +1177,22 @@ class nglPecker extends nglBranch implements inglBranch {
 	}
 
 	protected function SecureName($sName) {
-		return preg_replace("/[^A-Za-z0-9\_\-]/is", "", $sName);
+		$sName = \preg_replace("/[^A-Za-z0-9\_\-]/is", "", $sName);
+		return (empty($sName)) ? null : $sName;
+	}
+
+	protected function SetBridge($sBridge) {
+		$aBridge = \explode(".", $sBridge);
+		$sSelect = " `b`.`".$this->SecureName($aBridge[1])."`, ";
+		$sFrom = " LEFT JOIN `".$this->SecureName($aBridge[0])."` b  ON `b`.`__pecked__` = `t`.`__pecked__` ";
+		return [$sSelect, $sFrom];
 	}
 
 	protected function SetCols($aCols) {
 		if($aCols!==null) {
 			$aCols = $this->GetCols($aCols);
-			if(!is_array($aCols)) { $aCols = array($aCols); }
-			$this->attribute("colstr", "`".implode("`,`", $aCols)."`");
+			if(!\is_array($aCols)) { $aCols = [$aCols]; }
+			$this->attribute("colstr", "`".\implode("`,`", $aCols)."`");
 			$sTable = $this->argument("table");
 			if($sTable!==null) {
 				$this->aSavedData["COLS"][$sTable] = $aCols;
@@ -1073,9 +1210,9 @@ class nglPecker extends nglBranch implements inglBranch {
 
 	protected function SetDb($db) {
 		if($db!==null) {
-			if(is_string($db)) { $db = self::call($db); }
+			if(\is_string($db)) { $db = self::call($db); }
 			$this->db = $db;
-			if(method_exists($db, "connect")) {
+			if(\method_exists($db, "connect")) {
 				if(!$this->db->connect()) { self::errorMessage($this->object, 1001); }
 			}
 		}
@@ -1084,7 +1221,7 @@ class nglPecker extends nglBranch implements inglBranch {
 
 	protected function SetFeatures($aFeatures) {
 		if($aFeatures!==null) {
-			if(!is_array($aFeatures) || count($aFeatures)<3) { self::errorMessage($this->object, 1011); }
+			if(!\is_array($aFeatures) || count($aFeatures)<3) { self::errorMessage($this->object, 1011); }
 			$sFeTable = $this->SecureName($aFeatures[0]);
 			$sFeId = $this->SecureName($aFeatures[1]);
 			$sFeMatch = $this->SecureName($aFeatures[2]);
@@ -1093,12 +1230,12 @@ class nglPecker extends nglBranch implements inglBranch {
 			if($schema->rows()) {
 				$aGetSchema = $schema->getall("#COLUMN_NAME");
 				if(!isset($aGetSchema[$sFeId]) || !isset($aGetSchema[$sFeMatch])) { self::errorMessage($this->object, 1012); }
-				$aSchema = array(
+				$aSchema = [
 					"table" => $sFeTable,
 					"id" => $sFeId,
 					"match" => $sFeMatch,
 					"imya" => (isset($aGetSchema["imya"])) ? true : false
-				);
+				];
 			} else {
 				self::errorMessage($this->object, 1012);
 			}
@@ -1111,8 +1248,8 @@ class nglPecker extends nglBranch implements inglBranch {
 	protected function SetGrouper($aGrouper) {
 		if($aGrouper!==null) {
 			$aGrouper = $this->GetCols($aGrouper);
-			if(!is_array($aGrouper)) { $aGrouper = array($aGrouper); }
-			$this->attribute("grouper_str", "`".implode("`,`", $aGrouper)."`");
+			if(!\is_array($aGrouper)) { $aGrouper = [$aGrouper]; }
+			$this->attribute("grouperstr", "`".\implode("`,`", $aGrouper)."`");
 			$sTable = $this->argument("table");
 			if($sTable!==null) {
 				$this->aSavedData["GROUPER"][$sTable] = $aGrouper;
@@ -1127,8 +1264,8 @@ class nglPecker extends nglBranch implements inglBranch {
 			$sTableName = $this->SecureName($sTableName);
 			if(isset($this->aSavedData["ANALYSIS"], $this->aSavedData["ANALYSIS"][$sTableName])) {
 				$this->attribute("analysis", $this->aSavedData["ANALYSIS"][$sTableName]);
-				if(isset($this->aSavedData["GROUPER"][$sTableName])) { $this->attribute("grouper_str", $this->aSavedData["GROUPER"][$sTableName]); }
-				if(isset($this->aSavedData["COLS"][$sTableName])) { $this->attribute("colstr", $this->aSavedData["COLS"][$sTableName]); }
+				if(isset($this->aSavedData["GROUPER"][$sTableName])) { $this->attribute("grouperstr", "`".\implode("`,`", $this->aSavedData["GROUPER"][$sTableName])."`"); }
+				if(isset($this->aSavedData["COLS"][$sTableName])) { $this->attribute("colstr", "`".\implode("`,`", $this->aSavedData["COLS"][$sTableName])."`"); }
 			}
 		}
 		return $sTableName;

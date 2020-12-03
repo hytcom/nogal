@@ -20,19 +20,19 @@ class nglZip extends nglBranch implements inglBranch {
 	private $aErrors;
 
 	final protected function __declareArguments__() {
-		$vArguments							= array();
-		$vArguments["zipfile"]				= array('$mValue', "document.zip");
-		$vArguments["mode"]					= array('$mValue', "create"); // create | overwrite | open
-		$vArguments["extract"]				= array('$mValue', null);
-		$vArguments["extract_to"]			= array('$mValue', null);
-		$vArguments["content"]				= array('$mValue', null);
-		$vArguments["filepath"]				= array('$mValue', "");
-		$vArguments["downname"]				= array('$mValue', "document.zip");
+		$vArguments							= [];
+		$vArguments["zipfile"]				= ['$mValue', "document.zip"];
+		$vArguments["mode"]					= ['$mValue', "create"]; // create | overwrite | open
+		$vArguments["extract"]				= ['$mValue', null];
+		$vArguments["extract_to"]			= ['$mValue', null];
+		$vArguments["content"]				= ['$mValue', null];
+		$vArguments["filepath"]				= ['$mValue', ""];
+		$vArguments["downname"]				= ['$mValue', "document.zip"];
 		return $vArguments;
 	}
 
 	final protected function __declareAttributes__() {
-		$vAttributes = array();
+		$vAttributes = [];
 		return $vAttributes;
 	}
 
@@ -53,8 +53,8 @@ class nglZip extends nglBranch implements inglBranch {
 	}
 
 	public function load() {
-		list($sZipFile,$sMode) = $this->getarguments("zipfile,mode", func_get_args());
-		$sMode = strtolower($sMode);
+		list($sZipFile,$sMode) = $this->getarguments("zipfile,mode", \func_get_args());
+		$sMode = \strtolower($sMode);
 		$nMode = 0;
 		if($sMode=="create") {
 			$nMode = \ZipArchive::CREATE;
@@ -63,13 +63,13 @@ class nglZip extends nglBranch implements inglBranch {
 		}
 
 		if($sZipFile===true) {
-			$sZipFile = sys_get_temp_dir().NGL_DIR_SLASH.self::call()->unique().".zip";
+			$sZipFile = \sys_get_temp_dir().NGL_DIR_SLASH.self::call()->unique().".zip";
 		} else {
 			$sZipFile = self::call()->sandboxPath($sZipFile);
 		}
 
 		$this->zip = new \ZipArchive;
-		$nFlag = (!file_exists($sZipFile) && $nMode) ? $nMode : 0;
+		$nFlag = (!\file_exists($sZipFile) && $nMode) ? $nMode : 0;
 		$nError = $this->zip->open($sZipFile, $nFlag);
 		if($nError!==true) {
 			self::errorMessage($this->object, 1002, $this->aErrors[$nError]);
@@ -81,7 +81,7 @@ class nglZip extends nglBranch implements inglBranch {
 
 	public function create() {
 		if($this->zip===null) { self::errorMessage($this->object, 1001); return false; }
-		list($sFilePath,$sContent) = $this->getarguments("filepath,content", func_get_args());
+		list($sFilePath,$sContent) = $this->getarguments("filepath,content", \func_get_args());
 		
 		if($sContent!==null) {
 			$this->zip->addFromString($sFilePath, $sContent);
@@ -92,10 +92,10 @@ class nglZip extends nglBranch implements inglBranch {
 
 	public function add() {
 		if($this->zip===null) { self::errorMessage($this->object, 1001); return false; }
-		list($sFilePath) = $this->getarguments("filepath", func_get_args());
+		list($sFilePath) = $this->getarguments("filepath", \func_get_args());
 		
 		$sSandBoxPath = self::call()->sandboxPath($sFilePath);
-		if(file_exists($sSandBoxPath)) { $this->zip->addFile($sSandBoxPath, $sFilePath); return $this; }
+		if(\file_exists($sSandBoxPath)) { $this->zip->addFile($sSandBoxPath, $sFilePath); return $this; }
 		self::errorMessage($this->object, 1003, $sSandBoxPath);
 	}
 
@@ -106,8 +106,8 @@ class nglZip extends nglBranch implements inglBranch {
 		$sSandBoxPath = self::call()->sandboxPath($sFilePath);
 		$ls = self::call("files")->ls($sFilePath, "*", "signed", true);
 		foreach($ls as $sFile) {
-			$sLocalFile = str_replace(array("*", $sSandBoxPath), "", $sFile);
-			if($sLocalFile[0]==NGL_DIR_SLASH) { $sLocalFile = substr($sLocalFile, 1); }
+			$sLocalFile = \str_replace(["*", $sSandBoxPath], "", $sFile);
+			if($sLocalFile[0]==NGL_DIR_SLASH) { $sLocalFile = \substr($sLocalFile, 1); }
 			if($sFile[0]=="*") {
 				$this->zip->addEmptyDir($sLocalFile);
 			} else {
@@ -120,39 +120,40 @@ class nglZip extends nglBranch implements inglBranch {
 
 	public function getall() {
 		if($this->zip===null) { self::errorMessage($this->object, 1001); return false; }
-		$aFiles = array();
+		$aFiles = [];
 		for($x = 0; $x < $this->zip->numFiles; $x++) {
 			$sFile = $this->zip->getNameIndex($x);
 			if($sFile!==false) { $aFiles[$x] = $sFile; }
 		}
-		sort($aFiles);
+		\sort($aFiles);
 		return $aFiles;
 	}
 
 	public function unzip() {
 		if($this->zip===null) { self::errorMessage($this->object, 1001); return false; }
-		list($sExtractTo, $mExtract) = $this->getarguments("extract_to,extract", func_get_args());
+		list($sExtractTo, $mExtract) = $this->getarguments("extract_to,extract", \func_get_args());
 		$sExtractTo = self::call()->sandboxPath($sExtractTo);
 		return $this->zip->extractTo($sExtractTo, $mExtract);
 	}
 
 	public function download() {
 		if($this->zip===null) { self::errorMessage($this->object, 1001); return false; }
-		if(count(self::errorGetLast())) { exit(); }
+		$aLastError = self::errorGetLast();
+		if(\is_array($aLastError) && \count($aLastError)) { exit(); }
 
-		list($sFileName) = $this->getarguments("downname", func_get_args());
+		list($sFileName) = $this->getarguments("downname", \func_get_args());
 		$sFilePath = $this->zip->filename;
 		$this->zip->close();
 
-		header("Content-Description: File Transfer");
-		header("Content-Type: application/zip");
-		header("Content-Transfer-Encoding: binary");
-		header("Expires: 0");
-		header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-		header("Pragma: public");
-		header("Content-Disposition: attachment; filename=\"".$sFileName."\"");
-		header("Content-Length: ".filesize($sFilePath));
-		die(readfile($sFilePath));
+		\header("Content-Description: File Transfer");
+		\header("Content-Type: application/zip");
+		\header("Content-Transfer-Encoding: binary");
+		\header("Expires: 0");
+		\header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+		\header("Pragma: public");
+		\header("Content-Disposition: attachment; filename=\"".$sFileName."\"");
+		\header("Content-Length: ".\filesize($sFilePath));
+		die(\readfile($sFilePath));
 	}
 }
 

@@ -17,20 +17,20 @@ namespace nogal;
 class nglCoon extends nglBranch implements inglBranch {
 
 	final protected function __declareArguments__() {
-		$vArguments							= array();
-		$vArguments["apiname"]				= array('$mValue', "nogalcoon");
-		$vArguments["auth"]					= array('$mValue', null); // basic | bearer | alvin
-		$vArguments["ctype"]				= array('(string)$mValue', "json"); // csv | json | text | xml
-		$vArguments["data"]					= array('$mValue');
-		$vArguments["key"]					= array('$mValue', "SOME_STRONG_KEY");
-		$vArguments["method"]				= array('(string)$mValue', "POST");
-		$vArguments["token"]				= array('$mValue', null);
-		$vArguments["url"]					= array('(string)$mValue', null);
+		$vArguments							= [];
+		$vArguments["apiname"]				= ['$mValue', "nogalcoon"];
+		$vArguments["auth"]					= ['$mValue', null]; // basic | bearer | alvin
+		$vArguments["ctype"]				= ['(string)$mValue', "json"]; // csv | json | text | xml
+		$vArguments["data"]					= ['$mValue'];
+		$vArguments["key"]					= ['$mValue', "SOME_STRONG_KEY"];
+		$vArguments["method"]				= ['(string)$mValue', "POST"];
+		$vArguments["token"]				= ['$mValue', null];
+		$vArguments["url"]					= ['(string)$mValue', null];
 		return $vArguments;
 	}
 
 	final protected function __declareAttributes__() {
-		$vAttributes = array();
+		$vAttributes = [];
 		return $vAttributes;
 	}
 
@@ -42,8 +42,8 @@ class nglCoon extends nglBranch implements inglBranch {
 
 
 	public function request() {
-		list($mData,$sURL,$sToken,$sCType) = $this->getarguments("data,url,token,ctype", func_get_args());
-		$sMethod = strtoupper($this->argument("method"));
+		list($mData,$sURL,$sToken,$sCType) = $this->getarguments("data,url,token,ctype", \func_get_args());
+		$sMethod = \strtoupper($this->argument("method"));
 		$sAuth = $this->argument("auth");
 
 		$sCType = strtolower($sCType);
@@ -53,18 +53,18 @@ class nglCoon extends nglBranch implements inglBranch {
 			case "json":
 				$sContentType = "application/json";
 				if($sMethod=="POST") {
-					$mContent = (is_array($mData)) ? json_encode($mData) : $mData;
+					$mContent = (\is_array($mData)) ? \json_encode($mData) : $mData;
 				} else {
-					$mContent = (!is_array($mData)) ? json_decode($mData, true) : $mData;
+					$mContent = (!\is_array($mData)) ? \json_decode($mData, true) : $mData;
 				}
 				break;
 
 			case "xml":
 				$sContentType = "application/xml";
 				if($sMethod=="POST") {
-					$mContent = (is_array($mData)) ? self::call("shift")->convert($mData, "array-xml") : $mData;
+					$mContent = (\is_array($mData)) ? self::call("shift")->convert($mData, "array-xml") : $mData;
 				} else {
-					$mContent = (!is_array($mData)) ? self::call("shift")->convert($mData, "xml-array") : $mData;
+					$mContent = (!\is_array($mData)) ? self::call("shift")->convert($mData, "xml-array") : $mData;
 				}
 				$sCType = "xml";
 				break;
@@ -72,25 +72,25 @@ class nglCoon extends nglBranch implements inglBranch {
 			case "csv":
 				$sContentType = "text/csv";
 				if($sMethod=="POST") {
-					$mContent = (is_array($mData)) ? self::call("shift")->convert($mData, "array-csv") : $mData;
+					$mContent = (\is_array($mData)) ? self::call("shift")->convert($mData, "array-csv") : $mData;
 				} else {
-					$mContent = (!is_array($mData)) ? self::call("shift")->convert($mData, "csv-array") : $mData;
+					$mContent = (!\is_array($mData)) ? self::call("shift")->convert($mData, "csv-array") : $mData;
 				}
 				break;
 
 			case "text":
 				$sContentType = "text/plain";
 				if($sMethod=="POST") {
-					$mContent = (is_array($mData)) ? http_build_query($mData) : $mData;
+					$mContent = (\is_array($mData)) ? \http_build_query($mData) : $mData;
 				} else {
 					$mContent = $mData;
-					if(!is_array($mData)) { parse_str($mData, $mContent); }
+					if(!\is_array($mData)) { \parse_str($mData, $mContent); }
 				}
 				break;
 		}
 
 		$sBuffer = "REQUEST ERROR: Bad Request";
-		if(self::call()->isURL($sURL) && function_exists("curl_init")) {
+		if(self::call()->isURL($sURL) && \function_exists("curl_init")) {
 			$aHeaders = array("Content-Type: ".$sContentType);
 			if($sAuth!==null) { $aHeaders[] = "Authorization: ".$sAuth; }
 			if($sMethod=="GET" && !empty($mContent)) {
@@ -99,18 +99,18 @@ class nglCoon extends nglBranch implements inglBranch {
 			}
 
 			$curl = curl_init($sURL);
-			curl_setopt($curl, CURLOPT_HEADER, false);
-			curl_setopt($curl, CURLOPT_HTTPHEADER, $aHeaders); 
-			curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-			curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+			\curl_setopt($curl, CURLOPT_HEADER, false);
+			\curl_setopt($curl, CURLOPT_HTTPHEADER, $aHeaders); 
+			\curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+			\curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
 			if($sMethod=="POST") {
-				curl_setopt($curl, CURLOPT_POSTFIELDS, $mContent);
-				curl_setopt($curl, CURLOPT_POST, 1);
+				\curl_setopt($curl, CURLOPT_POSTFIELDS, $mContent);
+				\curl_setopt($curl, CURLOPT_POST, 1);
 			}
 			
-			$sBuffer = curl_exec($curl); 
-			if(curl_errno($curl)) { $sBuffer = "REQUEST ERROR curl: ".curl_error($curl); }
-			curl_close($curl);
+			$sBuffer = \curl_exec($curl); 
+			if(\curl_errno($curl)) { $sBuffer = "REQUEST ERROR curl: ".\curl_error($curl); }
+			\curl_close($curl);
 		}
 
 		return $sBuffer;
@@ -119,15 +119,15 @@ class nglCoon extends nglBranch implements inglBranch {
 	public function getrequest() {
 		$aHeaders		= self::call()->getheaders();
 		$aRequest		= $_REQUEST["source"];
-		$mBody			= $sInput = file_get_contents("php://input");
+		$mBody			= $sInput = \file_get_contents("php://input");
 		$aSelf			= self::call("sysvar")->SELF;
 		
 		if(isset($aHeaders["authorization"])) {
-			$aAuth = explode(" ", $aHeaders["authorization"], 2);
-			$sAuthMethod = strtolower($aAuth[0]);
+			$aAuth = \explode(" ", $aHeaders["authorization"], 2);
+			$sAuthMethod = \strtolower($aAuth[0]);
 			if($sAuthMethod=="basic") {
-				$sAuth = base64_decode($aAuth[1]);
-				$mAuth = (strpos($sAuth, ":")) ? explode(":", $sAuth, 2) : $sAuth;
+				$sAuth = \base64_decode($aAuth[1]);
+				$mAuth = (\strpos($sAuth, ":")) ? \explode(":", $sAuth, 2) : $sAuth;
 			} else if($sAuthMethod=="bearer") {
 				$mAuth = $aAuth[1];
 			} else if($sAuthMethod=="alvin") {
@@ -145,7 +145,7 @@ class nglCoon extends nglBranch implements inglBranch {
 		$sContentType = (isset($aHeaders["content-type"])) ? $aHeaders["content-type"] : null;
 		switch($sContentType) {
 			case "application/json":
-				$mBody = json_decode($sInput, true);
+				$mBody = \json_decode($sInput, true);
 				$sCType = "json";
 				break;
 
@@ -170,7 +170,7 @@ class nglCoon extends nglBranch implements inglBranch {
 
 		if($this->argument("ctype")===null) { $this->args("ctype", $sCType); }
 
-		$aReturn = array();
+		$aReturn = [];
 		if(isset($mAuth)) { $aReturn["auth"] = $mAuth; }
 		$aReturn["path"]	= $aSelf;
 		$aReturn["headers"]	= $aHeaders;
@@ -184,27 +184,27 @@ class nglCoon extends nglBranch implements inglBranch {
 		list($aData,$sToken,$sCType) = $this->getarguments("data,token,ctype", func_get_args());
 		$sApiName = $this->argument("apiname");
 
-		if(!in_array($sCType, array("csv","json","text","xml"))) { $sCType = "json"; }
+		if(!in_array($sCType, ["csv","json","text","xml"])) { $sCType = "json"; }
 
 		if($sCType=="json" || $sCType=="xml") {
-			$aResponse = array();
+			$aResponse = [];
 			$aResponse["api"]			= $sApiName;
-			$aResponse["timestamp"]		= time();
-			$aResponse["datetime"]		= date("Y-m-d H:i:s", $aResponse["timestamp"]);
+			$aResponse["timestamp"]		= \time();
+			$aResponse["datetime"]		= \date("Y-m-d H:i:s", $aResponse["timestamp"]);
 			if($sToken!==null) {
 				$aResponse["token"] 	= self::call()->tokenEncode($sToken, $this->argument("key"), false);
 			}
-			$aResponse["count"]			= (is_array($aData)) ? count($aData) : 0;
+			$aResponse["count"]			= (\is_array($aData)) ? \count($aData) : 0;
 			$aResponse["data"]			= $aData;
 
-			header("Content-Type: application/".$sCType, true);
+			\header("Content-Type: application/".$sCType, true);
 			return self::call("shift")->convert($aResponse, "array-".$sCType);
 		} else if($sCType=="csv") {
-			header("Content-Type: text/csv", true);
+			\header("Content-Type: text/csv", true);
 			return self::call("shift")->convert($aData, "array-csv");
 		} else {
-			header("Content-Type: text/plain", true);
-			return (is_array($aData)) ? self::call()->imploder(array("\t", "\n"), $aData) : $aData;
+			\header("Content-Type: text/plain", true);
+			return (\is_array($aData)) ? self::call()->imploder(["\t", "\n"], $aData) : $aData;
 		}
 	}
 }

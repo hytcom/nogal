@@ -42,40 +42,40 @@ class nglSystemVars extends nglTrunk {
 	private $SETTINGS;
 
 	public function __builder__() {
-		$SETTINGS = array();
+		$SETTINGS = [];
 
 		// para que una variable sea privada no debe admitir el argumento $mValue
 		// por eso se asignan mediate la ejecucion de un metodo privado
 		
 		// PRIVADAS (escritura privada, lectura publica)
 		// nombres de meses y dias
-		$SETTINGS["ACCENTED"]		= array('$this->AccentedChars()');
+		$SETTINGS["ACCENTED"]		= ['$this->AccentedChars()'];
 		
 		// IP del cliente
-		$SETTINGS["IP"]				= array('$this->SetIP()');
+		$SETTINGS["IP"]				= ['$this->SetIP()'];
 
 		// variable con contenido null
-		$SETTINGS["NULL"]			= array('null');
+		$SETTINGS["NULL"]			= ['null'];
 
 		// expresiones regulares de uso comun
-		$SETTINGS["REGEX"]			= array('$this->SetRegexs()');
+		$SETTINGS["REGEX"]			= ['$this->SetRegexs()'];
 
 		// PHP_SELF
-		$SETTINGS["SELF"]			= array('$this->SetSelf()');
+		$SETTINGS["SELF"]			= ['$this->SetSelf()'];
 		
 		// id del usuario (en caso de existir un login)
-		$SETTINGS["UID"]			= array('$this->SetUID()');
+		$SETTINGS["UID"]			= ['$this->SetUID()'];
 		
 		// version
-		$SETTINGS["VERSION"]		= array('$this->SetVersion()');
+		$SETTINGS["VERSION"]		= ['$this->SetVersion()'];
 
 		// SETTINGS
 		$this->SETTINGS = $SETTINGS;
 		
 		// VARIABLES
-		$VARS = array();
+		$VARS = [];
 		foreach($SETTINGS as $sVarname => $mValue) {
-			$VARS[$sVarname] = (!array_key_exists(1, $mValue)) ? eval("return ".$mValue[0].";") : $mValue[1];
+			$VARS[$sVarname] = (!\array_key_exists(1, $mValue)) ? eval("return ".$mValue[0].";") : $mValue[1];
 		}
 
 		$this->VARS = $VARS;
@@ -115,7 +115,7 @@ class nglSystemVars extends nglTrunk {
 		"return" : "array"
 	} **/
 	private function AccentedChars() {
-		$vChars = array(
+		$vChars = [
 			"À"=>"A", "Á"=>"A", "Â"=>"A", "Ã"=>"A", "Ä"=>"A", "Å"=>"A", "Æ"=>"A",
 			"È"=>"E", "É"=>"E", "Ê"=>"E", "Ë"=>"E",
 			"Ì"=>"I", "Í"=>"I", "Î"=>"I", "Ï"=>"I",
@@ -128,7 +128,7 @@ class nglSystemVars extends nglTrunk {
 			"ù"=>"u", "ú"=>"u", "û"=>"u",
 			"Š"=>"S", "š"=>"s", "Ž"=>"Z", "ž"=>"z", "Ç"=>"C", "Ñ"=>"N", "Ý"=>"Y", "Þ"=>"B",
 			"ß"=>"Ss", "ç"=>"c", "ñ"=>"n", "ý"=>"y", "ý"=>"y", "þ"=>"b", "ÿ"=>"y"
-		);
+		];
 		
 		return $vChars;
 	}
@@ -204,7 +204,7 @@ class nglSystemVars extends nglTrunk {
 		"return" : "array"
 	} **/
 	private function SetRegexs() {
-		$vRegexs = array();
+		$vRegexs = [];
 		$vRegexs["base64"] 		= "[a-zA-Z0-9\+\/\=]*";
 		$vRegexs["color"] 		= "#([0-9A-F]{6,8}|[0-9A-F]{3})";
 		$vRegexs["date"] 		= "[0-9]{4}\-([012][0-9]|3[01])\-([012][0-9]|3[01])";
@@ -247,10 +247,10 @@ class nglSystemVars extends nglTrunk {
 		"return" : "array"
 	} **/
 	private function SetVersion() {
-		$vVersion					= array();
+		$vVersion					= [];
 		$vVersion["name"]			= "nogal";
 		$vVersion["description"]	= "the most simple PHP Framework";
-		$vVersion["version"]		= file_get_contents(NGL_PATH_FRAMEWORK.NGL_DIR_SLASH."version.txt");
+		$vVersion["version"]		= \file_get_contents(NGL_PATH_FRAMEWORK.NGL_DIR_SLASH."version.txt");
 		$vVersion["author"]			= "hytcom";
 		$vVersion["site"]			= "https://hytcom.net";
 		$vVersion["documentation"]	= "https://github.com/hytcom/wiki/tree/master/nogal";

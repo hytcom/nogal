@@ -1,6 +1,6 @@
 [checksum]
-md5 = "f97e0333c1c9b3ae3209eff9add7a132"
-sha1 = "62e63d3e17752eb10ee5508855d3ea5632cd9be9"
+md5 = "1fd93cb88a683e0ecf186eac6cc01987"
+sha1 = "17c4c79daf82d395f6a86ccb4c9ecebfb1ec3b4c"
 
 [documentation]
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/shift.md"

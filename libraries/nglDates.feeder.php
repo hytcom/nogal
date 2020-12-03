@@ -21,18 +21,18 @@ class nglDates extends nglFeeder implements inglFeeder {
 	private $aSeconds;
 
 	final public function __init__($mArguments=null) {
-		$aDates = array();
+		$aDates = [];
 
-		$aDays = explode(",", NGL_DATE_DAYS);
-		$aDates["days"] = $aDates["days_short"] = array();
+		$aDays = \explode(",", NGL_DATE_DAYS);
+		$aDates["days"] = $aDates["days_short"] = [];
 		for($x=0;$x<7;$x++) {
 			$aDates["days"][$x+1] = $aDays[$x];
 			$aDates["days_short"][$x+1] = self::call("unicode")->substr($aDays[$x], 0 ,3);
 		}
 
 		// months
-		$aMonths = explode(",", NGL_DATE_MONTHS);
-		$aDates["months"] = $aDates["months_short"] = array();
+		$aMonths = \explode(",", NGL_DATE_MONTHS);
+		$aDates["months"] = $aDates["months_short"] = [];
 		for($x=0;$x<12;$x++) {
 			$aDates["months"][$x+1] = $aMonths[$x];
 			$aDates["months_short"][$x+1] = self::call("unicode")->substr($aMonths[$x], 0 ,3);
@@ -41,7 +41,7 @@ class nglDates extends nglFeeder implements inglFeeder {
 		$this->aSettings = $aDates;
 
 		// seconds
-		$aSeconds 			= array ();
+		$aSeconds 			= [];
 		$aSeconds["year"] 	= 31536000;
 		$aSeconds["month"] 	= 2592000;
 		$aSeconds["day"] 	= 86400;
@@ -58,23 +58,23 @@ class nglDates extends nglFeeder implements inglFeeder {
 	}
 
 	public function daysdiff($sDate1, $sDate2=null) {
-		$nDate1 = strtotime($sDate1);
-		$nDate2 = ($sDate2===null) ? time() : strtotime($sDate2);
+		$nDate1 = \strtotime($sDate1);
+		$nDate2 = ($sDate2===null) ? \time() : \strtotime($sDate2);
 
-		if(!($date1 = date_create($sDate1))) { return false; }
-		if(!($date2 = date_create($sDate2))) { return false; }
-		$interval = date_diff($date1, $date2);
+		if(!($date1 = \date_create($sDate1))) { return false; }
+		if(!($date2 = \date_create($sDate2))) { return false; }
+		$interval = \date_diff($date1, $date2);
 		return $interval->format("%a");
 	}
 
 	public function elapsed($mTime, $sFrom="second", $bReturnString=false) {
-		$sFrom = strtolower($sFrom);
+		$sFrom = \strtolower($sFrom);
 
-		if(!isset($this->aSeconds[$sFrom]) && is_string($mTime)) {
-			if(!($now = date_create($sFrom))) { return false; }
-			if(!($datefrom = date_create($mTime))) { return false; }
-			$interval = date_diff($now, $datefrom);
-			$aElapsed 			= array ();
+		if(!isset($this->aSeconds[$sFrom]) && \is_string($mTime)) {
+			if(!($now = \date_create($sFrom))) { return false; }
+			if(!($datefrom = \date_create($mTime))) { return false; }
+			$interval = \date_diff($now, $datefrom);
+			$aElapsed 			= [];
 			$aElapsed["year"] 	= $interval->y;
 			$aElapsed["month"] 	= $interval->m;
 			$aElapsed["day"] 	= $interval->d;
@@ -84,19 +84,19 @@ class nglDates extends nglFeeder implements inglFeeder {
 		} else {
 			if(!isset($this->aSeconds[$sFrom])) { $sFrom = "second"; }
 			$nSeconds = ($mTime * $this->aSeconds[$sFrom]);
-			$aElapsed = array();
+			$aElapsed = [];
 			foreach($this->aSeconds as $sUnit => $nToken) {
 				if($nSeconds < $nToken) {
 					$aElapsed[$sUnit] = 0;
 				} else {
-					$aElapsed[$sUnit] = floor($nSeconds/$nToken);
+					$aElapsed[$sUnit] = \floor($nSeconds/$nToken);
 					$nSeconds = $nSeconds%$nToken;
 				}
 			}
 		}
 
 		if($bReturnString) {
-			foreach(array_keys(array_reverse($this->aSeconds, true)) as $sKey) {
+			foreach(\array_keys(\array_reverse($this->aSeconds, true)) as $sKey) {
 				if($aElapsed[$sKey]=="0") { unset($aElapsed[$sKey]); } else { break; }
 			}
 
@@ -104,7 +104,7 @@ class nglDates extends nglFeeder implements inglFeeder {
 				$nValue = $nValue." ".$sPart.(($nValue!=1) ? "s" : "");
 			}
 
-			return implode(" ", $aElapsed);
+			return \implode(" ", $aElapsed);
 		}
 
 		return $aElapsed;
@@ -112,55 +112,55 @@ class nglDates extends nglFeeder implements inglFeeder {
 
 	public function info($mTime=null) {
 		if($mTime===null) {
-			$nTime = time();
+			$nTime = \time();
 		} else {
-			$nTime = (!preg_match("/^[0-9]+$/", $mTime)) ? strtotime($mTime) : $mTime;
+			$nTime = (!\preg_match("/^[0-9]+$/", $mTime)) ? \strtotime($mTime) : $mTime;
 		}
 
-		$aDate = array();
+		$aDate = [];
 		$aDate["timestamp"]				= $nTime;
-		$aDate["date"]					= date("Y-m-d", $nTime);
-		$aDate["datetime"]				= date("Y-m-d H:i:s", $nTime);
-		$aDate["number"]				= date("j", $nTime);
-		$aDate["day"]					= date("d", $nTime);
-		$aDate["month"]					= date("m", $nTime);
-		$aDate["year"]					= date("Y", $nTime);
-		$aDate["week"]					= date("W", $nTime);
-		$aDate["day_week"]				= date("w", $nTime);
-		$aDate["single_month"]			= date("n", $nTime);
-		$aDate["single_year"]			= date("y", $nTime);
-		$aDate["day_name"]				= $this->aSettings["days"][date("w", $nTime)+1];
-		$aDate["day_shortname"]			= $this->aSettings["days_short"][date("w", $nTime)+1];
-		$aDate["month_name"]			= $this->aSettings["months"][date("n", $nTime)];
-		$aDate["month_shortname"]		= $this->aSettings["months_short"][date("n", $nTime)];
-		$aDate["ampm"]					= date("A", $nTime);
-		$aDate["hour_12"]				= date("h", $nTime);
-		$aDate["hour"]					= date("H", $nTime);
-		$aDate["time"]					= date("H:i:s", $nTime);
-		$aDate["minutes"]				= date("i", $nTime);
-		$aDate["seconds"]				= date("s", $nTime);
+		$aDate["date"]					= \date("Y-m-d", $nTime);
+		$aDate["datetime"]				= \date("Y-m-d H:i:s", $nTime);
+		$aDate["number"]				= \date("j", $nTime);
+		$aDate["day"]					= \date("d", $nTime);
+		$aDate["month"]					= \date("m", $nTime);
+		$aDate["year"]					= \date("Y", $nTime);
+		$aDate["week"]					= \date("W", $nTime);
+		$aDate["day_week"]				= \date("w", $nTime);
+		$aDate["single_month"]			= \date("n", $nTime);
+		$aDate["single_year"]			= \date("y", $nTime);
+		$aDate["day_name"]				= $this->aSettings["days"][\date("w", $nTime)+1];
+		$aDate["day_shortname"]			= $this->aSettings["days_short"][\date("w", $nTime)+1];
+		$aDate["month_name"]			= $this->aSettings["months"][\date("n", $nTime)];
+		$aDate["month_shortname"]		= $this->aSettings["months_short"][\date("n", $nTime)];
+		$aDate["ampm"]					= \date("A", $nTime);
+		$aDate["hour_12"]				= \date("h", $nTime);
+		$aDate["hour"]					= \date("H", $nTime);
+		$aDate["time"]					= \date("H:i:s", $nTime);
+		$aDate["minutes"]				= \date("i", $nTime);
+		$aDate["seconds"]				= \date("s", $nTime);
 		
 		return $aDate;
 	}
 
 	public function microtimer($nTimeIni=null) {
 		if($nTimeIni===null) { $nTimeIni = self::startime(); }
-		$nReturn = microtime(true) - (float)$nTimeIni;
-		return (!strpos($nReturn, "E")) ? $nReturn : 0;
+		$nReturn = \microtime(true) - (float)$nTimeIni;
+		return (!\strpos($nReturn, "E")) ? $nReturn : 0;
 	}
 
 	public function monthsdiff($sDate1, $sDate2=null) {
-		$nDate1 = strtotime($sDate1);
-		$nDate2 = ($sDate2===null) ? time() : strtotime($sDate2);
+		$nDate1 = \strtotime($sDate1);
+		$nDate2 = ($sDate2===null) ? \time() : \strtotime($sDate2);
 		
-		$sMonth1 = date("Y", $nDate1)*12 + date("n", $nDate1);
-		$sMonth2 = date("Y", $nDate2)*12 + date("n", $nDate2);		
-		return abs(floor($sMonth1 - $sMonth2));
+		$sMonth1 = \date("Y", $nDate1)*12 + \date("n", $nDate1);
+		$sMonth2 = \date("Y", $nDate2)*12 + \date("n", $nDate2);		
+		return \abs(\floor($sMonth1 - $sMonth2));
 	}
 
 	public function timesdiff($sTime1, $sTime2=null) {
-		$nTime1 = strtotime($sTime1);
-		$nTime2 = ($sTime2===null) ? time() : strtotime($sTime2);
+		$nTime1 = \strtotime($sTime1);
+		$nTime2 = ($sTime2===null) ? \time() : \strtotime($sTime2);
 		
 		if($nTime2 < $nTime1) {
 			$nTime2 += 86400;
@@ -175,21 +175,21 @@ class nglDates extends nglFeeder implements inglFeeder {
 
 	private function CalendarMonth($nYear, $nMonth, $bComplete, $aEvents=false) {
 		$nDay			= 1;
-		$nTime			= mktime(0,0,0,$nMonth, $nDay, $nYear);
-		$nDaysOfMonth	= date("t", $nTime);
-		$nStartDay		= date("w", $nTime);
+		$nTime			= \mktime(0,0,0,$nMonth, $nDay, $nYear);
+		$nDaysOfMonth	= \date("t", $nTime);
+		$nStartDay		= \date("w", $nTime);
 
-		$aMonth = array();
-		$aWeek = array_fill(0, 7, array());
+		$aMonth = [];
+		$aWeek = \array_fill(0, 7, array());
 
 		for($y=0;$y<7;$y++) {
 			if($y<$nStartDay) {
 				if($bComplete) {
-					$aWeek[$y] = $this->info(mktime(0,0,0,$nMonth, ($y-$nStartDay+1), $nYear));
+					$aWeek[$y] = $this->info(\mktime(0,0,0,$nMonth, ($y-$nStartDay+1), $nYear));
 					$aWeek[$y]["day_of_month"] = "previus";
 				}
 			} else {
-				$aWeek[$y] = $this->info(mktime(0,0,0,$nMonth, $nDay, $nYear));
+				$aWeek[$y] = $this->info(\mktime(0,0,0,$nMonth, $nDay, $nYear));
 				$aWeek[$y]["day_of_month"] = "current";
 				$nDay++;
 			}
@@ -198,10 +198,10 @@ class nglDates extends nglFeeder implements inglFeeder {
 
 		$nWeeksLimit = ($nDaysOfMonth-$nDay+1);
 		for($x=0; $x<$nWeeksLimit; $x+=7) {
-			$aWeek = array_fill(0, 7, array());
+			$aWeek = \array_fill(0, 7, []);
 			for($y=0;$y<7;$y++) {
 				if($nDaysOfMonth<$nDay && !$bComplete) { break; }
-				$aWeek[$y] = $this->info(mktime(0,0,0,$nMonth, $nDay, $nYear));
+				$aWeek[$y] = $this->info(\mktime(0,0,0,$nMonth, $nDay, $nYear));
 				$aWeek[$y]["day_of_month"] = ($nDay>$nDaysOfMonth) ? "next" : "current";
 				$nDay++;
 			}
@@ -209,14 +209,14 @@ class nglDates extends nglFeeder implements inglFeeder {
 			if($nDaysOfMonth<$nDay && !$bComplete) { break; }
 		}
 
-		$aFinalMonth = array();
+		$aFinalMonth = [];
 		foreach($aMonth as $aWeek) {
-			$aFinalWeek = array();
+			$aFinalWeek = [];
 			foreach($aWeek as $nDay => $aDay) {
 				if(isset($aDay["date"])) {
 					// eventos
-					$aDay["events"] = array();
-					if(is_array($aEvents) && isset($aEvents[$aDay["date"]])) {
+					$aDay["events"] = [];
+					if(\is_array($aEvents) && isset($aEvents[$aDay["date"]])) {
 						$aDay["events"] = $aEvents[$aDay["date"]];
 					}
 					$aFinalWeek[$aDay["date"]] = $aDay;

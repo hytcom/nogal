@@ -28,7 +28,7 @@ class nglBee extends nglFeeder implements inglFeeder {
 	private $bDump;
 
 	final public function __init__($mArguments=null) {
-		if(!defined("NGL_BEE") || NGL_BEE===null || NGL_BEE===false) {
+		if(!\defined("NGL_BEE") || NGL_BEE===null || NGL_BEE===false) {
 		if(NGL_TERMINAL) {
 			$this->__errorMode__("shell");
 			self::errorMode("shell");
@@ -39,9 +39,9 @@ class nglBee extends nglFeeder implements inglFeeder {
 
 		$this->sDelimiter = "(\r\n|\n)";
 		$this->aLibs = self::Libraries();
-		$this->aObjs = array();
-		$this->aVars = array();
-		$this->aLoops = array();
+		$this->aObjs = [];
+		$this->aVars = [];
+		$this->aLoops = [];
 		$this->sSeparator = "\t";
 		$this->bDump = false;
 	}
@@ -50,7 +50,7 @@ class nglBee extends nglFeeder implements inglFeeder {
 		if(!NGL_TERMINAL && NGL_BEE!==true && !isset($_SESSION[NGL_SESSION_INDEX]["FLYINGBEE"])) {
 			self::errorMessage("bee", null, "You must login to use the Terminal");
 		}
-		if(!self::call()->isUTF8($sSentences)) { $sSentences = utf8_encode($sSentences); }
+		if(!self::call()->isUTF8($sSentences)) { $sSentences = \utf8_encode($sSentences); }
 		
 		$aCommands = $this->Parse($sSentences);
 		$this->error = false;
@@ -58,7 +58,7 @@ class nglBee extends nglFeeder implements inglFeeder {
 		if($this->RunCommands($aCommands)) {
 			if($this->output===null) { $this->output = "NULL"; }
 			if($this->bDump) {
-				if(is_object($this->output) && is_subclass_of($this->output, "nogal\\nglTrunk")) { return "TRUE"; }
+				if(\is_object($this->output) && \is_subclass_of($this->output, "nogal\\nglTrunk")) { return "TRUE"; }
 				return self::call()->dump($this->output);
 			} else {
 				return $this->output;
@@ -86,22 +86,22 @@ class nglBee extends nglFeeder implements inglFeeder {
 	}
 
 	private function RunCommands($aCommands) {
-		for($x=0; $x<count($aCommands); $x++) {
+		for($x=0; $x<\count($aCommands); $x++) {
 			$aCommand = $aCommands[$x];
 
 			if($aCommand[0]=="@loop") {
 				$aSource = $this->Argument($aCommand["source"]);
-				if(!is_array($aSource)) {
-					if(preg_match("/^([0-9]+)(:)([0-9]+)$/", $aSource, $aMatchs)) {
-						$aSource = range($aMatchs[1], $aMatchs[3]);
+				if(!\is_array($aSource)) {
+					if(\preg_match("/^([0-9]+)(:)([0-9]+)$/", $aSource, $aMatchs)) {
+						$aSource = \range($aMatchs[1], $aMatchs[3]);
 					}
 				}
-				$aSubCommands = array_slice($aCommands, $x+1, $aCommand["to"]);
+				$aSubCommands = \array_slice($aCommands, $x+1, $aCommand["to"]);
 				foreach($aSource as $aCurrent) {
 					$this->output = $aCurrent;
 					$this->RunCommands($aSubCommands);
 				}
-				$x += count($aSubCommands);
+				$x += \count($aSubCommands);
 			} else {
 				$bReturn = $this->RunCmd($aCommand);
 				if(!$bReturn) { return false; }
@@ -116,13 +116,13 @@ class nglBee extends nglFeeder implements inglFeeder {
 
 		if($sCmd[0]==="@") {
 			if($sCmd=="@php") {
-				array_shift($aCommand);
-				$this->output = call_user_func_array(array($this, "FuncPhp"), $aCommand);
+				\array_shift($aCommand);
+				$this->output = \call_user_func_array([$this, "FuncPhp"], $aCommand);
 				return true;
 			} else {
-				$sCmd = substr($sCmd, 1);
-				array_shift($aCommand);
-				call_user_func_array(array($this, "Func".$sCmd), $aCommand);
+				$sCmd = \substr($sCmd, 1);
+				\array_shift($aCommand);
+				\call_user_func_array([$this, "Func".$sCmd], $aCommand);
 				return true;
 			}
 		} else if($sCmd==='-$:') {
@@ -134,20 +134,21 @@ class nglBee extends nglFeeder implements inglFeeder {
 			}
 			$obj = $this->aObjs[$sCmd];
 		}
-		if(count(self::errorGetLast())) { die(self::errorMessage(null)); }
+		$aLastError = self::errorGetLast();
+		if(\is_array($aLastError) && \count($aLastError)) { die(self::errorMessage(null)); }
 
 		$aArgs = null;
-		if(array_key_exists(2, $aCommand)) {
+		if(\array_key_exists(2, $aCommand)) {
 			$aArgs = $this->Argument($aCommand[2], true);
 		}
 
-		if(array_key_exists(1, $aCommand)) {
-			if(method_exists($obj, $aCommand[1]) || (is_object($obj) && method_exists($obj, "isArgument") && $obj->isArgument($aCommand[1]))) {
+		if(\array_key_exists(1, $aCommand)) {
+			if(\method_exists($obj, $aCommand[1]) || (\is_object($obj) && \method_exists($obj, "isArgument") && $obj->isArgument($aCommand[1]))) {
 				if($aArgs!==null) {
-					$mOutput = call_user_func_array(array($obj,$aCommand[1]), $aArgs);
-					if(strtolower($sCmd)=="graft") { $mOutput = $mOutput->graft; }
+					$mOutput = \call_user_func_array([$obj,$aCommand[1]], $aArgs);
+					if(\strtolower($sCmd)=="graft") { $mOutput = $mOutput->graft; }
 				} else {
-					$mOutput = call_user_func(array($obj,$aCommand[1]));
+					$mOutput = \call_user_func([$obj,$aCommand[1]]);
 				}
 			} else {
 				if(NGL_TERMINAL) {
@@ -164,23 +165,23 @@ class nglBee extends nglFeeder implements inglFeeder {
 	}
 
 	private function Parse($sSentences) {
-		$aToRun = array();
-		$sSentences = preg_replace("/( )*\\\\".$this->sDelimiter."/", "", $sSentences);
-		$aSentences = preg_split("/".$this->sDelimiter."/", $sSentences."\n");
+		$aToRun = [];
+		$sSentences = \preg_replace("/( )*\\\\".$this->sDelimiter."/", "", $sSentences);
+		$aSentences = \preg_split("/".$this->sDelimiter."/", $sSentences."\n");
 
 		$x = -1;
 		foreach($aSentences as $sSentence) {
-			$sSentence = trim($sSentence);
+			$sSentence = \trim($sSentence);
 			if($sSentence==="" || $sSentence[0]=="#" || $sSentence[0].$sSentence[1]=="//") { continue; }
 			$x++;
-			$aCommand = explode(" ", $sSentence, 3);
-			$sCmd = strtolower($aCommand[0]);
+			$aCommand = \explode(" ", $sSentence, 3);
+			$sCmd = \strtolower($aCommand[0]);
 			
 			if($sCmd=="@loop") {
 				$this->aLoops[] = $x;
-				$aToRun[$x] = array($sCmd, "source"=>$aCommand[1], "from"=>$x+1, "to"=>$x+2);
+				$aToRun[$x] = [$sCmd, "source"=>$aCommand[1], "from"=>$x+1, "to"=>$x+2];
 			} else if($sCmd=="endloop") {
-				$l = array_pop($this->aLoops);
+				$l = \array_pop($this->aLoops);
 				$aToRun[$l]["to"] = $x-$aToRun[$l]["from"];
 				$x--;
 			} else {
@@ -197,7 +198,7 @@ class nglBee extends nglFeeder implements inglFeeder {
 	}
 
 	private function FuncLogin() {
-		list($sPassword) = func_get_args();
+		list($sPassword) = \func_get_args();
 		$this->login($sPassword);
 	}
 
@@ -206,7 +207,7 @@ class nglBee extends nglFeeder implements inglFeeder {
 	}
 
 	private function FuncSet() {
-		list($sVarname, $mValue) = func_get_args();
+		list($sVarname, $mValue) = \func_get_args();
 		if($mValue==='-$:') {
 			$this->aVars[$sVarname] = $this->output;
 		} else {
@@ -215,19 +216,19 @@ class nglBee extends nglFeeder implements inglFeeder {
 	}
 
 	private function FuncSeparator() {
-		list($sSeparator) = func_get_args();
+		list($sSeparator) = \func_get_args();
 		$this->sSeparator = $sSeparator;
 	}
 
 	private function FuncGet() {
-		@list($sVarname, $mIndex) = func_get_args();
+		@list($sVarname, $mIndex) = \func_get_args();
 		$mVar = ($sVarname==='-$:') ? $this->output : $this->aVars[$sVarname];
 		$this->output = $mVar;
 		if($mIndex!==null) {
 			$mIndex = $this->Argument($mIndex);
-			if(is_array($mIndex)) {
+			if(\is_array($mIndex)) {
 				foreach($mIndex as $sIndex) {
-					if(array_key_exists($sIndex, $this->output)) {
+					if(\array_key_exists($sIndex, $this->output)) {
 						$this->output = $this->output[$sIndex];
 					}
 				}
@@ -238,32 +239,32 @@ class nglBee extends nglFeeder implements inglFeeder {
 	}
 
 	private function FuncPrint() {
-		$mValue = implode(" ", func_get_args());
+		$mValue = \implode(" ", \func_get_args());
 		$mValue = $this->Argument($mValue);
-		if(is_array($mValue)) { $mValue = implode($this->sSeparator, $mValue); }
-		$mValue = preg_replace("/[\\\n]/is", "\n", $mValue);
-		print($mValue);
+		if(\is_array($mValue)) { $mValue = \implode($this->sSeparator, $mValue); }
+		$mValue = \preg_replace("/[\\\n]/is", "\n", $mValue);
+		\print($mValue);
 	}
 
 	private function FuncLaunch() {
-		$mValue = implode(" ", func_get_args());
+		$mValue = \implode(" ", \func_get_args());
 		$sURL = $this->Argument($mValue);
-		header("location:".$sURL);
+		\header("location:".$sURL);
 		exit();
 	}
 
 	private function FuncPhp() {
-		$aArguments = func_get_args();
+		$aArguments = \func_get_args();
 		$sFunction = $aArguments[0];
 		if(isset($aArguments[1])) {
-			return call_user_func_array($sFunction, $this->Argument($aArguments[1], true));
+			return \call_user_func_array($sFunction, $this->Argument($aArguments[1], true));
 		} else {
-			return call_user_func($sFunction);
+			return \call_user_func($sFunction);
 		}
 	}
 
 	private function Argument($mArgument, $bToRun=false) {
-		if(is_array($mArgument)) {
+		if(\is_array($mArgument)) {
 			foreach($mArgument as &$mArg) {
 				$mArg = $this->Argument($mArg);
 			}
@@ -271,64 +272,64 @@ class nglBee extends nglFeeder implements inglFeeder {
 			return $mArgument;
 		}
 
-		$sArgument = trim($mArgument);
-		$sArgument = trim($sArgument, '"');
+		$sArgument = \trim($mArgument);
+		$sArgument = \trim($sArgument, '"');
 
 		if($sArgument==='-$:') {
-			return ($bToRun) ? array($this->output) : $this->output;
+			return ($bToRun) ? [$this->output] : $this->output;
 		} else if($sArgument==":true:") {
-			return array(true);
+			return [true];
 		} else if($sArgument==":false:") {
-			return array(false);
+			return [false];
 		} else if($sArgument==":null:") {
-			return array(null);
+			return [null];
 		} else {
-			$sArgument = preg_replace(array("/(?<!\\\\)\\\\n/is", "/(?<!\\\\)\\\\r/is", "/(?<!\\\\)\\\\t/is"), array("\n","\r","\t"), $sArgument);
+			$sArgument = \preg_replace(["/(?<!\\\\)\\\\n/is", "/(?<!\\\\)\\\\r/is", "/(?<!\\\\)\\\\t/is"], ["\n","\r","\t"], $sArgument);
 			if(isset($sArgument[0]) && ($sArgument[0]=="{" || $sArgument[0]=="[")) {
-				$aArgs = json_decode($sArgument, true, 512, JSON_UNESCAPED_UNICODE);
-				if(is_array($aArgs)) {
+				$aArgs = \json_decode($sArgument, true, 512, JSON_UNESCAPED_UNICODE);
+				if(\is_array($aArgs)) {
 					foreach($aArgs as $mKey => $mValue) {
 						if($mValue==='-$:') {
 							$aArgs[$mKey] = $this->output;
 						} else if($sArgument==":true:") {
-							return array(true);
+							return [true];
 						} else if($sArgument==":false:") {
-							return array(false);
+							return [false];
 						} else if($sArgument==":null:") {
-							return array(null);
-						} else if(is_array($mValue)) {
+							return [null];
+						} else if(\is_array($mValue)) {
 							$aArgs[$mKey] = $this->Argument($mValue, $bToRun);
-						} else if(!is_array($mValue) && preg_match_all("/\{(\\$|@)([a-z][0-9a-z_]*)\}/is", $mValue, $aMatchs, PREG_SET_ORDER)) {
+						} else if(!\is_array($mValue) && preg_match_all("/\{(\\$|@)([a-z][0-9a-z_]*)\}/is", $mValue, $aMatchs, PREG_SET_ORDER)) {
 							if($mValue==$aMatchs[0][0] && array_key_exists($aMatchs[0][2], $this->aVars)) {
 								$aArgs[$mKey] = $this->aVars[$aMatchs[0][2]];
-							} else if($mValue==$aMatchs[0][0] && defined($aMatchs[0][2])) {
-								$aArgs[$mKey] = constant($aMatchs[0][2]);
+							} else if($mValue==$aMatchs[0][0] && \defined($aMatchs[0][2])) {
+								$aArgs[$mKey] = \constant($aMatchs[0][2]);
 							} else {
 								foreach($aMatchs as $aMatch) {
-									if(array_key_exists($aMatch[2], $this->aVars)) {
-										$mValue = str_replace($aMatch[0], $this->aVars[$aMatch[2]], $mValue);
-									} else if(defined($aMatchs[2])) {
-										$mValue = str_replace($aMatch[0], constant($aMatchs[0][2]), $mValue);
+									if(\array_key_exists($aMatch[2], $this->aVars)) {
+										$mValue = \str_replace($aMatch[0], $this->aVars[$aMatch[2]], $mValue);
+									} else if(\defined($aMatchs[2])) {
+										$mValue = \str_replace($aMatch[0], \constant($aMatchs[0][2]), $mValue);
 									}
 								}
-								$mValue = str_replace('-$:', $this->output, $mValue);
+								$mValue = \str_replace('-$:', $this->output, $mValue);
 								$aArgs[$mKey] =  $mValue;
 							}
 						} else {
 							$sReplace = "";
-							if(strpos($mValue, '-$:')!==false) {
-								if(is_array($this->output)) {
+							if(\strpos($mValue, '-$:')!==false) {
+								if(\is_array($this->output)) {
 									foreach($this->output as $mValue) {
-										if(is_array($mValue)) { 
+										if(\is_array($mValue)) { 
 											$bArrayArray = true;
 											break;
 										}
 									}
-									if(!isset($bArrayArray)) { $sReplace = implode($this->sSeparator, $this->output); }
+									if(!isset($bArrayArray)) { $sReplace = \implode($this->sSeparator, $this->output); }
 								} else {
 									$sReplace = $this->output;
 								}
-								$aArgs[$mKey] = str_replace('-$:', $sReplace, $mValue);
+								$aArgs[$mKey] = \str_replace('-$:', $sReplace, $mValue);
 							}
 						}
 					}
@@ -337,35 +338,35 @@ class nglBee extends nglFeeder implements inglFeeder {
 				}
 			}
 
-			if(preg_match_all("/\{(\\$|@)([a-z][0-9a-z_]*)\}/is", $sArgument, $aMatchs, PREG_SET_ORDER)) {
+			if(\preg_match_all("/\{(\\$|@)([a-z][0-9a-z_]*)\}/is", $sArgument, $aMatchs, PREG_SET_ORDER)) {
 				// variables
-				if($sArgument==$aMatchs[0][0] && array_key_exists($aMatchs[0][2], $this->aVars)) {
-					return ($bToRun) ? array($this->aVars[$aMatchs[0][2]]) : $this->aVars[$aMatchs[0][2]];
+				if($sArgument==$aMatchs[0][0] && \array_key_exists($aMatchs[0][2], $this->aVars)) {
+					return ($bToRun) ? [$this->aVars[$aMatchs[0][2]]] : $this->aVars[$aMatchs[0][2]];
 				}
 
 				// constantes
-				if($sArgument==$aMatchs[0][0] && defined($aMatchs[0][2])) {
-					return ($bToRun) ? array(constant($aMatchs[0][2])) : constant($aMatchs[0][2]);
+				if($sArgument==$aMatchs[0][0] && \defined($aMatchs[0][2])) {
+					return ($bToRun) ? [\constant($aMatchs[0][2])] : \constant($aMatchs[0][2]);
 				}
 	
 				foreach($aMatchs as $aMatch) {
-					if(array_key_exists($aMatch[2], $this->aVars)) {
-						$sArgument = str_replace($aMatch[0], $this->aVars[$aMatch[2]], $sArgument);
-					} else if(defined($aMatchs[2])) {
-						$sArgument = str_replace($aMatch[0], constant($aMatchs[0][2]), $sArgument);
+					if(\array_key_exists($aMatch[2], $this->aVars)) {
+						$sArgument = \str_replace($aMatch[0], $this->aVars[$aMatch[2]], $sArgument);
+					} else if(\defined($aMatchs[2])) {
+						$sArgument = \str_replace($aMatch[0], \constant($aMatchs[0][2]), $sArgument);
 					}
 				}
-				$sArgument = str_replace('-$:', $this->output, $sArgument);
-				return ($bToRun) ? array($sArgument) : $sArgument;
+				$sArgument = \str_replace('-$:', $this->output, $sArgument);
+				return ($bToRun) ? [$sArgument] : $sArgument;
 			}
 		}
 
 		if(strpos($sArgument, '-$:')!==false) {
-			$sReplace = (is_array($this->output)) ? self::call()->imploder($this->sSeparator, $this->output) : $this->output;
-			$sArgument = str_replace('-$:', $sReplace, $sArgument);
+			$sReplace = (\is_array($this->output)) ? self::call()->imploder($this->sSeparator, $this->output) : $this->output;
+			$sArgument = \str_replace('-$:', $sReplace, $sArgument);
 		}
 
-		return ($bToRun) ? array($sArgument) : $sArgument;
+		return ($bToRun) ? [$sArgument] : $sArgument;
 	}
 }
 

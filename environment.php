@@ -171,9 +171,9 @@ nglRoot::defineConstant("NGL_CHMOD_FILE",										0664);
 
 
 // SISTEMA ---------------------------------------------------------------------
-$NGL_URL = constant("NGL_URL");
+$NGL_URL = \constant("NGL_URL");
 if(!empty($NGL_URL)) {
-	$NGL_URLPARTS = parse_url(NGL_URL);
+	$NGL_URLPARTS = \parse_url(NGL_URL);
 	if(isset($NGL_URLPARTS["port"])) {
 		$NGL_URLPARTS["urlport"] =  ":".$NGL_URLPARTS["port"];
 	} else {
@@ -190,45 +190,45 @@ unset($NGL_URL);
 
 // path del archivo actual desde NGL_URL y REQUEST_URI
 if(PHP_SAPI!="cli") {
-	$NGL_PATH_CURRENT = explode("?", NGL_URL_ROOT.$_SERVER["REQUEST_URI"], 2);
+	$NGL_PATH_CURRENT = \explode("?", NGL_URL_ROOT.$_SERVER["REQUEST_URI"], 2);
 	$NGL_PATH_CURRENT_QUERY = isset($NGL_PATH_CURRENT[1]) ? $NGL_PATH_CURRENT[1] : "";
-	$NGL_PATH_CURRENT = str_replace(NGL_URL, "", $NGL_PATH_CURRENT[0]);
-	define("NGL_TERMINAL", false);
-	define("NGL_PATH_CURRENT", preg_replace("#/+$#", "/", $NGL_PATH_CURRENT));
-	define("NGL_PATH_CURRENT_QUERY", $NGL_PATH_CURRENT_QUERY);
+	$NGL_PATH_CURRENT = \str_replace(NGL_URL, "", $NGL_PATH_CURRENT[0]);
+	\define("NGL_TERMINAL", false);
+	\define("NGL_PATH_CURRENT", \preg_replace("#/+$#", "/", $NGL_PATH_CURRENT));
+	\define("NGL_PATH_CURRENT_QUERY", $NGL_PATH_CURRENT_QUERY);
 	unset($NGL_PATH_CURRENT, $NGL_PATH_CURRENT_QUERY);
 } else {
-	define("NGL_TERMINAL", true);
-	define("NGL_PATH_CURRENT", getcwd()."/".$_SERVER["PHP_SELF"]);
+	\define("NGL_TERMINAL", true);
+	\define("NGL_PATH_CURRENT", \getcwd()."/".$_SERVER["PHP_SELF"]);
 }
 
 #===============================================================================
 # VARIABLES RESERVADAS
 #===============================================================================
-$_SET	= array();	// variables seteadas en las plantillas nglXtroitel
-$ENV 	= array(); 	// variables de entorno tambien disponibles en las plantillas nglXtroitel
+$_SET	= [];	// variables seteadas en las plantillas nglXtroitel
+$ENV 	= []; 	// variables de entorno tambien disponibles en las plantillas nglXtroitel
 $env	= &$ENV; 	// EVN alias
 
 #===============================================================================
 # CONFIGURACION PHP
 #===============================================================================
 // errores || errors
-if(@ini_set("display_errors", true)===false) {
+if(@\ini_set("display_errors", true)===false) {
 	echo "<b>NOGAL ERROR</b> Can't modify PHP display_errors.<br />\n";
 } else {
-	@ini_set("track_errors", 0);
-	@ini_set("html_errors", 0);
-	error_reporting(NGL_ERROR_REPORTING);
+	@\ini_set("track_errors", 0);
+	@\ini_set("html_errors", 0);
+	\error_reporting(NGL_ERROR_REPORTING);
 }
 
 // manejador de errores || errors handler
 if(NGL_HANDLING_ERRORS) {
-	set_error_handler(__NAMESPACE__."\\nglRoot::errorsHandler", E_ALL | E_STRICT);
+	\set_error_handler(__NAMESPACE__."\\nglRoot::errorsHandler", E_ALL | E_STRICT);
 }
 
 // timezone
-if(function_exists("date_default_timezone_set")) {
-	date_default_timezone_set(NGL_TIMEZONE);
+if(\function_exists("date_default_timezone_set")) {
+	\date_default_timezone_set(NGL_TIMEZONE);
 }
 
 

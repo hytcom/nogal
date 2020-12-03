@@ -1,6 +1,6 @@
 [checksum]
-md5 = "cb5bf15fa9e2abc4318ffe2cc3fd53d2"
-sha1 = "ca2be16d76dbd03dde8b52da2051efc2d7a8cc13"
+md5 = "2dfff1e742789c82c0a629ab1b3c4ec2"
+sha1 = "bd68501562c5abdb0d24e759879de95d6e66db9b"
 
 [documentation]
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/ocr.md"

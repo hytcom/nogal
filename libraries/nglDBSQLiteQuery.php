@@ -48,19 +48,19 @@ class nglDBSQLiteQuery extends nglBranch implements iNglDBQuery {
 	private $cursor = null;
 	
 	final protected function __declareArguments__() {
-		$vArguments							= array();
-		$vArguments["column"]				= array('$mValue', null);
-		$vArguments["get_mode"]				= array('$this->GetMode($mValue)', SQLITE3_ASSOC);
-		$vArguments["get_group"]			= array('$mValue', null);
-		$vArguments["link"]					= array('$mValue', null);
-		$vArguments["query"]				= array('$mValue', null);
-		$vArguments["sentence"]				= array('(string)$mValue', null);
-		$vArguments["query_time"]			= array('$mValue', null);
+		$vArguments							= [];
+		$vArguments["column"]				= ['$mValue', null];
+		$vArguments["get_mode"]				= ['$this->GetMode($mValue)', \SQLITE3_ASSOC];
+		$vArguments["get_group"]			= ['$mValue', null];
+		$vArguments["link"]					= ['$mValue', null];
+		$vArguments["query"]				= ['$mValue', null];
+		$vArguments["sentence"]				= ['(string)$mValue', null];
+		$vArguments["query_time"]			= ['$mValue', null];
 		return $vArguments;
 	}
 
 	final protected function __declareAttributes__() {
-		$vAttributes						= array();
+		$vAttributes						= [];
 		$vAttributes["_allrows"]			= null;
 		$vAttributes["_columns"]			= null;
 		$vAttributes["_rows"]				= null;
@@ -91,13 +91,13 @@ class nglDBSQLiteQuery extends nglBranch implements iNglDBQuery {
 		$nRows = null;
 		if($this->attribute("crud")=="SELECT") {
 			$sSQL = $this->attribute("sql");
-			$sSQL = trim($sSQL);
-			if(preg_match("/LIMIT *[0-9]+ *,? *[0-9]*$/i", $sSQL)) {
-				$sSQL = preg_replace("/LIMIT *[0-9]+ *,? *[0-9]*$/i", "", $sSQL);
+			$sSQL = \trim($sSQL);
+			if(\preg_match("/LIMIT *[0-9]+ *,? *[0-9]*$/i", $sSQL)) {
+				$sSQL = \preg_replace("/LIMIT *[0-9]+ *,? *[0-9]*$/i", "", $sSQL);
 			
 				$sSQL = "SELECT COUNT(*) FROM (".$sSQL.")";
 				$getrows = $this->db->query($sSQL);
-				$nRows = (int)$getrows->fetchArray(SQLITE3_NUM)[0];
+				$nRows = (int)$getrows->fetchArray(\SQLITE3_NUM)[0];
 				$getrows->finalize();
 			} else {
 				$nRows = (int)$this->rows();
@@ -119,7 +119,7 @@ class nglDBSQLiteQuery extends nglBranch implements iNglDBQuery {
 	public function columns() {
 		if($this->attribute("columns")!==null) { return $this->attribute("columns"); }
 
-		$aGetColumns = array();
+		$aGetColumns = [];
 		$nCols = $this->cursor->numColumns();
 		if($nCols) {
 			for($x=0; $x<$nCols; $x++) {
@@ -146,12 +146,12 @@ class nglDBSQLiteQuery extends nglBranch implements iNglDBQuery {
 	public function count() {
 		if($this->attribute("rows")!==null) { return $this->attribute("rows"); }
 
-		if(in_array($this->attribute("crud"), array("INSERT", "UPDATE", "REPLACE", "DELETE"))) {
+		if(\in_array($this->attribute("crud"), ["INSERT", "UPDATE", "REPLACE", "DELETE"])) {
 			$nRows = $this->db->changes();
 		} else {
 			$sSQL = $this->attribute("sql");
 			$rows = $this->db->query("SELECT COUNT(*) FROM (".$sSQL.")");
-			$nRows = $rows->fetchArray(SQLITE3_NUM)[0];
+			$nRows = $rows->fetchArray(\SQLITE3_NUM)[0];
 		}
 		
 		$this->attribute("rows", $nRows);
@@ -165,7 +165,7 @@ class nglDBSQLiteQuery extends nglBranch implements iNglDBQuery {
 		"return": "boolean"
 	} **/
 	public function destroy() {
-		if(!is_bool($this->cursor)) { $this->cursor->finalize(); }
+		if(!\is_bool($this->cursor)) { $this->cursor->finalize(); }
 		return parent::__destroy__();
 	}	
 
@@ -192,10 +192,10 @@ class nglDBSQLiteQuery extends nglBranch implements iNglDBQuery {
 		"return" : "mixed"
 	} **/
 	public function get() {
-		list($sColumn,$sMode) = $this->getarguments("column,get_mode", func_get_args());
+		list($sColumn,$sMode) = $this->getarguments("column,get_mode", \func_get_args());
 		$aRow = $this->cursor->fetchArray($sMode);
-		if($sColumn[0]=="#") { $sColumn = substr($sColumn, 1); }
-		return ($sColumn!==null && $aRow!==false && array_key_exists($sColumn, $aRow)) ? $aRow[$sColumn] : $aRow;
+		if($sColumn[0]=="#") { $sColumn = \substr($sColumn, 1); }
+		return ($sColumn!==null && $aRow!==false && \array_key_exists($sColumn, $aRow)) ? $aRow[$sColumn] : $aRow;
 	}
 
 	/** FUNCTION {
@@ -245,27 +245,27 @@ class nglDBSQLiteQuery extends nglBranch implements iNglDBQuery {
 		"return" : "mixed"
 	} **/
 	public function getall() {
-		list($sColumn,$sMode,$aGroup) = $this->getarguments("column,get_mode,get_group", func_get_args());
+		list($sColumn,$sMode,$aGroup) = $this->getarguments("column,get_mode,get_group", \func_get_args());
 		
 		$bIndexMode = false;
 		if($sColumn[0]=="#") {
-			$sColumn = substr($sColumn, 1);
+			$sColumn = \substr($sColumn, 1);
 			$bIndexMode = true;
 		}
 
 		$bGroupByMode = false;
 		if($sColumn[0]=="@") {
-			$sGroupBy = substr($sColumn, 1);
+			$sGroupBy = \substr($sColumn, 1);
 			$sColumn = null;
 			$bGroupByMode = true;
-			$aGroup = (is_array($aGroup)) ? $aGroup : null;
+			$aGroup = (\is_array($aGroup)) ? $aGroup : null;
 		}
 
 		$this->reset();
 		$aRow = $this->cursor->fetchArray($sMode);
 
-		$aGetAll = array();
-		if($sColumn!==null && $aRow!==false && !array_key_exists($sColumn, $aRow)) { return $aGetAll; }
+		$aGetAll = [];
+		if($sColumn!==null && $aRow!==false && !\array_key_exists($sColumn, $aRow)) { return $aGetAll; }
 		$this->reset();
 
 		if($sColumn!==null) {
@@ -273,7 +273,7 @@ class nglDBSQLiteQuery extends nglBranch implements iNglDBQuery {
 				while($aRow = $this->cursor->fetchArray($sMode)) {
 					if(isset($aGetAll[$aRow[$sColumn]])) {
 						if(!isset($aMultiple[$aRow[$sColumn]])) {
-							$aGetAll[$aRow[$sColumn]] = array($aGetAll[$aRow[$sColumn]]);
+							$aGetAll[$aRow[$sColumn]] = [$aGetAll[$aRow[$sColumn]]];
 							$aMultiple[$aRow[$sColumn]] = true;
 						}
 						$aGetAll[$aRow[$sColumn]][] = $aRow;
@@ -308,16 +308,16 @@ class nglDBSQLiteQuery extends nglBranch implements iNglDBQuery {
 		"return": "int"
 	} **/
 	protected function GetMode($sMode) {
-		$aModes 				= array();
-		$aModes["both"] 		= SQLITE3_BOTH;
-		$aModes["num"] 			= SQLITE3_NUM;
-		$aModes["assoc"] 		= SQLITE3_ASSOC;
-		$aModes[3] 				= SQLITE3_BOTH;
-		$aModes[2] 				= SQLITE3_NUM;
-		$aModes[1] 				= SQLITE3_ASSOC;
+		$aModes 				= [];
+		$aModes["both"] 		= \SQLITE3_BOTH;
+		$aModes["num"] 			= \SQLITE3_NUM;
+		$aModes["assoc"] 		= \SQLITE3_ASSOC;
+		$aModes[3] 				= \SQLITE3_BOTH;
+		$aModes[2] 				= \SQLITE3_NUM;
+		$aModes[1] 				= \SQLITE3_ASSOC;
 
-		$sMode = strtolower($sMode);
-		return (isset($aModes[$sMode])) ? $aModes[$sMode] : SQLITE3_ASSOC;
+		$sMode = \strtolower($sMode);
+		return (isset($aModes[$sMode])) ? $aModes[$sMode] : \SQLITE3_ASSOC;
 	}
 	
 	/** FUNCTION {
@@ -336,7 +336,7 @@ class nglDBSQLiteQuery extends nglBranch implements iNglDBQuery {
 		"return" : "object"
 	} **/
 	public function getobj() {
-		return (object)$this->cursor->fetchArray(SQLITE3_ASSOC);
+		return (object)$this->cursor->fetchArray(\SQLITE3_ASSOC);
 	}
 
 	/** FUNCTION {
@@ -346,7 +346,7 @@ class nglDBSQLiteQuery extends nglBranch implements iNglDBQuery {
 		"return": "boolean"
 	} **/
 	public function free() {
-		if(!is_bool($this->cursor)) { $this->cursor->finalize(); }
+		if(!\is_bool($this->cursor)) { $this->cursor->finalize(); }
 		return $this;
 	}
 
@@ -379,7 +379,7 @@ class nglDBSQLiteQuery extends nglBranch implements iNglDBQuery {
 		"return": "boolean"
 	} **/
 	public function load() {
-		list($link, $query, $sQuery, $nQueryTime) = $this->getarguments("link,query,sentence,query_time", func_get_args());
+		list($link, $query, $sQuery, $nQueryTime) = $this->getarguments("link,query,sentence,query_time", \func_get_args());
 		
 		$this->db = $link;
 		$this->cursor = $query;
@@ -387,11 +387,11 @@ class nglDBSQLiteQuery extends nglBranch implements iNglDBQuery {
 		$this->attribute("time", $nQueryTime);
 		
 		$sSQL = $sQuery;
-		$sSQL = preg_replace("/^[^A-Z]*/i", "", $sSQL);
-		$sSQLCommand = strtok($sSQL, " ");
-		$sSQLCommand = strtoupper($sSQLCommand);
+		$sSQL = \preg_replace("/^[^A-Z]*/i", "", $sSQL);
+		$sSQLCommand = \strtok($sSQL, " ");
+		$sSQLCommand = \strtoupper($sSQLCommand);
 		
-		if(in_array($sSQLCommand, array("SELECT", "INSERT", "UPDATE", "REPLACE", "DELETE"))) {
+		if(\in_array($sSQLCommand, ["SELECT", "INSERT", "UPDATE", "REPLACE", "DELETE"])) {
 			$this->attribute("crud", $sSQLCommand);
 		} else {
 			$this->attribute("crud", false);
@@ -432,8 +432,8 @@ class nglDBSQLiteQuery extends nglBranch implements iNglDBQuery {
 	} **/
 	public function toArray() {
 		$this->reset();
-		$aGetAll = array();
-		while(($aRow = $this->cursor->fetchArray(SQLITE3_ASSOC))!==false) {
+		$aGetAll = [];
+		while(($aRow = $this->cursor->fetchArray(\SQLITE3_ASSOC))!==false) {
 			$aGetAll[] = $aRow;
 		}
 		$this->reset();

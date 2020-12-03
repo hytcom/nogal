@@ -9,19 +9,19 @@ namespace nogal;
 	"revision" : "20150930",
 	"extends" : "nglBranch",
 	"interfaces" : "inglFeeder",
-	"description" : "Implementa la clase "phpExcel".
+	"description" : "Implementa la clase "PhpOffice\PhpSpreadsheet".
 	
 		// lee un excel
-		$excel = $ngl("excel.")->load("names.xlsx");
+		$excel = $ngl("excel")->load("names.xlsx");
 		print_r($excel->getall());exit();
 
 		// lee un HTML
-		$excel = $ngl("excel.")->load("tabla.html");
+		$excel = $ngl("excel")->load("tabla.html");
 		print_r($excel->getall());exit();
 		
 
 		// crear un excel
-		$excel = $ngl("excel.")->load("test.xls");
+		$excel = $ngl("excel")->load("test.xls");
 		$excel->set("A1", array(
 			array("NOMBRE", "APELLIDO", "EDAD", "MESES"),
 			array("ariel", "bottero", "40"),
@@ -32,7 +32,7 @@ namespace nogal;
 
 
 		// lee un excel, modifica algo y escribe un html
-		$excel = $ngl("excel.")->load("names.xlsx");
+		$excel = $ngl("excel")->load("names.xlsx");
 		$excel->set("A2", "GROSO");
 		$excel->download("names.html");
 		exit();
@@ -41,7 +41,7 @@ namespace nogal;
 		$a = $ngl("excel")->load("impuestos_x_pais.xlsx")->getall(true);
 
 		$a = $ngl()->arrayGroup($a, array(
-			"MAIN" => array("pais", array()),
+			"MAIN" => array("pais", []),
 			"tax" => array("nombre", array("sin", "con"))
 		));
 
@@ -63,34 +63,35 @@ class nglGraftExcel extends nglScion {
 	private $nRow = 0;
 
 	final protected function __declareArguments__() {
-		$vArguments					= array();
-		$vArguments["content"]		= array('$mValue', null);
-		$vArguments["filename"]		= array('(string)$mValue', null);
-		$vArguments["sheet"]		= array('$this->SetSheet($mValue)', 0);
-		$vArguments["title"]		= array('$this->SetTitle($mValue)', "Hoja1");
-		$vArguments["index"]		= array('$mValue', "A1");
-		
-		$vArguments["fontfamily"]	= array('$mValue', "Calibri");
-		$vArguments["fontsize"]		= array('$mValue', 8);
-		
-		$vArguments["empty"]		= array('$mValue', null);
-		$vArguments["calculate"]	= array('self::call()->istrue($mValue)', true);
-		$vArguments["format"]		= array('self::call()->istrue($mValue)', true);
-		$vArguments["colnames"]		= array('self::call()->istrue($mValue)', true); // usa la primer fila como clave
-		$vArguments["colref"]		= array('self::call()->istrue($mValue)', true);
+		$vArguments						= [];
+		$vArguments["content"]			= ['$mValue', null];
+		$vArguments["filename"]			= ['(string)$mValue', null];
+		$vArguments["sheet"]			= ['$this->SetSheet($mValue)', 0];
+		$vArguments["title"]			= ['$this->SetTitle($mValue)', "Hoja1"];
+		$vArguments["index"]			= ['$mValue', "A1"];
+		$vArguments["cellval"]			= ['strtolower($mValue)', "value"]; // value | calculated | formatted
 
-		$vArguments["styles"]		= array('(array)$mValue', null); 
-		$vArguments["unmergefill"]	= array('self::call()->istrue($mValue)', false); 
+		$vArguments["fontfamily"]		= ['$mValue', "Calibri"];
+		$vArguments["fontsize"]			= ['$mValue', 8];
 
-		$vArguments["csv_enclosed"]		= array('$mValue', '"');
-		$vArguments["csv_splitter"]		= array('$mValue', ";");
-		$vArguments["csv_eol"]			= array('$mValue', "\r\n");
+		$vArguments["empty"]			= ['$mValue', null];
+		$vArguments["calculate"]		= ['self::call()->istrue($mValue)', true];
+		$vArguments["format"]			= ['self::call()->istrue($mValue)', true];
+		$vArguments["colnames"]			= ['self::call()->istrue($mValue)', true]; // usa la primer fila como clase
+		$vArguments["colref"]			= ['self::call()->istrue($mValue)', true];
+
+		$vArguments["styles"]			= ['$mValue', null];
+		$vArguments["unmergefill"]		= ['self::call()->istrue($mValue)', false]; 
+
+		$vArguments["csv_enclosed"]		= ['$mValue', '"'];
+		$vArguments["csv_splitter"]		= ['$mValue', ";"];
+		$vArguments["csv_eol"]			= ['$mValue', "\r\n"];
 
 		return $vArguments;
 	}
 
 	final protected function __declareAttributes__() {
-		$vAttributes				= array();
+		$vAttributes				= [];
 		$vAttributes["rows"]		= null;
 		return $vAttributes;
 	}
@@ -99,18 +100,16 @@ class nglGraftExcel extends nglScion {
 	}
 
 	public function load() {
-		list($sFileName,$sFontFamily,$nFontSize) = $this->getarguments("filename,fontfamily,fontsize", func_get_args());
-		$this->args(array("filename"=>$sFileName));
+		list($sFileName,$sFontFamily,$nFontSize) = $this->getarguments("filename,fontfamily,fontsize", \func_get_args());
+		$this->args(["filename"=>$sFileName]);
 
 		$sFileName = self::call()->sandboxPath($sFileName);
-		if(file_exists($sFileName)) {
-			$type = \PHPExcel_IOFactory::identify($sFileName);
-			$reader = \PHPExcel_IOFactory::createReader($type);
-
+		if(\file_exists($sFileName)) {
+			$reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReaderForFile($sFileName);
 			self::call()->errorReporting(false);
 			$this->excel = $reader->load($sFileName);
 			$aError = self::call()->errorGetLast();
-			if(count($aError) && strpos($aError["file"],"PHPExcel")) { return false; }
+			if(\count($aError) && \strpos($aError["file"],"Spreadsheet")) { return false; }
 			self::call()->errorClearLast();
 			self::call()->errorReportingRestore();
 
@@ -118,7 +117,7 @@ class nglGraftExcel extends nglScion {
 			$this->sMaxCol = $this->excel->getActiveSheet()->getHighestColumn();
 			$this->attribute("rows", $this->nMaxRow);
 		} else {
-			$this->excel = new \PHPExcel();
+			$this->excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
 			$this->excel->getDefaultStyle()->getFont()->setName($sFontFamily);
 			$this->excel->getDefaultStyle()->getFont()->setSize($nFontSize);
 			$this->nMaxRow = "1"; 
@@ -143,11 +142,11 @@ class nglGraftExcel extends nglScion {
 	}
 	
 	public function getall() {
-		list($bColnames,$sFrom) = $this->getarguments("colnames,index", func_get_args());
+		list($bColnames,$sFrom) = $this->getarguments("colnames,index", \func_get_args());
 		$sRange = $sFrom.":".$this->sMaxCol.$this->nMaxRow;
 		$aData = $this->GetRange($sRange);
 		if($bColnames) {
-			$aFirstRow = array_shift($aData);
+			$aFirstRow = \array_shift($aData);
 			$aData = self::call()->arrayArrayCombine($aFirstRow, $aData);
 		}
 		return $aData;
@@ -158,25 +157,36 @@ class nglGraftExcel extends nglScion {
 		return $this;
 	}
 	
+	// retorna el valor de una celda segun el tipo especificado
 	public function cell() {
-		list($sCell) = $this->getarguments("index", func_get_args());
-		return $this->excel->getActiveSheet()->getCell($sCell);
+		list($sCell, $sFormat) = $this->getarguments("index,cellval", \func_get_args());
+		$sFormat = strtolower($sFormat);
+		$cell = $this->excel->getActiveSheet()->getCell($sCell);
+		if($sFormat=="calculated") {
+			return $cell->getCalculatedValue();
+		} else if($sFormat=="formatted") {
+			return $cell->getFormattedValue();
+		} else {
+			return $cell->getValue();
+		}
 	}
 
+	// obtiene todos los valores de una fila. index debe ser un INT
 	public function row() {
-		list($nRow) = $this->getarguments("index", func_get_args());
+		list($nRow) = $this->getarguments("index", \func_get_args());
 		$nRow = (int)$nRow;
 		$sRange = "A".$nRow.":".$this->sMaxCol.$nRow;
-		return current($this->GetRange($sRange));
+		return \current($this->GetRange($sRange));
 	}
 
+	// obtiene todos los valores de una columna. index debe ser un STRING
 	public function col() {
-		list($sColumn) = $this->getarguments("index", func_get_args());
+		list($sColumn) = $this->getarguments("index", \func_get_args());
 		$sRange = $sColumn."1:".$sColumn.$this->nMaxRow;
-		$aColumns = array(); 
+		$aColumns = []; 
 		$aGet = $this->GetRange($sRange);
 		foreach($aGet as $nIndex => $aRow) {
-			$aColumns[$nIndex] = current($aRow);
+			$aColumns[$nIndex] = \current($aRow);
 		}
 		return $aColumns;
 	}
@@ -191,10 +201,10 @@ class nglGraftExcel extends nglScion {
 	*5		= desde A5 hasta la maxima columna de la fila 5
 	*/
 	private function StrToRange($sRange) {
-		if(strpos($sRange, "*")!==false) {
-			$sRange = strtoupper($sRange);
-			if(strpos($sRange, ":")) {
-				$aRange = explode(":", $sRange);
+		if(\strpos($sRange, "*")!==false) {
+			$sRange = \strtoupper($sRange);
+			if(\strpos($sRange, ":")) {
+				$aRange = \explode(":", $sRange);
 				$aRange[0] = $this->CellParts($aRange[0]);
 				$aRange[1] = $this->CellParts($aRange[1]);
 				$sToCol	= ($aRange[1][0]=="*") ? $this->sMaxCol : $aRange[1][0];
@@ -214,36 +224,40 @@ class nglGraftExcel extends nglScion {
 	}
 
 	private function CellParts($sCell) {
-		$sCell = trim($sCell);
-		$sCol = ($sCell[0]=="*") ? "*" : preg_replace("/[^A-Z]/i", "", $sCell);
-		$nRow = (substr($sCell, -1)=="*") ? "*" : preg_replace("/[^0-9]/", "", $sCell);
-		return array($sCol, $nRow);
+		$sCell = \trim($sCell);
+		$sCol = ($sCell[0]=="*") ? "*" : \preg_replace("/[^A-Z]/i", "", $sCell);
+		$nRow = (\substr($sCell, -1)=="*") ? "*" : \preg_replace("/[^0-9]/", "", $sCell);
+		return [$sCol, $nRow];
 	}
 
+	// obtiene un rango de filas y columnas
 	public function range() {
-		list($sRange) = $this->getarguments("index", func_get_args());
+		list($sRange) = $this->getarguments("index", \func_get_args());
 		return $this->GetRange($this->StrToRange($sRange));
 	}
 
+	// une un rango de celdas. Prevalece como valor el de la primer celda
 	public function merge() {
-		list($sRange, $mContent) = $this->getarguments("index", func_get_args());
-		if(strpos($sRange, ":")) {
+		list($sRange, $mContent) = $this->getarguments("index", \func_get_args());
+		if(\strpos($sRange, ":")) {
 			$this->excel->getActiveSheet()->mergeCells($sRange);
 		}
 		return $this;
 	}
 
+	// setea contenido en una celda
+	// si index es un rango, hace merge de las celdas
 	public function set() {
-		list($sCell, $mContent) = $this->getarguments("index,content", func_get_args());
-		if(!is_array($mContent)) {
+		list($sCell, $mContent) = $this->getarguments("index,content", \func_get_args());
+		if(!\is_array($mContent)) {
 			$sCellName = $sCell;
-			if(strpos($sCell, ":")) { $aCell = explode(":", $sCell); $sCellName = $aCell[0]; }
+			if(\strpos($sCell, ":")) { $aCell = \explode(":", $sCell); $sCellName = $aCell[0]; }
 			$this->excel->getActiveSheet()->setCellValue($sCellName, $mContent);
 			if(isset($aCell)) { $this->excel->getActiveSheet()->mergeCells($sCell); }
 			return $this;
 		} else {
 			$sEmptyValue = $this->argument("empty");
-			if(!self::call()->isArrayArray($mContent)) { $mContent = array($mContent); }
+			if(!self::call()->isArrayArray($mContent)) { $mContent = [$mContent]; }
 			$this->excel->getActiveSheet()->fromArray($mContent, $sEmptyValue, $sCell);
 		}
 
@@ -253,12 +267,11 @@ class nglGraftExcel extends nglScion {
 	}
 
 	public function style() {
-		list($sRange, $aStyles) = $this->getarguments("index,styles", func_get_args());
+		list($sRange, $mStyles) = $this->getarguments("index,styles", \func_get_args());
 		$sRange = $this->StrToRange($sRange);
-		$aStyles = $this->GetStyles($aStyles);
-
+		$aStyles = $this->GetStyles($mStyles);
 		if(isset($aStyles["sizes"])) {
-			$aRange = explode(":", $sRange);
+			$aRange = \explode(":", $sRange);
 			if(!isset($aRange[1])) { $aRange[1] = $aRange[0]; }
 			$aCellFrom = $this->CellParts($aRange[0]);
 			$aCellTo = $this->CellParts($aRange[1]);
@@ -291,11 +304,11 @@ class nglGraftExcel extends nglScion {
 	}
 
 	public function write() {
-		list($sFileName) = $this->getarguments("filename", func_get_args());
+		list($sFileName) = $this->getarguments("filename", \func_get_args());
 		$sFileName = self::call()->sandboxPath($sFileName);
 		$aFileType = $this->FileType($sFileName);
-		$writer = \PHPExcel_IOFactory::createWriter($this->excel, $aFileType[0]);
-		if($aFileType[0]) {
+		$writer =  \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($this->excel, $aFileType[0]);
+		if($aFileType[0]=="Csv") {
 			$writer->setEnclosure($this->argument("csv_enclosed"));
 			$writer->setDelimiter($this->argument("csv_splitter"));
 			$writer->setLineEnding($this->argument("csv_eol"));
@@ -305,48 +318,53 @@ class nglGraftExcel extends nglScion {
 	}
 
 	public function download() {
-		list($sFileName) = $this->getarguments("filename", func_get_args());
+		list($sFileName) = $this->getarguments("filename", \func_get_args());
 		$aFileType = $this->FileType($sFileName);
 
-		if(count(self::errorGetLast())) { exit(); }
+		if(\count(self::errorGetLast())) { exit(); }
 		
-		header("Content-Type: ".$aFileType[1]);
-		header("Content-Disposition: attachment;filename=\"".$sFileName."\"");
-		header("Cache-Control: max-age=0");
+		\header("Content-Type: ".$aFileType[1]);
+		\header("Content-Disposition: attachment;filename=\"".$sFileName."\"");
+		\header("Cache-Control: max-age=0");
 
-		$writer = \PHPExcel_IOFactory::createWriter($this->excel, $aFileType[0]);
+		$writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($this->excel, $aFileType[0]);
 		$writer->save("php://output");
 	}
 
+	// retorna el documento en formato HTML hacia la salida de datos
 	public function html() {
-		header("Content-Type: text/html");
-		header("Cache-Control: max-age=0");
-		$writer = \PHPExcel_IOFactory::createWriter($this->excel, "HTML");
-		return $writer->save("php://output");
-	}
-
-	public function source() {
-		list($sFileName) = $this->getarguments("filename", func_get_args());
-		$aFileType = $this->FileType($sFileName);
-		$writer = \PHPExcel_IOFactory::createWriter($this->excel, $aFileType[0]);
-		ob_start();
+		\header("Content-Type: text/html");
+		\header("Cache-Control: max-age=0");
+		$writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($this->excel, "Html");
+		\ob_start();
 		$writer->save("php://output");
-		$sSource = ob_get_contents();
-		ob_end_clean();
+		$sSource = \ob_get_contents();
+		\ob_end_clean();
 		return $sSource;
 	}
 
-	public function unmergeAll() {
-		list($bFill) = $this->getarguments("unmergefill", func_get_args());
+	public function source() {
+		list($sFileName) = $this->getarguments("filename", \func_get_args());
+		$aFileType = $this->FileType($sFileName);
+		$writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($this->excel, $aFileType[0]);
+		\ob_start();
+		$writer->save("php://output");
+		$sSource = \ob_get_contents();
+		\ob_end_clean();
+		return $sSource;
+	}
 
+	// descombina celdas. Si unmergefill es true, completa el valor de todas en el de la primera
+	public function unmergeAll() {
+		list($bFill) = $this->getarguments("unmergefill", \func_get_args());
 		$aMerged = $this->excel->getActiveSheet()->getMergeCells();
-		if(is_array($aMerged) && count($aMerged)) {
+		if(\is_array($aMerged) && \count($aMerged)) {
 			foreach($aMerged as $sRange) {
 				$this->excel->getActiveSheet()->unmergeCells($sRange);
 				if($bFill) {
-					$aCells = \PHPExcel_Cell::extractAllCellReferencesInRange($sRange);
-					$mValue = $this->cell($aCells[0])->getValue();
-					for($x=1;$x<count($aCells);$x++) {
+					$aCells = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::extractAllCellReferencesInRange($sRange);
+					$mValue = $this->cell($aCells[0]);
+					for($x=1;$x<\count($aCells);$x++) {
 						$this->set($aCells[$x], $mValue);
 					}
 				}
@@ -374,7 +392,7 @@ class nglGraftExcel extends nglScion {
 	}
 
 	protected function SetSheet($mSheet) {
-		if(is_int($mSheet)) {
+		if(\is_int($mSheet)) {
 			$nSheets = $this->excel->getSheetCount();
 			if(($nSheets-1)<$mSheet) {
 				$this->excel->createSheet($mSheet);
@@ -405,54 +423,68 @@ class nglGraftExcel extends nglScion {
 	}
 	
 	private function FileType($sFileName) {
-		$sType = strtolower(pathinfo($sFileName, PATHINFO_EXTENSION));
-		$aTypes = array(
-			"xlsx"	=> array("Excel2007", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"),
-			"xls"	=> array("Excel5", "application/vnd.ms-excel"),
-			"html"	=> array("HTML", "text/html"),
-			"csv"	=> array("CSV", "text/csv")
-		);
+		$sType = \strtolower(\pathinfo($sFileName, PATHINFO_EXTENSION));
+		$aTypes = [
+			"csv"	=> ["Csv", "text/csv"],
+			"html"	=> ["Html", "text/html"],
+			"ods"	=> ["Ods", "application/vnd.oasis.opendocument.spreadsheet"],
+			"xls"	=> ["Xls", "application/vnd.ms-excel"],
+			"xlsx"	=> ["Xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"],
+			"xml"	=> ["Xml", "application/xml "]
+		];
 
 		return (isset($aTypes[$sType])) ? $aTypes[$sType] : $aTypes["xls"];
 	}
 
 
-	private function GetStyles($aRules) {
-		$aCSS = array();
+	private function GetStyles($mRules) {
+		if(\is_array($mRules)) {
+			$aRules = $mRules;
+		} else {
+			$aTmp = self::call()->explodeTrim(";", $mRules);
+			$aRules = [];
+			foreach($aTmp as $sRule) {
+				$aPair = self::call()->explodeTrim(":", $sRule);
+				$aRules[$aPair[0]] = $aPair[1];
+			}
+		}
+
+		$aCSS = [];
 		foreach($aRules as $sKey => $mValue) {
-			$aCSS[strtolower($sKey)] = $mValue;
+			$aCSS[\strtolower($sKey)] = $mValue;
 		}
 		unset($aRules);
 
-		$aStyles = array("alignment" => array(), "font" => array(), "borders" => array(), "sizes" => array());
+		$aStyles = ["alignment" => [], "font" => [], "borders" => [], "sizes" => []];
 
 		// text-alignment
 		if(isset($aCSS["text-align"])) {
 			switch($aCSS["text-align"]) {
-				case "left": $aStyles["alignment"]["horizontal"] = \PHPExcel_Style_Alignment::HORIZONTAL_LEFT; break;
-				case "center": $aStyles["alignment"]["horizontal"] = \PHPExcel_Style_Alignment::HORIZONTAL_CENTER; break;
-				case "right": $aStyles["alignment"]["horizontal"] = \PHPExcel_Style_Alignment::HORIZONTAL_RIGHT; break;
-				case "justify": $aStyles["alignment"]["horizontal"] = \PHPExcel_Style_Alignment::HORIZONTAL_JUSTIFY; break;
+				case "left": $aStyles["alignment"]["horizontal"] = \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT; break;
+				case "center": $aStyles["alignment"]["horizontal"] = \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER; break;
+				case "right": $aStyles["alignment"]["horizontal"] = \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT; break;
+				case "justify": $aStyles["alignment"]["horizontal"] = \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_JUSTIFY; break;
 			}
 		}
 
 		if(isset($aCSS["vertical-align"])) {
 			switch ($aCSS["vertical-align"]) {
-				case "top": $aStyles["alignment"]["vertical"] = \PHPExcel_Style_Alignment::VERTICAL_TOP; break;
-				case "middle": $aStyles["alignment"]["vertical"] = \PHPExcel_Style_Alignment::VERTICAL_CENTER; break;
-				case "bottom": $aStyles["alignment"]["vertical"] = \PHPExcel_Style_Alignment::VERTICAL_BOTTOM; break;
-				case "justify": $aStyles["alignment"]["vertical"] = \PHPExcel_Style_Alignment::VERTICAL_JUSTIFY; break;
-				case "general": $aStyles["alignment"]["vertical"] = \PHPExcel_Style_Alignment::VERTICAL_JUSTIFY; break;
+				case "top": $aStyles["alignment"]["vertical"] = \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_TOP; break;
+				case "middle": $aStyles["alignment"]["vertical"] = \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER; break;
+				case "bottom": $aStyles["alignment"]["vertical"] = \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_BOTTOM; break;
+				case "justify": $aStyles["alignment"]["vertical"] = \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_JUSTIFY; break;
+				case "general": $aStyles["alignment"]["vertical"] = \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_JUSTIFY; break;
 
 			}
 		}
 
 		// background-color
+		if(isset($aCSS["background"])) { $aCSS["background-color"] = $aCSS["background"]; unset($aCSS["background"]); }
 		if(isset($aCSS["background-color"])) {
-			$aStyles["fill"] = array(
-				"type"  => \PHPExcel_Style_Fill::FILL_SOLID,
-				"color" => array("rgb" => str_replace("#", "", $aCSS["background-color"])),
-			);
+			$aStyles["fill"] = [
+				"type"  => PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+				"color" => ["rgb" => \str_replace("#", "", $aCSS["background-color"])],
+			];
 		}
 
 		// font-size
@@ -462,17 +494,17 @@ class nglGraftExcel extends nglScion {
 		if(isset($aCSS["font-weight"])) { $aStyles["font"][$aCSS["font-weight"]] = true; }
 
 		// font-color
-		if(isset($aCSS["color"])) { $aStyles["font"]["color"] = array("rgb" => str_replace("#", "", $aCSS["color"])); }
+		if(isset($aCSS["color"])) { $aStyles["font"]["color"] = ["rgb" => \str_replace("#", "", $aCSS["color"])]; }
 
 		// border
 		if(isset($aCSS["border"])) {
 			$aBorder = $this->StylesBorders($aCSS["border"]);
-			$aStyles["borders"] = array(
+			$aStyles["borders"] = [
 				"bottom" => $aBorder,
 				"left"   => $aBorder,
 				"top"    => $aBorder,
 				"right"  => $aBorder,
-			);
+			];
 		}
 
 		if(isset($aCSS["border-top"])) {
@@ -496,42 +528,42 @@ class nglGraftExcel extends nglScion {
 		}
 
 		if(isset($aCSS["width"])) {
-			$aStyles["sizes"]["width"] = (trim(strtolower($aCSS["width"]))=="auto") ? "auto" : preg_replace("/[^0-9]/", "", $aCSS["width"]);
+			$aStyles["sizes"]["width"] = (\trim(\strtolower($aCSS["width"]))=="auto") ? "auto" : \preg_replace("/[^0-9]/", "", $aCSS["width"]);
 		}
 
 		if(isset($aCSS["height"])) {
-			$aStyles["sizes"]["height"] = (trim(strtolower($aCSS["height"]))=="auto") ? -1 : preg_replace("/[^0-9]/", "", $aCSS["height"]);
+			$aStyles["sizes"]["height"] = (\trim(\strtolower($aCSS["height"]))=="auto") ? -1 : \preg_replace("/[^0-9]/", "", $aCSS["height"]);
 		}
 
-		if(!count($aStyles["alignment"])) { unset($aStyles["alignment"]); }
-		if(!count($aStyles["font"])) { unset($aStyles["font"]); }
-		if(!count($aStyles["borders"])) { unset($aStyles["borders"]); }
-		if(!count($aStyles["sizes"])) { unset($aStyles["sizes"]); }
+		if(!\count($aStyles["alignment"])) { unset($aStyles["alignment"]); }
+		if(!\count($aStyles["font"])) { unset($aStyles["font"]); }
+		if(!\count($aStyles["borders"])) { unset($aStyles["borders"]); }
+		if(!\count($aStyles["sizes"])) { unset($aStyles["sizes"]); }
 
 		return $aStyles;
 	}
 
 	private function StylesBorders($sBorder) {
-		$aBorderParts = explode(" ", $sBorder);
-		$aBorder = array();
+		$aBorderParts = \explode(" ", $sBorder);
+		$aBorder = [];
 		foreach($aBorderParts as $sPart) {
-			$sPart = trim(strtolower($sPart));
+			$sPart = \trim(\strtolower($sPart));
 			switch($sPart) {
-				case "none": $aBorder["style"] = \PHPExcel_Style_Border::BORDER_NONE; break;
-				case "dashdot": $aBorder["style"] = \PHPExcel_Style_Border::BORDER_DASHDOT; break;
-				case "dashdotdot": $aBorder["style"] = \PHPExcel_Style_Border::BORDER_DASHDOTDOT; break;
-				case "dashed": $aBorder["style"] = \PHPExcel_Style_Border::BORDER_DASHED; break;
-				case "dotted": $aBorder["style"] = \PHPExcel_Style_Border::BORDER_DOTTED; break;
-				case "double": $aBorder["style"] = \PHPExcel_Style_Border::BORDER_DOUBLE; break;
-				case "hair": $aBorder["style"] = \PHPExcel_Style_Border::BORDER_HAIR; break;
-				case "medium": $aBorder["style"] = \PHPExcel_Style_Border::BORDER_MEDIUM; break;
-				case "mediumdashdot": $aBorder["style"] = \PHPExcel_Style_Border::BORDER_MEDIUMDASHDOT; break;
-				case "mediumdashdotdot": $aBorder["style"] = \PHPExcel_Style_Border::BORDER_MEDIUMDASHDOTDOT; break;
-				case "mediumdashed": $aBorder["style"] = \PHPExcel_Style_Border::BORDER_MEDIUMDASHED; break;
-				case "slantdashdot": $aBorder["style"] = \PHPExcel_Style_Border::BORDER_SLANTDASHDOT; break;
-				case "thick": $aBorder["style"] = \PHPExcel_Style_Border::BORDER_THICK; break;
-				case "thin": $aBorder["style"] = \PHPExcel_Style_Border::BORDER_THIN; break;
-				default: $aBorder["color"] = array("rgb" => str_replace("#", "", $sPart)); break;
+				case "none": $aBorder["style"] = \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_NONE; break;
+				case "dashdot": $aBorder["style"] = \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_DASHDOT; break;
+				case "dashdotdot": $aBorder["style"] = \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_DASHDOTDOT; break;
+				case "dashed": $aBorder["style"] = \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_DASHED; break;
+				case "dotted": $aBorder["style"] = \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_DOTTED; break;
+				case "double": $aBorder["style"] = \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_DOUBLE; break;
+				case "hair": $aBorder["style"] = \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_HAIR; break;
+				case "medium": $aBorder["style"] = \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM; break;
+				case "mediumdashdot": $aBorder["style"] = \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUMDASHDOT; break;
+				case "mediumdashdotdot": $aBorder["style"] = \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUMDASHDOTDOT; break;
+				case "mediumdashed": $aBorder["style"] = \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUMDASHED; break;
+				case "slantdashdot": $aBorder["style"] = \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_SLANTDASHDOT; break;
+				case "thick": $aBorder["style"] = \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THICK; break;
+				case "thin": $aBorder["style"] = \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN; break;
+				default: $aBorder["color"] = ["rgb" => \str_replace("#", "", $sPart)]; break;
 			}
 		}
 		return $aBorder;

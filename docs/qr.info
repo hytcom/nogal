@@ -1,6 +1,6 @@
 [checksum]
-md5 = "a6a3749a70976c72ba4c3810d703f237"
-sha1 = "6212b9be38f4961a13330feb632d6e788737e7da"
+md5 = "95a8b47e28b53774ec92584d897b60a5"
+sha1 = "22d88e60ecc4a4ad7145a23923dc18a8289ad330"
 
 [documentation]
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/qr.md"

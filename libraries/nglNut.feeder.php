@@ -25,7 +25,7 @@ class nglNut extends nglTrunk {
 	protected $class		= "nglNut";
 	protected $me			= "nut";
 	protected $object		= "nut";
-	protected $aSafeMethods	= array();
+	protected $aSafeMethods	= [];
 
 
 	final public function __init__($sNutID=null, $aMethods=null) {
@@ -35,7 +35,7 @@ class nglNut extends nglTrunk {
 	}
 
 	final public function arg($vArguments, $sIndex, $mDefault=null) {
-		return (isset($vArguments[$sIndex])) ? trim($vArguments[$sIndex], "\t\n\r\0\x0B") : $mDefault;
+		return (isset($vArguments[$sIndex])) ? \trim($vArguments[$sIndex], "\t\n\r\0\x0B") : $mDefault;
 	}
 
 	final public function ngl($sObjectName="fn") {
@@ -43,17 +43,17 @@ class nglNut extends nglTrunk {
 	}
 
 	final public function load($sNutName, $sNutID=null) {
-		$sNutName = strtolower($sNutName);
+		$sNutName = \strtolower($sNutName);
 		if($sNutID!==null && isset(self::$aNutsLoaded[$sNutID])) { return self::$aNutsLoaded[$sNutID]; }
 
 		if(!$this->nut($sNutName)) {
 			$sFilePath = self::call()->clearPath(NGL_PATH_NUTS.NGL_DIR_SLASH.$sNutName.".php");
-			if(file_exists($sFilePath)) {
+			if(\file_exists($sFilePath)) {
 				require_once($sFilePath);
-				if(strpos($sNutName, "_")) {
-					$sNutName = str_replace("_", " ", $sNutName);
-					$sNutName = ucwords($sNutName);
-					$sNutName = str_replace(" ", "", $sNutName);
+				if(\strpos($sNutName, "_")) {
+					$sNutName = \str_replace("_", " ", $sNutName);
+					$sNutName = \ucwords($sNutName);
+					$sNutName = \str_replace(" ", "", $sNutName);
 				}
 				
 				$this->sNut = $sNutName;
@@ -61,9 +61,9 @@ class nglNut extends nglTrunk {
 
 				$reflection = new \ReflectionClass($sClassName);
 				$aMethods = $reflection->getMethods(\ReflectionMethod::IS_PUBLIC);
-				$sClass = strtolower($sClassName);
+				$sClass = \strtolower($sClassName);
 				foreach($aMethods as $vMethod) {
-					$sMethod = strtolower($vMethod->class);
+					$sMethod = \strtolower($vMethod->class);
 					if($sMethod!=$sClass) { break; }
 					if($sMethod==$sClass) {
 						self::errorMessage($this->object, 1002);
@@ -71,12 +71,12 @@ class nglNut extends nglTrunk {
 				}
 				
 				// metodos permitidos del nut
-				$aAllowedMethods = array();
+				$aAllowedMethods = [];
 				$aMethods = $reflection->getMethods(\ReflectionMethod::IS_PROTECTED);
 				foreach($aMethods as $vMethod) {
-					$sClassMethod = strtolower($vMethod->class);
+					$sClassMethod = \strtolower($vMethod->class);
 					if($sClassMethod==$sClass) {
-						$aAllowedMethods[strtolower($vMethod->name)] = true;
+						$aAllowedMethods[\strtolower($vMethod->name)] = true;
 					}
 				}
 				unset($aAllowedMethods["init"]);
@@ -87,12 +87,12 @@ class nglNut extends nglTrunk {
 
 		$aNut = $this->nut($sNutName);
 		$sClassName = $aNut[0];
-		if(class_exists($sClassName)) {
+		if(\class_exists($sClassName)) {
 			self::$bLoadAllowed = true;
 			$nut = new $sClassName();
 			self::$bLoadAllowed = false;
 			$sNutID = $nut->__init__($sNutID, $aNut[1]);
-			if(method_exists($nut, "init")) { $nut->init(); }
+			if(\method_exists($nut, "init")) { $nut->init(); }
 			self::$aNutsLoaded[$sNutID] = $nut;
 			return $nut;
 		} else {
@@ -101,30 +101,30 @@ class nglNut extends nglTrunk {
 	}
 
 	final public function ifmethod($sFunction) {
-		return (method_exists($this, $sFunction));
+		return (\method_exists($this, $sFunction));
 	}
 
 	final public function run($sMethod, $aArguments=null) {
-		if(!isset($this->aAllowedMethods[strtolower($sMethod)])) { trigger_error("Nonexistent method", E_USER_ERROR); }
+		if(!isset($this->aAllowedMethods[\strtolower($sMethod)])) { \trigger_error("Nonexistent method", E_USER_ERROR); }
 
-		if($this->bSafemode && !in_array($sMethod, $this->aSafeMethods)) {
+		if($this->bSafemode && !\in_array($sMethod, $this->aSafeMethods)) {
 			return self::errorMessage($this->object, 1003, $this->sNut."::".$sMethod);
 		} else {
 			if($aArguments==null) {
-				$aDataArguments = array();
+				$aDataArguments = [];
 			} else {
-				$aDataArguments = array();
+				$aDataArguments = [];
 				foreach($aArguments as $sKey => $mValue) {
-					$sKey = strtolower($sKey);
-					if(strpos($sKey, "data-")===0) {
-						$aDataArguments["DATA"][substr($sKey, 5)] = $mValue;
+					$sKey = \strtolower($sKey);
+					if(\strpos($sKey, "data-")===0) {
+						$aDataArguments["DATA"][\substr($sKey, 5)] = $mValue;
 					} else {
 						$aDataArguments[$sKey] = $mValue; 
 					}
 				}
 			}
 
-			return call_user_func(array($this, $sMethod), $aDataArguments);
+			return \call_user_func([$this, $sMethod], $aDataArguments);
 		}
 	}
 

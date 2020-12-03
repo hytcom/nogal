@@ -48,28 +48,28 @@ class nglGraftPDF extends nglScion {
 	private $sCSS;
 
 	final protected function __declareArguments__() {
-		$vArguments					= array();
-		$vArguments["output"]		= array('$mValue', null);
-		$vArguments["css"]			= array('$this->SetCSS($mValue)', null);
-		$vArguments["header"]		= array('$this->SetHeader($mValue)', null);
-		$vArguments["footer"]		= array('$this->SetFooter($mValue)', null);
-		$vArguments["content"]		= array('$this->SetContent($mValue)', null);
-		$vArguments["filename"]		= array('(string)$mValue', "document.pdf");
-		$vArguments["font"]			= array('(string)$mValue', "helvetica");
-		$vArguments["sense"]		= array('(string)$mValue', "P");
-		$vArguments["page"]			= array('(string)$mValue', "A4");
-		$vArguments["encoding"]		= array('(string)$mValue', "UTF-8");
-		$vArguments["margin"]		= array('$mValue', array(5,5,5,8));
-		$vArguments["margintop"]	= array('$mValue', "-");
-		$vArguments["marginright"]	= array('$mValue', "-");
-		$vArguments["marginbottom"]	= array('$mValue', "-");
-		$vArguments["marginleft"]	= array('$mValue', "-");
-		$vArguments["tmpdir"]		= array('$mValue', NGL_PATH_TMP.NGL_DIR_SLASH."mpdf");
+		$vArguments					= [];
+		$vArguments["output"]		= ['$mValue', null];
+		$vArguments["css"]			= ['$this->SetCSS($mValue)', null];
+		$vArguments["header"]		= ['$this->SetHeader($mValue)', null];
+		$vArguments["footer"]		= ['$this->SetFooter($mValue)', null];
+		$vArguments["content"]		= ['$this->SetContent($mValue)', null];
+		$vArguments["filename"]		= ['(string)$mValue', "document.pdf"];
+		$vArguments["font"]			= ['(string)$mValue', "helvetica"];
+		$vArguments["sense"]		= ['(string)$mValue', "P"];
+		$vArguments["page"]			= ['(string)$mValue', "A4"];
+		$vArguments["encoding"]		= ['(string)$mValue', "UTF-8"];
+		$vArguments["margin"]		= ['$mValue', [5,5,5,8]];
+		$vArguments["margintop"]	= ['$mValue', "-"];
+		$vArguments["marginright"]	= ['$mValue', "-"];
+		$vArguments["marginbottom"]	= ['$mValue', "-"];
+		$vArguments["marginleft"]	= ['$mValue', "-"];
+		$vArguments["tmpdir"]		= ['$mValue', NGL_PATH_TMP.NGL_DIR_SLASH."mpdf"];
 		return $vArguments;
 	}
 
 	final protected function __declareAttributes__() {
-		$vAttributes = array();
+		$vAttributes = [];
 		return $vAttributes;
 	}
 
@@ -77,36 +77,36 @@ class nglGraftPDF extends nglScion {
 	}
 
 	final public function __init__() {
-		require_once(__DIR__."/vendor/paragonie/random_compat/lib/random.php");
+		require_once(__DIR__."/composer/vendor/paragonie/random_compat/lib/random.php");
 		$this->sCSS = "";
 	}
 
 	public function create() {
-		list($sFileName) = $this->getarguments("filename", func_get_args());
+		list($sFileName) = $this->getarguments("filename", \func_get_args());
 		if($sFileName===null) { $sFileName = "document.pdf"; }
 		$sFileName = self::call()->sandboxPath($sFileName);
-		$this->args(array("filename"=>$sFileName));
+		$this->args(["filename"=>$sFileName]);
 		return $this->page();
 	}
 
 	public function page() {
-		list($sPageSize, $sSense, $mMargins, $sEncoding, $sFontName) = $this->getarguments("page,sense,margin,encoding,font", func_get_args());
+		list($sPageSize, $sSense, $mMargins, $sEncoding, $sFontName) = $this->getarguments("page,sense,margin,encoding,font", \func_get_args());
 		
-		if(is_string($mMargins)) { $mMargins = json_decode($mMargins, true); }
+		if(\is_string($mMargins)) { $mMargins = \json_decode($mMargins, true); }
 		if($this->argument("margintop")!="-") { $mMargins[0] = $this->argument("margintop"); }
 		if($this->argument("marginright")!="-") { $mMargins[1] = $this->argument("marginright"); }
 		if($this->argument("marginbottom")!="-") { $mMargins[2] = $this->argument("marginbottom"); }
 		if($this->argument("marginleft")!="-") { $mMargins[3] = $this->argument("marginleft"); }
 
 		$sTmpDir = self::call()->sandboxPath($this->argument("tmpdir"));
-		if(!is_dir($sTmpDir)) {
-			if(!mkdir($sTmpDir, 07777)) {
+		if(!\is_dir($sTmpDir)) {
+			if(!\mkdir($sTmpDir, 07777)) {
 				self::errorMode("die");
 				self::errorMessage($this->object, 1001, "Can't create TMPDIR: ".$sTmpDir);
 			}
 		}
 
-		$this->pdf = new \Mpdf\Mpdf(array(
+		$this->pdf = new \Mpdf\Mpdf([
 			"tempDir" => $sTmpDir,
 			"format" => $sPageSize,
 			"mode" => $sEncoding,
@@ -116,7 +116,7 @@ class nglGraftPDF extends nglScion {
 			"margin_bottom" =>  $mMargins[2], 
 			"margin_left" => $mMargins[3], 
 			"default_font" => $sFontName 
-		));
+		]);
 
 		return $this;
 	}
@@ -142,26 +142,26 @@ class nglGraftPDF extends nglScion {
 	}
 
 	public function base64() {
-		list($sFilename) = $this->getarguments("filename", func_get_args());
+		list($sFilename) = $this->getarguments("filename", \func_get_args());
 		if($this->pdf===null) { $this->create(); }
-		return base64_encode($this->WriteContent($this->sContent, "source", false));
+		return \base64_encode($this->WriteContent($this->sContent, "source", false));
 	}
 
 	public function download() {
-		list($sFilename) = $this->getarguments("filename", func_get_args());
+		list($sFilename) = $this->getarguments("filename", \func_get_args());
 		if($this->pdf===null) { $this->create(); }
-		if(count(self::errorGetLast())) { exit(); }
+		if(\count(self::errorGetLast())) { exit(); }
 		return $this->WriteContent($this->sContent, "download", $sFilename);
 	}
 
 	public function save() {
-		list($sFilename) = $this->getarguments("filename", func_get_args());
+		list($sFilename) = $this->getarguments("filename", \func_get_args());
 		if($this->pdf===null) { $this->create(); }
 		return $this->WriteContent($this->sContent, "save", $sFilename);
 	}
 
 	public function view() {
-		list($sFilename) = $this->getarguments("filename", func_get_args());
+		list($sFilename) = $this->getarguments("filename", \func_get_args());
 		if($this->pdf===null) { $this->create(); }
 		return $this->WriteContent($this->sContent);
 	}
@@ -172,7 +172,7 @@ class nglGraftPDF extends nglScion {
 
 		$sOutput = \Mpdf\Output\Destination::INLINE;
 		if($sOutputMode!==true) {
-			$sOutputMode = strtolower($sOutputMode);
+			$sOutputMode = \strtolower($sOutputMode);
 			if($sOutputMode=="view") {
 				$sOutput = \Mpdf\Output\Destination::INLINE;
 			} else if($sOutputMode=="download") {
