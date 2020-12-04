@@ -41,7 +41,7 @@ class nglNest extends nglBranch {
 		$vArguments["after"]				= ['$mValue', true];
 		$vArguments["core"]					= ['self::call()->istrue($mValue)', false];
 		$vArguments["db"]					= ['$mValue', null];
-		$vArguments["der"]					= ['self::call()->istrue($mValue)', false)] 
+		$vArguments["der"]					= ['self::call()->istrue($mValue)', false];
 		$vArguments["structure"]			= ['$mValue', null];
 		$vArguments["newname"]				= ['$mValue', null];
 		$vArguments["select"]				= ['$this->SetObject($mValue)', null];
