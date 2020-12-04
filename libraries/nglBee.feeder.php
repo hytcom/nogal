@@ -243,7 +243,7 @@ class nglBee extends nglFeeder implements inglFeeder {
 		$mValue = $this->Argument($mValue);
 		if(\is_array($mValue)) { $mValue = \implode($this->sSeparator, $mValue); }
 		$mValue = \preg_replace("/[\\\n]/is", "\n", $mValue);
-		\print($mValue);
+		print($mValue);
 	}
 
 	private function FuncLaunch() {
