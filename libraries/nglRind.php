@@ -2983,11 +2983,6 @@ namespace nogal {
 					break;
 
 				case "owl":
-					$sChkType = '\is_object('.$sDataVar.')';
-					$sSetting = $sEndVar.' = Rind::nut('.$sNut.','.$this->RIND_QUOTE.'rows'.$this->RIND_QUOTE.', ['.$this->RIND_QUOTE.'content'.$this->RIND_QUOTE.'=>'.$sDataVar.']);';
-					$sRowSource = 'Rind::nut('.$sNut.','.$this->RIND_QUOTE.'get'.$this->RIND_QUOTE.', ['.$this->RIND_QUOTE.'content'.$this->RIND_QUOTE.'=>'.$sDataVar.'])';
-					break;
-
 				case "element":
 					$sChkType = '\is_object('.$sDataVar.')';
 					$sSetting = $sEndVar.' = (\method_exists('.$sDataVar.', '.$this->RIND_QUOTE.'rows'.$this->RIND_QUOTE.')) ? '.$sDataVar.'->rows() : 0;';
@@ -3041,12 +3036,9 @@ namespace nogal {
 			$sLoop .= 'if('.$sChkType.') {'.$this->EOL;
 
 			// origen de datos
-			if($sType=="owl") {
-				$sLoop .= $sNut.' = Rind::nut('.$this->RIND_QUOTE.'owl'.$this->RIND_QUOTE.');';
-				$sLoop .= 'if(Rind::nut('.$sNut.','.$this->RIND_QUOTE.'rows'.$this->RIND_QUOTE.', ['.$this->RIND_QUOTE.'content'.$this->RIND_QUOTE.'=>'.$sDataVar.'])) { Rind::nut('.$sNut.','.$this->RIND_QUOTE.'reset'.$this->RIND_QUOTE.', ['.$this->RIND_QUOTE.'content'.$this->RIND_QUOTE.'=>'.$sDataVar.']); }'.$this->EOL;
-				$sLoop .= 'Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["allrows"] = Rind::nut('.$sNut.','.$this->RIND_QUOTE.'allrows'.$this->RIND_QUOTE.', ['.$this->RIND_QUOTE.'content'.$this->RIND_QUOTE.'=>'.$sDataVar.']);'.$this->EOL;
-			} else if($sType=="element") {
+			if($sType=="owl" || $sType=="element") {
 				$sLoop .= 'if(\method_exists('.$sDataVar.', '.$this->RIND_QUOTE.'reset'.$this->RIND_QUOTE.')) { '.$sDataVar.'->reset(); }'.$this->EOL;
+				$sLoop .= 'if(\method_exists('.$sDataVar.', '.$this->RIND_QUOTE.'allrows'.$this->RIND_QUOTE.')) { Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["allrows"] = '.$sDataVar.'->allrows(); }'.$this->EOL;
 			} else if($sType!="number") {
 				$sLoop .= '\reset('.$sDataVar.');'.$this->EOL;
 			} else {
@@ -3068,8 +3060,8 @@ namespace nogal {
 			$sLoop .= 'if(!'.$sEndVar.') { ]PHP]>'.$sEmpty.'<[PHP[ }'.$this->EOL;
 			$sLoop .= 'Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"] = []; '.$this->EOL;
 
-			if($sType=="owl") {
-				$sLoop .= 'Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["allrows"] = Rind::nut('.$sNut.','.$this->RIND_QUOTE.'allrows'.$this->RIND_QUOTE.', ['.$this->RIND_QUOTE.'content'.$this->RIND_QUOTE.'=>'.$sDataVar.']);'.$this->EOL;
+			if($sType=="owl" || $sType=="element") {
+				$sLoop .= 'if(\method_exists('.$sDataVar.', '.$this->RIND_QUOTE.'allrows'.$this->RIND_QUOTE.')) { Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["allrows"] = '.$sDataVar.'->allrows(); }'.$this->EOL;
 			} else {
 				$sLoop .= 'Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["allrows"] = '.$sEndVar.'; '.$this->EOL;
 			}
@@ -3116,14 +3108,10 @@ namespace nogal {
 				// origen de datos
 				if($sRowSource) {
 					$sLoop .= $sRowData.' = '.$sRowSource.';'.$this->EOL;
-					if($sType=="owl") {
-						$sLoop .= 'Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["data"] = '.$sRowData.';'.$this->EOL;
-					} else {
-						if($sType!="element") {
-							$sLoop .= 'if(!isset('.$sDataVar.'['.$sKeysVar.'['.$sCountVar.']])) { continue; }'.$this->EOL;
-						}
-						$sLoop .= 'Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["data"] = (\is_array('.$sRowData.')) ? '.$sRowData.' : ['.$sRowData.'];'.$this->EOL;
+					if($sType!="owl" && $sType!="element") {
+						$sLoop .= 'if(!isset('.$sDataVar.'['.$sKeysVar.'['.$sCountVar.']])) { continue; }'.$this->EOL;
 					}
+					$sLoop .= 'Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["data"] = (\is_array('.$sRowData.')) ? '.$sRowData.' : ['.$sRowData.'];'.$this->EOL;
 					$sLoop .= 'Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["current"] = \current(Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["data"]); \reset(Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["data"]);'.$this->EOL;
 				} else {
 					$sLoop .= 'Rind::this('.$this->RIND_ME.')->SET["'.$sName.'"]["data"] = '.$sCountVar.';'.$this->EOL;

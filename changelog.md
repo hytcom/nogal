@@ -14,6 +14,9 @@
 - nuevo método **Imya** para que los **imyas** contengan ahora el código de la tabla
 - nuevo método **getByImya**
 
+## rind
+- se mejoró la perfonmance de los loops owl
+
 ________________________________________________________________________________
 # 2.8.0 - 202012030000
 ## general
