@@ -431,7 +431,8 @@ class nglNest extends nglBranch {
 				$aRelations[] = "---- JOINED TO `".$aTable[1]."` AS '".$sAlias."' USING `".$aTable[0]."` FIELD";
 
 				$aSelect = \array_merge($aSelect, $this->DescribeColumns($aTable[1], $sAlias));
-				$aFrom[] = "LEFT JOIN `".$aTable[1]."` ".$sAlias." ON `".$sAlias."`.`id` = `".$sObject."`.`".$aTable[0]."`";
+				$sJoinField = (isset($aTable[2])) ? $aTable[2] : "id";
+				$aFrom[] = "LEFT JOIN `".$aTable[1]."` ".$sAlias." ON `".$sAlias."`.`".$sJoinField."` = `".$sObject."`.`".$aTable[0]."`";
 			}
 		}
 
