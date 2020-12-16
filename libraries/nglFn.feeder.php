@@ -1487,7 +1487,7 @@ class nglFn extends nglTrunk {
 	public function emptyToNull($aData, $aKeys=null) {
 		if($aKeys===null) { $aKeys = \array_keys($aData); }
 		foreach($aKeys as $mKey) {
-			if(!isset($aData[$mKey]) || empty($aData[$mKey])) { $aData[$mKey] = null; }
+			if(empty($aData[$mKey])) { $aData[$mKey] = null; }
 		}
 
 		return  $aData;
@@ -1509,7 +1509,7 @@ class nglFn extends nglTrunk {
 	public function emptyToZero($aData, $aKeys=null) {
 		if($aKeys===null) { $aKeys = \array_keys($aData); }
 		foreach($aKeys as $mKey) {
-			if(!isset($aData[$mKey]) || empty($aData[$mKey])) { $aData[$mKey] = 0; }
+			if(empty($aData[$mKey])) { $aData[$mKey] = 0; }
 		}
 
 		return  $aData;

@@ -49,7 +49,7 @@ class nglPecker extends nglBranch implements inglBranch {
 		$vArguments["force"]				= ['self::call()->isTrue($mValue)', false];
 		$vArguments["grouper"]				= ['$this->SetGrouper($mValue)', null];
 		$vArguments["hashappend"]			= ['self::call()->isTrue($mValue)', false];
-		$vArguments["hittest"]				= ['$mValue', false); // test | show | tr]e
+		$vArguments["hittest"]				= ['$mValue', false]; // test | show | true
 		$vArguments["id"]					= ['$mValue', null];
 		$vArguments["key"]					= ['$this->SecureName($mValue)', null];
 		$vArguments["length"]				= ['$mValue', 32];
@@ -119,7 +119,7 @@ class nglPecker extends nglBranch implements inglBranch {
 		$sCreate = \str_replace("TABLE `".$sTable."` (", "TABLE `".$sTable."_".$sDate."` (", $sCreate);
 		$this->db->query($sCreate);
 		$insert = $this->db->query("INSERT INTO `".$sTable."_".$sDate."` SELECT * FROM `".$sTable."`");
-		$this->Output(["table"=> $sTable."_".$sDate, "rows"=>$insert->rows()]]);
+		$this->Output(["table"=> $sTable."_".$sDate, "rows"=>$insert->rows()]);
 	}
 
 	public function backupAll() {

@@ -718,7 +718,8 @@ class nglNest extends nglBranch {
 			foreach($aOWL["tables"] as $sTable => $aColumns) {
 				$sColumns = '["'.\implode('","', \array_keys($aColumns)).'"]';
 				$sColumns = $db->escape($sColumns);
-				$sSQL .= $db->insert("__ngl_owl_structure__", ["name"=>$sTable, "columns"=>$sColumns]).";\n";
+				$sCode = \substr(self::call()->strimya($sTable), 0, 12);
+				$sSQL .= $db->insert("__ngl_owl_structure__", ["name"=>$sTable, "code"=>$sCode, "columns"=>$sColumns]).";\n";
 			}
 		}
 		if(isset($aOWL["foreigns"])) {
@@ -726,7 +727,8 @@ class nglNest extends nglBranch {
 				$aColumns = \array_keys($aView["fields"]);
 				$sColumns = '["'.\implode('","', $aColumns).'"]';
 				$sColumns = $db->escape($sColumns);
-				$sSQL .= $db->insert("__ngl_owl_structure__", ["name"=>$sTable, "columns"=>$sColumns]).";\n";
+				$sCode = \substr(self::call()->strimya($sTable), 0, 12);
+				$sSQL .= $db->insert("__ngl_owl_structure__", ["name"=>$sTable, "code"=>$sCode, "columns"=>$sColumns]).";\n";
 			}
 		}
 		if(isset($aOWL["views"])) {
@@ -734,7 +736,8 @@ class nglNest extends nglBranch {
 				$aColumns = \array_keys($aView["fields"]);
 				$sColumns = '["'.\implode('","', $aColumns).'"]';
 				$sColumns = $db->escape($sColumns);
-				$sSQL .= $db->insert("__ngl_owl_structure__", ["name"=>$sTable, "columns"=>$sColumns]).";\n";
+				$sCode = \substr(self::call()->strimya($sTable), 0, 12);
+				$sSQL .= $db->insert("__ngl_owl_structure__", ["name"=>$sTable, "code"=>$sCode, "columns"=>$sColumns]).";\n";
 			}
 		}
 		$sSQL .= "-- END COLUMNS --\n\n";
@@ -1486,6 +1489,7 @@ DROP TABLE IF EXISTS `__ngl_owl_structure__`;
 CREATE TABLE `__ngl_owl_structure__` (
 	`id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 	`name` CHAR(128) NOT NULL,
+	`code` CHAR(12) NOT NULL,
 	`columns` TEXT NOT NULL,
 	`foreignkey` TEXT NULL,
 	`relationship` TEXT NULL,
@@ -1494,6 +1498,7 @@ CREATE TABLE `__ngl_owl_structure__` (
 	PRIMARY KEY (`id`) 
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 CREATE INDEX `name_idx` ON `__ngl_owl_structure__` (`name`);
+CREATE UNIQUE INDEX `code_idx` ON `__ngl_owl_structure__` (`code`);
 
 -- index --
 DROP TABLE IF EXISTS `__ngl_owl_index__`;

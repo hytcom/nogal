@@ -598,7 +598,8 @@ class nglRoot {
 				$sObject = $aLast["object"];
 				$sCode = $aLast["type"];
 				$sDescription = $sDescriptionPure = $aLast["description"];
-				if(isset($aLast["message"]) && !empty($aLast["message"])) { $sDescription = $aLast["message"]; }
+				// if(isset($aLast["message"]) && !empty($aLast["message"])) { $sDescription = $aLast["message"]; }
+				if(!empty($aLast["message"])) { $sDescription = $aLast["message"]; }
 				if(isset($aLast["aditional"])) { $sAditionalText = $aLast["aditional"]; }
 			}
 		}

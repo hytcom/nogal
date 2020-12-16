@@ -195,7 +195,7 @@ class nglMail extends nglBranch implements iNglClient {
 		$vArguments["timeout"]					= ['(int)$mValue', "20"];
 		$vArguments["folder"]					= ['$mValue', "INBOX"];
 		$vArguments["mail"]						= ['$mValue', null];
-		$vArguments["fields"]					= ['$mValue', null); /* separados por espacios */
+		$vArguments["fields"]					= ['$mValue', null]; /* separados por espacios */
 		$vArguments["revert"]					= ['self::call()->isTrue($mValue)', true];
 		$vArguments["limit"]					= ['(int)$mValue', 25];
 		$vArguments["smtp_authtype"]			= ['$mValue', null]; /* "(CRAM-MD5 | LOGIN | PLAIN)" */
@@ -609,7 +609,6 @@ class nglMail extends nglBranch implements iNglClient {
 		} else if($this->sServerType=="imap") {
 			list($sSearch,$nLimit) = $this->getarguments("search,limit", \func_get_args());
 			if($sSearch===null) { $sSearch = "ALL"; }
-
 			$vResponse = $this->request("SEARCH ".$sSearch);
 			$sResult = \str_replace("* SEARCH ", "", $vResponse["text"]);
 			if($this->FindMark($vResponse["text"])) {

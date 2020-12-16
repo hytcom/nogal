@@ -331,7 +331,7 @@ class nglOwl extends nglBranch {
 		}
 
 		unset($vData["id"]);
-		$vData["imya"] = self::call()->imya();
+		$vData["imya"] = $this->Imya($sTable);
 		$vData["state"] = 1;
 
 		// validacion
@@ -394,6 +394,7 @@ class nglOwl extends nglBranch {
 		$sSQL = $this->AlvinSQL($sJSQL, "select");
 		$this->attribute("query", $sSQL);
 		if($this->argument("debug")) { echo self::call()->dump($sSQL); }
+		$d = $this->db->query($sSQL);
 		return $this->db->query($sSQL);
 	}
 	
@@ -536,7 +537,8 @@ class nglOwl extends nglBranch {
 		$this->aRelationships = [];
 		if(\is_array($vObject["relationship"]) && \count($vObject["relationship"])) {
 			// parent
-			if(isset($vObject["relationship"]["parent"]) && !empty($vObject["relationship"]["parent"])) {
+			// if(isset($vObject["relationship"]["parent"]) && !empty($vObject["relationship"]["parent"])) {
+			if(!empty($vObject["relationship"]["parent"])) {
 				$sSQL = $this->JsqlParser('{
 					"columns":["columns","relationship"],
 					"tables":["__ngl_owl_structure__"],
@@ -661,7 +663,8 @@ class nglOwl extends nglBranch {
 
 		$aToInsert = $aToUpdate = [];
 		foreach($aArguments as $aRow) {
-			if((isset($aRow["id"]) && !empty($aRow["id"])) || (isset($aRow["imya"]) && !empty($aRow["imya"]))) {
+			// if((isset($aRow["id"]) && !empty($aRow["id"])) || (isset($aRow["imya"]) && !empty($aRow["imya"]))) {
+			if(!empty($aRow["id"]) || !empty($aRow["imya"])) {
 				$aToUpdate[] = $aRow;
 			} else {
 				$aToInsert[] = $aRow;
@@ -691,7 +694,8 @@ class nglOwl extends nglBranch {
 				$aColumn = (\is_array($mColumn)) ? $mColumn : [$mColumn];
 				$aTable = \explode(".", $aColumn[0]);
 				$aSelected[$aTable[0]] = true;
-				$sAlias = ((isset($aColumn[1])) ? $aColumn[1] : $aTable[1]);
+				// $sAlias = ((isset($aColumn[1])) ? $aColumn[1] : $aTable[1]);
+				$sAlias = ((isset($aColumn[1])) ? $aColumn[1] : str_replace(".", "_", $aColumn[0]));
 				$aSelect[$sAlias] = '["'.$aTable[0].'.'.$aTable[1].'","'.$sAlias.'"]';
 				$aSelect[$sAlias] = '["'.$aTable[0].'.'.$aTable[1].'","'.$sAlias.'"]';
 			}
@@ -713,7 +717,7 @@ class nglOwl extends nglBranch {
 		$nLoopingOut = 0;
 		$aUsed = $aUnUsed = [];
 
-		// print_r($vTables);die("#".count($vTables));
+		// print_r($vTables);var_dump($mChildren);exit();
 		$nTables = \count($vTables);
 		while(\count($vTables)) {
 			if($nLoopingOut++>$nTables) {
@@ -863,6 +867,7 @@ class nglOwl extends nglBranch {
 
 		$sView = '{"columns" : ['.\implode(',', $aSelect).'], "tables" : ['.\implode(', ', $aFrom).']}';
 		$sEOL = $this->argument("view_eol");
+
 		return (\strtolower($sOutputMode)=="jsql") ? $sView : $this->JsqlParser($sView, $sEOL);
 	}
 
@@ -981,8 +986,8 @@ class nglOwl extends nglBranch {
 			}
 
 			if($sOR!="*") {
-				$sHash = self::call()->imya();
-				$sHashNot = self::call()->imya();
+				$sHash = self::call()->unique(16);
+				$sHashNot = self::call()->unique(16);
 				$aJSQL = self::call("jsql")->decode($sJSQL);
 				
 				if(isset($aJSQL["where"])) {
@@ -1304,6 +1309,12 @@ class nglOwl extends nglBranch {
 			// registro de hijos
 			if($bChildren) { $this->aTmpChildren[$aTable["alias"]] = $aTable["name"]; }
 		}
+	}
+
+	private function Imya($sObject=null) {
+		if($sObject===null) { $sObject = $this->sObject; }
+		$sGroup = \substr(self::call()->strimya($sObject), 0, 12);
+		return $sGroup.$this->unique(20);
 	}
 
 	private function JsonAppener($sJSQL, $sExtra) {

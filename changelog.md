@@ -1,3 +1,19 @@
+# 2.8.1 - 202012160000
+## general
+- se eliminaron redundancias de **isset** AND **empty**
+- fix bugs relacionados con el cambio de sintaxis de la version 2.8.0
+
+## mail
+- fix bug
+
+## nest
+- cambios relacionados con código de las tablas
+
+## owl
+- se incorpora el concepto de código de tabla en **\_\_ngl\_owl\_structure\_\_**
+- nuevo método **Imya** para que los **imyas** contengan ahora el código de la tabla
+
+________________________________________________________________________________
 # 2.8.0 - 202012030000
 ## general
 - se agregó la *\\* de global namespace a todas las funciones y constantes PHP
