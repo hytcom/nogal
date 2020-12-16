@@ -3297,7 +3297,7 @@ namespace nogal {
 			}
 
 			foreach($aFiles as $mKey => $aTpl) {
-				if($mKey===$aSubMerge[0]) { continue; }
+				if($aSubMerge && $mKey===$aSubMerge[0]) { continue; }
 				$sNowDoc = self::call()->unique(6);
 				$sTemplatePath = self::call()->unique(6);
 				$sTemplatePath = (\substr($aTpl[0],-1)!=NGL_DIR_SLASH && \strtolower(\substr($aTpl[0],-5))!=".html") ? $aTpl[0].".html" : $aTpl[0];
