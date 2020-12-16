@@ -292,6 +292,30 @@ class nglOwl extends nglBranch {
 		return $this->attribute("result");
 	}
 
+	public function getByImya() {
+		list($sImya) = $this->getarguments("id", \func_get_args());
+
+		$sSQL = $this->JsqlParser('{
+			"columns":["name"],
+			"tables":["__ngl_owl_structure__"],
+			"where":[["code","eq","('.\substr($sImya, 0, 12).')"]]
+		}');
+		$table = $this->db->query($sSQL);
+
+		if($table->rows()) {
+			$sTable = $table->get("name");
+			$sSQL = $this->JsqlParser('{
+				"tables":["'.$sTable.'"],
+				"where":[["imya","eq","('.$sImya.')"]]
+			}');
+			$data = $this->db->query($sSQL);
+			if($data->rows()) {
+				return [$sTable, $data->get()];
+			}
+		}
+		return false;
+	}
+
 	public function insert() {
 		if(!$this->bInternalCall) { $this->Logger(); }
 

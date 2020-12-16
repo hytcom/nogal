@@ -12,6 +12,7 @@
 ## owl
 - se incorpora el concepto de código de tabla en **\_\_ngl\_owl\_structure\_\_**
 - nuevo método **Imya** para que los **imyas** contengan ahora el código de la tabla
+- nuevo método **getByImya**
 
 ________________________________________________________________________________
 # 2.8.0 - 202012030000
