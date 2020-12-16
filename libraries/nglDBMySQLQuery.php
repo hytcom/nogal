@@ -126,7 +126,7 @@ class nglDBMySQLQuery extends nglBranch implements iNglDBQuery {
 	public function get() {
 		list($sColumn,$nMode) = $this->getarguments("column,get_mode", \func_get_args());
 		$aRow = $this->cursor->fetch_array($nMode);
-		if($sColumn[0]=="#") { $sColumn = \substr($sColumn, 1); }
+		if(!empty($sColumn) && $sColumn[0]=="#") { $sColumn = \substr($sColumn, 1); }
 		return ($sColumn!==null && $aRow!==false && $aRow!==null && \array_key_exists($sColumn, $aRow)) ? $aRow[$sColumn] : $aRow;
 	}
 

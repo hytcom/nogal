@@ -1,6 +1,6 @@
 [checksum]
-md5 = "abdd23dba1a448d5ff21f7625ef85821"
-sha1 = "24e0112493ba6f480d6998a0e300658d1e52d7c4"
+md5 = "48189e231ec966ae80bda02dcf7c3666"
+sha1 = "9deab368553c015f85f89a8a68f1990d756369b2"
 
 [documentation]
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/sqliteq.md"

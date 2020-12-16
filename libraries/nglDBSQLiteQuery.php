@@ -194,7 +194,7 @@ class nglDBSQLiteQuery extends nglBranch implements iNglDBQuery {
 	public function get() {
 		list($sColumn,$sMode) = $this->getarguments("column,get_mode", \func_get_args());
 		$aRow = $this->cursor->fetchArray($sMode);
-		if($sColumn[0]=="#") { $sColumn = \substr($sColumn, 1); }
+		if(!empty($sColumn) && $sColumn[0]=="#") { $sColumn = \substr($sColumn, 1); }
 		return ($sColumn!==null && $aRow!==false && \array_key_exists($sColumn, $aRow)) ? $aRow[$sColumn] : $aRow;
 	}
 
