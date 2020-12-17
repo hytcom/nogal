@@ -728,7 +728,7 @@ class nglOwl extends nglBranch {
 		$nJoinLevel = $this->argument("join_level");
 		if(\is_array($mJoins)) {
 			$aJoins = $mJoins;
-		} else if($mJoins[0]==":") {
+		} else if(!empty($mJoins) && $mJoins[0]==":") {
 			$aJoins = \array_keys($vTables);
 			$nJoinLevel = \substr($mJoins, 1);
 		} else {
