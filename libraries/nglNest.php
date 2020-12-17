@@ -244,7 +244,7 @@ class nglNest extends nglBranch {
 		} else if(\is_string($mType)) {
 			if(isset($this->aFields[$mType])) {
 				$aType = $this->aFields[\strtolower($mType)];
-			} else if($mType[0]=="@") { // @tabla OR @tabla-padre cuando es pid
+			} else if(!empty($mType) && $mType[0]=="@") { // @tabla OR @tabla-padre cuando es pid
 				$this->DefJoins($sObject, $sField, $mType);
 				$aType = $this->aFields["fk"];
 			} else {
@@ -290,7 +290,7 @@ class nglNest extends nglBranch {
 		$this->bAlterField = true;
 		$sField = $this->FormatName($sField);
 		if(\is_string($mType)) {
-			if($mType[0]!="@") {
+			if(!empty($mType) && $mType[0]!="@") {
 				$mType = ["name"=>$mType];
 			} else {
 				$mType = ["name"=>$sField, "type"=>$mType];

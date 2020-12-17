@@ -1145,7 +1145,7 @@ class nglShift extends nglTrunk {
 							return $sUTF8;
 		
 						} else if(\preg_match("/^\[.*\]$/s", $sString) || \preg_match("/^\{.*\}$/s", $sString)) {
-							if($sString[0]=="[") {
+							if(!empty($sString) && $sString[0]=="[") {
 								$aStakeState = [3];
 								$aDecoded = [];
 							} else {
@@ -1625,14 +1625,14 @@ class nglShift extends nglTrunk {
 			foreach($aTable as $sRow) {
 				$sRow = \trim($sRow);
 				if($bMultiline) {
-					if($sRow[0]=="+") {
+					if(!empty($sRow) && $sRow[0]=="+") {
 						$aReturn[] = \array_combine($aHeaders, $aMultiline);
 						$aMultiline = $aMultilineEmpty;
 						continue;
 					}
 					$aMultiline = self::call()->arrayConcat([$aMultiline, \array_slice(self::call()->explodeTrim("|", $sRow), 1, -1)], " ");
 				} else {
-					if($sRow[0]=="+") { continue; }
+					if(!empty($sRow) && $sRow[0]=="+") { continue; }
 					$aReturn[] = \array_combine($aHeaders, \array_slice(self::call()->explodeTrim("|", $sRow), 1, -1));
 				}
 			}

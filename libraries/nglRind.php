@@ -668,7 +668,7 @@ namespace nogal {
 					$aClose = \array_pop($vStringType["PHP"]);
 				}
 
-				if(isset($aClose)) {
+				if(!empty($aClose)) {
 					if($aClose[0]=="?") {
 						$sChar = ($aCode[$x]!="]") ? ".\x22" : "";
 					} else {
@@ -887,6 +887,7 @@ namespace nogal {
 		private function IfcaseInline($sString) {
 			$aReturn = [];
 			$sString = \ltrim($sString, " \t\n\r\0\x0B");
+			if($sString=="") { return "false"; }
 			if($sString[0]!="(") {
 				$sEmpty = \trim($sString, " \t\n\r\0\x0B");
 				$sEmpty = "\x12heredoc>".$sEmpty."\x12\x11heredoc>";
@@ -3428,7 +3429,7 @@ namespace nogal {
 						$aMethod = \explode(":", $mMethod);
 						$nIndex = (int)$aMethod[0];
 						$nLength = (int)$aMethod[1];
-					} else if($mMethod[0]=="[") {
+					} else if(!empty($sMethod) && $mMethod[0]=="[") {
 						$sIndex = \substr($mMethod, 1, -1);
 					} else if(\strpos($mMethod,"|")) {
 						$aPipes = $this->dynVar();

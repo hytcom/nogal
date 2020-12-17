@@ -81,7 +81,7 @@ abstract class nglBranch extends nglTrunk {
 	} **/
 	final public function __get($sProperty) {
 		// no atributos privados
-		if($sProperty[0]!="_") {
+		if(!empty($sProperty) && $sProperty[0]!="_") {
 			if(\array_key_exists($sProperty, $this->aAttributes)) {
 				// atributos
 				return $this->aAttributes[$sProperty];
@@ -179,7 +179,7 @@ abstract class nglBranch extends nglTrunk {
 	} **/
 	final public function args($mArguments, $mValue=null) {
 		if(\is_string($mArguments)) {
-			if($mArguments[0]=="{") {
+			if(!empty($mArguments) && $mArguments[0]=="{") {
 				$mArguments = self::call("fn")->isJSON($mArguments, "array");
 				if(\is_array($mArguments)) { return $this->__arguments__($mArguments); }
 

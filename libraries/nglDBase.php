@@ -125,7 +125,7 @@ class nglDBase extends nglBranch implements iNglDataBase {
 	public function get() {
 		list($sColumn,$nMode) = $this->getarguments("column,get_mode", \func_get_args());
 		if(@$aRow = $this->Fetch($nMode)) {
-			if($sColumn[0]=="#") { $sColumn = \substr($sColumn, 1); }
+			if(!empty($sColumn) && $sColumn[0]=="#") { $sColumn = \substr($sColumn, 1); }
 			return ($sColumn!==null && \array_key_exists($sColumn, $aRow)) ? $aRow[$sColumn] : $aRow;
 		} else {
 			return false;
@@ -141,12 +141,12 @@ class nglDBase extends nglBranch implements iNglDataBase {
 			$sColumn = null;
 			$bGroupByMode = true;
 		} else {
-			if($sColumn[0]=="#") {
+			if(!empty($sColumn) && $sColumn[0]=="#") {
 				$sColumn = \substr($sColumn, 1);
 				$bIndexMode = true;
 			}
 
-			if($sColumn[0]=="@") {
+			if(!empty($sColumn) && $sColumn[0]=="@") {
 				$aColumn = \explode(";", \substr($sColumn, 1));
 				$sColumn = $aColumn[0];
 				$sValue = (\count($aColumn)>1) ? $aColumn[1] : $aColumn[0];

@@ -156,7 +156,7 @@ class nglOwl extends nglBranch {
 		$aReturn = $this->vObjects[$this->sObject];
 		$aFields = [];
 
-		if($sSubObject!=null) {
+		if(!empty($sSubObject)) {
 			if($sSubObject[0]=="*") {
 				$sSubObject = \substr($sSubObject, 1);
 				$aReturnTables = [];

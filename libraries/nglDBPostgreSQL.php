@@ -263,7 +263,7 @@ class nglDBPostgreSQL extends nglBranch implements iNglDataBase {
 				
 				if(\strtoupper($sMode)=="CONFLICT") {
 					$sTarget = $this->argument("conflict_target");
-					if($sTarget[0]=="(") {
+					if(!empty($sTarget) && $sTarget[0]=="(") {
 						$sTarget = "ON ".$sTarget;
 					} else if(\strtoupper(\substr($sTarget,0,5))!="WHERE") {
 						$sTarget = "ON CONSTRAINT ".$sTarget;

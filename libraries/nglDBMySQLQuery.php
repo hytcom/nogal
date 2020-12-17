@@ -139,12 +139,12 @@ class nglDBMySQLQuery extends nglBranch implements iNglDBQuery {
 			$sColumn = null;
 			$bGroupByMode = true;
 		} else {
-			if($sColumn[0]=="#") {
+			if(!empty($sColumn) && $sColumn[0]=="#") {
 				$sColumn = \substr($sColumn, 1);
 				$bIndexMode = true;
 			}
 
-			if($sColumn[0]=="@") {
+			if(!empty($sColumn) && $sColumn[0]=="@") {
 				$aColumn = \explode(";", \substr($sColumn, 1));
 				$sColumn = $aColumn[0];
 				$sValue = (\count($aColumn)>1) ? $aColumn[1] : $aColumn[0];

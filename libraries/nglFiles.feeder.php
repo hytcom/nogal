@@ -178,7 +178,7 @@ class nglFiles extends nglFeeder implements inglFeeder {
 		if($sMask!=="*") {
 			$aDirs = $aTmpDirs = [];
 			foreach($aFiles as $sFile) {
-				if($sFile[0]!="*") {
+				if(!empty($sFile) && $sFile[0]!="*") {
 					$sDirname = \dirname($sFile);
 					$aTmpDirs[$sDirname] = true;
 				}
@@ -199,7 +199,7 @@ class nglFiles extends nglFeeder implements inglFeeder {
 		if($mCase!==false) { $mCase = \strtolower($mCase); }
 		$nSource = \strlen($sSource);
 		foreach($aFiles as $sFile) {
-			$nDir = ($sFile[0]=="*") ? 1 : 0;
+			$nDir = (!empty($sFile) && $sFile[0]=="*") ? 1 : 0;
 			$sFile = \substr($sFile, $nSource+$nDir);
 			
 			$sSourceFile = self::call()->clearPath($sSource.NGL_DIR_SLASH.$sFile);
@@ -657,7 +657,7 @@ class nglFiles extends nglFeeder implements inglFeeder {
 		$nDeleted = 0;
 
 		foreach($aFiles as $sFile) {
-			$nDir = ($sFile[0]=="*") ? 1 : 0;
+			$nDir = (!empty($sFile) && $sFile[0]=="*") ? 1 : 0;
 			$sFile = \substr($sFile, $nDir);
 		
 			if(\file_exists($sFile)) {

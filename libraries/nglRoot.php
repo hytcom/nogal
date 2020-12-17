@@ -346,7 +346,7 @@ class nglRoot {
 		$sFile = \str_replace(\parse_url(NGL_URL, PHP_URL_PATH), "", $sURL);
 		$sFile = \str_replace("\\", "/", $sFile);
 
-		if($sFile[0]!="/") { $sFile = "/".$sFile; }
+		if(!empty($sFile) && $sFile[0]!="/") { $sFile = "/".$sFile; }
 		$sFile = self::call()->clearPath($sFile, false, "/");
 		$aParts = \explode("/", $sFile, 3);
 

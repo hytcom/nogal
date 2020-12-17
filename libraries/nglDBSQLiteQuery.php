@@ -248,13 +248,13 @@ class nglDBSQLiteQuery extends nglBranch implements iNglDBQuery {
 		list($sColumn,$sMode,$aGroup) = $this->getarguments("column,get_mode,get_group", \func_get_args());
 		
 		$bIndexMode = false;
-		if($sColumn[0]=="#") {
+		if(!empty($sColumn) && $sColumn[0]=="#") {
 			$sColumn = \substr($sColumn, 1);
 			$bIndexMode = true;
 		}
 
 		$bGroupByMode = false;
-		if($sColumn[0]=="@") {
+		if(!empty($sColumn) && $sColumn[0]=="@") {
 			$sGroupBy = \substr($sColumn, 1);
 			$sColumn = null;
 			$bGroupByMode = true;

@@ -1,3 +1,8 @@
+# 2.8.2 - 202012171600
+## general
+- fix sintaxis por actualización a PHP 7.4
+
+________________________________________________________________________________
 # 2.8.1 - 202012160000
 ## general
 - se eliminaron redundancias de **isset** AND **empty**

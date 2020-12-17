@@ -1223,7 +1223,7 @@ class nglFn extends nglTrunk {
 		"return" : "array"
 	} **/
 	public function colorRGB($sHexacolor="#00000000") {
-		if($sHexacolor[0]!="#") { $sHexacolor = "#".$sHexacolor; }
+		if(!empty($sHexacolor) && $sHexacolor[0]!="#") { $sHexacolor = "#".$sHexacolor; }
 		\sscanf($sHexacolor, "#%2x%2x%2x%2x", $nRed, $nGreen, $nBlue, $nAlpha);
 		$vRGB 			= [];
 		$vRGB["red"] 	= $nRed;
@@ -1949,7 +1949,7 @@ class nglFn extends nglTrunk {
 		if(!\strlen($sString)) { return false; }
 		$bType = null;
 		$sString = \ltrim($sString);
-		if($sString[0]!="\x5B" && $sString[0]!="\x7B") { return false; }
+		if(!empty($sString) && $sString[0]!="\x5B" && $sString[0]!="\x7B") { return false; }
 		if($mType!==null) {
 			$bType = (\strtolower($mType)=="array");
 			$json = @\json_decode($sString, $bType);

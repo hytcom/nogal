@@ -108,7 +108,7 @@ class nglZip extends nglBranch implements inglBranch {
 		foreach($ls as $sFile) {
 			$sLocalFile = \str_replace(["*", $sSandBoxPath], "", $sFile);
 			if($sLocalFile[0]==NGL_DIR_SLASH) { $sLocalFile = \substr($sLocalFile, 1); }
-			if($sFile[0]=="*") {
+			if(!empty($sFile) && $sFile[0]=="*") {
 				$this->zip->addEmptyDir($sLocalFile);
 			} else {
 				$this->zip->addFile($sFile, $sLocalFile);

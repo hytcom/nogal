@@ -154,7 +154,7 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 
 	// importa los permisos desde una cadena plana o un json
 	public function import($sGrants) {
-		if($sGrants[0]=="{") {
+		if(!empty($sGrants) && $sGrants[0]=="{") {
 			return $this->jsonGrants($sGrants);
 		} else {
 			$aGrants = self::call()->strToArray($sGrants);
@@ -288,7 +288,7 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 	private function MakeProfile($sName, $aGrants, $bNew=false) {
 		if($bNew) { $this->aGrants["profiles"][$sName] = []; }
 		foreach($aGrants as $sGrant) {
-			if($sGrant[0]=="-") { $sGrant = \substr($sGrant, 1); $bRemove = true; }
+			if(!empty($sGrant) && $sGrant[0]=="-") { $sGrant = \substr($sGrant, 1); $bRemove = true; }
 			$sGrant = $this->GrantName($sGrant, true);
 			$aGrant = \explode(".", $sGrant);
 			if(isset($this->aGrants["groups"][$aGrant[0]])) {

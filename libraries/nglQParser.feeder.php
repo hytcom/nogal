@@ -224,29 +224,31 @@ class nglQParser extends nglFeeder implements inglFeeder {
 	}
 
 	private function Keyword($sKeyword, $sTableName=null) {
-		if($sKeyword[0]=="'" || $sKeyword[0]=='"') {
-			return '"'.\substr($sKeyword, 1, -1).'"';
-		} else {
-			if(\strpos($sKeyword, ".")) {
-				$aKeyword = \explode(".", $sKeyword);
-				$sTableName = $aKeyword[0];
-				$sKeyword = $aKeyword[1];
-			}
-
-			if($sTableName===false) {
-				$sKeyword = \str_replace("`", "", $sKeyword);
-				return \trim($sKeyword);
+		if(!empty($sKeyword)) {
+			if($sKeyword[0]=="'" || $sKeyword[0]=='"') {
+				return '"'.\substr($sKeyword, 1, -1).'"';
 			} else {
-				if(\strpos($sTableName, ",")) {
-					$sTableName = \substr($sTableName, 0, \strpos($sTableName, ","));
+				if(\strpos($sKeyword, ".")) {
+					$aKeyword = \explode(".", $sKeyword);
+					$sTableName = $aKeyword[0];
+					$sKeyword = $aKeyword[1];
 				}
+
+				if($sTableName===false) {
+					$sKeyword = \str_replace("`", "", $sKeyword);
+					return \trim($sKeyword);
+				} else {
+					if(\strpos($sTableName, ",")) {
+						$sTableName = \substr($sTableName, 0, \strpos($sTableName, ","));
+					}
+				}
+
+				$sTableName = \str_replace("`", "", $sTableName);
+				$sKeyword = \str_replace("`", "", $sKeyword);
+
+				// return '$'.$sTableName.'["'.trim($sKeyword).'"]';
+				return [\trim($sTableName), \trim($sKeyword)];
 			}
-
-			$sTableName = \str_replace("`", "", $sTableName);
-			$sKeyword = \str_replace("`", "", $sKeyword);
-
-			// return '$'.$sTableName.'["'.trim($sKeyword).'"]';
-			return [\trim($sTableName), \trim($sKeyword)];
 		}
 	}
 }

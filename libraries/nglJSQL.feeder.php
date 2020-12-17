@@ -56,7 +56,7 @@ class nglJSQL extends nglFeeder implements inglFeeder {
 
 	public function value($sString, $bQuoted=true, $bIsSet=false) {
 		$sString = \trim($sString);
-		if($sString[0]=="(") { $sString = \substr($sString, 1, -1); }
+		if(!empty($sString) && $sString[0]=="(") { $sString = \substr($sString, 1, -1); }
 		if($bIsSet) {
 			$sString = "'".\str_replace(",", "','", $sString)."'";
 		} else {
