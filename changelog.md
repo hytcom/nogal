@@ -8,17 +8,24 @@
 ## fn
 - fix error en **msort** derivado de la version 2.8.0
 
+## nut
+- fix en el segundo argumento del método **load**
+
+## owl
+- por error de un viejo debug, el método **query** ejecutaba dos veces la query
+
 ## pecker
 - nuevo argumento **file_charset** en el método **loadfile**
 
 ## rind
 - reestructuración del método **buildcache**
+- se corrigió el uso de nut a raíz del fix de dicho objeto
 
 ## tree
 - nuevos métodos **get** y **nodePath**
 - se el método **children**
- 
-________________________________________________________________________________
+
+_____________________________________________________
 # 2.8.2 - 202012171600
 ## general
 - fix sintaxis por actualización a PHP 7.4

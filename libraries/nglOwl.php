@@ -39,6 +39,7 @@ class nglOwl extends nglBranch {
 	private $nRelationshipsLevel;
 	private $nRelationshipsLevelLimit;
 	private $bViewFields;
+	private $query;
 
 	final protected function __declareArguments__() {
 		$vArguments							= [];
@@ -418,8 +419,8 @@ class nglOwl extends nglBranch {
 		$sSQL = $this->AlvinSQL($sJSQL, "select");
 		$this->attribute("query", $sSQL);
 		if($this->argument("debug")) { echo self::call()->dump($sSQL); }
-		$d = $this->db->query($sSQL);
-		return $this->db->query($sSQL);
+		$this->query = $this->db->query($sSQL);
+		return $this->query;
 	}
 	
 	public function relationship() {

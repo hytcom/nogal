@@ -3886,9 +3886,8 @@ namespace {
 		
 		public static function nut($mNut, $sMethod=null, $aArguments=null) {
 			global $ngl;
-			// $sNutID = (isset($aArguments["nutid"]) && !empty($aArguments["nutid"])) ? $aArguments["nutid"] : $ngl()->unique();
 			$sNutID = (!empty($aArguments["nutid"])) ? $aArguments["nutid"] : $ngl()->unique();
-			$nut = (\is_string($mNut)) ? $ngl("nut.".$mNut, $sNutID) : $mNut;
+			$nut = (\is_string($mNut)) ? $ngl("nut.".$mNut, ["nutid"=>$sNutID]) : $mNut;
 			return ($sMethod==null) ? $nut : $nut->run($sMethod, $aArguments);
 		}
 		

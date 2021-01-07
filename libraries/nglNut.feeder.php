@@ -42,8 +42,9 @@ class nglNut extends nglTrunk {
 		return self::call($sObjectName);
 	}
 
-	final public function load($sNutName, $sNutID=null) {
+	final public function load($sNutName, $aConfig=null) {
 		$sNutName = \strtolower($sNutName);
+		$sNutID = (!empty($aConfig["nutid"])) ? $aConfig["nutid"] : null;
 		if($sNutID!==null && isset(self::$aNutsLoaded[$sNutID])) { return self::$aNutsLoaded[$sNutID]; }
 
 		if(!$this->nut($sNutName)) {
