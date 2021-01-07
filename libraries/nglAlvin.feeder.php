@@ -43,6 +43,7 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 	private $aRAW;
 	private $sDefaultGrants;
 	private $crypt;
+	private $roles;
 
 	final public function __init__($mArguments=null) {
 		$this->aToken = null;
@@ -53,9 +54,10 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 		$this->aGrants = [];
 		$this->aRAW = [];
 		$this->sGrantsFile = null;
-		$this->sDefaultGrants = '{"GRANTS":{"profiles":{"ADMIN":[]}},"RAW":[]}';
+		$this->sDefaultGrants = '{"GRANTS":{"profiles":{"ADMIN":[]}},"ROLES":[],"RAW":[]}';
 		$this->crypt = (self::call()->exists("crypt")) ? self::call("crypt") : null;
 		$this->sKeysPath = NGL_PATH_DATA.NGL_DIR_SLASH."alvin";
+		$this->roles = self::call("tree")->loadtree([]);
 		if($this->crypt!==null) { $this->crypt->type("rsa")->base64(true); }
 		$this->__errorMode__("die");
 	}
@@ -125,6 +127,7 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 		} else {
 			$sGrants = $this->sDefaultGrants;
 		}
+
 		return $this->jsonGrants($sGrants);
 	}
 
@@ -140,7 +143,7 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 		}
 
 		self::call()->msort($this->aGrants, "ksort");
-		$sGrants = \json_encode(["GRANTS"=>$this->aGrants, "RAW"=>$this->aRAW]);
+		$sGrants = \json_encode(["GRANTS"=>$this->aGrants, "ROLES"=>$this->roles(), "RAW"=>$this->aRAW]);
 		$sGrants = self::call("crypt")->type("aes")->key($sPassphrase)->base64(true)->encrypt($sGrants);
 
 		$save = self::call("file")->load($sFilePath);
@@ -176,7 +179,7 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 	}
 
 	public function export($bPretty=false) {
-		$sGrants = \json_encode(["GRANTS"=>$this->aGrants, "RAW"=>$this->aRAW]);
+		$sGrants = \json_encode(["GRANTS"=>$this->aGrants, "ROLES"=>$this->roles(), "RAW"=>$this->aRAW]);
 		return ($bPretty) ? self::call("shift")->jsonFormat($sGrants) : $sGrants;
 	}
 
@@ -206,6 +209,37 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 		return $this;
 	}
 
+	// ROLES -------------------------------------------------------------------
+	// valida un nombre de perfil
+	public function role($sRole) {
+		return $this->GrantName($sRole, false);
+	}
+
+	public function roles() {
+		return $this->roles->tree();
+	}
+
+	// agrega un role
+	public function setRole($sRole, $sParent=null) {
+		$aRole = ["id"=>$this->GrantName($sRole, false)];
+		if($sParent!=null) { $aRole["parent"] = $this->GrantName($sParent, false); }
+		$this->roles->node($aRole);
+		return $this;
+	}
+
+	// obtiene la ruta de un role en formato cadena
+	public function rolePath($sRole) {
+		$sRole = $this->GrantName($sRole, false);
+		return $this->roles->nodePath($sRole, "id", ",");
+	}
+
+	// obtiene los hijos de un role
+	public function roleChildren($sRole) {
+		$sRole = $this->GrantName($sRole, false);
+		return $this->roles->children($sRole);
+	}
+
+	// GRANTS ------------------------------------------------------------------
 	// retorna todos los permisos del tipo grant
 	public function getall() {
 		return $this->aGrants;
@@ -361,13 +395,13 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 	}
 
 	// genera el token del usuario
-	public function token($sProfileName, $aGrants=[], $aRaw=[], $sUsername=null) {
+	public function token($sProfileName, $sRoleName=null, $aGrants=[], $aRaw=[], $sUsername=null) {
 		if($sUsername!==null) { $sUsername = $this->username($sUsername); }
 		if(!$this->crypt) { return self::errorMessage($this->object, 1001); }
 
-		$sProfileName = \trim($sProfileName);
-		$sProfileName = \strtoupper($sProfileName);
-		$aToken = ["profile"=>$sProfileName, "grants"=>null,"raw"=>null];
+		$sProfileName = $this->profile($sProfileName);
+		$sRoleName = $this->role($sRoleName);
+		$aToken = ["profile"=>$sProfileName, "role"=>$sRoleName, "grants"=>null,"raw"=>null];
 
 		// permisos
 		if(\is_array($aGrants) && \count($aGrants)) {
@@ -417,8 +451,9 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 		$aGrants = json_decode($sGrants, true);
 		if($aGrants!==null) {
 			if(\array_key_exists("GRANTS", $aGrants)) { $this->aGrants = $aGrants["GRANTS"]; }
+			if(\array_key_exists("ROLES", $aGrants)) { $this->aRoles = self::call("tree")->loadtree($aGrants["ROLES"]); }
 			if(\array_key_exists("RAW", $aGrants)) { $this->aRAW = $aGrants["RAW"]; }
-			if(!\array_key_exists("GRANTS", $aGrants) && !\array_key_exists("RAW", $aGrants)) { $this->aGrants = $aGrants; }
+			if(!\array_key_exists("GRANTS", $aGrants) && !\array_key_exists("ROLES", $aGrants) && !\array_key_exists("RAW", $aGrants)) { $this->aGrants = $aGrants; }
 		} else {
 			return self::errorMessage($this->object, 1012);
 		}

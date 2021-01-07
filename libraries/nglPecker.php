@@ -45,6 +45,7 @@ class nglPecker extends nglBranch implements inglBranch {
 		$vArguments["exec"]					= ['$mValue', false];
 		$vArguments["features"]				= ['$this->SetFeatures($mValue)', null];
 		$vArguments["file"]					= ['$mValue', null];
+		$vArguments["file_charset"]			= ['$mValue', null];
 		$vArguments["file_eol"]				= ['$mValue', "\\r\\n"];
 		$vArguments["force"]				= ['self::call()->isTrue($mValue)', false];
 		$vArguments["grouper"]				= ['$this->SetGrouper($mValue)', null];
@@ -572,6 +573,7 @@ class nglPecker extends nglBranch implements inglBranch {
 			}
 			$this->db->file_eol($this->argument("file_eol"));
 			$this->db->file_separator($sSplitter);
+			if($this->argument("file_charset")!=null) { $this->db->charset($this->argument("file_charset")); }
 			$this->db->import($sLoadFile, $sTable);
 		}
 

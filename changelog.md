@@ -1,3 +1,24 @@
+# 2.8.3 - 202101071530
+## general
+- fix sintaxis por actualización a PHP 7.4
+
+## alvin
+- incorporación de roles (beta)
+
+## fn
+- fix error en **msort** derivado de la version 2.8.0
+
+## pecker
+- nuevo argumento **file_charset** en el método **loadfile**
+
+## rind
+- reestructuración del método **buildcache**
+
+## tree
+- nuevos métodos **get** y **nodePath**
+- se el método **children**
+ 
+________________________________________________________________________________
 # 2.8.2 - 202012171600
 ## general
 - fix sintaxis por actualización a PHP 7.4

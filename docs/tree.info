@@ -1,6 +1,6 @@
 [checksum]
-md5 = "efab89fa6688b6d3104d301d4a04b24e"
-sha1 = "9a21b5007fd7b9b0898db596cac3659acefb72a8"
+md5 = "bca001bc0bbf51759c570a8929302fd7"
+sha1 = "9208ad41ea1c4761aca0baf8cff06c470eb453d7"
 
 [documentation]
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/tree.md"

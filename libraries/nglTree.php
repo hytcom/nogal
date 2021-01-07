@@ -202,7 +202,9 @@ class nglTree extends nglBranch implements inglBranch {
 	private function NextId() {
 		$aIndex = \array_keys($this->aFlat);
 		\sort($aIndex, SORT_NATURAL);
-		$mLast = $aIndex[\count($aIndex)-1];
+		$nLast = \count($aIndex)-1;
+		if($nLast<0) { $nLast = 0; }
+		$mLast = (!empty($aIndex[$nLast])) ? $aIndex[$nLast] : 0;
 		return (\is_numeric($mLast)) ? $mLast+1 : $mLast."0";
 	}
 
@@ -212,6 +214,15 @@ class nglTree extends nglBranch implements inglBranch {
 
 	public function flat() {
 		return $this->attribute("flat");
+	}
+
+	public function get() {
+		list($mId) = $this->getarguments("id", \func_get_args());
+		if(isset($this->aFlat[$mId])) {
+			return $this->aFlat[$mId];
+		}
+		
+		return null;	
 	}
 
 	public function parent() {
@@ -228,39 +239,30 @@ class nglTree extends nglBranch implements inglBranch {
 	public function trace() {
 		list($mId) = $this->getarguments("id", \func_get_args());
 		
-		$mIndex =  $this->attribute("id_column");
+		$mIndex =  $this->attribute("parent_column");
 		$aTrace = [];
-		while($aParent=$this->parent($mId)) {
+		while($aParent=$this->get($mId)) {
 			$mId = $aParent[$mIndex];
 			$aTrace[] = $aParent;
 		}
-		
+
 		return \array_reverse($aTrace);
 	}
 	
 	public function children() {
 		list($mId) = $this->getarguments("id", \func_get_args());
-		
 		$aChildren = $this->attribute("tree");
 		if(!$mId) { return $aChildren; }
-
 		$mIndex =  $this->attribute("id_column");
 		$mChildren =  $this->attribute("children");
-
 		$aTrace = $this->trace($mId);
-		if(\is_array($aTrace) && count($aTrace)) {
-			$aFirst = \array_shift($aTrace);
-			$aChildren = $aChildren[$aFirst[$mIndex]];
-
-			if(\is_array($aTrace) && \count($aTrace)) {
-				foreach($aTrace as $aItem) {
-					$aChildren = $aChildren[$mChildren][$aItem[$mIndex]];
-				}
+		if(\is_array($aTrace) && \count($aTrace)) {
+			foreach($aTrace as $aItem) {
+				if(!empty($aChildren[$aItem[$mIndex]][$mChildren])) { return []; }
+				$aChildren = $aChildren[$aItem[$mIndex]][$mChildren];
 			}
 		}
 
-		$aChildren = (!isset($aFirst)) ? $aChildren[$mId] : $aChildren[$mChildren][$mId];
-		$aChildren = (isset($aChildren[$mChildren])) ? $aChildren[$mChildren] : null;
 		return $aChildren;
 	}
 	
@@ -311,7 +313,16 @@ class nglTree extends nglBranch implements inglBranch {
 
 		return \implode($aPrint);
 	}
-	
+
+	public function nodePath() {
+		list($mId,$sColumn,$sSeparator) = $this->getarguments("id,column,separator", \func_get_args());
+		$aPaths = $aPath = [];
+		foreach($this->trace($mId) as $aBranch) {
+			$aPath[] = $aBranch[$sColumn];
+		}
+		return implode($sSeparator, $aPath);
+	}
+
 	public function paths() {
 		list($sColumn,$sSeparator) = $this->getarguments("column,separator", \func_get_args());
 		

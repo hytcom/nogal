@@ -728,7 +728,7 @@ class nglOwl extends nglBranch {
 		$nJoinLevel = $this->argument("join_level");
 		if(\is_array($mJoins)) {
 			$aJoins = $mJoins;
-		} else if(!empty($mJoins) && $mJoins[0]==":") {
+		} else if(!empty($mJoins) && \is_string($mJoins) && $mJoins[0]==":") {
 			$aJoins = \array_keys($vTables);
 			$nJoinLevel = \substr($mJoins, 1);
 		} else {
@@ -1004,7 +1004,7 @@ class nglOwl extends nglBranch {
 						$sOR = \addslashes($sOR);
 						$sOR = self::call()->explodeTrim(",", $sOR);
 						$sOR = (\count($sOR)) ? \implode("','", \array_unique($sOR)) : "";
-						$sOR = " OR `alvin` IN('".$sOR."') ";
+						$sOR = " OR `role` IN('".$sOR."') ";
 					}
 				}
 			}
@@ -1030,7 +1030,7 @@ class nglOwl extends nglBranch {
 				$sSQL = $this->JsqlParser($aJSQL);
 			
 				// consulta final
-				$sSQL = \str_replace($sHash, "SELECT `row` FROM `__ngl_owl_index__` WHERE `table` = '".$sTableName."' AND (`alvin` IS NULL ".$sOR.")", $sSQL);
+				$sSQL = \str_replace($sHash, "SELECT `row` FROM `__ngl_owl_index__` WHERE `table` = '".$sTableName."' AND (`role` IS NULL ".$sOR.")", $sSQL);
 				$sSQL = \str_replace($sHashNot, "SELECT `row` FROM `__ngl_owl_index__` WHERE `table` = '".$sTableName."'", $sSQL);
 			} else {
 				$sSQL = $this->JsqlParser($sJSQL);

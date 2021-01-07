@@ -710,30 +710,41 @@ namespace nogal {
 		}
 
 		public function buildcache() {
+			$this->args(["curdir"=>$this->argument("gui"), "cache_mode"=>"cache"]);
 			$this->SetPaths();
 			$this->flushCache(true);
 
+			$sProjectPath = $this->attribute("project_path");
 			$sGuiPath = $this->attribute("gui_path");
 			$sCachePath = $this->attribute("cache_path");
-			$sCacheMode = $this->argument("cache_mode");
 			$aTree = self::call("files")->ls($sGuiPath, "*.html", "single", true);
-			foreach($aTree as $sFile) {
-				$sSource		= $this->readTemplate($sFile);
-				$sFileHash		= \md5($sSource);
-				$sSource		= $this->rind2php($sSource);
-				$sSourceCode 	= "<?php /*rind-".$sFileHash."-".$this->RIND_UID."-".$sCacheMode."-".\date("YmdHis")."*/ ?>\n";
-				$sSourceCode 	.= "<?php ".$this->RIND_TEMPLATES."=[];\n ".$this->sMergeFiles." ?>\n";
-				$sSourceCode 	.= $sSource;
+			foreach($aTree as $sFilePath) {
+				$this->attribute("template_path", \dirname($sFilePath));
+				$this->RIND_TEMPLATESLOG	= [];
+				$this->aLoadedCollections	= [];
+				$this->aLoops				= ["self"=>$this->dynVar(), "parent"=>$this->dynVar()];
+				$this->sPHPFile				= null;
+				$this->sMergeFiles			= "";
+				$this->aMergeTail			= [];
+				$this->aFilePath			= \pathinfo($sFilePath);
 
-				$sCacheFile 	= \str_replace($sGuiPath."/", "", $sFile);
-				$aCacheFile		= \pathinfo($sCacheFile);
-				if(!\is_dir($aCacheFile["dirname"])) {
-					$aFolders = \explode(NGL_DIR_SLASH, $aCacheFile["dirname"]);
+				$sFolder					= \str_replace($sGuiPath, "", $this->aFilePath["dirname"]);
+				$sCacheDir					= self::call()->clearPath($sCachePath.NGL_DIR_SLASH.$sFolder);
+				$sCacheFile					= \str_replace($sGuiPath, $sCachePath, $sFilePath);
+				$this->attribute("cache_file", $sCacheFile);
+				$sSource = $this->readTemplate($sFilePath);
+				$sFileHash = \md5($sSource);
+	
+				\Rind::$Rinds[$this->RIND_UID] = $this;
+
+				// directorio de destino
+				if(!\is_dir($sCacheDir)) {
+					$aFolders = \explode(NGL_DIR_SLASH, $sFolder);
 					$sFolders = "";
 					foreach($aFolders as $sDir) {
 						if($sDir!="") {
 							$sFolders .= $sDir.NGL_DIR_SLASH;
-							if(!\is_dir($sCachePath.NGL_DIR_SLASH.$sFolders)) {
+							if(!@\is_dir($sCachePath.NGL_DIR_SLASH.$sFolders)) {
 								@\mkdir($sCachePath.NGL_DIR_SLASH.$sFolders);
 								@\chmod($sCachePath.NGL_DIR_SLASH.$sFolders, NGL_CHMOD_FOLDER);
 							}
@@ -741,7 +752,12 @@ namespace nogal {
 					}
 				}
 
-				$sCacheFile = $sCachePath.NGL_DIR_SLASH.$sCacheFile;
+				$sSource		= $this->rind2php($sSource);
+				$sSourceCode 	= "<?php /*rind-".$sFileHash."-".$this->RIND_UID."-cache-".\date("YmdHis")."*/ ?>\n";
+				$sSourceCode 	.= "<?php ".$this->RIND_TEMPLATES."=[];\n ".$this->sMergeFiles." ?>\n";
+				$sSourceCode 	.= $sSource;
+				$sSource 		= null;
+
 				self::call("file.".$this->RIND_UID)->load($sCacheFile);
 				self::call("file.".$this->RIND_UID)->context(["http"=>["method"=>"GET","header"=>"Content-Type: text/xml; charset=".NGL_CHARSET]]);
 				if(!self::call("file.".$this->RIND_UID)->write($sSourceCode)) {
@@ -749,6 +765,8 @@ namespace nogal {
 				} else {
 					@\chmod($sCacheFile, NGL_CHMOD_FILE);
 				}
+
+				$sSourceCode = null;
 			}
 
 			return $aTree;
@@ -1825,15 +1843,16 @@ namespace nogal {
 			if($sCurrentDir===null) {
 				$sCurrentDir = self::call()->clearPath(\dirname($this->sPHPFile), false, NGL_DIR_SLASH, true);
 			}
-			// die($sCurrentDir);
+			// die($sCurrentDir."\n");
 
 			// rutas relativas
 			$sRelativePath	= self::call()->clearPath(\str_replace($sRoot, "", $sCurrentDir));
 			$sRelativeGUI	= self::call()->clearPath(\str_replace($sRoot, "", $sGUIPath));
-			//  die($sRelativePath." --- ".$sRelativeGUI);
+			// die($sRelativePath." --- ".$sRelativeGUI);
 			
 			// ruta del archivo template
 			$sTemplatePath = self::call()->clearPath($sGUIPath.NGL_DIR_SLASH.$sRelativePath, true);
+			// die($sRelativePath." --- ".$sGUIPath);
 
 			// URLs
 			// protocolo
@@ -2550,7 +2569,7 @@ namespace nogal {
 			if($nCurly===false && $nSquare===false) {
 				$sString = \str_replace(["\x12json>", "\x12\x11json>"], "", $sString);
 				if(\strlen($sString)) {
-					$sGUIPath = ($sString[0]==NGL_DIR_SLASH) ? $this->attribute("project_path") : $this->aFilePath["dirname"].NGL_DIR_SLASH;
+					$sGUIPath = ($sString[0]==NGL_DIR_SLASH) ? $this->attribute("project_path") : (!empty($this->aFilePath["dirname"]) ? $this->aFilePath["dirname"].NGL_DIR_SLASH : ".".NGL_DIR_SLASH);
 					$sString = $sGUIPath.$sString;
 					$sString = $this->readTemplate($sString);
 					$sString = $this->TagConverter($sString);
@@ -3836,7 +3855,7 @@ namespace {
 				$aReplaces = [];
 				foreach($aMatchs[0] as $sMatch) {
 					$sVar = \substr($sMatch, 2, -1);
-					$sEval = 'return $SET["'.\str_replace('.', '"]["', $sVar).'"];';
+					$sEval = 'return @$SET["'.\str_replace('.', '"]["', $sVar).'"];';
 					$aReplaces[$sMatch] = eval($ngl()->EvalCode($sEval));
 				}
 				$aSearch = \array_keys($aReplaces);

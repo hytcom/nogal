@@ -620,7 +620,7 @@ class nglFn extends nglTrunk {
 							$aGrouped[$sSubGroup][$nIdex][$mSubIndex] = null;
 						}
 					} else {
-						if($mValue[$mIndex]!==null) {
+						if(\is_array($mValue) && \array_key_exists($mIndex, $mValue) && $mValue[$mIndex]!==null) {
 							$bEmptySubGroup = false;
 							$aGrouped[$sSubGroup][$nIdex][$mIndex] = $mValue[$mIndex];
 						} else {
@@ -1038,7 +1038,7 @@ class nglFn extends nglTrunk {
 		krsort
 	*/
 	public function mSort(&$aArray, $sMethod="sort", $nFlags=SORT_REGULAR) {
-		if(!\in_array(\strtolower($sMethod), ["sort","\ksort","rsort","krsort"])) { $sMethod = "sort"; }
+		if(!\in_array(\strtolower($sMethod), ["sort","ksort","rsort","krsort"])) { $sMethod = "sort"; }
 		foreach($aArray as &$mValue) {
 			if(\is_array($mValue)) { $this->mSort($mValue, $sMethod, $nFlags); }
 		}
