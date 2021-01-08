@@ -20,6 +20,7 @@
 ## rind
 - reestructuración del método **buildcache**
 - se corrigió el uso de nut a raíz del fix de dicho objeto
+- se mejoró el método **varName**
 
 ## tree
 - nuevos métodos **get** y **nodePath**

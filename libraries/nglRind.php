@@ -2237,8 +2237,7 @@ namespace nogal {
 			$nLength -= 2;
 			if($nLength<1) { $nLength = 1; }
 			if($nLength>32) { $nLength = 32; }
-
-			$sVarName = \microtime();
+			$sVarName = \random_int(1000, 2000).\microtime().\random_int(1000, 2000);
 			$sVarName = \md5($sVarName);
 			return "Ox".\substr($sVarName,0,$nLength);
 		}
