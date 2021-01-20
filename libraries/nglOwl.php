@@ -43,7 +43,7 @@ class nglOwl extends nglBranch {
 
 	final protected function __declareArguments__() {
 		$vArguments							= [];
-		$vArguments["alvin"]				= ['self::call()->istrue($mValue)', false];
+		$vArguments["alvin"]				= ['self::call()->istrue($mValue)', true];
 		$vArguments["cascade"]				= ['self::call()->istrue($mValue)', false];
 		$vArguments["child"]				= ['strtolower($mValue)', null];
 		$vArguments["data"]					= ['(array)$mValue', null];
@@ -91,7 +91,7 @@ class nglOwl extends nglBranch {
 		$this->bInternalCall = false;
 		$this->aTmpChildren = [];
 		
-		if(NGL_ALVIN) { $this->args(array("alvin"=>true)); }
+		// if(NGL_ALVIN) { $this->args(array("alvin"=>true)); }
 	}
 
 	final public function __init__() {
@@ -143,6 +143,54 @@ class nglOwl extends nglBranch {
 	
 	public function connect($driver) {
 		return $this->load($driver);
+	}
+
+	public function dbStructure() {
+		return <<<SQL
+-- MySQL / MariaDB --------------------------------------------------------------
+-- owl index --
+DROP TABLE IF EXISTS `__ngl_owl_index__`;
+CREATE TABLE `__ngl_owl_index__` (
+	`id` INT UNSIGNED AUTO_INCREMENT NOT NULL,
+	`imya` CHAR(32) NOT NULL DEFAULT '' COMMENT 'imya del registro en la tabla de origen',
+	`role` char(32) DEFAULT NULL COMMENT 'role a partir del cual se obtiene acceso',
+	PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Indice de los registros de las tablas que hagan uso de roles';
+CREATE INDEX `imya_idx` ON `__ngl_owl_index__` (`imya`);
+CREATE INDEX `role_idx` ON `__ngl_owl_index__` (`role`);
+
+-- owl log --
+DROP TABLE IF EXISTS `__ngl_owl_log__`;
+CREATE TABLE `__ngl_owl_log__` (
+	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	`imya` CHAR(32) NOT NULL DEFAULT '' COMMENT 'imya del registro en la tabla de origen',
+	`user` SMALLINT UNSIGNED DEFAULT NULL COMMENT 'id del usuario que ejecutó la acción',
+	`action` ENUM('insert','update','suspend','delete') NOT NULL DEFAULT 'insert' COMMENT 'tipo de acción',
+	`date` DATETIME NOT NULL COMMENT 'fecha y hora de la ejecución',
+	`ip` CHAR(45) NULL DEFAULT NULL COMMENT 'dirección de IP del usuario',
+	`changelog` MEDIUMTEXT NULL DEFAULT NULL COMMENT 'cuando el argumento owlog_changelog del objeto OWL sea true, se almacenará un JSON con la versión anterior de los datos',
+	PRIMARY KEY (`id`) 
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Log de operaciones realizadas mediante el objeto OWL';
+CREATE INDEX `imya_idx` ON `__ngl_owl_log__` (`imya`);
+CREATE INDEX `user_idx` ON `__ngl_owl_log__` (`user`);
+
+-- owl structures --
+DROP TABLE IF EXISTS `__ngl_owl_structure__`;
+CREATE TABLE `__ngl_owl_structure__` (
+	`id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+	`name` CHAR(128) NOT NULL COMMENT 'nombre del objeto',
+	`code` CHAR(12) NOT NULL COMMENT 'código del objeto. Que luego formará parte de el IMYA de cada registro del mismo',
+	`roles` ENUM('0', '1') NOT NULL DEFAULT '0' COMMENT 'determina si el objeto esta sujeto a roles: 0=no, 1=si',
+	`columns` TEXT NOT NULL COMMENT 'JSON con los nombres de las columnas del objeto',
+	`foreignkey` TEXT NULL COMMENT 'relaciones externas',
+	`relationship` TEXT NULL COMMENT 'relaciones con otros objetos en formato JSON',
+	`validate_insert` TEXT NULL COMMENT 'reglas del validación para los datos para el objeto VALIDATE al momento del INSERT',
+	`validate_update` TEXT NULL COMMENT 'reglas del validación para los datos para el objeto VALIDATE al momento del UPDATE',
+	PRIMARY KEY (`id`) 
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Estructuras de los objetos (tablas) de el entorno OWL';
+CREATE INDEX `name_idx` ON `__ngl_owl_structure__` (`name`);
+CREATE UNIQUE INDEX `code_idx` ON `__ngl_owl_structure__` (`code`);
+SQL;
 	}
 
 	public function delete() {
@@ -378,18 +426,14 @@ class nglOwl extends nglBranch {
 			
 			if($nRows) {
 				// log
-				$this->OwLog($sTable, $nRowID, "insert");
+				$this->OwLog($vData["imya"], "insert");
 				
-				// alvin
-				$bAlvin = $this->AlvinInit();
-				if($bAlvin) {
-					$aAlvin = self::call("alvin")->raw("owl");
-					$aIndex				= [];
-					$aIndex["table"]	= $sTable;
-					$aIndex["row"]		= $nRowID;
-					$aIndex["imya"]		= $vData["imya"];
-					$aIndex["alvin"]	= (isset($aAlvin[$sTable]["insert"])) ? $aAlvin[$sTable]["insert"] : null;
-					$this->db->insert("__ngl_owl_index__", $aIndex, "INSERT", false, true);
+				// roles
+				if($bAlvin = $this->AlvinInit()) {
+					$this->db->insert("__ngl_owl_index__", [
+						"imya"	=> $vData["imya"],
+						"role"	=> self::call("alvin")->role()
+					], "INSERT", false, true);
 				}
 			}
 			
@@ -416,7 +460,7 @@ class nglOwl extends nglBranch {
 
 	public function query() {
 		list($sJSQL) = $this->getarguments("jsql", \func_get_args());
-		$sSQL = $this->AlvinSQL($sJSQL, "select");
+		$sSQL = $this->AlvinSQL($sJSQL);
 		$this->attribute("query", $sSQL);
 		if($this->argument("debug")) { echo self::call()->dump($sSQL); }
 		$this->query = $this->db->query($sSQL);
@@ -981,58 +1025,30 @@ class nglOwl extends nglBranch {
 	}
 
 	final private function AlvinInit() {
-		if(NGL_ALVIN===null || !$this->argument("alvin")) { return null; }
-		if(!self::call("alvin")->loaded()) { self::call("alvin")->load(); }
+		if(NGL_ALVIN===null || !$this->argument("alvin") || !self::call("alvin")->loaded()) { return null; }
 		return self::call("alvin")->loaded();
 	}
 
-	final private function AlvinSQL($sJSQL, $sAlvinGrant="select") {
-		$sAlvinGrant = \strtolower($sAlvinGrant);
-		$bAlvin = $this->AlvinInit();
-
-		if($bAlvin!==null) {
+	final private function AlvinSQL($sJSQL) {
+		if($this->AlvinInit()) {
 			$sTableName = ($this->bChildMode) ? $this->sChildTable : $this->sObject;
-			$sOR = "";
-			if($bAlvin) {
-				$aAlvin = self::call("alvin")->raw("owl");
-				if($aAlvin!==false && isset($aAlvin[$sTableName][$sAlvinGrant])) {
-					$sOR = \trim($aAlvin[$sTableName][$sAlvinGrant]);
-					if($sOR!="*") {
-						if($sAlvinGrant!="insert") {
-							$sInsert = \trim($aAlvin[$sTableName]["insert"]);
-							if(!empty($sInsert)) { $sOR .= ",".\trim($aAlvin[$sTableName]["insert"]); }
-						}
-						$sOR = \addslashes($sOR);
-						$sOR = self::call()->explodeTrim(",", $sOR);
-						$sOR = (\count($sOR)) ? \implode("','", \array_unique($sOR)) : "";
-						$sOR = " OR `role` IN('".$sOR."') ";
-					}
-				}
-			}
+			$sRole = self::call("alvin")->role();
+			$role = $this->db->query("SELECT id FROM __ngl_owl_structure__ WHERE name = '".$sTableName."' AND roles = '1'");
+			if(!empty($sRole) && $role->rows()) {
+				$sChain = self::call("alvin")->rolechain();
+				$sRoles = (!empty($sChain)) ? "OR role IN ('".\str_replace(",", "','", $sChain)."')" : "";
 
-			if($sOR!="*") {
 				$sHash = self::call()->unique(16);
-				$sHashNot = self::call()->unique(16);
 				$aJSQL = self::call("jsql")->decode($sJSQL);
-				
 				if(isset($aJSQL["where"])) {
-					$aJSQL["where"] = [$aJSQL["where"], "AND", [
-						[$sTableName.".id", "notin", $sHashNot],
-						"OR",
-						[$sTableName.".id", "in", $sHash]
-					]];
+					$aJSQL["where"] = [$aJSQL["where"], "AND", [[$sTableName.".imya", "in", $sHash]]];
 				} else {
-					$aJSQL["where"] = [
-						[$sTableName.".id", "notin", $sHashNot],
-						"OR",
-						[$sTableName.".id", "in", $sHash]
-					];
+					$aJSQL["where"] = [[$sTableName.".imya", "in", $sHash]];
 				}
 				$sSQL = $this->JsqlParser($aJSQL);
 			
 				// consulta final
-				$sSQL = \str_replace($sHash, "SELECT `row` FROM `__ngl_owl_index__` WHERE `table` = '".$sTableName."' AND (`role` IS NULL ".$sOR.")", $sSQL);
-				$sSQL = \str_replace($sHashNot, "SELECT `row` FROM `__ngl_owl_index__` WHERE `table` = '".$sTableName."'", $sSQL);
+				$sSQL = \str_replace($sHash, "SELECT imya FROM __ngl_owl_index__ WHERE (role IS NULL OR role = '".$sRole."' ".$sRoles.")", $sSQL);
 			} else {
 				$sSQL = $this->JsqlParser($sJSQL);
 			}
@@ -1085,7 +1101,7 @@ class nglOwl extends nglBranch {
 					"columns":["'.$sCrossTable.'.id"],
 					"tables":["'.\implode('","', $aConditions["from"]).'"],
 					"where":['.\implode(',"AND",', $aConditions["where"]).']
-				}', "update");
+				}');
 
 				$aRows = [];
 				$this->attribute("query", $sSQL);
@@ -1121,14 +1137,15 @@ class nglOwl extends nglBranch {
 
 	private function DeleteInCascade($aCascade) {
 		\krsort($aCascade);
-
 		$nRows = 0;
 		foreach($aCascade as $aTable) {
 			$this->attribute("query", $aTable[2]);
 			if($this->db->query($aTable[2])) {
 				$aIDs = \explode(",", $aTable[1]);
-				foreach($aIDs as $nId) {
-					$this->OwLog($aTable[0], $nId, "delete");
+				foreach($aIDs as $nID) {
+					if($sImya = $this->ImyaFromID($aTable[0], $nID)) {
+						$this->OwLog($sImya, "delete");
+					}
 					$nRows++;
 				}
 			}
@@ -1339,7 +1356,14 @@ class nglOwl extends nglBranch {
 	private function Imya($sObject=null) {
 		if($sObject===null) { $sObject = $this->sObject; }
 		$sGroup = \substr(self::call()->strimya($sObject), 0, 12);
-		return $sGroup.$this->unique(20);
+		return $sGroup.self::call()->unique(20);
+	}
+
+	private function ImyaFromID($sTableName, $nID) {
+		// ansi query no requiere jsql
+		$imya = $this->db->query("SELECT imya FROM ".$sTableName." WHERE id='".$nID."'");
+		if($imya->rows()) { return $imya->get("imya"); }
+		return false;
 	}
 
 	private function JsonAppener($sJSQL, $sExtra) {
@@ -1367,11 +1391,10 @@ class nglOwl extends nglBranch {
 		}
 	}
 
-	private function OwLog($sTable, $nRow, $sAction, $aChangeLog=null) {
+	private function OwLog($sImya, $sAction, $aChangeLog=null) {
 		if($this->argument("owlog")) {
 			$aLog				= [];
-			$aLog["table"]		= $sTable;
-			$aLog["row"]		= $nRow;
+			$aLog["imya"]		= $sImya;
 			$aLog["user"]		= self::call("sysvar")->UID;
 			$aLog["action"]		= $sAction;
 			$aLog["date"]		= \date("Y-m-d H:i:s");
@@ -1508,8 +1531,7 @@ class nglOwl extends nglBranch {
 					}
 				}
 			} else {
-				//  actualizacion de datos
-				// no modifica state
+				//  actualizacion de datos, no modifica state
 				// validacion
 				unset($vData["state"]);
 				if(isset($this->vObjects[$sTable]["validate_update"])) {
@@ -1533,7 +1555,7 @@ class nglOwl extends nglBranch {
 				}
 			} else {
 				if($this->argument("owlog_changelog")) {
-					$changes = $this->db->query("SELECT * FROM `".$sTable."` WHERE ".$sSQLWhere);
+					$changes = $this->db->query("SELECT * FROM ".$sTable." WHERE ".$sSQLWhere);
 					$aChangeLog = $changes->getall("#id");
 				}
 				$update = $this->db->update($sTable, $vData, $sSQLWhere);
@@ -1547,7 +1569,11 @@ class nglOwl extends nglBranch {
 					if(!isset($aRowID)) { $aRowID = [$nRowID]; }
 					foreach($aRowID as $nID) {
 						$aChanges = (isset($aChangeLog, $aChangeLog[$nID])) ? $aChangeLog[$nID] : null;
-						$this->OwLog($sTable, $nID, $sLogAction, $aChanges);
+
+						// log
+						if($sImya = $this->ImyaFromID($sTable, $nID)) {
+							$this->OwLog($sImya, $sLogAction, $aChanges);
+						}
 					}
 				} else {
 					$this->Logger("empty", "0 affected rows");

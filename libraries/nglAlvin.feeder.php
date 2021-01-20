@@ -34,7 +34,7 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 
 	private $aToken;
 	private $aGeneratedKeys;
-	private $sKeysPath;
+	private $sAlvinPath;
 	private $sCryptKey;
 	private $sPrivateKey;
 	private $sPassphrase;
@@ -56,10 +56,47 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 		$this->sGrantsFile = null;
 		$this->sDefaultGrants = '{"GRANTS":{"profiles":{"ADMIN":[]}},"ROLES":[],"RAW":[]}';
 		$this->crypt = (self::call()->exists("crypt")) ? self::call("crypt") : null;
-		$this->sKeysPath = NGL_PATH_DATA.NGL_DIR_SLASH."alvin";
+		$this->sAlvinPath = NGL_PATH_DATA.NGL_DIR_SLASH."alvin";
 		$this->roles = self::call("tree")->loadtree([]);
 		if($this->crypt!==null) { $this->crypt->type("rsa")->base64(true); }
 		$this->__errorMode__("die");
+	}
+
+	// DB --------------------------------------------------------------------
+	public function dbStructure() {
+		return <<<SQL
+-- MySQL / MariaDB --------------------------------------------------------------
+-- users
+CREATE TABLE IF NOT EXISTS `users` (
+	`id` INT UNSIGNED AUTO_INCREMENT NOT NULL,
+	`imya` CHAR(32) NOT NULL DEFAULT '',
+	`state` ENUM('0','1') DEFAULT '1' COMMENT 'NULL=eliminado, 0=inactivo, 1=activo',
+	`wrong` INT UNSIGNED NOT NULL COMMENT 'cantidad de fallos en intentos de login',
+	`fullname` VARCHAR(128) DEFAULT NULL,
+	`username` VARCHAR(128) DEFAULT NULL,
+	`password` VARCHAR(255) DEFAULT NULL,
+	`email` CHAR(96) DEFAULT NULL,
+	`profile` CHAR(32) DEFAULT NULL,
+	`roles` CHAR(255) DEFAULT NULL,
+	`alvin` TEXT DEFAULT NULL COMMENT 'token alvin',
+	PRIMARY KEY (`id`)
+) ENGINE=MyISAM, CHARACTER SET utf8mb4, COLLATE=utf8mb4_unicode_ci COMMENT='Tabla de usuarios del sistema';
+CREATE UNIQUE INDEX `imya` ON `users` (`imya`);
+CREATE UNIQUE INDEX `username` ON `users` (`username`);
+CREATE INDEX `state` ON `users` (`state`);
+
+DROP TABLE IF EXISTS `users_entities`;
+CREATE TABLE `users_entities` (
+	`id` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT NOT NULL,
+	`imya` CHAR(32) NOT NULL DEFAULT '',
+	`state` ENUM('0', '1') NULL DEFAULT '1',
+	`pid` INT UNSIGNED NOT NULL COMMENT 'id del usuario',
+	`entity` CHAR(32)  NOT NULL COMMENT 'imya del registro en la entidad asociada'
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Identifica a los usuarios del sistema con los registros de otras entidades. Por ejemplo, cual es el usuario del vendedor JUAN';
+CREATE UNIQUE INDEX `imya` ON `users_entities` (`imya`);
+CREATE INDEX `state` ON `users_entities` (`state`);
+CREATE INDEX `pid` ON `users_entities` (`pid`);
+SQL;
 	}
 
 	// KEYS --------------------------------------------------------------------
@@ -76,13 +113,13 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 	}
 
 	public function saveKeys() {
-		if(!\is_dir($this->sKeysPath)) {
-			if(!@\mkdir($this->sKeysPath, 0775, true)) {
-				self::errorMessage($this->object, 1005, $this->sKeysPath);
+		if(!\is_dir($this->sAlvinPath)) {
+			if(!@\mkdir($this->sAlvinPath, 0777, true)) {
+				self::errorMessage($this->object, 1005, $this->sAlvinPath);
 			}
 		}
-		@\file_put_contents($this->sKeysPath.NGL_DIR_SLASH."private.key", $this->aGeneratedKeys["private"]);
-		@\file_put_contents($this->sKeysPath.NGL_DIR_SLASH."public.key", $this->aGeneratedKeys["public"]);
+		@\file_put_contents($this->sAlvinPath.NGL_DIR_SLASH."private.key", $this->aGeneratedKeys["private"]);
+		@\file_put_contents($this->sAlvinPath.NGL_DIR_SLASH."public.key", $this->aGeneratedKeys["public"]);
 
 		return $this;
 	}
@@ -91,8 +128,8 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 		if(!$this->crypt) { self::errorMessage($this->object, 1001); }
 		if($bPrivate) {
 			if($sKey===null) {
-				if(\file_exists($this->sKeysPath.NGL_DIR_SLASH."private.key")) {
-					$sKey = \file_get_contents($this->sKeysPath.NGL_DIR_SLASH."private.key");
+				if(\file_exists($this->sAlvinPath.NGL_DIR_SLASH."private.key")) {
+					$sKey = \file_get_contents($this->sAlvinPath.NGL_DIR_SLASH."private.key");
 				} else {
 					return self::errorMessage($this->object, 1008);
 				}
@@ -101,8 +138,8 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 			$this->sPrivateKey = $sKey;
 		} else {
 			if($sKey===null) {
-				if(\file_exists($this->sKeysPath.NGL_DIR_SLASH."public.key")) {
-					$sKey = \file_get_contents($this->sKeysPath.NGL_DIR_SLASH."public.key");
+				if(\file_exists($this->sAlvinPath.NGL_DIR_SLASH."public.key")) {
+					$sKey = \file_get_contents($this->sAlvinPath.NGL_DIR_SLASH."public.key");
 				} else {
 					return self::errorMessage($this->object, 1007);
 				}
@@ -115,11 +152,10 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 
 	// ADMIN GRANTS ------------------------------------------------------------
 	// carga o crea los permisos
-	public function loadGrants($sFilePath, $sPassphrase=null) {
+	public function loadGrants($sPassphrase=null) {
 		if($sPassphrase===null) { return self::errorMessage($this->object, 1010); }
-		$grants = self::call("file")->load($sFilePath);
+		$grants = self::call("file")->load($this->sAlvinPath.NGL_DIR_SLASH."grants");
 		if($grants->size) {
-			$this->sGrantsFile = $sFilePath;
 			$sGrants = $grants->read();
 			$sGrants = \preg_replace("/(\n|\r)/is", "", $sGrants);
 			$grants->close();
@@ -132,27 +168,45 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 	}
 
 	// escribe el archivo con los permisos
-	public function save($sFilePath=null, $sPassphrase=null) {
+	public function save($sPassphrase=null) {
 		if($sPassphrase===null) { return self::errorMessage($this->object, 1010); }
-		if($sFilePath===null) {
-			if($this->sGrantsFile!==null) {
-				$sFilePath = $this->sGrantsFile;
-			} else {
-				return self::errorMessage($this->object, 1006);
-			}
-		}
 
 		self::call()->msort($this->aGrants, "ksort");
 		$sGrants = \json_encode(["GRANTS"=>$this->aGrants, "ROLES"=>$this->roles(), "RAW"=>$this->aRAW]);
+		$sGrants = self::call("shift")->jsonformat($sGrants, true);
 		$sGrants = self::call("crypt")->type("aes")->key($sPassphrase)->base64(true)->encrypt($sGrants);
 
-		$save = self::call("file")->load($sFilePath);
+		$this->BackupGrants();
+		$save = self::call("file")->load($this->sAlvinPath.NGL_DIR_SLASH."grants");
 		if($save->write(\chunk_split($sGrants, 80))!==false) {
 			$save->close();
+
+			if($this->crypt) {
+				$sJsonRoles = self::call("shift")->jsonformat(\json_encode($this->roles()), true);
+				if(!$this->sPrivateKey) { return self::errorMessage($this->object, 1008); }
+				$sJsonRoles = $this->crypt->type("rsa")->key($this->sPrivateKey)->encrypt($sJsonRoles);
+				$saveroles = self::call("file")->load($this->sAlvinPath.NGL_DIR_SLASH."roles");
+				if($saveroles->write(\chunk_split($sJsonRoles, 80))!==false) {
+					$saveroles->close();
+				}
+			}
+
 			return true;
 		}
 
 		return false;
+	}
+
+	private function BackupGrants() {
+		$aBackups = self::call("files")->ls($this->sAlvinPath.NGL_DIR_SLASH, "*.bak", "info");
+		$aBackups = self::call()->arrayMultiSort($aBackups, [["field"=>"timestamp", "order"=>"desc", "type"=>2]]);
+		$aBackups = array_slice($aBackups, 6);
+		if(count($aBackups)) {
+			foreach($aBackups as $aBack) {
+				unlink($aBack["path"]);
+			}
+		}
+		copy($this->sAlvinPath.NGL_DIR_SLASH."grants", $this->sAlvinPath.NGL_DIR_SLASH."grants_".date("YmdHis").".bak");
 	}
 
 	// importa los permisos desde una cadena plana o un json
@@ -210,13 +264,43 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 	}
 
 	// ROLES -------------------------------------------------------------------
-	// valida un nombre de perfil
-	public function role($sRole) {
-		return $this->GrantName($sRole, false);
+	// valida un nombre de rol o una cadena de ellos separados por ,
+	// si el nombre es nulo y hay un token cargado, intenta retornar el role del mismo
+	public function role($sRoles=null) {
+		if($sRoles===null && $this->aToken!==null) { return $this->aToken["role"]; }
+		$aRoles = \explode(",", $sRoles);
+		foreach($aRoles as $x => $sRole) {
+			$aRoles[$x] = $this->GrantName($sRole, false);
+		}
+		return \implode(",", $aRoles);
+	}
+
+	public function rolechain($sRoles=null) {
+		if($sRoles===null) { $sRoles = $this->role(); }
+		if(!empty($sRoles) && \file_exists($this->sAlvinPath.NGL_DIR_SLASH."roles")) {
+			$sRolesTree = \file_get_contents($this->sAlvinPath.NGL_DIR_SLASH."roles");
+			$sRolesTree = self::call("crypt")->type("rsa")->base64(true)->key(NGL_ALVIN)->decrypt($sRolesTree);
+			$aRoles = \json_decode($sRolesTree, true);
+			if(\is_array($aRoles)) {
+				$tree = self::call("tree")->loadtree($aRoles);
+				$aUserRoles = \explode(",", $sRoles);
+				$aChain = [];
+				foreach($aUserRoles as $sRole) {
+					$aChain = \array_merge($aChain, $tree->childrenChain($sRole, null));
+				}
+				return \implode(",", \array_unique($aChain));
+			}
+		}
+		return "";
 	}
 
 	public function roles() {
 		return $this->roles->tree();
+	}
+
+	// resetea los roles
+	public function resetRoles() {
+		$this->roles = self::call("tree")->loadtree([]);
 	}
 
 	// agrega un role
@@ -230,7 +314,7 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 	// obtiene la ruta de un role en formato cadena
 	public function rolePath($sRole) {
 		$sRole = $this->GrantName($sRole, false);
-		return $this->roles->nodePath($sRole, "id", ",");
+		return $this->roles->parentsChain($sRole, "id", ",");
 	}
 
 	// obtiene los hijos de un role
@@ -401,7 +485,7 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 
 		$sProfileName = $this->profile($sProfileName);
 		$sRoleName = $this->role($sRoleName);
-		$aToken = ["profile"=>$sProfileName, "role"=>$sRoleName, "grants"=>null,"raw"=>null];
+		$aToken = ["profile"=>$sProfileName, "role"=>$sRoleName, "grants"=>null, "raw"=>null, "username"=>$sUsername];
 
 		// permisos
 		if(\is_array($aGrants) && \count($aGrants)) {
@@ -451,7 +535,7 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 		$aGrants = json_decode($sGrants, true);
 		if($aGrants!==null) {
 			if(\array_key_exists("GRANTS", $aGrants)) { $this->aGrants = $aGrants["GRANTS"]; }
-			if(\array_key_exists("ROLES", $aGrants)) { $this->aRoles = self::call("tree")->loadtree($aGrants["ROLES"]); }
+			if(\array_key_exists("ROLES", $aGrants)) { $this->roles = self::call("tree")->loadtree($aGrants["ROLES"]); }
 			if(\array_key_exists("RAW", $aGrants)) { $this->aRAW = $aGrants["RAW"]; }
 			if(!\array_key_exists("GRANTS", $aGrants) && !\array_key_exists("ROLES", $aGrants) && !\array_key_exists("RAW", $aGrants)) { $this->aGrants = $aGrants; }
 		} else {
@@ -532,12 +616,16 @@ class nglAlvin extends nglFeeder implements inglFeeder {
 	}
 
 	// valida un nombre de perfil
-	public function profile($sProfile) {
+	// si el nombre es nulo y hay un token cargado, intenta retornar el perfil del mismo
+	public function profile($sProfile=null) {
+		if($sProfile===null && $this->aToken!==null) { return $this->aToken["profile"]; }
 		return $this->GrantName($sProfile, false);
 	}
 
 	// valida un nombre de usuario
-	public function username($sUsername) {
+	// si el nombre es nulo y hay un token cargado, intenta retornar el nombre del mismo
+	public function username($sUsername=null) {
+		if($sUsername===null && $this->aToken!==null) { return $this->aToken["username"]; }
 		$sUsername = self::call()->unaccented($sUsername);
 		return \preg_replace("/[^a-zA-Z0-9\_\-\.\@]+/", "", $sUsername);
 	}

@@ -200,6 +200,7 @@ class nglMail extends nglBranch implements iNglClient {
 		$vArguments["limit"]					= ['(int)$mValue', 25];
 		$vArguments["smtp_authtype"]			= ['$mValue', null]; /* "(CRAM-MD5 | LOGIN | PLAIN)" */
 		$vArguments["localhost"]				= ['$mValue', "localhost"];
+		$vArguments["flags"]					= ['$mValue', null]; /* separadas por espacios y sin la \ */
 
 		return $vArguments;
 	}
@@ -476,6 +477,46 @@ class nglMail extends nglBranch implements iNglClient {
 		return (\strpos($sResponse, $sMark)!==false);
 	}
 
+	/*
+        \Seen
+           Message has been read
+
+        \Answered
+           Message has been answered
+
+        \Flagged
+           Message is "flagged" for urgent/special attention
+
+        \Deleted
+           Message is "deleted" for removal by later EXPUNGE
+
+        \Draft
+           Message has not completed composition (marked as a draft).
+
+        \Recent
+	*/
+	public function flag() {
+		list($nMailId, $sFlags) = $this->getarguments("mail,flags", \func_get_args());
+		$sFlag = $this->BuildFlags($sFlags);
+		$this->request("STORE ".$nMailId." +FLAGS (\\Seen)");
+	}
+
+	public function unflag() {
+		list($nMailId, $sFlags) = $this->getarguments("mail,flags", \func_get_args());
+		$sFlag = $this->BuildFlags($sFlags);
+		$this->request("STORE ".$nMailId." -FLAGS (\\Seen)");
+	}
+	
+	private function BuildFlags($sFlags) {
+		$aFlags = \explode(" ", $sFlags);
+		foreach($aFlags as &$sFlag) {
+			$sFlag = \strtolower($sFlag);
+			$sFlag = \preg_replace("/[^a-z]/", "", $sFlag);
+			$sFlag = "\\".\ucfirst($sFlag);
+		}
+		return \implode(" ", $aFlags);
+	}
+
 	public function get() {
 		list($nMailId) = $this->getarguments("mail", \func_get_args());
 		
@@ -634,8 +675,9 @@ class nglMail extends nglBranch implements iNglClient {
 			$aHeader = $this->headers($nMail, "date from subject");
 			if($aHeader!==false) { $aSearch[$nMail] = $aHeader; }
 			if(++$n==$nLimit) { break; }
+			$this->unflag($nMail, "seen");
 		}
-		
+
 		return $aSearch;
 	}
 

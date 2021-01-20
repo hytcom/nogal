@@ -798,23 +798,23 @@ class nglFn extends nglTrunk {
 
 			switch($nType) {
 				case 1: /* Case insensitive natural. */
-					\uasort($aData, function($a, $b) use ($mKey, $bOrder) { return ($bOrder ? '' : '-').\strcasecmp($a[$mKey], $b[$mKey]); });
+					\uasort($aData, function($a, $b) use ($mKey, $bOrder) { $nVal = \strcasecmp($a[$mKey], $b[$mKey]); return ($bOrder ? $nVal : ($nVal*-1)); });
 					break;
 
 				case 2: /* Numeric. */
-					\uasort($aData, function($a, $b) use ($mKey, $bOrder) { return ($bOrder ? '' : '-').($a[$mKey] == $b[$mKey]) ? 0 : (($a[$mKey] < $b[$mKey]) ? -1 : 1); });
+					\uasort($aData, function($a, $b) use ($mKey, $bOrder) { $nVal = ($a[$mKey] == $b[$mKey]) ? 0 : (($a[$mKey] < $b[$mKey]) ? -1 : 1); return ($bOrder ? $nVal : ($nVal*-1)); });
 					break;
 
 				case 3: /* Case sensitive string. */
-					\uasort($aData, function($a, $b) use ($mKey, $bOrder) { return ($bOrder ? '' : '-').\strcmp($a[$mKey], $b[$mKey]); });
+					\uasort($aData, function($a, $b) use ($mKey, $bOrder) { $nVal = \strcmp($a[$mKey], $b[$mKey]); return ($bOrder ? $nVal : ($nVal*-1)); });
 					break;
 
 				case 4: /* Case insensitive string. */
-					\uasort($aData, function($a, $b) use ($mKey, $bOrder) { return ($bOrder ? '' : '-').\strcasecmp($a[$mKey], $b[$mKey]); });
+					\uasort($aData, function($a, $b) use ($mKey, $bOrder) { $nVal = \strcasecmp($a[$mKey], $b[$mKey]); return ($bOrder ? $nVal : ($nVal*-1)); });
 					break;
 
 				default: /* Case sensitive natural. */
-					\uasort($aData, function($a, $b) use ($mKey, $bOrder) { return ($bOrder ? '' : '-').\strnatcmp($a[$mKey], $b[$mKey]); });
+					\uasort($aData, function($a, $b) use ($mKey, $bOrder) { $nVal = \strnatcmp($a[$mKey], $b[$mKey]); return ($bOrder ? $nVal : ($nVal*-1)); });
 					break;
 			}
 		}

@@ -1466,66 +1466,19 @@ class nglNest extends nglBranch {
 	}
 
 	private function CreateStructure() {
-		return <<<SQL
--- OWL CORE --------------------------------------------------------------------
--- log --
-DROP TABLE IF EXISTS `__ngl_owl_log__`;
-CREATE TABLE `__ngl_owl_log__` (
-	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-	`table` CHAR(128) NOT NULL,
-	`row` INT UNSIGNED NOT NULL,
-	`user` SMALLINT UNSIGNED DEFAULT NULL,
-	`action` ENUM('insert','update','suspend','delete') NOT NULL DEFAULT 'insert',
-	`date` DATETIME NOT NULL,
-	`ip` CHAR(45) NOT NULL DEFAULT '',
-	`changelog` MEDIUMTEXT NULL DEFAULT NULL,
-	PRIMARY KEY (`id`) 
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-CREATE INDEX `table_idx` ON `__ngl_owl_log__` (`table`);
-CREATE INDEX `row_idx` ON `__ngl_owl_log__` (`row`);
-CREATE INDEX `user_idx` ON `__ngl_owl_log__` (`user`);
-
--- tables --
-DROP TABLE IF EXISTS `__ngl_owl_structure__`;
-CREATE TABLE `__ngl_owl_structure__` (
-	`id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-	`name` CHAR(128) NOT NULL,
-	`code` CHAR(12) NOT NULL,
-	`columns` TEXT NOT NULL,
-	`foreignkey` TEXT NULL,
-	`relationship` TEXT NULL,
-	`validate_insert` TEXT NULL,
-	`validate_update` TEXT NULL,
-	PRIMARY KEY (`id`) 
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-CREATE INDEX `name_idx` ON `__ngl_owl_structure__` (`name`);
-CREATE UNIQUE INDEX `code_idx` ON `__ngl_owl_structure__` (`code`);
-
--- index --
-DROP TABLE IF EXISTS `__ngl_owl_index__`;
-CREATE TABLE `__ngl_owl_index__` (
-	`id` INT UNSIGNED AUTO_INCREMENT NOT NULL,
-	`table` CHAR(128) NOT NULL DEFAULT '',
-	`row` INT UNSIGNED NOT NULL,
-	`imya` CHAR(32) NOT NULL DEFAULT '',
-	`alvin` CHAR(32) NULL DEFAULT NULL,
-	PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-CREATE INDEX `table_idx` ON `__ngl_owl_index__` (`table`);
-CREATE INDEX `row_idx` ON `__ngl_owl_index__` (`row`);
-CREATE INDEX `imya_idx` ON `__ngl_owl_index__` (`imya`);
+		$sSQL = $this->owl->dbStructure();
+		$sSQL .= <<<SQL
 
 -- sentences --
 DROP TABLE IF EXISTS `__ngl_sentences__`;
 CREATE TABLE `__ngl_sentences__` (
 	`name` VARCHAR(128) NOT NULL DEFAULT '',
-	`type` ENUM('function','procedure','query','structure','trigger','view') NOT NULL,
-	`sentence` MEDIUMTEXT NOT NULL,
-	`dependencies` MEDIUMTEXT NULL,
+	`type` ENUM('function','procedure','query','structure','trigger','view') NOT NULL COMMENT 'tipo de sentencia',
+	`sentence` MEDIUMTEXT NOT NULL COMMENT 'sentencia SQL',
+	`dependencies` MEDIUMTEXT NULL COMMENT 'nombre de tablas/views separados por coma, de las cuales depende la sentencia',
 	`notes` VARCHAR(255) NULL,
 	PRIMARY KEY (`name`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Almacena sentencias SQL utilizadas en el proyecto. Esta tabla es fundamental para el funcionamiento de NEST';
 
 -- PROJECT ENTITIES ------------------------------------------------------------\n
 SQL;

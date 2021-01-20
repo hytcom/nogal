@@ -162,6 +162,7 @@ class nglTree extends nglBranch implements inglBranch {
 	private function Prepare($aSource) {
 		$mIdColumn =  $this->attribute("id_column");
 		$mParentColumn =  $this->attribute("parent_column");
+		$mChildren =  $this->attribute("children_column");
 		
 		$aFlat = $aGrouped = [];
 		foreach($aSource as $aSubArray) {
@@ -217,19 +218,18 @@ class nglTree extends nglBranch implements inglBranch {
 	}
 
 	public function get() {
-		list($mId) = $this->getarguments("id", \func_get_args());
-		if(isset($this->aFlat[$mId])) {
-			return $this->aFlat[$mId];
+		list($nId) = $this->getarguments("id", \func_get_args());
+		if(isset($this->aFlat[$nId])) {
+			return $this->aFlat[$nId];
 		}
-		
 		return null;	
 	}
 
 	public function parent() {
-		list($mId) = $this->getarguments("id", \func_get_args());
+		list($nId) = $this->getarguments("id", \func_get_args());
 
-		if(isset($this->aFlat[$mId])) {
-			$mParent = $this->aFlat[$mId][$this->attribute("parent_column")];
+		if(isset($this->aFlat[$nId])) {
+			$mParent = $this->aFlat[$nId][$this->attribute("parent_column")];
 			return (isset($this->aFlat[$mParent])) ? $this->aFlat[$mParent] : 0;
 		}
 		
@@ -237,33 +237,55 @@ class nglTree extends nglBranch implements inglBranch {
 	}
 	
 	public function trace() {
-		list($mId) = $this->getarguments("id", \func_get_args());
-		
+		list($nId) = $this->getarguments("id", \func_get_args());
 		$mIndex =  $this->attribute("parent_column");
 		$aTrace = [];
-		while($aParent=$this->get($mId)) {
-			$mId = $aParent[$mIndex];
+		while($aParent=$this->get($nId)) {
+			$nId = $aParent[$mIndex];
 			$aTrace[] = $aParent;
 		}
-
 		return \array_reverse($aTrace);
 	}
 	
 	public function children() {
-		list($mId) = $this->getarguments("id", \func_get_args());
+		list($nId) = $this->getarguments("id", \func_get_args());
 		$aChildren = $this->attribute("tree");
-		if(!$mId) { return $aChildren; }
+		if(!$nId) { return $aChildren; }
 		$mIndex =  $this->attribute("id_column");
 		$mChildren =  $this->attribute("children");
-		$aTrace = $this->trace($mId);
+		$aTrace = $this->trace($nId);
+
 		if(\is_array($aTrace) && \count($aTrace)) {
 			foreach($aTrace as $aItem) {
-				if(!empty($aChildren[$aItem[$mIndex]][$mChildren])) { return []; }
+				if(empty($aChildren[$aItem[$mIndex]][$mChildren])) { return []; }
 				$aChildren = $aChildren[$aItem[$mIndex]][$mChildren];
 			}
 		}
 
 		return $aChildren;
+	}
+
+	public function childrenChain() {
+		list($nId,$sSeparator) = $this->getarguments("id,separator", \func_get_args());
+		$aChildren = $this->children($nId);
+		if(\is_array($aChildren) && \count($aChildren)) {
+			$mIndex =  $this->attribute("id_column");
+			$mChildren =  $this->attribute("children");
+			$aChain = [];
+			$this->ChildrenChainer($aChain, $aChildren, $mIndex, $mChildren);
+			return ($sSeparator===null) ? $aChain : \implode($sSeparator, $aChain);
+		}
+		return "";
+	}
+
+	private function ChildrenChainer(&$aChain, $aData, $mIndex, $mChildren) {
+		foreach($aData as $aChild) {
+			$aChain[] = $aChild[$mIndex];
+			if(!empty($aChild[$mChildren])) {
+				$this->ChildrenChainer($aChain, $aChild[$mChildren], $mIndex, $mChildren);
+			}
+		}
+		return $aChain;
 	}
 	
 	/* si existe lo modifica, sino lo agrega */
@@ -295,32 +317,13 @@ class nglTree extends nglBranch implements inglBranch {
 		return $this;
 	}
 
-	public function show() {
-		list($sColumn) = $this->getarguments("column", \func_get_args());
-		
-		$aTree = $this->attribute("tree");
-		$mChildren = $this->attribute("children");
-
-		$aPrint = self::call()->treeWalk($aTree, function($aNode, $nLevel, $bFirst, $bLast) use ($sColumn, $mChildren) {
-				$sOutput  = "";
-				$sOutput .= ($nLevel) ? \str_repeat("│   ", $nLevel) : "";
-				$sOutput .= ($bLast) ? "└─── " : "├─── ";
-				$sOutput .= $aNode[$sColumn];
-				$sOutput .= "\n";
-				return $sOutput;
-			}
-		);
-
-		return \implode($aPrint);
-	}
-
-	public function nodePath() {
-		list($mId,$sColumn,$sSeparator) = $this->getarguments("id,column,separator", \func_get_args());
+	public function parentsChain() {
+		list($nId,$sColumn,$sSeparator) = $this->getarguments("id,column,separator", \func_get_args());
 		$aPaths = $aPath = [];
-		foreach($this->trace($mId) as $aBranch) {
+		foreach($this->trace($nId) as $aBranch) {
 			$aPath[] = $aBranch[$sColumn];
 		}
-		return implode($sSeparator, $aPath);
+		return ($sSeparator===null) ? $aPath : \implode($sSeparator, $aPath);
 	}
 
 	public function paths() {
@@ -347,6 +350,25 @@ class nglTree extends nglBranch implements inglBranch {
 		
 		\natsort($aPaths);
 		return $aPaths;
+	}
+	
+	public function show() {
+		list($sColumn) = $this->getarguments("column", \func_get_args());
+		
+		$aTree = $this->attribute("tree");
+		$mChildren = $this->attribute("children");
+
+		$aPrint = self::call()->treeWalk($aTree, function($aNode, $nLevel, $bFirst, $bLast) use ($sColumn, $mChildren) {
+				$sOutput  = "";
+				$sOutput .= ($nLevel) ? \str_repeat("│   ", $nLevel) : "";
+				$sOutput .= ($bLast) ? "└─── " : "├─── ";
+				$sOutput .= $aNode[$sColumn];
+				$sOutput .= "\n";
+				return $sOutput;
+			}
+		);
+
+		return \implode($aPrint);
 	}
 }
 

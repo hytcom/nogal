@@ -1,3 +1,28 @@
+# 2.8.4 - 202101201930
+## alvin
+- se establecieron como fijos los paths de los archivos en el filesystem, en el directorio **NGL_PATH_DATA/alvin**
+- se terminaron de aplicar los roles
+
+## fn
+- fix errors en **arrayMultiSort**
+
+## mail
+- nuevos métodos **flag**, **unflag** y **BuildFlags**
+
+## nest
+- se modificó el método **CreateStructure** 
+
+## owl
+- nuevos métodos **dbStructure** y **ImyaFromID**
+- se hicieron los cambios para la nueva estructura de roles
+- cambios en la tabla y modo de logs
+
+## tree
+- nuevo método **childrenChain**
+- se renombró el método **nodePath** a **parentsChain**
+- se modificaron los métodos **get**, **parent**, **trace** y **children**
+
+________________________________________________________________________________
 # 2.8.3 - 202101071530
 ## general
 - fix sintaxis por actualización a PHP 7.4
