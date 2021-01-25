@@ -1,3 +1,25 @@
+# 2.8.5 - 202101252000
+## alvin
+- nuevos métodos **reload** y **AdminGrants**
+- modificaciones a la estructura y salvado de los ROLES
+
+## mysql
+- nuevo método **describe**
+
+## nest
+- nuevos métodos **comment**, **db2nest** y **useroles**
+- cambios en el manejo de ALTER TABLE
+
+## owl
+- cambios en los métodos **alvin** relacionados con el uso de ROLES
+
+## rind
+- cambio en la carga del token **alvin**
+
+## tree
+- fix error en **loadTree**
+
+________________________________________________________________________________
 # 2.8.4 - 202101201930
 ## alvin
 - se establecieron como fijos los paths de los archivos en el filesystem, en el directorio **NGL_PATH_DATA/alvin**

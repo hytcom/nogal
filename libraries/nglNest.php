@@ -39,6 +39,7 @@ class nglNest extends nglBranch {
 		$vArguments							= [];
 		$vArguments["about"]				= ['$mValue', null];
 		$vArguments["after"]				= ['$mValue', true];
+		$vArguments["comment"]				= ['$mValue'];
 		$vArguments["core"]					= ['self::call()->istrue($mValue)', false];
 		$vArguments["db"]					= ['$mValue', null];
 		$vArguments["der"]					= ['self::call()->istrue($mValue)', false];
@@ -67,6 +68,7 @@ class nglNest extends nglBranch {
 		$vArguments["enclosed"]				= ['$mValue', '"'];
 		$vArguments["splitter"]				= ['$mValue', ";"];
 		$vArguments["eol"]					= ['$mValue', "\r\n"];
+		$vArguments["roles"]				= ['(int)$mValue', 0];
 		
 		return $vArguments;
 	}
@@ -302,22 +304,6 @@ class nglNest extends nglBranch {
 		return $return;
 	}
 
-	public function move() {
-		list($sObject,$sField,$sAfter) = $this->getarguments("entity,field,after", \func_get_args());
-		$sObject = $this->FormatName($sObject);
-		$aFields = $this->owl["tables"][$sObject];
-		if(!isset($aFields[$sAfter])) { $sAfter = true; }
-		$aNewOrder = [];
-		foreach($aFields as $sFieldKey => $sLabel) {
-			if($sFieldKey!==$sField) { $aNewOrder[$sFieldKey] = $sLabel; }
-			if($sFieldKey===$sAfter) { $aNewOrder[$sField] = $aFields[$sField]; }
-		}
-		if($sAfter===true) { $aNewOrder[$sField] = $aFields[$sField]; }
-
-		$this->owl["tables"][$sObject] = $aNewOrder;
-		return $this;
-	}
-
 	public function check() {
 		list($sObject) = $this->getarguments("entity", \func_get_args());
 		return (isset($this->owl["tables"][$sObject]) || isset($this->owl["views"][$sObject]) || isset($this->owl["foreigns"][$sObject]));
@@ -339,6 +325,15 @@ class nglNest extends nglBranch {
 		return $this;
 	}
 
+	public function comment() {
+		list($sComment) = $this->getarguments("comment", \func_get_args());
+		$sObject = $this->attribute("object");
+		$this->owl["nest"]["objects"][$sObject]["comment"] = $sComment;
+		if(!\array_key_exists($sObject, $this->aAlterTable)) { $this->aAlterTable[$sObject] = []; }
+		$this->aAlterTable[$sObject]["comment"] = $sComment;
+		return $this;
+	}
+
 	public function create() {
 		list($sObject, $sTitle, $aFields) = $this->getarguments("entity,title,fields", \func_get_args());
 
@@ -353,7 +348,7 @@ class nglNest extends nglBranch {
 		$sObject = $this->FormatName($sObject);
 		$this->owl["tables"][$sObject] = [];
 		$this->owl["titles"][$sObject] = ($sTitle!==null) ? $sTitle : $sObject;
-		$this->owl["nest"]["objects"][$sObject]	= ["left"=>0, "top"=>0];
+		$this->owl["nest"]["objects"][$sObject]	= ["left"=>0, "top"=>0, "comment"=>""];
 		$this->owl["def"][$sObject] = [];
 		$this->SetObject($sObject);
 
@@ -502,7 +497,8 @@ class nglNest extends nglBranch {
 		}
 
 		$sNewName = "dropped_".$sObject."_".\date("YmdHis")."_".self::call()->unique(8);
-		$this->aAlterTable[] = "`".$sObject."` TO `".$sNewName."`";
+		if(!\array_key_exists($sObject, $this->aAlterTable)) { $this->aAlterTable[$sObject] = []; }
+		$this->aAlterTable[$sObject]["rename"] = $sNewName;
 		$this->attribute("object", null);
 		return $this;
 	}
@@ -545,6 +541,64 @@ class nglNest extends nglBranch {
 
 			return $sNestCode;
 		}
+	}
+
+	public function db2nest() {
+		list($sObject) = $this->getarguments("entity", \func_get_args());
+		$db = $this->argument("db");
+		if($aDescribe = $db->describe($sObject)) {
+			$sHash = self::call()->unique(8);
+
+			if(!\array_key_exists($sObject, $this->owl["tables"])) {
+				$sNestCode = '-$: create ["'.$sObject.'","'.$sObject.'"]'."\n";
+			} else {
+				$sNestCode = '-$: select "'.$sObject.'"'."\n";
+				$aCurrent = $this->owl["tables"][$sObject];
+				unset($aCurrent["id"], $aCurrent["imya"], $aCurrent["state"]);
+			}
+
+			foreach($aDescribe as $aField) {
+				$sField = \strtolower($aField["name"]);
+				
+				if($sField=="id" || $sField=="imya" || $sField=="state") {
+					if(isset($aCurrent)) { continue; }
+					$sField .= "_".$sHash;
+				}
+				$aField["type"] = \strtoupper($aField["type"]);
+				$aField["default"] = (!empty($aField["default"])) ? $aField["default"] : "NONE";
+				$aField["attrs"] = (!empty($aField["attributes"])) ? \strtoupper($aField["attributes"]) : "--";
+				$aField["index"] = (!empty($aField["index"])) ? \strtoupper($aField["index"]) : "--";
+				$aField["null"] = $aField["nullable"]=="YES" ? true : false;
+				unset($aField["attributes"], $aField["nullable"], $aField["extra"]);
+
+				if(isset($aCurrent) && \array_key_exists($sField, $aCurrent)) {
+					unset($aCurrent[$sField]);
+					if(
+						(\array_key_exists("type", $this->owl["def"][$sObject][$sField]) && $this->owl["def"][$sObject][$sField]["type"] != $aField["type"]) ||
+						(\array_key_exists("length", $this->owl["def"][$sObject][$sField]) && $this->owl["def"][$sObject][$sField]["length"] != $aField["length"]) ||
+						(\array_key_exists("default", $this->owl["def"][$sObject][$sField]) && $this->owl["def"][$sObject][$sField]["default"] != $aField["default"]) ||
+						(\array_key_exists("index", $this->owl["def"][$sObject][$sField]) && $this->owl["def"][$sObject][$sField]["index"] != $aField["index"]) ||
+						(\array_key_exists("attrs", $this->owl["def"][$sObject][$sField]) && $this->owl["def"][$sObject][$sField]["attrs"] != $aField["attrs"]) ||
+						(\array_key_exists("null", $this->owl["def"][$sObject][$sField]) && $this->owl["def"][$sObject][$sField]["null"] != $aField["null"]) ||
+						(\array_key_exists("comment", $this->owl["def"][$sObject][$sField]) && $this->owl["def"][$sObject][$sField]["comment"] != $aField["comment"])
+					) {
+						$sNestCode .= '-$: alter ["'.$sField.'", '.\json_encode($aField).']'."\n";
+					}
+				} else {
+					$sNestCode .= '-$: add ["'.$sField.'", '.\json_encode($aField).']'."\n";
+				}
+			}
+
+			if(isset($aCurrent) && \count($aCurrent)) {
+				foreach($aCurrent as $sField) {
+					$sNestCode .= '-$: rem "'.$sField.'"'."\n";
+				}
+			}
+
+			return $sNestCode;
+		}
+
+		return "";
 	}
 
 	public function regenerate() {
@@ -634,6 +688,7 @@ class nglNest extends nglBranch {
 		$aJSON = $aOWL;
 		foreach($aJSON["def"] as &$aJsonTable) {
 			foreach($aJsonTable as &$aJsonField) {
+				if(!\array_key_exists("comment", $aJsonField)) { $aJsonField["comment"] = ""; }
 				unset($aJsonField["oldname"], $aJsonField["oldindex"]);
 			}
 		}
@@ -662,7 +717,10 @@ class nglNest extends nglBranch {
 
 		// RENAME / DROP TABLE
 		if(\is_array($this->aAlterTable) && \count($this->aAlterTable)) {
-			$sSQLStructure .= "RENAME TABLE ".\implode(", ", $this->aAlterTable).";\n\n";
+			foreach($this->aAlterTable as $sTable =>$aTable) {
+				if(isset($aTable["comment"])) { $sSQLStructure .= "ALTER TABLE `".$sTable."` COMMENT '".\addslashes($aTable["comment"])."';\n"; }
+				if(isset($aTable["rename"])) { $sSQLStructure .= "RENAME TABLE `".$sTable."` TO `".$aTable["rename"]."`;\n"; }
+			}
 		}
 
 		if($this->bRegenerate) { $this->aStarred = []; }
@@ -720,7 +778,8 @@ class nglNest extends nglBranch {
 				$sColumns = '["'.\implode('","', \array_keys($aColumns)).'"]';
 				$sColumns = $db->escape($sColumns);
 				$sCode = \substr(self::call()->strimya($sTable), 0, 12);
-				$sSQL .= $db->insert("__ngl_owl_structure__", ["name"=>$sTable, "code"=>$sCode, "columns"=>$sColumns]).";\n";
+				$nRoles = (\array_key_exists("roles", $this->owl["nest"]["objects"][$sTable])) ? $this->owl["nest"]["objects"][$sTable]["roles"] : "0";
+				$sSQL .= $db->insert("__ngl_owl_structure__", ["name"=>$sTable, "code"=>$sCode, "roles"=>$nRoles, "columns"=>$sColumns]).";\n";
 			}
 		}
 		if(isset($aOWL["foreigns"])) {
@@ -989,6 +1048,22 @@ class nglNest extends nglBranch {
 		return $this;
 	}
 
+	public function move() {
+		list($sObject,$sField,$sAfter) = $this->getarguments("entity,field,after", \func_get_args());
+		$sObject = $this->FormatName($sObject);
+		$aFields = $this->owl["tables"][$sObject];
+		if(!isset($aFields[$sAfter])) { $sAfter = true; }
+		$aNewOrder = [];
+		foreach($aFields as $sFieldKey => $sLabel) {
+			if($sFieldKey!==$sField) { $aNewOrder[$sFieldKey] = $sLabel; }
+			if($sFieldKey===$sAfter) { $aNewOrder[$sField] = $aFields[$sField]; }
+		}
+		if($sAfter===true) { $aNewOrder[$sField] = $aFields[$sField]; }
+
+		$this->owl["tables"][$sObject] = $aNewOrder;
+		return $this;
+	}
+
 	public function position() {
 		list($sObject,$nLeft,$nTop) = $this->getarguments("entity,left,top", \func_get_args());
 		$sObject = $this->FormatName($sObject);
@@ -1189,7 +1264,10 @@ class nglNest extends nglBranch {
 			}
 		}
 
-		if(!isset($this->aAdd[$sNewName])) { $this->aAlterTable[] = "`".$sObject."` TO `".$sNewName."`"; }
+		if(!isset($this->aAdd[$sNewName])) {
+			if(!\array_key_exists($sObject, $this->aAlterTable)) { $this->aAlterTable[$sObject] = []; }
+			$this->aAlterTable[$sObject]["rename"] = $sNewName;
+		}
 		$this->SetObject($sNewName);
 		return $this;
 	}
@@ -1270,6 +1348,13 @@ class nglNest extends nglBranch {
 		unset($this->owl["foreigns"][$sJoined]["joins"][$sObject]);
 		unset($this->owl["views"][$sJoined]["joins"][$sObject]);
 		
+		return $this;
+	}
+
+	public function useroles() {
+		list($nRoles) = $this->getarguments("roles", \func_get_args());
+		$sObject = $this->attribute("object");
+		$this->owl["nest"]["objects"][$sObject]["roles"] = $nRoles;
 		return $this;
 	}
 
@@ -1653,8 +1738,8 @@ SQL;
 		if($aField["default"]!="NONE" && $aField["default"]!="'NONE'") {
 			$sDefault = "DEFAULT ".$aField["default"];
 		}
-
-		return $sNameType." ".$nLength." ".$sAttribs." ".$sNull." ".$sDefault;
+		$sComments = !empty($aField["comment"]) ? "COMMENT '".\addslashes($aField["comment"])."'" : "";
+		return $sNameType." ".$nLength." ".$sAttribs." ".$sNull." ".$sDefault." ".$sComments;
 	}
 
 	protected function SetObject($sObject) {

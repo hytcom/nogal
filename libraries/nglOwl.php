@@ -429,6 +429,7 @@ SQL;
 				$this->OwLog($vData["imya"], "insert");
 				
 				// roles
+				\nogal\dump($this->AlvinInit());
 				if($bAlvin = $this->AlvinInit()) {
 					$this->db->insert("__ngl_owl_index__", [
 						"imya"	=> $vData["imya"],
@@ -1025,8 +1026,9 @@ SQL;
 	}
 
 	final private function AlvinInit() {
-		if(NGL_ALVIN===null || !$this->argument("alvin") || !self::call("alvin")->loaded()) { return null; }
-		return self::call("alvin")->loaded();
+		if(NGL_ALVIN===null || !$this->argument("alvin")) { return false; }
+		if(!self::call("alvin")->loaded()) { return (self::call("alvin")->reload()===false) ? false : true; }
+		return true;
 	}
 
 	final private function AlvinSQL($sJSQL) {
@@ -1034,14 +1036,15 @@ SQL;
 			$sTableName = ($this->bChildMode) ? $this->sChildTable : $this->sObject;
 			$sRole = self::call("alvin")->role();
 			$role = $this->db->query("SELECT id FROM __ngl_owl_structure__ WHERE name = '".$sTableName."' AND roles = '1'");
-			if(!empty($sRole) && $role->rows()) {
+			if(!empty($sRole) && \strtoupper($sRole)!="ADMIN" && $role->rows()) {
 				$sChain = self::call("alvin")->rolechain();
 				$sRoles = (!empty($sChain)) ? "OR role IN ('".\str_replace(",", "','", $sChain)."')" : "";
 
 				$sHash = self::call()->unique(16);
+				$sHashNot = self::call()->unique(16);
 				$aJSQL = self::call("jsql")->decode($sJSQL);
 				if(isset($aJSQL["where"])) {
-					$aJSQL["where"] = [$aJSQL["where"], "AND", [[$sTableName.".imya", "in", $sHash]]];
+					$aJSQL["where"] = [$aJSQL["where"], "AND", [[$sTableName.".imya", "in", $sHash], "OR", [$sTableName.".imya", "notin", $sHashNot]]];
 				} else {
 					$aJSQL["where"] = [[$sTableName.".imya", "in", $sHash]];
 				}
@@ -1049,6 +1052,7 @@ SQL;
 			
 				// consulta final
 				$sSQL = \str_replace($sHash, "SELECT imya FROM __ngl_owl_index__ WHERE (role IS NULL OR role = '".$sRole."' ".$sRoles.")", $sSQL);
+				$sSQL = \str_replace($sHashNot, "SELECT imya FROM __ngl_owl_index__ WHERE 1", $sSQL);
 			} else {
 				$sSQL = $this->JsqlParser($sJSQL);
 			}

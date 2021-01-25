@@ -4011,10 +4011,7 @@ namespace {
 
 			if(NGL_ALVIN!==null) {
 				if(!$ngl("alvin")->loaded()) {
-					$sUsername	= isset($_SESSION[NGL_SESSION_INDEX]["ALVIN"]["username"]) ? $_SESSION[NGL_SESSION_INDEX]["ALVIN"]["username"] : null;
-					$sToken		= isset($_SESSION[NGL_SESSION_INDEX]["ALVIN"]["alvin"]) ? $_SESSION[NGL_SESSION_INDEX]["ALVIN"]["alvin"] : null;
-					$sProfile	= isset($_SESSION[NGL_SESSION_INDEX]["ALVIN"]["profile"]) ? $_SESSION[NGL_SESSION_INDEX]["ALVIN"]["profile"] : null;
-					if(!$ngl("alvin")->load($sToken, $sUsername, $sProfile)) { return false; }
+					if(!$ngl("alvin")->reload()) { return false; }
 				}
 
 				if($sGrants===null) {

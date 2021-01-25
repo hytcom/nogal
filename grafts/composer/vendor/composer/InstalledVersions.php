@@ -1,5 +1,15 @@
 <?php
 
+
+
+
+
+
+
+
+
+
+
 namespace Composer;
 
 use Composer\Semver\VersionParser;
@@ -19,7 +29,7 @@ private static $installed = array (
     'aliases' => 
     array (
     ),
-    'reference' => '2a7e961aff116549f79469b0aa0ca0fc83c7769e',
+    'reference' => 'bf9861efc61717cb7b953a7b82aa3c1ec6f5f90c',
     'name' => '__root__',
   ),
   'versions' => 
@@ -31,7 +41,7 @@ private static $installed = array (
       'aliases' => 
       array (
       ),
-      'reference' => '2a7e961aff116549f79469b0aa0ca0fc83c7769e',
+      'reference' => 'bf9861efc61717cb7b953a7b82aa3c1ec6f5f90c',
     ),
     'aferrandini/phpqrcode' => 
     array (

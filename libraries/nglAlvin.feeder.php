@@ -78,7 +78,7 @@ CREATE TABLE IF NOT EXISTS `users` (
 	`email` CHAR(96) DEFAULT NULL,
 	`profile` CHAR(32) DEFAULT NULL,
 	`roles` CHAR(255) DEFAULT NULL,
-	`alvin` TEXT DEFAULT NULL COMMENT 'token alvin',
+	`alvin` MEDIUMEXT DEFAULT NULL COMMENT 'token alvin',
 	PRIMARY KEY (`id`)
 ) ENGINE=MyISAM, CHARACTER SET utf8mb4, COLLATE=utf8mb4_unicode_ci COMMENT='Tabla de usuarios del sistema';
 CREATE UNIQUE INDEX `imya` ON `users` (`imya`);
@@ -171,8 +171,10 @@ SQL;
 	public function save($sPassphrase=null) {
 		if($sPassphrase===null) { return self::errorMessage($this->object, 1010); }
 
+		$this->AdminGrants();
+		$aRoles = $this->roles();
 		self::call()->msort($this->aGrants, "ksort");
-		$sGrants = \json_encode(["GRANTS"=>$this->aGrants, "ROLES"=>$this->roles(), "RAW"=>$this->aRAW]);
+		$sGrants = \json_encode(["GRANTS"=>$this->aGrants, "ROLES"=>$aRoles, "RAW"=>$this->aRAW]);
 		$sGrants = self::call("shift")->jsonformat($sGrants, true);
 		$sGrants = self::call("crypt")->type("aes")->key($sPassphrase)->base64(true)->encrypt($sGrants);
 
@@ -182,7 +184,7 @@ SQL;
 			$save->close();
 
 			if($this->crypt) {
-				$sJsonRoles = self::call("shift")->jsonformat(\json_encode($this->roles()), true);
+				$sJsonRoles = self::call("shift")->jsonformat(\json_encode($aRoles), true);
 				if(!$this->sPrivateKey) { return self::errorMessage($this->object, 1008); }
 				$sJsonRoles = $this->crypt->type("rsa")->key($this->sPrivateKey)->encrypt($sJsonRoles);
 				$saveroles = self::call("file")->load($this->sAlvinPath.NGL_DIR_SLASH."roles");
@@ -284,7 +286,7 @@ SQL;
 			if(\is_array($aRoles)) {
 				$tree = self::call("tree")->loadtree($aRoles);
 				$aUserRoles = \explode(",", $sRoles);
-				$aChain = [];
+				$aChain = [$aUserRoles[0]];
 				foreach($aUserRoles as $sRole) {
 					$aChain = \array_merge($aChain, $tree->childrenChain($sRole, null));
 				}
@@ -542,6 +544,9 @@ SQL;
 			return self::errorMessage($this->object, 1012);
 		}
 
+		// perfil y rol admin
+		$this->AdminGrants();
+
 		return $this;
 	}
 
@@ -613,6 +618,15 @@ SQL;
 	// verifica que haya un token cargado
 	public function loaded() {
 		return ($this->aToken!==null);
+	}
+
+	public function reload() {
+		if(empty($_SESSION[NGL_SESSION_INDEX]["ALVIN"])) { return false; }
+		$sUsername	= isset($_SESSION[NGL_SESSION_INDEX]["ALVIN"]["username"]) ? $_SESSION[NGL_SESSION_INDEX]["ALVIN"]["username"] : null;
+		$sToken		= isset($_SESSION[NGL_SESSION_INDEX]["ALVIN"]["alvin"]) ? $_SESSION[NGL_SESSION_INDEX]["ALVIN"]["alvin"] : null;
+		$sProfile	= isset($_SESSION[NGL_SESSION_INDEX]["ALVIN"]["profile"]) ? $_SESSION[NGL_SESSION_INDEX]["ALVIN"]["profile"] : null;
+		if(!$this->load($sToken, $sUsername, $sProfile)) { return false; }
+		return $this;
 	}
 
 	// valida un nombre de perfil
@@ -717,6 +731,12 @@ SQL;
 	public function unload($aUser) {
 		$this->aToken = null;
 		return $this;
+	}
+
+	private function AdminGrants() {
+		if(!\array_key_exists("ADMIN", $this->aGrants["profiles"])) { $this->aGrants["profiles"]["ADMIN"] = []; }
+		$aRoles = $this->roles();
+		if(empty($aRoles) || !\array_key_exists("ADMIN", $aRoles)) { $this->setRole("ADMIN"); }
 	}
 
 	// primero intenta matchear el nombre del perfil

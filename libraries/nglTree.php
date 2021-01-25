@@ -134,15 +134,17 @@ class nglTree extends nglBranch implements inglBranch {
 
 		if(is_array($aSource) && !\count($aSource)) { $aSource = []; }
 		$fBuilder = function($aTree) use (&$fBuilder, &$aFlat, $mChildren) {
-			foreach($aTree as $aBranch) {
-				$aChildren = null;
-				if(isset($aBranch[$mChildren])) {
-					$aChildren = $aBranch[$mChildren];
-					unset($aBranch[$mChildren]);
+			if(is_array($aTree) && \count($aTree)) {
+				foreach($aTree as $aBranch) {
+					$aChildren = null;
+					if(isset($aBranch[$mChildren])) {
+						$aChildren = $aBranch[$mChildren];
+						unset($aBranch[$mChildren]);
+					}
+					
+					$aFlat[] = $aBranch;
+					if($aChildren!==null) { $fBuilder($aChildren); }
 				}
-				
-				$aFlat[] = $aBranch;
-				if($aChildren!==null) { $fBuilder($aChildren); }
 			}
 		};
 		$aFlat = [];		

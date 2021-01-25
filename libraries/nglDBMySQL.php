@@ -95,6 +95,40 @@ class nglDBMySQL extends nglBranch implements iNglDataBase {
 		return $this->query("SHOW GRANTS FOR CURRENT_USER")->getall();
 	}
 
+	public function describe() {
+		list($sTable) = $this->getarguments("table", \func_get_args());
+		$sSplitter = self::call()->unique(6);
+		$describe = $this->query("
+			SELECT 
+				`name`, `type`, `length`, `attributes`, `default`, `nullable`, `index`, `extra`, `comment` 
+				FROM (
+					SELECT 
+						@type := REPLACE(REPLACE(`COLUMN_TYPE`, '(', '".$sSplitter."'), ')', '".$sSplitter."'),
+						@len := ROUND((LENGTH(@type) - LENGTH(REPLACE(@type, '".$sSplitter."', '') )) / 6),
+						`COLUMN_NAME` AS 'name', 
+						TRIM(SUBSTRING_INDEX(@type, '".$sSplitter."', 1)) AS 'type',
+						IF(@len>=2, TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(@type, '".$sSplitter."', 2), '".$sSplitter."', -1)), '') AS 'length',
+						IF(@len>=2, TRIM(SUBSTRING_INDEX(@type, '".$sSplitter."', -1)), '') AS 'attributes',
+						`COLUMN_DEFAULT` AS 'default', 
+						`IS_NULLABLE` AS 'nullable', 
+						CASE 
+							WHEN `COLUMN_KEY`='PRI' THEN 'PRIMARY' 
+							WHEN `COLUMN_KEY`='UNI' THEN 'UNIQUE' 
+							WHEN `COLUMN_KEY`='MUL' THEN 'INDEX' 
+							ELSE '' 
+						END AS 'index', 
+						`EXTRA` AS 'extra', 
+						`COLUMN_COMMENT` AS 'comment'
+					FROM `information_schema`.`COLUMNS` 
+					WHERE 
+						`TABLE_SCHEMA` = '".$this->argument("base")."' AND 
+						`TABLE_NAME` = '".$sTable."'
+				) info
+		");
+
+		return ($describe->rows()) ? $describe->getall() : null;
+	}
+
 	public function destroy() {
 		foreach($this->aQueries as $query) {
 			self::call($query)->destroy();
