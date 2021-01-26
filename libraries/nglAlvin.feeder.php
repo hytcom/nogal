@@ -269,7 +269,7 @@ SQL;
 	// valida un nombre de rol o una cadena de ellos separados por ,
 	// si el nombre es nulo y hay un token cargado, intenta retornar el role del mismo
 	public function role($sRoles=null) {
-		if($sRoles===null && $this->aToken!==null) { return $this->aToken["role"]; }
+		if($sRoles===null) { return ($this->aToken!==null && !empty($this->aToken["role"])) ? $this->aToken["role"] : null; }
 		$aRoles = \explode(",", $sRoles);
 		foreach($aRoles as $x => $sRole) {
 			$aRoles[$x] = $this->GrantName($sRole, false);
