@@ -1027,7 +1027,7 @@ SQL;
 
 	final private function AlvinInit() {
 		if(NGL_ALVIN===null || !$this->argument("alvin")) { return false; }
-		if(!self::call("alvin")->loaded()) { return (self::call("alvin")->reload()===false) ? false : true; }
+		if(!self::call("alvin")->loaded()) { return (self::call("alvin")->autoload()===false) ? false : true; }
 		return true;
 	}
 

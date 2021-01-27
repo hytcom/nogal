@@ -353,10 +353,11 @@ SQL;
 	}
 
 	// agrega un permiso a la estructura
-	public function setGrant($sType, $sName, $mGrant) {
+	public function setGrant($sType, $sName, $mGrant=null) {
 		$this->chkType($sType);
 		$sName = $this->GrantName($sName);
 		if($sName===false) { self::errorMessage($this->object, 1011, null, "die"); }
+		if($sType=="grants" && $mGrant===null) { $mGrant = $sName; }
 		
 		$sIndex = $this->FindGrant($sName, false, $sType);
 		
@@ -620,7 +621,7 @@ SQL;
 		return ($this->aToken!==null);
 	}
 
-	public function reload() {
+	public function autoload() {
 		if(empty($_SESSION[NGL_SESSION_INDEX]["ALVIN"])) { return false; }
 		$sUsername	= isset($_SESSION[NGL_SESSION_INDEX]["ALVIN"]["username"]) ? $_SESSION[NGL_SESSION_INDEX]["ALVIN"]["username"] : null;
 		$sToken		= isset($_SESSION[NGL_SESSION_INDEX]["ALVIN"]["alvin"]) ? $_SESSION[NGL_SESSION_INDEX]["ALVIN"]["alvin"] : null;

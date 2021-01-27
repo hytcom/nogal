@@ -277,7 +277,7 @@ class nglTree extends nglBranch implements inglBranch {
 			$this->ChildrenChainer($aChain, $aChildren, $mIndex, $mChildren);
 			return ($sSeparator===null) ? $aChain : \implode($sSeparator, $aChain);
 		}
-		return "";
+		return [];
 	}
 
 	private function ChildrenChainer(&$aChain, $aData, $mIndex, $mChildren) {

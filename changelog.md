@@ -1,3 +1,18 @@
+# 2.8.6 - 202101271800
+## general
+- se cambió el método alvin **reload** por **autoload** en los objetos **owl** y **rind**
+
+## alvin
+- el método **setGrant** ahora acepta 2 argumentos para la creación de un **grant**
+- se renombró el método **reload** a **autoload**
+
+## tree
+- fix error en el método **childrenChain**
+
+## tutor
+- se activó el chequeo de permisos en el método **Alvin**
+
+________________________________________________________________________________
 # 2.8.5 - 202101252000
 ## alvin
 - nuevos métodos **reload** y **AdminGrants**

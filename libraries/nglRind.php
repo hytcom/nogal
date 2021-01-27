@@ -4011,7 +4011,7 @@ namespace {
 
 			if(NGL_ALVIN!==null) {
 				if(!$ngl("alvin")->loaded()) {
-					if(!$ngl("alvin")->reload()) { return false; }
+					if(!$ngl("alvin")->autoload()) { return false; }
 				}
 
 				if($sGrants===null) {

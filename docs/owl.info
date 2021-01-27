@@ -1,6 +1,6 @@
 [checksum]
-md5 = "e63364ba0b17dc2713d2e2984a022d55"
-sha1 = "6b2cd3385a7b68a739540cd63ee36dec600a1ab1"
+md5 = "1670eda95646d63a707d209a34a9f787"
+sha1 = "24b1622ccbe13077648a8cc69cff273eda21ba2b"
 
 [documentation]
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/owl.md"
