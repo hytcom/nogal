@@ -1694,7 +1694,7 @@ SQL;
 	}
 
 	private function DescribeColumns($sTable, $sAlias) {
-		$aColumns = (isset($this->owl["tables"][$sTable])) ? $this->owl["tables"][$sTable] : $this->owl["views"][$sTable]["fields"];
+		$aColumns = (isset($this->owl["tables"][$sTable])) ? $this->owl["tables"][$sTable] : (isset($this->owl["views"][$sTable]) ? $this->owl["views"][$sTable]["fields"] : []);
 		$aDescribe = [];
 		foreach($aColumns as $sColumn => $sLabel) {
 			$aDescribe[] = "`".$sAlias."`.`".$sColumn."` AS '".$sAlias."_".$sColumn."'";

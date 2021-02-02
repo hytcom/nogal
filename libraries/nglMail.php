@@ -222,6 +222,10 @@ class nglMail extends nglBranch implements iNglClient {
 		$vAttributes["mail_html"]		= null;
 		$vAttributes["mail_priority"]	= null;
 		$vAttributes["mail_notify"]		= null;
+		
+		$vAttributes["getted"]			= null;
+		$vAttributes["getted_id"]		= null;
+		$vAttributes["getted_keys"]		= null;
 
 		$vAttributes["state"]			= null;
 		$vAttributes["log"]				= null;
@@ -519,7 +523,8 @@ class nglMail extends nglBranch implements iNglClient {
 
 	public function get() {
 		list($nMailId) = $this->getarguments("mail", \func_get_args());
-		
+		if($nMailId==$this->attribute("getted_id")) { return $this->attribute("getted"); }
+
 		if($this->sServerType=="imap") {
 			$sResponse = $this->Fetch($nMailId, "BODY[]");
 		} else {
@@ -614,6 +619,9 @@ class nglMail extends nglBranch implements iNglClient {
 			}
 		}
 
+		$this->attribute("getted", $aMail);
+		$this->attribute("getted_id", $nMailId);
+		$this->attribute("getted_keys", self::call()->arrayKeysR($aMail));
 		return $aMail;
 	}
 

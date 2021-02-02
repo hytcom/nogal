@@ -340,6 +340,19 @@ class nglFn extends nglTrunk {
 		return ($nFound) ? $aSource : false;
 	}
 
+	public function arrayKeysR($aArray) {
+		$aKeys = [];
+		foreach($aArray as $mKey => $aSubArray) {
+			if(\is_array($aSubArray)) {
+				if(self::call()->isArrayArray($aSubArray)) { $aSubArray = \current($aSubArray); }
+				$aKeys[$mKey] = self::call()->arrayKeysR($aSubArray);
+			} else {
+				$aKeys[$mKey] = $mKey;
+			}
+		}
+		return $aKeys;
+	}
+
 	/** FUNCTION {
 		"name" : "arrayGoto", 
 		"type" : "public",
@@ -1577,6 +1590,7 @@ class nglFn extends nglTrunk {
 
 		// chequeo de codificaciones comunes o pasadas por el usuario
 		foreach($aEncoding as $sEncoding) {
+			if(!\strstr($sEncoding, "//")) { $sEncoding .= "//IGNORE"; }
 			$sSample = \iconv($sEncoding, $sEncoding, $sString);
 			if(\md5($sSample)==$sMD5) {
 				return ($bStrict) ? true : $sEncoding;
@@ -1588,6 +1602,7 @@ class nglFn extends nglTrunk {
 		// chequedo de codificaciones occidentales
 		$aEncoding = $aEncodingEuropeans;
 		foreach($aEncoding as $sEncoding) {
+			if(!\strstr($sEncoding, "//")) { $sEncoding .= "//IGNORE"; }
 			$sSample = @\iconv($sEncoding, $sEncoding, $sString);
 			if(\md5($sSample)==$sMD5) {
 				return ($bStrict) ? true : $sEncoding;
@@ -1833,7 +1848,8 @@ class nglFn extends nglTrunk {
 		"type" : "public",
 		"description" : "
 			Comprueba si <b>$aArray</b> es un Array de Arrays. 
-			Con <b>$bStrict</b> FALSE sólo chequeará que el primer valor de <b>$aArray</b> sea un array. Si es TRUE verificará que todos los valores sean del tipo array.
+			Con <b>$bStrict</b> FALSE sólo chequeará que el primer y ultimo valor de <b>$aArray</b> sean un arrays y tengan las mismas claves.
+			Si es TRUE verificará que todos los valores sean del tipo array y tengan las mismas claves
 		",
 		"parameters" : { 
 			"$aArray" : ["array", "Array a comprobar"], 
@@ -1845,12 +1861,15 @@ class nglFn extends nglTrunk {
 		if(\is_array($aArray)) {
 			\reset($aArray);
 			if(!$bStrict) {
-				$mValue = \current($aArray);
-				return (\is_array($mValue));
+				$aFirst = \current($aArray);
+				$aLast = \end($aArray);
+				return (\is_array($aFirst) && \is_array($aLast) && (\array_keys($aFirst)==\array_keys($aLast)));
 			}
 
+			$aFirst = \current($aArray);
+			$aFirstKeys = \array_keys($aFirst);
 			foreach($aArray as $mValue) {
-				if(!\is_array($mValue)) { return false; }
+				if(!\is_array($mValue) || $aFirstKeys!=\array_keys($mValue)) { return false; }
 			}
 
 			return true;

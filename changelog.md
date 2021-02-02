@@ -1,3 +1,19 @@
+# 2.8.7 - 202102021500
+## fn
+- nuevo método **arrayKeysR**
+- se mejoraron los métodos **encoding** y **isArrayArray**
+
+## mail
+- se añadieron los atributos **getted**, **getted_id** y **getted_keys**
+- mejora en el método **get**
+
+## nest
+- fix error en **DescribeColumns**git
+
+## owl
+- fix error en **insert**
+
+________________________________________________________________________________
 # 2.8.6 - 202101271800
 ## general
 - se cambió el método alvin **reload** por **autoload** en los objetos **owl** y **rind**

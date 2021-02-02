@@ -429,7 +429,6 @@ SQL;
 				$this->OwLog($vData["imya"], "insert");
 				
 				// roles
-				\nogal\dump($this->AlvinInit());
 				if($bAlvin = $this->AlvinInit()) {
 					$this->db->insert("__ngl_owl_index__", [
 						"imya"	=> $vData["imya"],
