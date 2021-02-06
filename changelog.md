@@ -1,3 +1,12 @@
+# 2.8.8 - 202102061400
+## mail
+- reestructuraciones generales
+- cambios en los headers, nuevos métodos y la posibilidad de responder a un mail determniado
+
+## rind
+- se modificaron los métodos **stamp** y **SetPaths**, permitiendo ahora imprimir plantilas con rutas relativas al proyecto, desde cualquier ubicación
+
+________________________________________________________________________________
 # 2.8.7 - 202102021500
 ## fn
 - nuevo método **arrayKeysR**

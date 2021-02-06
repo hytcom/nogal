@@ -169,7 +169,7 @@ namespace nogal {
 			$vAttributes["project_path"]		= null;
 			$vAttributes["gui_url"]				= null;
 			$vAttributes["gui_path"]			= null;
-			$vAttributes["template_path"]		= null;
+			$vAttributes["relative_path"]		= null;
 			$vAttributes["template_url"]		= null;
 			$vAttributes["cache_path"]			= null;
 			$vAttributes["cache_file"]			= null;
@@ -719,7 +719,6 @@ namespace nogal {
 			$sCachePath = $this->attribute("cache_path");
 			$aTree = self::call("files")->ls($sGuiPath, "*.html", "single", true);
 			foreach($aTree as $sFilePath) {
-				$this->attribute("template_path", \dirname($sFilePath));
 				$this->RIND_TEMPLATESLOG	= [];
 				$this->aLoadedCollections	= [];
 				$this->aLoops				= ["self"=>$this->dynVar(), "parent"=>$this->dynVar()];
@@ -1168,7 +1167,13 @@ namespace nogal {
 		protected function PathBuilder($sFileName) {
 			$sScheme = \parse_url($sFileName, PHP_URL_SCHEME);
 			$sScheme = \strtolower($sScheme);
-			$sTemplatePath = $this->attribute("template_path");
+
+			if($sFileName[0]==NGL_DIR_SLASH) {
+				$sFileName = \substr($sFileName, 1);
+				$sTemplatePath = $this->attribute("project_path");
+			} else {
+				$sTemplatePath = self::call()->clearPath($this->attribute("gui_path").NGL_DIR_SLASH.$this->attribute("relative_path"), true);
+			}
 
 			// aborción por HTTP
 			if((!\ini_get("allow_url_fopen") || !$this->argument("http_support")) && $sScheme=="http") {
@@ -1185,7 +1190,6 @@ namespace nogal {
 			if($sScheme=="http" || $sScheme=="https" || \strlen($sBasePaths)) {
 				$sFilePath = $sFileName;
 			} else {
-				$sBasePath = (!\strpos($this->attribute("root_url"), "//www.")) ? \str_replace("//www.", "//", $this->attribute("root_url")) : $this->attribute("root_url");
 				$sFilePath = $sTemplatePath.NGL_DIR_SLASH.$sFileName;
 			}
 
@@ -1240,7 +1244,7 @@ namespace nogal {
 			// si no se especifica un nombre de plantilla se intentará leer el archivo HTML
 			// con el mismo nombre de archivo PHP, dentro de la carpeta GUI correspondiente
 			if(empty($sFileName)) { $sFileName = $vItSelf["filename"].".html"; }
-
+			
 			$sFilePath			= $this->PathBuilder($sFileName);
 			$this->aFilePath	= \pathinfo($sFilePath);
 			$sDirName 			= self::call()->clearPath($this->aFilePath["dirname"]);
@@ -1248,14 +1252,14 @@ namespace nogal {
 			$sBaseDir 			= self::call("files")->basePaths($sGUIPath, $sDirName);
 			$sFolder			= \str_replace($sBaseDir, "", $sDirName);
 			$sCachePath			= $this->attribute("cache_path");
-
 			$sCacheDir			= self::call()->clearPath($sCachePath.NGL_DIR_SLASH.$sFolder);
 
 			if(\strtolower($sCacheFile)==="self") {
 				$sCacheFile	= $vItSelf["basename"];
 			} else if(empty($sCacheFile)) {
-				$sCacheFile	= $sFileName;
+				$sCacheFile	= ($sFileName[0]==NGL_DIR_SLASH) ? \basename($sPHPFile) : $sFileName;
 			}
+
 			$sCacheFile	= $sCacheDir.NGL_DIR_SLASH.$sCacheFile;
 			$this->attribute("cache_file", $sCacheFile);
 
@@ -1819,7 +1823,7 @@ namespace nogal {
 				Este método deberá ser ejecutado siempre que los valores de los argumentos involucrados sean alterados para los cambios surgan efecto.
 			",
 			"input" : "cache,gui,root,scheme",
-			"output" : "cache_path,gui_path,gui_url,root_url,template_path,template_url",
+			"output" : "project_path,cache_path,gui_path,gui_url,root_url,relative_path,template_url",
 			"return" : "$this"
 		} **/
 		private function SetPaths() {
@@ -1836,30 +1840,31 @@ namespace nogal {
 			// directorio de cache
 			$sCachePath = ($sCache!==null) ? self::call()->clearPath($sCache, false, NGL_DIR_SLASH, true) : $sRoot;
 
+			// project path
+			$sProjectPath 	= \realpath(NGL_PATH_PROJECT);
+			$nProjectPath 	= \strlen($sProjectPath);
+			$sProjectPath	= self::call()->clearPath($sProjectPath, false, NGL_DIR_SLASH, true);
+
 			// ruta de la carpeta GUI
-			$sGUIPath = ($sGUI!==null) ? self::call()->clearPath($sGUI, false, NGL_DIR_SLASH, true) : $sRoot;
+			$sGUIPath	= ($sGUI!==null) ? self::call()->clearPath($sGUI, false, NGL_DIR_SLASH, true) : $sRoot;
+			$sGUIPath 	= \realpath($sGUIPath);
+			$sGUIPath 	= $sProjectPath.\substr($sGUIPath, $nProjectPath);
+			$sGUIPath 	= self::call()->clearPath($sGUIPath, false, NGL_DIR_SLASH, true);
 
 			// ruta del archivo .php que hace la peticion
 			if($sCurrentDir===null) {
 				$sCurrentDir = self::call()->clearPath(\dirname($this->sPHPFile), false, NGL_DIR_SLASH, true);
 			}
-			// die($sCurrentDir."\n");
 
 			// rutas relativas
 			$sRelativePath	= self::call()->clearPath(\str_replace($sRoot, "", $sCurrentDir));
 			$sRelativeGUI	= self::call()->clearPath(\str_replace($sRoot, "", $sGUIPath));
-			// die($sRelativePath." --- ".$sRelativeGUI);
 			
-			// ruta del archivo template
-			$sTemplatePath = self::call()->clearPath($sGUIPath.NGL_DIR_SLASH.$sRelativePath, true);
-			// die($sRelativePath." --- ".$sGUIPath);
-
 			// URLs
 			// protocolo
 			$sScheme = ($sScheme!==null) ? \strtolower($sScheme) : "http";
 			
 			// url del archivo .php que hace la peticion
-			//$sURLSelf = self::call()->clearPath($sScheme."://".$_SERVER["HTTP_HOST"].$sRelativePath);
 			$sURLSelf = self::call()->clearPath(NGL_URL.$sRelativePath);
 
 			// url del sitio para modo de seguimiento de plantillas
@@ -1889,29 +1894,22 @@ namespace nogal {
 			$sTemplateURL	= self::call()->clearPath($sTemplateURL);
 
 			// atributos
-			$sProjectPath 	= \realpath(NGL_PATH_PROJECT);
-			$nProjectPath 	= \strlen($sProjectPath);
-			$sGUIPath 		= \realpath($sGUIPath);
-			$sGUIPath 		= $sProjectPath.\substr($sGUIPath, $nProjectPath);
-			$sGUIPath 		= self::call()->clearPath($sGUIPath, false, NGL_DIR_SLASH, true);
-			$sProjectPath	= self::call()->clearPath($sProjectPath, false, NGL_DIR_SLASH, true);
-
 			// print("project_path: ".$sProjectPath."\n");
 			// print("root_url: ".$sRootURL."\n");
 			// print("gui_path: ".$sGUIPath."\n");
 			// print("gui_url: ".$sGUIURL."\n");
-			// print("template_path: ".$sTemplatePath."\n");
+			// print("relative_path: ".$sRelativePath."\n");
 			// print("template_url: ".$sTemplateURL."\n");
 			// print("cache_path: ".$sCachePath."\n");
 			// exit("\nfin de setpaths");
 			
 			$this->attribute("project_path", 	$sProjectPath);
+			$this->attribute("relative_path",	$sRelativePath);
+			$this->attribute("cache_path", 		$sCachePath);
 			$this->attribute("root_url", 		$sRootURL);
 			$this->attribute("gui_path", 		$sGUIPath);
 			$this->attribute("gui_url", 		$sGUIURL);
-			$this->attribute("template_path",	$sTemplatePath);
 			$this->attribute("template_url", 	$sTemplateURL);
-			$this->attribute("cache_path", 		$sCachePath);
 			
 			return $this;
 		}
@@ -1969,12 +1967,13 @@ namespace nogal {
 		public function showPaths() {
 			$this->SetPaths();
 			return [
-				"root_url" => $this->attribute("root_url"),
+				"project_path" => $this->attribute("project_path"),
+				"relative_path" => $this->attribute("relative_path"),
 				"gui_path" => $this->attribute("gui_path"),
+				"cache_path" => $this->attribute("cache_path"),
+				"root_url" => $this->attribute("root_url"),
 				"gui_url" => $this->attribute("gui_url"),
-				"template_path" => $this->attribute("template_path"),
-				"template_url" => $this->attribute("template_url"),
-				"cache_path" => $this->attribute("cache_path")
+				"template_url" => $this->attribute("template_url")
 			];
 		}
 
