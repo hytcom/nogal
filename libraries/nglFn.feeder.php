@@ -1835,6 +1835,7 @@ class nglFn extends nglTrunk {
 	} **/
 	public function intPart($mNumber=null) {
 		if($mNumber===null || $mNumber==="" || \is_array($mNumber)) { return null; }
+		$mNumber = (string)$mNumber;
 		$sSing = ($mNumber[0]=="-") ? $mNumber[0] : "";
 		$sNumber = \preg_replace("/[^\.\,\d]/", "", $mNumber);
 		$sNumber = \str_replace(",", ".", $sNumber);
