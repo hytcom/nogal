@@ -169,6 +169,7 @@ class nglMail extends nglBranch implements iNglClient {
 	private $nSMTPMaxSize;
 	private $sRegexMail;
 	private $sContentKey;
+	private $bLogged;
 
 	final protected function __declareArguments__() {
 		$vArguments								= [];
@@ -182,7 +183,7 @@ class nglMail extends nglBranch implements iNglClient {
 		$vArguments["flags"]					= ['$mValue', null]; /* separadas por espacios y sin la \ */
 		$vArguments["folder"]					= ['$mValue', "INBOX"];
 		$vArguments["from"]						= ['$this->MailAddress((string)$mValue, "from")'];
-		$vArguments["get_mode"]					= ['$mValue', "all"]; // all | keys
+		$vArguments["get_mode"]					= ['$mValue', "headers"]; // headers | all | keys
 		$vArguments["headers"]					= ['$mValue', "DATE FROM SUBJECT"];
 		$vArguments["host"]						= ['$mValue'];
 		$vArguments["inreplyto"]				= ['$mValue', null]; /* id del mail al que se esta respondiendo */
@@ -210,32 +211,33 @@ class nglMail extends nglBranch implements iNglClient {
 	}
 
 	final protected function __declareAttributes__() {
-		$vAttributes					= [];
-		$vAttributes["mail_headers"]	= null;
-		$vAttributes["mail_body"]		= null;
+		$vAttributes						= [];
+		$vAttributes["mail_headers"]		= null;
+		$vAttributes["mail_body"]			= null;
 
-		$vAttributes["mail_from"]		= null;
-		$vAttributes["mail_from_mail"]	= null;
-		$vAttributes["mail_reply"]		= null;
-		$vAttributes["mail_to"]			= null;
-		$vAttributes["mail_cc"]			= null;
-		$vAttributes["mail_bcc"]		= null;
+		$vAttributes["mail_from"]			= null;
+		$vAttributes["mail_from_mail"]		= null;
+		$vAttributes["mail_reply"]			= null;
+		$vAttributes["mail_to"]				= null;
+		$vAttributes["mail_cc"]				= null;
+		$vAttributes["mail_bcc"]			= null;
 		
-		$vAttributes["mail_subject"]	= null;
-		$vAttributes["mail_text"]		= null;
-		$vAttributes["mail_html"]		= null;
-		$vAttributes["mail_priority"]	= null;
-		$vAttributes["mail_notify"]		= null;
+		$vAttributes["mail_subject"]		= null;
+		$vAttributes["mail_text"]			= null;
+		$vAttributes["mail_html"]			= null;
+		$vAttributes["mail_priority"]		= null;
+		$vAttributes["mail_notify"]			= null;
 		
-		$vAttributes["getted"]			= null;
-		$vAttributes["getted_id"]		= null;
-		$vAttributes["getted_keys"]		= null;
+		$vAttributes["getted"]				= null;
+		$vAttributes["getted_id"]			= null;
+		$vAttributes["getted_keys"]			= null;
+		$vAttributes["currret_mailbox"]		= null;
 
-		$vAttributes["state"]			= null;
-		$vAttributes["log"]				= null;
+		$vAttributes["state"]				= null;
+		$vAttributes["log"]					= null;
 
-		$vAttributes["exists"]			= null;
-		$vAttributes["recent"]			= null;
+		$vAttributes["exists"]				= null;
+		$vAttributes["recent"]				= null;
 		
 		return $vAttributes;
 	}
@@ -260,6 +262,7 @@ class nglMail extends nglBranch implements iNglClient {
 	}
 
 	final public function __init__() {
+		$this->bLogged = false;
 	}
 
 	public function attach() {
@@ -552,6 +555,7 @@ class nglMail extends nglBranch implements iNglClient {
 	}
 
 	public function get() {
+		if($this->bLogged) { $this->connect()->login()->mailbox($this->attribute("currret_mailbox")); }
 		list($nMailId,$sGetMode) = $this->getarguments("mail,get_mode", \func_get_args());
 		$nMailId = $this->MailsIds($nMailId, true);
 		$sGetMode = strtolower($sGetMode);
@@ -559,14 +563,30 @@ class nglMail extends nglBranch implements iNglClient {
 			return ($sGetMode=="keys") ? $this->attribute("getted_keys") : $this->attribute("getted");
 		}
 
-		if($this->sServerType=="imap") {
-			$aResponse = $this->Fetch($nMailId, "BODY[]");
+		if($sGetMode=="headers") {
+			return $this->headers($nMailId);
 		} else {
-			$aResponse = $this->Fetch($nMailId);
+			if($this->sServerType=="imap") {
+				$aResponse = $this->Fetch($nMailId, "BODY[]");
+			} else {
+				$aResponse = $this->Fetch($nMailId);
+			}
 		}
 
-		$sResponse = current($aResponse);
-		$vMailParts = \explode($this->sCRLF.$this->sCRLF, $sResponse, 2);
+		if(\is_array($aResponse)) {
+			$aMail = $this->MailParser(\current($aResponse));
+			$aKeys = self::call()->arrayKeysR($aMail);
+			$this->attribute("getted", $aMail);
+			$this->attribute("getted_id", $nMailId);
+			$this->attribute("getted_keys", $aKeys);
+			return ($sGetMode=="keys") ? $aKeys : $aMail;
+		}
+
+		return false;
+	}
+
+	private function MailParser($sMailContent) {
+		$vMailParts = \explode($this->sCRLF.$this->sCRLF, $sMailContent, 2);
 
 		// mail
 		$aMail = [];
@@ -582,15 +602,17 @@ class nglMail extends nglBranch implements iNglClient {
 
 		// from, to, subject
 		$aMail["timestamp"] = \strtotime($aMail["headers"]["Date"]);
-		$aMail["from"] = $this->PrepareMails($aMail["headers"]["From"]);
-		$aMail["from"] = $aMail["from"][0];
+		$aFrom = $this->PrepareMails($aMail["headers"]["From"], true);
+		$aMail["from"] = $aFrom[0];
+		$aMail["from_name"] = $aFrom[1];
+		$aMail["from_address"] = $aFrom[2];
 		$aMail["to"] = $this->PrepareMails($aMail["headers"]["To"])[0];
-		if(\array_key_exists("Cc", $aMail["headers"])) { $aMail["cc"] = $this->PrepareMails($aMail["headers"]["Cc"]); }
-		if(\array_key_exists("Cco", $aMail["headers"])) { $aMail["cco"] = $this->PrepareMails($aMail["headers"]["Cco"]); }
+		$aMail["cc"] = \array_key_exists("Cc", $aMail["headers"]) ? $this->PrepareMails($aMail["headers"]["Cc"]) : "";
+		$aMail["cco"] = \array_key_exists("Cco", $aMail["headers"]) ? $this->PrepareMails($aMail["headers"]["Cco"]) : "";
 		$aMail["subject"] = $aMail["headers"]["Subject"];
 
 		// body
-		\preg_match_all("/boundary=\"?([a-z0-9\'\(\)\+\_\,\-\.\/\:\=\?]+)\"?/is", $sResponse, $aBoundary);
+		\preg_match_all("/boundary=\"?([a-z0-9\'\(\)\+\_\,\-\.\/\:\=\?]+)\"?/is", $sMailContent, $aBoundary);
 
 		$aBoundaries = [];		
 		foreach($aBoundary[1] as $sBoundary) {
@@ -609,8 +631,6 @@ class nglMail extends nglBranch implements iNglClient {
 			if(empty($sFragment)) { continue; }
 
 			$aFragment = \explode($this->sCRLF, $sFragment);
-			// print_r($aFragment); exit();
-
 			$bSave = false;
 			$sContent = "";
 			$sLastKey = null;
@@ -655,11 +675,7 @@ class nglMail extends nglBranch implements iNglClient {
 			}
 		}
 
-		$aKeys = self::call()->arrayKeysR($aMail);
-		$this->attribute("getted", $aMail);
-		$this->attribute("getted_id", $nMailId);
-		$this->attribute("getted_keys", $aKeys);
-		return ($sGetMode=="keys") ? $aKeys : $aMail;
+		return $aMail;
 	}
 
 	/**
@@ -689,11 +705,12 @@ class nglMail extends nglBranch implements iNglClient {
 		UNKEYWORD "string" - match messages that do not have the keyword "string"
 		UNSEEN - match messages which have not been read yet 
 	**/
-	public function getAll() {
+	public function getall() {
 		if($this->sServerType=="smtp") {
 			return false;
 		} else if($this->sServerType=="imap") {
-			list($sSearch,$nLimit,$sHeaders) = $this->getarguments("search,limit,headers", \func_get_args());
+			if($this->bLogged) { $this->connect()->login()->mailbox($this->attribute("currret_mailbox")); }
+			list($sSearch,$nLimit,$sGetMode) = $this->getarguments("search,limit,get_mode", \func_get_args());
 			if($sSearch===null) { $sSearch = "ALL"; }
 			$vResponse = $this->request("SEARCH ".$sSearch);
 			$sResult = \str_replace("* SEARCH ", "", $vResponse["text"]);
@@ -714,30 +731,46 @@ class nglMail extends nglBranch implements iNglClient {
 		// mas nuevos primero
 		if($this->argument("revert")) { $aResult = \array_reverse($aResult); }
 		$aGet = \array_slice($aResult, 0, $nLimit);
-		if(empty($sHeaders)) { $sHeaders = "DATE FROM SUBJECT"; }
-		$aHeaders = $this->headers($aGet, $sHeaders);
+		if($sGetMode=="headers") {
+			$aResponse = $this->headers($aGet);
+		} else if($sGetMode=="keys") {
+			$aResponse = $this->Fetch(\current($aGet), "BODY[]");
+
+		} else {
+			$sMailsId = $this->MailsIds($aGet);
+			$aMails = $this->Fetch($sMailsId, "BODY[]");
+			$aResponse = [];
+			foreach($aMails as $nMail => $sMail) {
+				$aResponse[$nMail] = $this->MailParser($sMail);
+			}
+		}
+
 		$this->unflag($aGet, "seen");
-		return $aHeaders;
+		return $aResponse;
 	}
 
 	public function getraw() {
 		list($nMailId) = $this->getarguments("mail", \func_get_args());
 		$nMailId = $this->MailsIds($nMailId, true);
 		if($this->sServerType=="imap") {
+			if($this->bLogged) { $this->connect()->login()->mailbox($this->attribute("currret_mailbox")); }
 			return $this->Fetch($nMailId, "BODY[]");
 		} else {
 			return $this->Fetch($nMailId);
 		}
-
 		return false;
 	}
 
 	public function getreplyto() {
 		list($nMailId) = $this->getarguments("mail", \func_get_args());
 		$nMailId = $this->MailsIds($nMailId, true);
-		$aHeaders = $this->headers($nMailId, "MESSAGE-ID REFERENCES");
-		$this->unflag($nMailId, "seen");
-		return $aHeaders;
+		if($this->sServerType=="imap") {
+			if($this->bLogged) { $this->connect()->login()->mailbox($this->attribute("currret_mailbox")); }
+			$aHeaders = $this->headers($nMailId, "MESSAGE-ID REFERENCES");
+			$this->unflag($nMailId, "seen");
+			return $aHeaders;
+		}
+		return false;
 	}
 
 	public function headers() {
@@ -844,6 +877,7 @@ class nglMail extends nglBranch implements iNglClient {
 
 			if($this->FindMark($vResponse["text"])) {
 				$this->attribute("state", "AUTHENTICATED");
+				$this->bLogged = true;
 				return $this;
 			}
 		}
@@ -857,11 +891,9 @@ class nglMail extends nglBranch implements iNglClient {
 		if($this->attribute("state")=="AUTHENTICATED") {
 			if($this->sServerType=="imap") {
 				$vResponse = $this->request("SELECT ".$sMailBox);
-
 				if($this->FindMark($vResponse["text"], "* OK")) {
 					\preg_match("/\* ([\d]+) EXISTS/s", $vResponse["text"], $aExists);
 					\preg_match("/\* ([\d]+) RECENT/s", $vResponse["text"], $aRecent);
-
 					if(\array_key_exists(1, $aExists)) { $this->attribute("exists", (int)$aExists[1]); }
 					if(\array_key_exists(1, $aRecent)) { $this->attribute("recent", (int)$aRecent[1]); }
 					$this->attribute("state", "SELECTED");
@@ -876,6 +908,7 @@ class nglMail extends nglBranch implements iNglClient {
 				}
 			}
 			
+			$this->attribute("currret_mailbox", $sMailBox);
 			return $this;
 		}
 
@@ -1034,7 +1067,6 @@ class nglMail extends nglBranch implements iNglClient {
 
 	public function request() {
 		list($sMessage,$sMark) = $this->getarguments("command,mark", \func_get_args());
-
 		$sMessage = (($this->sServerType=="imap") ? $this->Tag(true)." " : "").$sMessage.$this->sCRLF;
 		@\fputs($this->socket, $sMessage);
 		$this->Logger("<< ".$sMessage); 

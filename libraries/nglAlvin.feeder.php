@@ -202,13 +202,13 @@ SQL;
 	private function BackupGrants() {
 		$aBackups = self::call("files")->ls($this->sAlvinPath.NGL_DIR_SLASH, "*.bak", "info");
 		$aBackups = self::call()->arrayMultiSort($aBackups, [["field"=>"timestamp", "order"=>"desc", "type"=>2]]);
-		$aBackups = array_slice($aBackups, 6);
-		if(count($aBackups)) {
+		$aBackups = \array_slice($aBackups, 6);
+		if(\count($aBackups)) {
 			foreach($aBackups as $aBack) {
-				unlink($aBack["path"]);
+				\unlink($aBack["path"]);
 			}
 		}
-		copy($this->sAlvinPath.NGL_DIR_SLASH."grants", $this->sAlvinPath.NGL_DIR_SLASH."grants_".date("YmdHis").".bak");
+		@\copy($this->sAlvinPath.NGL_DIR_SLASH."grants", $this->sAlvinPath.NGL_DIR_SLASH."grants_".\date("YmdHis").".bak");
 	}
 
 	// importa los permisos desde una cadena plana o un json

@@ -83,6 +83,8 @@ class nglOwl extends nglBranch {
 		$vAttributes["query"]				= null;
 		$vAttributes["result"]				= null;
 		$vAttributes["validate"]			= null;
+		$vAttributes["last_id"]				= null;
+		$vAttributes["last_imya"]			= null;
 		return $vAttributes;
 	}
 
@@ -422,6 +424,8 @@ SQL;
 		$nRowID = null;
 		if($insert) {
 			$nRowID = $insert->lastid();
+			$this->attribute("last_id", $nRowID);
+			$this->attribute("last_imya", $vData["imya"]);
 			$nRows = $insert->rows();
 			
 			if($nRows) {

@@ -1,3 +1,19 @@
+# 2.8.9 - 202102121800
+## alvin
+- fix sintaxis
+
+## mail
+- nuevo argumento **get_mode**
+- cambios en los métodos **get**, **getall**, **getraw** y **getreplyto** para soporte de autologin
+- nuevo método **MailParser**
+
+## owl
+- nuevos atributos **last_id** y **last_imya**
+
+## shift
+- nuevo método **jsObject**
+
+________________________________________________________________________________
 # 2.8.8 - 202102061400
 ## mail
 - reestructuraciones generales

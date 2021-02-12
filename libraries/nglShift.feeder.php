@@ -341,6 +341,9 @@ class nglShift extends nglTrunk {
 		switch($aMethod[1]) {
 			case "csv":
 				return $this->csvEncode($aData, $vOptions);
+
+			case "gchart":
+				return $this->GoogleCharts($aData);
 			
 			case "text":
 			case "fixed":
@@ -731,6 +734,66 @@ class nglShift extends nglTrunk {
 		}
 		
 		return $sString;
+	}
+
+	public function jsObject($aData) {
+		$aValues = [];
+		if(\is_array($aData) && \count($aData) && self::call()->isarrayarray($aData)) {
+			$aFirst = \current($aData);
+			$aColnames = array_keys($aFirst);
+			$aRegexs = self::call("sysvar")->REGEX;
+			$aTypes = [];
+			$x = 0;
+			foreach($aFirst as $mVal) {
+				if(\is_numeric($mVal)) {
+					$aTypes[] = ["type"=>"number", "label"=>$aColnames[$x]];
+				} else if(\is_bool($mVal) || \in_array(\strtolower($mVal), ["false", "true"])) {
+					$aTypes[] = ["type"=>"boolean", "label"=>$aColnames[$x]];
+				} else if(\preg_match("/".$aRegexs["datetime"]."/i", $mVal)) {
+					$aTypes[] = ["type"=>"datetime", "label"=>$aColnames[$x]];
+				} else if(\preg_match("/".$aRegexs["date"]."/i", $mVal)) {
+					$aTypes[] = ["type"=>"date", "label"=>$aColnames[$x]];
+				} else {
+					$aTypes[] = ["type"=>"string", "label"=>$aColnames[$x]];
+				}
+				$x++;
+			}
+
+			foreach($aData as $aRow) {
+				$x = 0;
+				$aNewData = [];
+				foreach(\array_values($aRow) as $mVal) {
+					if($aTypes[$x]["type"]=="date") {
+						$aDate = \explode("-", $mVal);
+						$aNewData[] = (isset($aDate[2])) ? "new Date(".$aDate[0].",".$aDate[1].",".$aDate[2].")" : "null";
+					} else if($aTypes[$x]["type"]=="datetime") {
+						$aDateTime = \explode(" ", $mVal);
+						$aDate = \explode("-", $aDateTime[0]);
+						$aTime = \explode(":", $aDateTime[1]);
+						$aNewData[] = (isset($aDate[2], $aTime[2])) ? "new Date(".$aDate[0].",".$aDate[1].",".$aDate[2].",".$aTime[0].",".$aTime[1].",".$aTime[2].")" : "null";;
+					} else if($aTypes[$x]["type"]=="boolean") {
+						$aNewData[] = self::call()->isTrue($mVal) ? "true" : "false";
+					} else if($mVal===null || \strtolower($mVal)=="null") {
+						$aNewData[] = "null";
+					} else if($aTypes[$x]["type"]=="number") {
+						$aNewData[] = self::call()->isInteger($mVal) ? "parseInt(".(int)$mVal.")" : "parseFloat(".$mVal.")";
+					} else {
+						$aNewData[] = $mVal;
+					}
+					$x++;
+				}
+				$aValues[] = $aNewData;
+			}
+		}
+	
+		foreach($aTypes as $k => $sType) {
+			
+		}
+
+		$sTypes = \json_encode($aTypes); 
+		$sValues = \json_encode($aValues, JSON_NUMERIC_CHECK);
+		$sValues = preg_replace("/\"(new Date\([0-9,]+\)|parseInt\([0-9]+\)|parseFloat\([0-9\.]+\)|null|true|false)\"/is", "\\1", $sValues);
+		return ["columns"=>$sTypes, "data"=>$sValues];
 	}
 
 	/** FUNCTION {
