@@ -28,7 +28,7 @@ define("NGL_DOCUMENT_ROOT",														"/var/www");
 define("NGL_PATH_FRAMEWORK",													"/usr/share/nogal");
 
 // directorio project
-define("NGL_PATH_PROJECT",														NGL_DOCUMENT_ROOT."/project");
+define("NGL_PATH_PROJECT",														NGL_DOCUMENT_ROOT);
 
 // directorio public
 define("NGL_PATH_PUBLIC",														NGL_PATH_PROJECT."/html");

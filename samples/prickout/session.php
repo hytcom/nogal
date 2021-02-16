@@ -35,9 +35,9 @@ $ngl("sess")->start(
 if(!isset($_SESSION[NGL_SESSION_INDEX]["LANGUAGE"])) {
 	$_SESSION[NGL_SESSION_INDEX]["LANGUAGE"] = "en";
 	if(isset($_SERVER["HTTP_ACCEPT_LANGUAGE"])) {
-		$_SESSION[NGL_SESSION_INDEX]["LANGUAGE"] = strtolower(substr($_SERVER["HTTP_ACCEPT_LANGUAGE"], 0, 2));
+		$_SESSION[NGL_SESSION_INDEX]["LANGUAGE"] = \strtolower(\substr($_SERVER["HTTP_ACCEPT_LANGUAGE"], 0, 2));
 	}
-	if(!in_array($_SESSION[NGL_SESSION_INDEX]["LANGUAGE"], array("es","en"))) {
+	if(!in_array($_SESSION[NGL_SESSION_INDEX]["LANGUAGE"], ["es","en"])) {
 		$_SESSION[NGL_SESSION_INDEX]["LANGUAGE"] = "en";
 	}
 }

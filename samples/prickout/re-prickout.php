@@ -3,7 +3,6 @@
 /** $REDIRECTURL ---------------------------------------------------------------
 contiene el path completo de la URL solicitada
 ------------------------------------------------------------------------------*/
-
 /*
 switch(true) {
 	// equivalente a una RewriteRule. Siempre dentro de NGL_PATH_PRICKOUT
@@ -33,15 +32,15 @@ switch(true) {
 if(isset($NGL_REPRICKOUT_URL)) {
 	if(isset($NGL_REPRICKOUT_REQUEST)) {
 		$req = $ngl("file")->load($NGL_REPRICKOUT_URL);
-		$options = array(
+		$options = [
 			"CURLOPT_CUSTOMREQUEST" => "POST",
 			"CURLOPT_POST" => 1,
 			"CURLOPT_POSTFIELDS" => $NGL_REPRICKOUT_REQUEST
-		);
+		];
 
 		echo $req->read(null, $options);
 	} else {
-		header("location:".$NGL_REPRICKOUT_URL);
+		\header("location:".$NGL_REPRICKOUT_URL);
 	}
 	
 	exit();

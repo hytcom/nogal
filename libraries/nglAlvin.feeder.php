@@ -288,7 +288,8 @@ SQL;
 				$aUserRoles = \explode(",", $sRoles);
 				$aChain = [$aUserRoles[0]];
 				foreach($aUserRoles as $sRole) {
-					$aChain = \array_merge($aChain, $tree->childrenChain($sRole, null));
+					$aChain[] = $sRole;
+					$aChain += $tree->childrenChain($sRole, null);
 				}
 				return \implode(",", \array_unique($aChain));
 			}

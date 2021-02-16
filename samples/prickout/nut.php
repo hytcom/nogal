@@ -7,15 +7,15 @@ if(isset($_SERVER["REQUEST_METHOD"])) {
 
 // ejecucion del nut -----------------------------------------------------------------------------
 try {
-	$aNut = explode("/", $PRICKOUT[1]);
-	$sNut = array_shift($aNut);
-	$sMethod = (isset($aNut[0])) ? array_shift($aNut) : $sNut;
-	$aRequest["_NUT"] = array(
-							"path" => $PRICKOUT[1],
-							"name" => $sNut,
-							"method" => $sMethod,
-							"args" => $aNut
-						);
+	$aNut = \explode("/", $PRICKOUT[1]);
+	$sNut = \array_shift($aNut);
+	$sMethod = (isset($aNut[0])) ? \array_shift($aNut) : $sNut;
+	$aRequest["_NUT"] = [
+		"path" => $PRICKOUT[1],
+		"name" => $sNut,
+		"method" => $sMethod,
+		"args" => $aNut
+	];
 	$nut = $ngl("nut.".$sNut);
 	echo $nut->run($sMethod, $aRequest);
 } catch (Exception $e) {

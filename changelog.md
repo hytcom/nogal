@@ -1,3 +1,11 @@
+# 2.9.0 - 202102161100
+## genertal
+- reestrucutración de samples
+
+## alvin
+- fix sintaxis en **rolechain**
+
+________________________________________________________________________________
 # 2.8.9 - 202102121800
 ## alvin
 - fix sintaxis

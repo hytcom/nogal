@@ -19,10 +19,11 @@ $ENV["files"]											= NGL_PATH_PUBLIC.NGL_DIR_SLASH."files";
 // urls (sin Slash al final)
 $ENV["url"]												= NGL_URL;
 $ENV["theme"]											= NGL_URL;
-$ENV["cdn"]												= NGL_URL."/cdn";
 $ENV["css"]												= NGL_URL."/css";
 $ENV["js"]												= NGL_URL."/js";
 $ENV["storage"]											= NGL_URL."/files";
+$ENV["cdn"]												= "https://cdn.upps/rel-".NGL_PROJECT_RELEASE;
+$ENV["site"]											= NGL_URL;
 
 // archivos
 $ENV["self"]											= $ngl("sysvar")->SELF;
@@ -33,7 +34,7 @@ $ENV["dates"]											= $ngl("dates")->settings();
 $ENV["now"]												= $ngl("dates")->info();
 
 // idioma
-$ENV["lang"]											= $_SESSION[NGL_SESSION_INDEX]["LANGUAGE"];
+$ENV["lang"]											= (isset($_SESSION, $_SESSION[NGL_SESSION_INDEX]["LANGUAGE"])) ? $_SESSION[NGL_SESSION_INDEX]["LANGUAGE"] : "es";
 
 // búsquedas
 $ENV["q"]												= (isset($_REQUEST["values"]["q"])) ? $_REQUEST["values"]["q"] : "";
@@ -101,7 +102,17 @@ $NGL_ONCECODE_IGNORES									= array();
 #===============================================================================
 #	VARIABLES DEL PROYECTO
 #===============================================================================
-// $ENV["foobar"] = "foo";
+$ENV["gtools"] = array();
+$ENV["gtools"]["apikey"] = null;
+$ENV["gtools"]["maps"] = array(
+	//eg: , Buenos Aires, Argentina
+	"bound" => "",
 
+	//eg: obelisco, Buenos Aires, Argentina
+	"center" => "",
+	
+	//eg: ["buenos", "aires", "argentina"]
+	"clearwords" => []
+);
 
 ?>

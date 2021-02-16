@@ -54,13 +54,13 @@ require_once("/usr/share/nogal/nogal.php");
 			</small>
 
 			<h3>VERSION</h3>
-			<?php echo $ngl("shift")->html($ngl("sysvar")->VERSION, array("classes"=>"table table-striped table-bordered")); ?>
+			<?php echo $ngl("shift")->html($ngl("sysvar")->VERSION, ["classes"=>"table table-striped table-bordered"]); ?>
 			<br /><br />
 			<h3>OBJECTS</h3>
-			<?php echo $ngl("shift")->html($ngl()->availables(), array("classes"=>"table table-striped table-bordered")); ?>
+			<?php echo $ngl("shift")->html($ngl()->availables(), ["classes"=>"table table-striped table-bordered"]); ?>
 			<br /><br />
 			<h3>CONSTANTS</h3>
-			<?php echo $ngl("shift")->html($ngl()->constants(), array("classes"=>"table table-striped table-bordered")); ?>
+			<?php echo $ngl("shift")->html($ngl()->constants(), ["classes"=>"table table-striped table-bordered"]); ?>
 		</div>
 	</body>
 </html>
