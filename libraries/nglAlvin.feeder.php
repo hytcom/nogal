@@ -269,7 +269,7 @@ SQL;
 	// valida un nombre de rol o una cadena de ellos separados por ,
 	// si el nombre es nulo y hay un token cargado, intenta retornar el role del mismo
 	public function role($sRoles=null) {
-		if($sRoles===null) { return ($this->aToken!==null && !empty($this->aToken["role"])) ? $this->aToken["role"] : null; }
+		if($sRoles===null && isset($_SESSION[NGL_SESSION_INDEX]["ALVIN"]["role"])) { return $_SESSION[NGL_SESSION_INDEX]["ALVIN"]["role"]; }
 		$aRoles = \explode(",", $sRoles);
 		foreach($aRoles as $x => $sRole) {
 			$aRoles[$x] = $this->GrantName($sRole, false);
@@ -278,20 +278,21 @@ SQL;
 	}
 
 	public function rolechain($sRoles=null) {
-		if($sRoles===null) { $sRoles = $this->role(); }
+		if($sRoles===null && isset($_SESSION[NGL_SESSION_INDEX]["ALVIN"]["roleschain"])) { return $_SESSION[NGL_SESSION_INDEX]["ALVIN"]["roleschain"]; }
 		if(!empty($sRoles) && \file_exists($this->sAlvinPath.NGL_DIR_SLASH."roles")) {
 			$sRolesTree = \file_get_contents($this->sAlvinPath.NGL_DIR_SLASH."roles");
-			$sRolesTree = self::call("crypt")->type("rsa")->base64(true)->key(NGL_ALVIN)->decrypt($sRolesTree);
-			$aRoles = \json_decode($sRolesTree, true);
-			if(\is_array($aRoles)) {
-				$tree = self::call("tree")->loadtree($aRoles);
-				$aUserRoles = \explode(",", $sRoles);
-				$aChain = [$aUserRoles[0]];
-				foreach($aUserRoles as $sRole) {
-					$aChain[] = $sRole;
-					$aChain += $tree->childrenChain($sRole, null);
+			if($sRolesTree = @self::call("crypt")->type("rsa")->base64(true)->key(NGL_ALVIN)->decrypt($sRolesTree)) {
+				$aRoles = \json_decode($sRolesTree, true);
+				if(\is_array($aRoles)) {
+					$tree = self::call("tree")->loadtree($aRoles);
+					$aUserRoles = \explode(",", $sRoles);
+					$aChain = [$aUserRoles[0]];
+					foreach($aUserRoles as $sRole) {
+						$aChain[] = $sRole;
+						$aChain += $tree->childrenChain($sRole, null);
+					}
+					return \implode(",", \array_unique($aChain));
 				}
-				return \implode(",", \array_unique($aChain));
 			}
 		}
 		return "";

@@ -1,6 +1,6 @@
 [checksum]
-md5 = "4edab5e1d488f49ca6c7d906d97e6d43"
-sha1 = "54539435cbbf31e78fe3735e1ea21806ceff281d"
+md5 = "54d63ed12655375cd8d17c0b7f46a29d"
+sha1 = "c7c946feb65e3ae99360f08e62daf2af8efed97d"
 
 [documentation]
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/alvin.md"
