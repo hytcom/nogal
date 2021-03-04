@@ -605,10 +605,10 @@ class nglMail extends nglBranch implements iNglClient {
 		$aFrom = $this->PrepareMails($aMail["headers"]["From"], true);
 		$aMail["from"] = $aFrom[0];
 		$aMail["from_name"] = $aFrom[1];
-		$aMail["from_address"] = $aFrom[2];
+		$aMail["from_address"] = $aFrom[3];
 		$aMail["to"] = $this->PrepareMails($aMail["headers"]["To"])[0];
-		$aMail["cc"] = \array_key_exists("Cc", $aMail["headers"]) ? $this->PrepareMails($aMail["headers"]["Cc"]) : "";
-		$aMail["cco"] = \array_key_exists("Cco", $aMail["headers"]) ? $this->PrepareMails($aMail["headers"]["Cco"]) : "";
+		$aMail["cc"] = \array_key_exists("Cc", $aMail["headers"]) ? $this->PrepareMails($aMail["headers"]["Cc"])["list"] : "";
+		$aMail["cco"] = \array_key_exists("Cco", $aMail["headers"]) ? $this->PrepareMails($aMail["headers"]["Cco"])["list"] : "";
 		$aMail["subject"] = $aMail["headers"]["Subject"];
 
 		// body
@@ -1108,21 +1108,20 @@ class nglMail extends nglBranch implements iNglClient {
 		list($mTo, $mCC, $mBCC) = $this->getarguments("to,cc,bcc", \func_get_args());
 		if($this->attribute("from")==null) { return self::errorMessage($this->object, 1001); }
 		
-		$aTo = $this->PrepareMails($mTo);
-		$this->attribute("mail_to", $aTo);
-		$this->attribute("mail_cc", $this->PrepareMails($mCC));
-		$this->attribute("mail_bcc", $this->PrepareMails($mBCC));
+		$aSendTo = $this->PrepareMails($mTo);
+		$this->attribute("mail_to", $aSendTo);
+		$this->attribute("mail_cc", $this->PrepareMails($mCC)["list"]);
+		$this->attribute("mail_bcc", $this->PrepareMails($mBCC)["list"]);
 		
 		$aSent = [];
-		if(\is_array($aTo) && \count($aTo)) {
-			if(!\is_array($aTo)) { $aTo = [$aTo]; }
-
+		if(\is_array($aSendTo) && \count($aSendTo)) {
 			$this->BuildMail();
 			$sMessage = $this->attribute("mail_body");
 			$sHeaders = $this->attribute("mail_headers");
 			$sSubject = $this->argument("mail_subject");
 
-			foreach($aTo as $sTo) {
+			foreach($aSendTo["details"] as $aTo) {
+				$sTo = $aTo[2];
 				$sMsgId = self::call()->imya();
 				$sHeader = \str_replace("{{MAILTO}}", $sTo, $sHeaders);
 				$sHeader = \str_replace("{{MSGID}}", $sMsgId, $sHeader);
@@ -1200,7 +1199,7 @@ class nglMail extends nglBranch implements iNglClient {
 		}
 
 		// from
-		$vResponse = $this->request("MAIL FROM: <".$this->attribute("mail_from_mail").">");
+		$vResponse = $this->request("MAIL FROM: ".$this->attribute("mail_from_mail"));
 
 		// to
 		if($vResponse["code"]==250) {
@@ -1232,6 +1231,7 @@ class nglMail extends nglBranch implements iNglClient {
 	}
 
 	// test1@domain.com
+	// <test1@domain.com>
 	// test1 <test1@domain.com>
 	// test1@domain.com;test2@domain.com
 	// test1 <test1@domain.com>;test2@domain.com
@@ -1245,7 +1245,7 @@ class nglMail extends nglBranch implements iNglClient {
 			$aMails = $mEmails;
 		}
 
-		$aValidMails = [];
+		$aValidMails = ["list"=>[], "details"=>[]];
 		if(\is_array($aMails) && \count($aMails)) {
 			foreach($aMails as $sEmail) {
 				$sEmail = \str_replace(["<",">"], " ", $sEmail);
@@ -1254,16 +1254,17 @@ class nglMail extends nglBranch implements iNglClient {
 				if(isset($aEmail[1])) {
 					$sEmail = \array_pop($aEmail);
 					$sName = \implode(" ", $aEmail);
-					$sName = \trim($sName)." ";
+					$sName = \trim($sName);
 				} else {
-					$sEmail = \trim($sEmail);
-					$sName = "";
+					$sEmail = \trim($aEmail[0]);
+					$sName = $sEmail;
 				}
 
-				if($bOnce) { return [$sName."<".$sEmail.">", $sName, $sEmail]; }
+				if($bOnce) { return [$sName."<".$sEmail.">", $sName, "<".$sEmail.">", $sEmail]; }
 
 				if(\preg_match("/".$this->sRegexMail."/is", $sEmail)) {
-					$aValidMails[] = $sName."<".$sEmail.">";
+					$aValidMails["list"][] = "<".$sEmail.">";
+					$aValidMails["details"][] = [$sName."<".$sEmail.">", $sName, "<".$sEmail.">", $sEmail];
 				}
 			}
 		}

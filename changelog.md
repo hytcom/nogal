@@ -1,3 +1,15 @@
+# 2.9.1 - 202103041430
+## coon
+- se separó el **token** del tipo de **auth**
+
+## fn
+- se reescribieron los métodos **arrange** y **disarrange**
+- se corrijieron errores de sitáxis en **tokenEndode** y **tokenDecode**
+
+## mail
+- cambios en el método **PrepareMails** y en todo el impacto relacionado
+
+________________________________________________________________________________
 # 2.9.0 - 202102161100
 ## genertal
 - reestrucutración de samples

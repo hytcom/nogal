@@ -1,6 +1,6 @@
 [checksum]
-md5 = "f78bb814f551113f6057d99db0ac773f"
-sha1 = "bac7e34ce4f7423a8fb97dbf3cc6ed15ca8ae98d"
+md5 = "d731206c7206526c76fc850d956a623c"
+sha1 = "fe407cf9f0045aa25902056a752abd2c5e54aab3"
 
 [documentation]
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/mail.md"

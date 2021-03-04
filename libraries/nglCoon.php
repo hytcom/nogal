@@ -91,8 +91,8 @@ class nglCoon extends nglBranch implements inglBranch {
 
 		$sBuffer = "REQUEST ERROR: Bad Request";
 		if(self::call()->isURL($sURL) && \function_exists("curl_init")) {
-			$aHeaders = array("Content-Type: ".$sContentType);
-			if($sAuth!==null) { $aHeaders[] = "Authorization: ".$sAuth; }
+			$aHeaders = ["Content-Type: ".$sContentType];
+			if($sAuth!==null) { $aHeaders[] = "Authorization: ".$sAuth." ".$sToken; }
 			if($sMethod=="GET" && !empty($mContent)) {
 				$url = self::call("url")->load($sURL);
 				$sURL = $url->update("params", $mContent)->get();

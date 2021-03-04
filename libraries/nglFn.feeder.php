@@ -141,44 +141,26 @@ class nglFn extends nglTrunk {
 		$sFill 			= self::call()->unique(6);
 		$nDisarrange	= \count($aDisarrange);
 		$aOrdered		= \array_fill(0, $nDisarrange, $sFill);
+		$aCounter		= \array_keys($aOrdered);
 		$nArrange 		= \count($aArrange);
 		if($nArrange<$nDisarrange) {
 			$nMultiplier = \ceil($nDisarrange/$nArrange);
 			$aArrange = self::call()->arrayRepeat($aArrange, $nMultiplier);
 		}
 
-		$y = 0;
+		$y = -1;
 		foreach($aArrange as $nIndex) {
 			$nIndex *= 1;
-			if(!$nIndex) { $nIndex = 10; }
-			$nKey = -1;
-			for($x=0;$x<$nIndex;$x++) {
-				$aItem = \each($aOrdered);
-				if($aItem===false) {
-					\reset($aOrdered);
-					$nKey = -1;
-					$x--;
-					continue;
-				} else {
-					$nKey++;
-					if($nKey==$nDisarrange) { $nKey = 0; }
-					if($aItem[1]!=$sFill) { $x--; }
-				}
+			for($x=1;$x<$nIndex+1;$x++) {
+				$nKey = \current($aCounter);
+				if(\next($aCounter)===false) { \reset($aCounter); }
 			}
-			
-			$aOrdered[$nKey] = $aDisarrange[$y];
-			\reset($aOrdered);
-			$y++;
 
-			if($y==$nDisarrange-1) {
-				foreach($aOrdered as $nKey => $sValue) {
-					if($sValue==$sFill) {
-						$aOrdered[$nKey] = $aDisarrange[$y];
-						break;
-					}
-				}
-				break;
-			}
+			unset($aCounter[$nKey]);
+			\reset($aCounter);
+
+			$aOrdered[$nKey] = $aDisarrange[++$y];
+			if(!\count($aCounter)) { break; }
 		}
 		
 		return (\is_string($mSource)) ? \implode($aOrdered) : $aOrdered;;
@@ -1323,7 +1305,7 @@ class nglFn extends nglTrunk {
 			$sDecimal = \bcdiv($sDecimal, "16", 0);
 		}
 
-		return \str_pad($sHexaDecimal, $nLength, "0", \str_PAD_LEFT);
+		return \str_pad($sHexaDecimal, $nLength, "0", \STR_PAD_LEFT);
 	}
 
 	/** FUNCTION {
@@ -1392,9 +1374,7 @@ class nglFn extends nglTrunk {
 			$nIndex--;
 			$x = 0;
 			while(\count($aItems)) {
-				$aChar = \each($aItems);
-
-				if($aChar===false) { \reset($aItems); continue; }
+				$aChar = [key($aItems), \current($aItems)];
 				if($nIndex==$x) {
 					$x = 0;
 					$aDisarrange[] = $aChar[1];
@@ -1406,6 +1386,8 @@ class nglFn extends nglTrunk {
 					}
 					break;
 				}
+
+				if(\next($aItems)===false) { \reset($aItems); }
 
 				$x++;
 			}
@@ -2638,20 +2620,19 @@ class nglFn extends nglTrunk {
 			"$sToken" : ["string", "Cadena codificada"],
 			"$sKey" : ["string", "Código se seguridad"]
 		},
-		"seealso" : ["nglFn::tokenEncode"],
+		"seealso" : ["nglFn::tokenEncode"], 
 		"return" : "string"
 	} **/
 	public function tokenDecode($sToken, $sKey) {
 		if(strlen($sToken)<64) { return false; }
 
-		$bSort = false;
-		$aToken = \explode("\n", $sToken);
+		$aToken = self::call()->explodeTrim("\n", $sToken);
 		if(\count($aToken)>1) {
 			\array_shift($aToken);
 			\array_pop($aToken);
 			$sToken = \implode($aToken);
 		} else {
-			$bSort = true;
+			$sToken = \preg_replace("/\/(.*?)\//is", "", $sToken);
 		}
 
 		// firma
@@ -2686,13 +2667,13 @@ class nglFn extends nglTrunk {
 		// token
 		$sToken = \preg_replace("/\s/", "", $sToken);
 		$aToken = \str_split($sToken, 2);
-		
+
 		$x = 0;
 		$aClear = [];
 		while(\count($aClear)<\count($aToken)) {
 			$nKey = \next($aKeyRev);
 			if($nKey===false) { \reset($aKeyRev); $nKey = \next($aKeyRev); };
-			$x += (!$bSort) ? \ceil($nKey/2) : 1;
+			$x += \ceil($nKey/2);
 			$aClear[] = $aToken[$x];
 			if(\count($aClear)==$nLength) { break; }
 			$x++;
@@ -2745,7 +2726,6 @@ class nglFn extends nglTrunk {
 
 			$nFill = ($sTokenTitle!==false) ? \ceil($nKey/2) : 1;
 			for($x=0;$x<$nFill;$x++) {
-				// $aToken[] = "00";
 				$aToken[] = $sChars[\rand(0,61)].$sChars[\rand(0,61)];
 			}
 			$aToken[] = $sChar;
