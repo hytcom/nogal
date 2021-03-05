@@ -2,6 +2,9 @@
 ## coon
 - se separó el **token** del tipo de **auth**
 
+## excel
+- fix error en el método **set**
+
 ## fn
 - se reescribieron los métodos **arrange** y **disarrange**
 - se corrijieron errores de sitáxis en **tokenEndode** y **tokenDecode**

@@ -54,6 +54,9 @@ namespace nogal;
 	}
 }
 
+# error codes
+1001 = content isn't a array of arrays
+
 **/
 class nglGraftExcel extends nglScion {
 
@@ -77,7 +80,7 @@ class nglGraftExcel extends nglScion {
 		$vArguments["empty"]			= ['$mValue', null];
 		$vArguments["calculate"]		= ['self::call()->istrue($mValue)', true];
 		$vArguments["format"]			= ['self::call()->istrue($mValue)', true];
-		$vArguments["colnames"]			= ['self::call()->istrue($mValue)', true]; // usa la primer fila como clase
+		$vArguments["colnames"]			= ['self::call()->istrue($mValue)', true]; // en get usa la primer fila como nombre de los indices. En set utiliza los indices como titulos de las columnas
 		$vArguments["colref"]			= ['self::call()->istrue($mValue)', true];
 
 		$vArguments["styles"]			= ['$mValue', null];
@@ -103,7 +106,7 @@ class nglGraftExcel extends nglScion {
 		list($sFileName,$sFontFamily,$nFontSize) = $this->getarguments("filename,fontfamily,fontsize", \func_get_args());
 		$this->args(["filename"=>$sFileName]);
 
-		$sFileName = self::call()->sandboxPath($sFileName);
+		if($sFileName!==null) { $sFileName = self::call()->sandboxPath($sFileName); }
 		if(\file_exists($sFileName)) {
 			$reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReaderForFile($sFileName);
 			self::call()->errorReporting(false);
@@ -248,7 +251,7 @@ class nglGraftExcel extends nglScion {
 	// setea contenido en una celda
 	// si index es un rango, hace merge de las celdas
 	public function set() {
-		list($sCell, $mContent) = $this->getarguments("index,content", \func_get_args());
+		list($sCell, $mContent, $bColnames) = $this->getarguments("index,content,colnames", \func_get_args());
 		if(!\is_array($mContent)) {
 			$sCellName = $sCell;
 			if(\strpos($sCell, ":")) { $aCell = \explode(":", $sCell); $sCellName = $aCell[0]; }
@@ -257,7 +260,12 @@ class nglGraftExcel extends nglScion {
 			return $this;
 		} else {
 			$sEmptyValue = $this->argument("empty");
-			if(!self::call()->isArrayArray($mContent)) { $mContent = [$mContent]; }
+			if(!self::call()->isArrayArray($mContent)) {
+				self::errorMode("die");
+				self::errorMessage($this->object, 1001);
+			}
+			
+			if($bColnames) { \array_unshift($mContent, \array_keys(\current($mContent))); }
 			$this->excel->getActiveSheet()->fromArray($mContent, $sEmptyValue, $sCell);
 		}
 
