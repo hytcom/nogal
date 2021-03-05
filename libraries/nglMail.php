@@ -433,6 +433,7 @@ class nglMail extends nglBranch implements iNglClient {
 
 		$this->Logger("<< ".$sHost.":".$nPort.$this->sCRLF);
 		$this->socket = @\fsockopen($sHost, $nPort, $nError, $sError, $nTimeOut);
+
 		if($this->socket===false) {
 			$this->Logger("-- \t\tERROR #".$nError." (".$sError.")".$this->sCRLF);
 			return false;
@@ -478,19 +479,40 @@ class nglMail extends nglBranch implements iNglClient {
 			if($this->sServerType=="imap") {
 				$vResponse = $this->request("FETCH ".$sMailsId." (".$sMessagesFilter.")");
 				if($vResponse["text"][0]=="*") {
-					$sResponse = \trim(\substr($vResponse["text"],2));
-					$aResponse = \explode($this->sCRLF."* ", $sResponse);
 					$aMessages = [];
-					foreach($aResponse as $sMessage) {
-						$aMessage = \explode($this->sCRLF, $sMessage, 2);
-						$nId = (int)\substr($aMessage[0],0,\strrpos($aMessage[0], " "));
-						$nIni = \strrpos($aMessage[0], "{")+1;
-						$nEnd = \strrpos($aMessage[0], "}");
-						$nLength = \substr($aMessage[0], $nIni, ($nEnd-$nIni));
-						$aMessages[$nId] = \substr($aMessage[1], 0, (int)$nLength);
+					
+					$sResponse = \substr($vResponse["text"], 0, \strpos($vResponse["text"], $this->Tag()));
+					$aResponse = \explode($this->sCRLF, $sResponse);
+
+					// inicio mensajes
+					$sMessageData = \array_shift($aResponse);
+					$sMessage = \substr($sMessageData, \strrpos($sMessageData, "}")+1);
+
+					// mensajes
+					foreach($aResponse as $sLine) {
+						if(preg_match("/^\*[ 0-9]+FETCH.*\}/", $sLine)) {
+							$nId = (int)\substr($sMessageData, 1, \strrpos($sMessageData, " FETCH"));
+							$nIni = \strrpos($sMessageData, "{")+1;
+							$nEnd = \strrpos($sMessageData, "}");
+							$nLength = \substr($sMessageData, $nIni, ($nEnd-$nIni));
+							$aMessages[$nId] = \trim(\substr($sMessage, 0, (int)$nLength));
+
+							$sMessageData = $sLine;
+							$sMessage = \substr($sMessageData, \strrpos($sMessageData, "}")+1);
+							continue;
+						}
+
+						$sMessage .= $sLine.$this->sCRLF;
 					}
 
+					// fin de los mensajes
+					$nId = (int)\substr($sMessageData, 1, \strrpos($sMessageData, " FETCH"));
+					$nIni = \strrpos($sMessageData, "{")+1;
+					$nEnd = \strrpos($sMessageData, "}");
+					$nLength = \substr($sMessageData, $nIni, ($nEnd-$nIni));
+					$aMessages[$nId] = \trim(\substr($sMessage, 0, (int)$nLength));
 					return $aMessages;
+
 				} else {
 					return false;
 				}
@@ -606,7 +628,7 @@ class nglMail extends nglBranch implements iNglClient {
 		$aMail["from"] = $aFrom[0];
 		$aMail["from_name"] = $aFrom[1];
 		$aMail["from_address"] = $aFrom[3];
-		$aMail["to"] = $this->PrepareMails($aMail["headers"]["To"])[0];
+		$aMail["to"] = $this->PrepareMails($aMail["headers"]["To"])["list"][0];
 		$aMail["cc"] = \array_key_exists("Cc", $aMail["headers"]) ? $this->PrepareMails($aMail["headers"]["Cc"])["list"] : "";
 		$aMail["cco"] = \array_key_exists("Cco", $aMail["headers"]) ? $this->PrepareMails($aMail["headers"]["Cco"])["list"] : "";
 		$aMail["subject"] = $aMail["headers"]["Subject"];
@@ -712,7 +734,7 @@ class nglMail extends nglBranch implements iNglClient {
 			if($this->bLogged) { $this->connect()->login()->mailbox($this->attribute("currret_mailbox")); }
 			list($sSearch,$nLimit,$sGetMode) = $this->getarguments("search,limit,get_mode", \func_get_args());
 			if($sSearch===null) { $sSearch = "ALL"; }
-			$vResponse = $this->request("SEARCH ".$sSearch);
+			$vResponse = $this->request("SEARCH ".$sSearch, $this->Tag());
 			$sResult = \str_replace("* SEARCH ", "", $vResponse["text"]);
 			if($this->FindMark($vResponse["text"])) {
 				$nTag = \strpos($sResult, $this->sTag);
@@ -735,16 +757,16 @@ class nglMail extends nglBranch implements iNglClient {
 			$aResponse = $this->headers($aGet);
 		} else if($sGetMode=="keys") {
 			$aResponse = $this->Fetch(\current($aGet), "BODY[]");
-
 		} else {
 			$sMailsId = $this->MailsIds($aGet);
 			$aMails = $this->Fetch($sMailsId, "BODY[]");
 			$aResponse = [];
-			foreach($aMails as $nMail => $sMail) {
-				$aResponse[$nMail] = $this->MailParser($sMail);
+			if(\is_array($aMails)) {
+				foreach($aMails as $nMail => $sMail) {
+					$aResponse[$nMail] = $this->MailParser($sMail);
+				}
 			}
 		}
-
 		$this->unflag($aGet, "seen");
 		return $aResponse;
 	}
@@ -1087,14 +1109,15 @@ class nglMail extends nglBranch implements iNglClient {
 			$this->Logger("-- No active connections");
 		} else {
 			$sResponse = "";
-			while(true) {
-				$sGet = \fgets($this->socket, 515);
-				$sResponse .= (!empty($sGet)) ? $sGet : "\n";
-				$vMetaData = \stream_get_meta_data($this->socket);
-				if($vMetaData["unread_bytes"]==0) { break; }
-				if($sMark!=null && \strpos($sGet, $sMark)===0) { break; }
-			}
 
+			while(true) {
+				$sGet = \fgets($this->socket, 4096);
+				$sResponse .= (!empty($sGet)) ? $sGet : "\n";
+				if(($sMark!==null && \strpos($sGet, $sMark)===0) ||(\strpos($sGet, $this->Tag())===0)) { 
+					break;
+				}
+			}
+			
 			$vResponse["text"] = $sResponse;
 			if($bSMTP) { $vResponse["code"] = \substr($sResponse, 0, 3); }
 			if($bPOP3) { $vResponse["code"] = \substr($sResponse, 0, 4); }
@@ -1102,6 +1125,11 @@ class nglMail extends nglBranch implements iNglClient {
 		}
 
 		return $vResponse;
+	}
+
+	private function ResponseEnd(&$nInit=null) {
+		$nInit = \microtime(true);
+		return \feof($this->socket);
 	}
 
 	public function send() {

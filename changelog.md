@@ -7,7 +7,8 @@
 - se corrijieron errores de sitáxis en **tokenEndode** y **tokenDecode**
 
 ## mail
-- cambios en el método **PrepareMails** y en todo el impacto relacionado
+- cambios en el método **PrepareMails** y dependencias
+- cambios en el método **Response** y dependencias
 
 ________________________________________________________________________________
 # 2.9.0 - 202102161100
