@@ -24,6 +24,7 @@ class nglCoon extends nglBranch implements inglBranch {
 		$vArguments["data"]					= ['$mValue'];
 		$vArguments["key"]					= ['$mValue', "SOME_STRONG_KEY"];
 		$vArguments["method"]				= ['(string)$mValue', "POST"];
+		$vArguments["port"]					= ['$mValue', null];
 		$vArguments["token"]				= ['$mValue', null];
 		$vArguments["url"]					= ['(string)$mValue', null];
 		return $vArguments;
@@ -44,6 +45,7 @@ class nglCoon extends nglBranch implements inglBranch {
 	public function request() {
 		list($mData,$sURL,$sToken,$sCType) = $this->getarguments("data,url,token,ctype", \func_get_args());
 		$sMethod = \strtoupper($this->argument("method"));
+		$nPort = $this->argument("port");
 		$sAuth = $this->argument("auth");
 
 		$sCType = strtolower($sCType);
@@ -98,7 +100,8 @@ class nglCoon extends nglBranch implements inglBranch {
 				$sURL = $url->update("params", $mContent)->get();
 			}
 
-			$curl = curl_init($sURL);
+			$curl = \curl_init($sURL);
+			if($nPort!==null) { \curl_setopt($curl, CURLOPT_PORT, $nPort); }
 			\curl_setopt($curl, CURLOPT_HEADER, false);
 			\curl_setopt($curl, CURLOPT_HTTPHEADER, $aHeaders); 
 			\curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);

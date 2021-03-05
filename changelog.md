@@ -1,6 +1,7 @@
 # 2.9.1 - 202103041430
 ## coon
 - se separó el **token** del tipo de **auth**
+- se agregó el argumento **port**
 
 ## excel
 - fix error en el método **set**
