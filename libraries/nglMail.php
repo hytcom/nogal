@@ -479,8 +479,7 @@ class nglMail extends nglBranch implements iNglClient {
 		if($this->attribute("state")=="SELECTED") {
 			if($this->sServerType=="imap") {
 				$vResponse = $this->request("FETCH ".$sMailsId." (".$sMessagesFilter.")");
-				if($this->argument("peek")) { $this->unflag($sMailsId, "seen"); }
-
+				$aMessages = false;
 				if($vResponse["text"][0]=="*") {
 					$aMessages = [];
 					
@@ -514,11 +513,10 @@ class nglMail extends nglBranch implements iNglClient {
 					$nEnd = \strrpos($sMessageData, "}");
 					$nLength = \substr($sMessageData, $nIni, ($nEnd-$nIni));
 					$aMessages[$nId] = \trim(\substr($sMessage, 0, (int)$nLength));
-					return $aMessages;
-
-				} else {
-					return false;
 				}
+
+				if($this->argument("peek")) { $this->unflag($sMailsId, "seen"); }
+				return $aMessages;
 			} else {
 				$vResponse = $this->request("RETR ".$sMailsId);
 				if($this->FindMark($vResponse["text"])) {
@@ -680,9 +678,27 @@ class nglMail extends nglBranch implements iNglClient {
 							case ($sContentType && \strpos($sContentType, "text/html")!==false):
 								$aMail["html"] = $this->DecodingType($sFragment, $sEncoding);
 								break;
-							case (isset($vFragment["Content-Type"]) && \strpos($vFragment["Content-Type"], "boundary")==false):
-								$sFragment = \implode($this->sCRLF, $aFragment);
+							case (isset($vFragment["Content-Type"]) && !isset($vFragment["boundary"]) && \strpos($vFragment["Content-Type"], "boundary")==false):
+								$aMimeType = self::call()->parseHeaderProperty($vFragment["Content-Type"]);
+								$vFragment["mimetype"] = \current($aMimeType);
+								if(\array_key_exists("Content-Disposition", $vFragment) ) {
+									$aDisposition = self::call()->parseHeaderProperty($vFragment["Content-Disposition"]);
+									if(\array_key_exists("attachment", $aDisposition)) {
+										$vFragment["type"] = "attachment";
+										$aFileinfo = self::call()->parseHeaderProperty($vFragment["filename"]);
+										$vFragment["filename"] = \current($aFileinfo);
+										$vFragment["size"] = \array_key_exists("size", $aFileinfo) ? $aFileinfo["size"] : "";
+									} else {
+										$vFragment["type"] = "inline";
+										$vFragment["filename"] = \array_key_exists("filename", $aDisposition) ? $aDisposition["filename"] : $vFragment["filename"];
+										$vFragment["size"] = \array_key_exists("size", $aDisposition) ? $aDisposition["size"] : "";
+									}
+								}
+
+								// content en base64
+								$sFragment = \implode("", $aFragment);
 								$vFragment["source"] = \trim($sFragment);
+
 								$aMail["attachments"][] = $vFragment;
 								break;
 						}

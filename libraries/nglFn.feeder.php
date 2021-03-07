@@ -710,12 +710,12 @@ class nglFn extends nglTrunk {
 		"return" : "array"
 	} **/
 	public function arrayMerge() {
-        $aArrays = \func_get_args();
-        $aMerge = \array_shift($aArrays);
+		$aArrays = \func_get_args();
+		$aMerge = \array_shift($aArrays);
 
-        foreach($aArrays as $aArray) {
-            \reset($aMerge);
-            while(list($mKey, $mValue) = \each($aArray)) {
+		foreach($aArrays as $aArray) {
+			\reset($aMerge);
+			while(list($mKey, $mValue) = \each($aArray)) {
 				if(isset($aMerge[$mKey]) && \is_array($mValue) && \is_array($aMerge[$mKey])) {
 					if(!\is_string($mKey)) {
 						$aMerge[] = $this->arrayMerge($aMerge[$mKey], $mValue);
@@ -729,11 +729,11 @@ class nglFn extends nglTrunk {
 						$aMerge[$mKey] = $mValue;
 					}
 				}
-            }
-        }
+			}
+		}
 
-        return $aMerge;
-    }
+		return $aMerge;
+	}
 	
 	/** FUNCTION {
 		"name" : "arrayMultiSort",
@@ -1693,6 +1693,28 @@ class nglFn extends nglTrunk {
 		
 		return $aHeaders;
 	}
+
+	public function parseHeaderProperty($sRawHeaders) {
+		$aGetProperties = explode(";", $sRawHeaders);
+		$aProperties = [];
+		foreach($aGetProperties as $sProperty) {
+			$sProperty = \trim($sProperty);
+			if($sProperty!="") {
+				$x = \strpos($sProperty, "=");
+				if($x!==false)  {
+					$sKey = \trim(\substr($sProperty, 0, $x));
+					$sValue = \trim(\substr($sProperty, $x+1));
+					if(\strlen($sValue) > 0 && $sValue[0]=='"') { $sValue = \substr($sValue, 1, -1); }
+					$aProperties[$sKey] = $sValue;
+				} else {
+					$aProperties[\trim($sProperty)] = \trim($sProperty);
+				}
+			}
+		}
+
+		return $aProperties;
+	}
+
 
 	/** FUNCTION {
 		"name" : "hex2dec", 

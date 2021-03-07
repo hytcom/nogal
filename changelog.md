@@ -10,11 +10,13 @@
 ## fn
 - se reescribieron los métodos **arrange** y **disarrange**
 - se corrijieron errores de sitáxis en **tokenEndode** y **tokenDecode**
+- nuevo método **parseHeaderProperty**
 
 ## mail
 - cambios en el método **PrepareMails** y dependencias
 - cambios en el método **Response** y dependencias
 - se agregó el argumento **peek**
+- se mejoró la captura de adjuntos en el método **MailParser**
 
 ________________________________________________________________________________
 # 2.9.0 - 202102161100
