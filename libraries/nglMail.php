@@ -685,8 +685,12 @@ class nglMail extends nglBranch implements iNglClient {
 									$aDisposition = self::call()->parseHeaderProperty($vFragment["Content-Disposition"]);
 									if(\array_key_exists("attachment", $aDisposition)) {
 										$vFragment["type"] = "attachment";
-										$aFileinfo = self::call()->parseHeaderProperty($vFragment["filename"]);
-										$vFragment["filename"] = \current($aFileinfo);
+										if(\array_key_exists("filename", $vFragment)) {
+											$aFileinfo = self::call()->parseHeaderProperty($vFragment["filename"]);
+											$vFragment["filename"] = \current($aFileinfo);
+										} else {
+											$vFragment["filename"] = \array_key_exists("filename", $aMimeType) ? $aMimeType["filename"] : "unname";
+										}
 										$vFragment["size"] = \array_key_exists("size", $aFileinfo) ? $aFileinfo["size"] : "";
 									} else {
 										$vFragment["type"] = "inline";
