@@ -14,6 +14,7 @@
 ## mail
 - cambios en el método **PrepareMails** y dependencias
 - cambios en el método **Response** y dependencias
+- se agregó el argumento **peek**
 
 ________________________________________________________________________________
 # 2.9.0 - 202102161100

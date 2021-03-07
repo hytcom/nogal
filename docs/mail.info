@@ -1,6 +1,6 @@
 [checksum]
-md5 = "ff70f3d1f0654c0afcea5801072807b4"
-sha1 = "a10afc09c79b8b007ea69f4083e982c60bf73100"
+md5 = "5336f8db159b713ed2e0d2e3788bda91"
+sha1 = "f931a9cb1b28dba25c7a19c4d8208ad571ac0add"
 
 [documentation]
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/mail.md"
@@ -17,6 +17,7 @@ flags = "Banderas para marcar/desmarcar el mail, separadas por espacios y sin la
 folder = "Nombre de la carpeta por defecto al consultar correos"
 from = "Dirección de correo saliente"
 get_mode = "Datos que se quieren obtener en el método get: ALL | KEYS"
+headers = "Header por defecto: DATE FROM SUBJECT"
 host = "Dominio o IP del servidor de correo"
 inreplyto = "Message-ID del mail que se quiere responder"
 limit = "Cantidad máxima de correos a ser leidos por el método getall"
@@ -25,6 +26,7 @@ mail = "Id del correo activo"
 message = "Cuerpo del correo"
 notify = "Dirección del acuse de recibo"
 pass = "Contraseña del servidor de correo"
+peek = "Vuelve a marcar los correos como no leídos luego de utilizar los métodos get"
 port = "Puerto del servidor de correo"
 priority = "Prioridad del correo a enviar, de 1 a 5"
 references = "References del mail que se quiere responder, sin el id del mismo"

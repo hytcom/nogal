@@ -193,6 +193,7 @@ class nglMail extends nglBranch implements iNglClient {
 		$vArguments["message"]					= ['$this->MailMessage((string)$mValue)', null];
 		$vArguments["notify"]					= ['$this->MailNotify((string)$mValue)', null];
 		$vArguments["pass"]						= ['$mValue'];
+		$vArguments["peek"]						= ['self::call()->isTrue($mValue)', false]; // vuelve a marcar como no leido luego de leer
 		$vArguments["port"]						= ['(int)$mValue'];
 		$vArguments["priority"]					= ['$this->MailPriority((string)$mValue)', null];
 		$vArguments["references"]				= ['$mValue', null]; /* referencia original del mail al que se esta respondiendo, sin el id del mismo */
@@ -478,6 +479,8 @@ class nglMail extends nglBranch implements iNglClient {
 		if($this->attribute("state")=="SELECTED") {
 			if($this->sServerType=="imap") {
 				$vResponse = $this->request("FETCH ".$sMailsId." (".$sMessagesFilter.")");
+				if($this->argument("peek")) { $this->unflag($sMailsId, "seen"); }
+
 				if($vResponse["text"][0]=="*") {
 					$aMessages = [];
 					
@@ -767,7 +770,7 @@ class nglMail extends nglBranch implements iNglClient {
 				}
 			}
 		}
-		$this->unflag($aGet, "seen");
+
 		return $aResponse;
 	}
 
