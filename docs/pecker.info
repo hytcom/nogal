@@ -18,6 +18,7 @@ features = "array con los datos de la tabla de 'features' usada por el método n
 	2 => nombre del campo contra el que se hará match\
 "
 file = "path del archivo para LOAD"
+file_charset = "Codificación del archivo"
 file_eol = "fin de línea"
 force = "booleano que determina si debe forzarse el reanalisis"
 grouper = "array con los números de columnas que compondrán el agrupador"

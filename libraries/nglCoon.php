@@ -20,6 +20,7 @@ class nglCoon extends nglBranch implements inglBranch {
 		$vArguments							= [];
 		$vArguments["apiname"]				= ['$mValue', "nogalcoon"];
 		$vArguments["auth"]					= ['$mValue', null]; // basic | bearer | alvin
+		$vArguments["bodyauth"]				= ['$mValue', false]; // solo en metodos POST
 		$vArguments["ctype"]				= ['(string)$mValue', "json"]; // csv | json | text | xml
 		$vArguments["data"]					= ['$mValue'];
 		$vArguments["key"]					= ['$mValue', "SOME_STRONG_KEY"];
@@ -46,7 +47,8 @@ class nglCoon extends nglBranch implements inglBranch {
 		list($mData,$sURL,$sToken,$sCType) = $this->getarguments("data,url,token,ctype", \func_get_args());
 		$sMethod = \strtoupper($this->argument("method"));
 		$nPort = $this->argument("port");
-		$sAuth = $this->argument("auth");
+		$sAuth = $this->argument("auth")." ".$sToken;
+		$bBodyAuth = $this->argument("bodyauth");
 
 		$sCType = strtolower($sCType);
 		$mContent = "";
@@ -55,6 +57,10 @@ class nglCoon extends nglBranch implements inglBranch {
 			case "json":
 				$sContentType = "application/json";
 				if($sMethod=="POST") {
+					if($bBodyAuth) {
+						if(!\is_array($mData)) { $mData = \json_decode($mData); }
+						$mData["NGL-REQUEST-AUTHORIZATION"] = $sAuth;
+					}
 					$mContent = (\is_array($mData)) ? \json_encode($mData) : $mData;
 				} else {
 					$mContent = (!\is_array($mData)) ? \json_decode($mData, true) : $mData;
@@ -64,6 +70,10 @@ class nglCoon extends nglBranch implements inglBranch {
 			case "xml":
 				$sContentType = "application/xml";
 				if($sMethod=="POST") {
+					if($bBodyAuth) {
+						if(!\is_array($mData)) { $mData = self::call("shift")->convert($mData, "xml-array"); }
+						$mData["NGL-REQUEST-AUTHORIZATION"] = $sAuth;
+					}
 					$mContent = (\is_array($mData)) ? self::call("shift")->convert($mData, "array-xml") : $mData;
 				} else {
 					$mContent = (!\is_array($mData)) ? self::call("shift")->convert($mData, "xml-array") : $mData;
@@ -74,6 +84,10 @@ class nglCoon extends nglBranch implements inglBranch {
 			case "csv":
 				$sContentType = "text/csv";
 				if($sMethod=="POST") {
+					if($bBodyAuth) {
+						if(!\is_array($mData)) { $mData = self::call("shift")->convert($mData, "csv-array"); }
+						$mData["NGL-REQUEST-AUTHORIZATION"] = $sAuth;
+					}
 					$mContent = (\is_array($mData)) ? self::call("shift")->convert($mData, "array-csv") : $mData;
 				} else {
 					$mContent = (!\is_array($mData)) ? self::call("shift")->convert($mData, "csv-array") : $mData;
@@ -83,6 +97,13 @@ class nglCoon extends nglBranch implements inglBranch {
 			case "text":
 				$sContentType = "text/plain";
 				if($sMethod=="POST") {
+					if($bBodyAuth) {
+						if(!\is_array($mData)) {
+							$sToParse = $mData;
+							\parse_str($sToParse, $mData);
+						}
+						$mData["NGL-REQUEST-AUTHORIZATION"] = $sAuth;
+					}
 					$mContent = (\is_array($mData)) ? \http_build_query($mData) : $mData;
 				} else {
 					$mContent = $mData;
@@ -94,7 +115,7 @@ class nglCoon extends nglBranch implements inglBranch {
 		$sBuffer = "REQUEST ERROR: Bad Request";
 		if(self::call()->isURL($sURL) && \function_exists("curl_init")) {
 			$aHeaders = ["Content-Type: ".$sContentType];
-			if($sAuth!==null) { $aHeaders[] = "Authorization: ".$sAuth." ".$sToken; }
+			if($sAuth!==null) { $aHeaders[] = "Authorization: ".$sAuth; }
 			if($sMethod=="GET" && !empty($mContent)) {
 				$url = self::call("url")->load($sURL);
 				$sURL = $url->update("params", $mContent)->get();
@@ -124,7 +145,41 @@ class nglCoon extends nglBranch implements inglBranch {
 		$aRequest		= $_REQUEST["source"];
 		$mBody			= $sInput = \file_get_contents("php://input");
 		$aSelf			= self::call("sysvar")->SELF;
-		
+
+		$sCType = $this->argument("ctype");
+		$sContentType = (isset($aHeaders["content-type"])) ? $aHeaders["content-type"] : $sCType;
+		switch($sContentType) {
+			case "json":
+			case "application/json":
+				$mBody = \json_decode($sInput, true);
+				$sCType = "json";
+				break;
+
+			case "xml":
+			case "application/xhtml+xml":
+			case "application/xml":
+			case "text/xml":
+				$mBody = self::call("shift")->convert($sInput, "xml-array");
+				$sCType = "xml";
+				break;
+
+			case "csv":
+			case "text/csv":
+				$mBody = self::call("shift")->convert($sInput, "csv-array");
+				$sCType = "csv";
+				break;
+
+			case "text":
+			case "text/plain":
+			case "text/html":
+				$mBody = $sInput;
+				$sCType = "text";
+				break;
+		}
+
+		if($this->argument("ctype")===null) { $this->args("ctype", $sCType); }
+
+		if($this->argument("bodyauth")) { $aHeaders["authorization"] = $mBody["NGL-REQUEST-AUTHORIZATION"]; }
 		if(isset($aHeaders["authorization"])) {
 			$aAuth = \explode(" ", $aHeaders["authorization"], 2);
 			$sAuthMethod = \strtolower($aAuth[0]);
@@ -143,36 +198,7 @@ class nglCoon extends nglBranch implements inglBranch {
 				}
 			}
 		}
-		
-		$sCType = $this->argument("ctype");
-		$sContentType = (isset($aHeaders["content-type"])) ? $aHeaders["content-type"] : null;
-		switch($sContentType) {
-			case "application/json":
-				$mBody = \json_decode($sInput, true);
-				$sCType = "json";
-				break;
-
-			case "application/xhtml+xml":
-			case "application/xml":
-			case "text/xml":
-				$mBody = self::call("shift")->convert($sInput, "xml-array");
-				$sCType = "xml";
-				break;
-
-			case "text/csv":
-				$mBody = self::call("shift")->convert($sInput, "csv-array");
-				$sCType = "csv";
-				break;
-
-			case "text/plain":
-			case "text/html":
-				$mBody = $sInput;
-				$sCType = "text";
-				break;
-		}
-
-		if($this->argument("ctype")===null) { $this->args("ctype", $sCType); }
-
+	
 		$aReturn = [];
 		if(isset($mAuth)) { $aReturn["auth"] = $mAuth; }
 		$aReturn["path"]	= $aSelf;

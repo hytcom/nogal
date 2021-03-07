@@ -1,6 +1,6 @@
 [checksum]
-md5 = "2ff6ac8e7e8e9386ddbf3e7b12485954"
-sha1 = "9752a23ef76839977d9eb40ea63a535606d4b830"
+md5 = "54e864b902d6835ff543a3a8c837d0fe"
+sha1 = "91b63366383705f5630b173be3c4bc62b5274a73"
 
 [documentation]
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/coon.md"
@@ -8,9 +8,11 @@ url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/coon.md"
 [arguments]
 apiname = "Nombre de la API"
 auth = "Tipo de autenticación: basic, bearer ó alvin"
+bodyauth = "Incluye el método de autenticación en la variable NGL-REQUEST-AUTHORIZATION del body"
 ctype = "Content-type de la solititud, formato de entrada y salida de datos: csv, json, text ó xml"
 data = "Datos de entrada y salida"
 key = "Contraseña utilizada para el cifrado del TOKEN"
 method = "Método empleado en la conexión: GET ó POST"
+port = "Puerto del web service"
 token = "Token de autenticación entre solicitudes"
 url = "URL del web service"
