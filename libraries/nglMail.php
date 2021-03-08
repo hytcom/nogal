@@ -1137,12 +1137,20 @@ class nglMail extends nglBranch implements iNglClient {
 			$this->Logger("-- No active connections");
 		} else {
 			$sResponse = "";
-
-			while(true) {
-				$sGet = \fgets($this->socket, 4096);
-				$sResponse .= (!empty($sGet)) ? $sGet : "\n";
-				if(($sMark!==null && \strpos($sGet, $sMark)===0) ||(\strpos($sGet, $this->Tag())===0)) { 
-					break;
+			if($bSMTP) {
+				while(true) {
+					$sGet = \fgets($this->socket, 512);
+					$sResponse .= (!empty($sGet)) ? $sGet : "\n";
+					$vMetaData = \stream_get_meta_data($this->socket);
+					if($vMetaData["unread_bytes"]==0) { break; }
+				}
+			} else {
+				while(true) {
+					$sGet = \fgets($this->socket, 4096);
+					$sResponse .= (!empty($sGet)) ? $sGet : "\n";
+					if(($sMark!==null && \strpos($sGet, $sMark)===0) ||(\strpos($sGet, $this->Tag())===0)) { 
+						break;
+					}
 				}
 			}
 			
