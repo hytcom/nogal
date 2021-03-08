@@ -681,7 +681,8 @@ class nglMail extends nglBranch implements iNglClient {
 							case (isset($vFragment["Content-Type"]) && !isset($vFragment["boundary"]) && \strpos($vFragment["Content-Type"], "boundary")==false):
 								$aMimeType = self::call()->parseHeaderProperty($vFragment["Content-Type"]);
 								$vFragment["mimetype"] = \current($aMimeType);
-								if(\array_key_exists("Content-Disposition", $vFragment) ) {
+
+								if(\array_key_exists("Content-Disposition", $vFragment)) {
 									$aDisposition = self::call()->parseHeaderProperty($vFragment["Content-Disposition"]);
 									if(\array_key_exists("attachment", $aDisposition)) {
 										$vFragment["type"] = "attachment";
@@ -691,15 +692,19 @@ class nglMail extends nglBranch implements iNglClient {
 										} else {
 											$vFragment["filename"] = \array_key_exists("filename", $aMimeType) ? $aMimeType["filename"] : "unname";
 										}
-										$vFragment["size"] = \array_key_exists("size", $aFileinfo) ? $aFileinfo["size"] : "";
+										$vFragment["size"] = \array_key_exists("size", $aFileinfo) ? $aFileinfo["size"] : 0;
 									} else {
 										$vFragment["type"] = "inline";
 										$vFragment["filename"] = \array_key_exists("filename", $aDisposition) ? $aDisposition["filename"] : $vFragment["filename"];
-										$vFragment["size"] = \array_key_exists("size", $aDisposition) ? $aDisposition["size"] : "";
+										$vFragment["size"] = \array_key_exists("size", $aDisposition) ? $aDisposition["size"] : 0;
 									}
+								} else if(\array_key_exists("Content-Transfer-Encoding", $vFragment)) {
+									$vFragment["type"] = "inline";
+									$vFragment["filename"] = \array_key_exists("name", $vFragment) ? $vFragment["name"] : (\array_key_exists("filename", $vFragment) ? $vFragment["filename"] : "unname");
+									$vFragment["size"] = 0;
 								}
 
-								// content en base64
+								// content
 								$sFragment = \implode("", $aFragment);
 								$vFragment["source"] = \trim($sFragment);
 
