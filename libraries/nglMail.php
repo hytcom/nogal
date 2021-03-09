@@ -173,9 +173,10 @@ class nglMail extends nglBranch implements iNglClient {
 
 	final protected function __declareArguments__() {
 		$vArguments								= [];
+		$vArguments["attach"]					= ['$mValue', null];
 		$vArguments["attach_content"]			= ['$mValue', null];
 		$vArguments["attach_name"]				= ['$mValue', null];
-		$vArguments["attach"]					= ['$mValue', null];
+		$vArguments["attachs_ignore"]			= ['self::call()->isTrue($mValue)', false];
 		$vArguments["bcc"]						= ['$mValue', null];
 		$vArguments["cc"]						= ['$mValue', null];
 		$vArguments["charset"]					= ['(string)$mValue', "UTF-8"]; /* (UTF-8 | iso-8859-1) */
@@ -633,6 +634,8 @@ class nglMail extends nglBranch implements iNglClient {
 		$aMail["cc"] = \array_key_exists("Cc", $aMail["headers"]) ? $this->PrepareMails($aMail["headers"]["Cc"])["list"] : "";
 		$aMail["cco"] = \array_key_exists("Cco", $aMail["headers"]) ? $this->PrepareMails($aMail["headers"]["Cco"])["list"] : "";
 		$aMail["subject"] = $aMail["headers"]["Subject"];
+		$aMail["hasattachments"] = false;
+		$aMail["attachments"] = [];
 
 		// body
 		\preg_match_all("/boundary=\"?([a-z0-9\'\(\)\+\_\,\-\.\/\:\=\?]+)\"?/is", $sMailContent, $aBoundary);
@@ -679,6 +682,8 @@ class nglMail extends nglBranch implements iNglClient {
 								$aMail["html"] = $this->DecodingType($sFragment, $sEncoding);
 								break;
 							case (isset($vFragment["Content-Type"]) && !isset($vFragment["boundary"]) && \strpos($vFragment["Content-Type"], "boundary")==false):
+								$aMail["hasattachments"] = true;
+								if($this->argument("attachs_ignore")) { break; }
 								$aMimeType = self::call()->parseHeaderProperty($vFragment["Content-Type"]);
 								$vFragment["mimetype"] = \current($aMimeType);
 
@@ -686,6 +691,7 @@ class nglMail extends nglBranch implements iNglClient {
 									$aDisposition = self::call()->parseHeaderProperty($vFragment["Content-Disposition"]);
 									if(\array_key_exists("attachment", $aDisposition)) {
 										$vFragment["type"] = "attachment";
+										$aFileinfo = [];
 										if(\array_key_exists("filename", $vFragment)) {
 											$aFileinfo = self::call()->parseHeaderProperty($vFragment["filename"]);
 											$vFragment["filename"] = \current($aFileinfo);
@@ -1142,7 +1148,8 @@ class nglMail extends nglBranch implements iNglClient {
 					$sGet = \fgets($this->socket, 512);
 					$sResponse .= (!empty($sGet)) ? $sGet : "\n";
 					$vMetaData = \stream_get_meta_data($this->socket);
-					if($vMetaData["unread_bytes"]==0) { break; }
+					// if($vMetaData["unread_bytes"]==0) { break; }
+					if($vMetaData["timed_out"]) { break; }
 				}
 			} else {
 				while(true) {
@@ -1300,7 +1307,7 @@ class nglMail extends nglBranch implements iNglClient {
 	// test1@domain.com;test2@domain.com
 	// test1 <test1@domain.com>;test2@domain.com
 	// test1 <test1@domain.com>,test2 <test2@domain.com>
-	// array("test1", "test1 <test1@domain.com>");
+	// array("test1@domain2.com", "test1 <test1@domain.com>");
 	private function PrepareMails($mEmails, $bOnce=false) {
 		if(\is_string($mEmails)) {
 			$mEmails = \str_replace(",", ";", $mEmails);

@@ -1,6 +1,6 @@
 [checksum]
-md5 = "0c82d1526152bee13c4d672da37e14d6"
-sha1 = "704183ca29bf0ee6274e70ece4ac35695b8b92f2"
+md5 = "ffcb1f358db2ba956c12317f831a1d70"
+sha1 = "d78f316ce71250fe8f24f3ad7c2f2f0b4bc3f9a5"
 
 [documentation]
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/mail.md"
@@ -8,6 +8,7 @@ url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/mail.md"
 [arguments]
 attach = "Ruta de un archivo adjunto relativa a NGL_SANDBOX"
 attach_content = "Contenido que puede ser enviado como archivo adjunto"
+attachs_ignore = "Ignora los adjuntos al leer los emails con el método MailParser, pero aún asi informa si hay adjuntos mediante el valor hasattachments"
 attach_name = "Nombre que llevará el archivo adjunto attach"
 bcc = "Direcciones en copia oculta, separados cualquier caracter NO válido en una dirección de correo (espacio, coma, punto y coma, etc)"
 cc = "Direcciones en copia, separados cualquier caracter NO válido en una dirección de correo (espacio, coma, punto y coma, etc)"

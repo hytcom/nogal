@@ -1,8 +1,8 @@
 # 2.9.1 - 202103041430
 ## coon
 - se separó el **token** del tipo de **auth**
-- se agregó el argumento **bodyauth**
-- se agregó el argumento **port**
+- nuevo argumento **bodyauth**
+- nuevo argumento **port**
 
 ## excel
 - fix error en el método **set**
@@ -15,7 +15,8 @@
 ## mail
 - cambios en el método **PrepareMails** y dependencias
 - cambios en el método **Response** y dependencias
-- se agregó el argumento **peek**
+- nuevo argumento **peek**
+- nuevo argumento **attachs_ignore**
 - se mejoró la captura de adjuntos en el método **MailParser**
 
 ________________________________________________________________________________
