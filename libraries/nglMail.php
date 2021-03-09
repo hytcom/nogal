@@ -1148,8 +1148,8 @@ class nglMail extends nglBranch implements iNglClient {
 					$sGet = \fgets($this->socket, 512);
 					$sResponse .= (!empty($sGet)) ? $sGet : "\n";
 					$vMetaData = \stream_get_meta_data($this->socket);
-					// if($vMetaData["unread_bytes"]==0) { break; }
-					if($vMetaData["timed_out"]) { break; }
+					if($vMetaData["unread_bytes"]==0) { break; }
+					// if($vMetaData["timed_out"]) { break; }
 				}
 			} else {
 				while(true) {
