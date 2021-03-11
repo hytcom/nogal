@@ -390,16 +390,16 @@ class nglRoot {
 
 	public static function errorsHandler($nError, $sMessage, $sFile, $nLine) {
 		if(\defined("E_ERROR")) { 				$aErrors[E_ERROR]		 		= "Error"; }
-		if(\defined("E_WARNING")) { 				$aErrors[E_WARNING]				= "Warning"; }
+		if(\defined("E_WARNING")) { 				$aErrors[E_WARNING]			= "Warning"; }
 		if(\defined("E_PARSE")) { 				$aErrors[E_PARSE]				= "Parsing Error"; }
 		if(\defined("E_NOTICE")) { 				$aErrors[E_NOTICE]				= "Notice"; }
 		if(\defined("E_CORE_ERROR")) { 			$aErrors[E_CORE_ERROR]			= "Core Error"; }
 		if(\defined("E_CORE_WARNING")) { 		$aErrors[E_CORE_WARNING]		= "Core Warning"; }
 		if(\defined("E_COMPILE_ERROR")) { 		$aErrors[E_COMPILE_ERROR]		= "Compile Error"; }
-		if(\defined("E_COMPILE_WARNING")) { 		$aErrors[E_COMPILE_WARNING]		= "Compile Warning"; }
+		if(\defined("E_COMPILE_WARNING")) { 		$aErrors[E_COMPILE_WARNING]	= "Compile Warning"; }
 		if(\defined("E_USER_ERROR")) { 			$aErrors[E_USER_ERROR]			= "User Error"; }
-		if(\defined("E_USER_WARNING")) {			$aErrors[E_USER_WARNING]		= "User Warning"; }
-		if(\defined("E_USER_NOTICE")) { 			$aErrors[E_USER_NOTICE]			= "User Notice"; }
+		if(\defined("E_USER_WARNING")) {			$aErrors[E_USER_WARNING]	= "User Warning"; }
+		if(\defined("E_USER_NOTICE")) { 			$aErrors[E_USER_NOTICE]		= "User Notice"; }
 		if(\defined("E_STRICT")) { 				$aErrors[E_STRICT]				= "Runtime Notice"; }
 		if(\defined("E_RECOVERABLE_ERROR")) {	$aErrors[E_RECOVERABLE_ERROR]	= "Catchable Fatal Error"; }
 		if(\defined("E_DEPRECATED")) { 			$aErrors[E_DEPRECATED]			= "Runtime Notice, this code not work in future versions"; }
@@ -657,7 +657,7 @@ class nglRoot {
 		$vCurrentPath = self::currentPath();
 		$sErrRow  = \date("Y-m-d H:i:s");
 		$sErrRow .= "\t".(isset($_SERVER["REMOTE_ADDR"]) ? $_SERVER["REMOTE_ADDR"] : "localhost");
-		$sErrRow .= "\t".$vCurrentPath["path"];
+		$sErrRow .= "\t".$vCurrentPath["fullpath"];
 		$sErrRow .= "\t".$sCurrentFile." (".$nCurrentLine.")";
 		$sErrRow .= "\t".$sMsgText;
 		self::log("errors.log", $sErrRow);

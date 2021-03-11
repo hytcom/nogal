@@ -1,4 +1,4 @@
-# 2.9.1 - 202103102230
+# 2.9.1 - 202103111900
 ## coon
 - se separó el **token** del tipo de **auth**
 - nuevo argumento **bodyauth**
@@ -21,6 +21,9 @@
 
 ## owl
 - fix error en el guardado del changelog
+
+## root
+- se reemplazó el **path** del archivo, por el **fullpath** en el manejador de errores
 
 ________________________________________________________________________________
 # 2.9.0 - 202102161100
