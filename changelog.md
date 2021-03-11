@@ -1,4 +1,4 @@
-# 2.9.1 - 202103041430
+# 2.9.1 - 202103102230
 ## coon
 - se separó el **token** del tipo de **auth**
 - nuevo argumento **bodyauth**
@@ -18,6 +18,9 @@
 - nuevo argumento **peek**
 - nuevo argumento **attachs_ignore**
 - se mejoró la captura de adjuntos en el método **MailParser**
+
+## owl
+- fix error en el guardado del changelog
 
 ________________________________________________________________________________
 # 2.9.0 - 202102161100

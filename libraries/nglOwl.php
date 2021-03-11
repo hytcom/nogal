@@ -1406,7 +1406,7 @@ SQL;
 			$aLog["action"]		= $sAction;
 			$aLog["date"]		= \date("Y-m-d H:i:s");
 			$aLog["ip"]			= self::call("sysvar")->IP;
-			$aLog["changelog"]	= ($aChangeLog!=null) ? \json_encode($aChangeLog) : null;
+			$aLog["changelog"]	= ($aChangeLog!=null) ? $this->db->escape(\json_encode($aChangeLog)) : null;
 
 			$this->db->insert("__ngl_owl_log__", $aLog, "INSERT", false, true);
 			$this->Logger("success", $aLog);
