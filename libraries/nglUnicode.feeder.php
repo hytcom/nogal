@@ -864,6 +864,7 @@ class nglUnicode extends nglTrunk {
 			$nCount = \strlen($sString);
 		} else {
 			$nCount = 0;
+			$sString = (string)$sString;
 			$nString = \strlen($sString);
 			for($x=0; $x<$nString; $x++) {
 				if((\ord($sString[$x])&0xC0)!=0x80) {
