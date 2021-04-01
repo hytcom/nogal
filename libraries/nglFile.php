@@ -300,6 +300,7 @@ class nglFile extends nglBranch implements inglBranch {
 						}
 					}
 				}
+				\curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
 				\curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 
 				$sBuffer = \curl_exec($curl); 

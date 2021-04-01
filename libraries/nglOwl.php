@@ -182,7 +182,7 @@ CREATE TABLE `__ngl_owl_structure__` (
 	`id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
 	`name` CHAR(128) NOT NULL COMMENT 'nombre del objeto',
 	`code` CHAR(12) NOT NULL COMMENT 'código del objeto. Que luego formará parte de el IMYA de cada registro del mismo',
-	`roles` ENUM('0', '1') NOT NULL DEFAULT '0' COMMENT 'determina si el objeto esta sujeto a roles: 0=no, 1=si',
+	`roles` ENUM('0', '1', '2', '3') NOT NULL DEFAULT '0' COMMENT 'determina si el objeto esta sujeto a roles: 0=no, 1=si',
 	`columns` TEXT NOT NULL COMMENT 'JSON con los nombres de las columnas del objeto',
 	`foreignkey` TEXT NULL COMMENT 'relaciones externas',
 	`relationship` TEXT NULL COMMENT 'relaciones con otros objetos en formato JSON',

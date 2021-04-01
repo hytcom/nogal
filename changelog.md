@@ -1,3 +1,31 @@
+# 2.9.2 - 202104011500
+## file
+- se añadió la opción **CURLOPT_FOLLOWLOCATION** al método **read**
+
+## mysql
+- nuevo método **ifexists**
+
+## nest
+- fix error en el método **load** cuando no existe un registro **owl**
+- cambios en **createFromYaml** ahora soporta el uso de **presets**
+- fix errores de dependencia al borrar y renombrar
+- **db2nest** ahora es **createNestCodeFromTable**
+- comentarios y defaults en **CreateStructure**
+
+## owl
+- se agregaron opciones en el campo **roles** de la tabla **__ngl_owl_structure__** en el método **dbStructure**
+
+## pgsql
+- nuevo método **ifexists**
+
+## rind
+- fix error menor en **rindLoop**
+- se quitó la codificación base64 para el método **file** del comando **set**. Ahora el usuario debe codificar el argumento antes de enviarlo
+
+## tutor
+- se añadió la clausula admin al método **alvin**
+
+________________________________________________________________________________
 # 2.9.1 - 202103111900
 ## coon
 - se separó el **token** del tipo de **auth**

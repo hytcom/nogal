@@ -226,7 +226,8 @@ class nglNest extends nglBranch {
 				$aType = $this->aFields["fk"];
 			} else {
 				if(\array_key_exists("default", $mType)) {
-					if(\strtolower($mType["default"])=="now") {
+					if($mType["default"][0]=="'") { $mType["default"] = \substr($mType["default"], 1, -1); }
+					if(\strtolower($mType["default"])=="now" || \strtolower($mType["default"])=="current_timestamp") {
 						$mType["default"] = "CURRENT_TIMESTAMP";
 					} else if(\strtolower($mType["default"])=="null" || $mType["default"]===null) {
 						$mType["default"] = "NULL";
@@ -341,8 +342,14 @@ class nglNest extends nglBranch {
 			self::errorMessage($this->object, 1001); // empty object name
 			return false;
 		} else if(isset($this->owl["tables"][$sObject])) {
-			self::errorMessage($this->object, 1002, $sObject); // object alredy exists
-			return false;
+			if(isset($this->aAutoNormalize[$sObject])) {
+				unset($this->aAutoNormalize[$sObject], $this->owl["tables"][$sObject]);
+			} else {
+				self::errorMessage($this->object, 1002, $sObject); // object alredy exists
+				return false;
+			}
+		} else if(isset($this->aAutoNormalize[$sObject])) {
+			unset($this->aAutoNormalize[$sObject]);
 		}
 
 		$sObject = $this->FormatName($sObject);
@@ -543,7 +550,7 @@ class nglNest extends nglBranch {
 		}
 	}
 
-	public function db2nest() {
+	public function createNestCodeFromTable() {
 		list($sObject) = $this->getarguments("entity", \func_get_args());
 		$db = $this->argument("db");
 		if($aDescribe = $db->describe($sObject)) {
@@ -995,11 +1002,15 @@ class nglNest extends nglBranch {
 					$sentence = $db->query("SELECT `sentence` FROM `__ngl_sentences__` WHERE `name` = '".$mStructure."'");
 					if($sentence && $sentence->rows()) {
 						$mStructure = $sentence->get("sentence");
-					} else {
-						self::errorMessage($this->object, 1010); // owl sentence
+						$aStructure = \json_decode($mStructure, true);
+					} else if($mStructure!="owl") {
+						$sentence = $db->query("SELECT `sentence` FROM `__ngl_sentences__` WHERE `name` = 'owl'");
+						if($sentence && $sentence->rows()) {
+							$mStructure = $sentence->get("sentence");
+							$aStructure = \json_decode($mStructure, true);
+						}
 					}
 				}
-				$aStructure = \json_decode($mStructure, true);
 			}
 		}
 
@@ -1133,10 +1144,10 @@ class nglNest extends nglBranch {
 		if($sNewName===null) { $sNewName = $sEntity; }
 		if(isset($this->aPresets[$sEntity])) {
 			if($sTitle===null) { $sTitle = $sNewName; }
-			$this->create($sNewName, $sTitle, $this->aPresets[$sEntity]);
+			return $this->create($sNewName, $sTitle, $this->aPresets[$sEntity]);
 		}
 
-		return $this;
+		return false;
 	}
 	
 	public function presets() {
@@ -1170,6 +1181,15 @@ class nglNest extends nglBranch {
 
 		$mField = $this->FormatName($mField);
 		unset($this->owl["tables"][$sObject][$mField], $this->owl["def"][$sObject][$mField]);
+
+		if(isset($this->owl["parents"][$sObject])) {
+			unset($this->owl["children"][$this->owl["parents"][$sObject]][$sObject]);
+			if(!\count($this->owl["children"][$this->owl["parents"][$sObject]])) {
+				unset($this->owl["children"][$this->owl["parents"][$sObject]]);
+			}
+			unset($this->owl["parents"][$sObject]);
+		}
+
 		if(isset($this->owl["joins"][$sObject])) {
 			foreach($this->owl["joins"][$sObject] as $sIndex=>$sJoin) {
 				if(\strpos($sJoin, $mField.":")===0) {
@@ -1226,6 +1246,7 @@ class nglNest extends nglBranch {
 			$this->owl["titles"][$sObject],
 			$this->owl["def"][$sObject],
 			$this->owl["foreignkeys"][$sObject],
+			$this->owl["parents"][$sObject],
 			$this->owl["children"][$sObject],
 			$this->owl["joins"][$sObject],
 			$this->owl["validator"][$sObject],
@@ -1464,19 +1485,28 @@ class nglNest extends nglBranch {
 		$sData = $yml->read();
 		$aData = self::call("shift")->convert($sData, "yml-array");
 
-		foreach($aData as $sTitle => $aFields) {
+		foreach($aData as $sTitle => $mDefinition) {
 			$sObject = $this->FormatName($sTitle);
-			$aColumns = [];
-			foreach($aFields as $sField) {
-				if(\is_string($sField)) {
-					$aField = \explode(":", $sField);
-					$sField = $this->FormatName($aField[0]);
-					$aField = ($aField[1][0]=="@") ? \array_combine(["label", "type"], $aField) : \array_combine(["label", "alias"], $aField);
-					$aColumns[$sField] = $aField;
+			if(\is_string($mDefinition)) {
+				if(!$this->preset($mDefinition, $sObject, $sTitle)) { return false; }
+			} else {
+				$aColumns = [];
+				foreach($mDefinition as $sField) {
+					if(\is_string($sField)) {
+						$aField = \explode(":", $sField);
+						$sField = $this->FormatName($aField[0]);
+						if($aField[1][0]=="@") {
+							$aField[1] = "@".$this->FormatName($aField[1]);
+							$aField = \array_combine(["label", "type"], $aField);
+						} else {
+							$aField = \array_combine(["label", "alias"], $aField);
+						}
+						$aColumns[$sField] = $aField;
+					}
 				}
-			}
 
-			if(!$this->create($sObject, $sTitle, $aColumns)) { return false; }
+				if(!$this->create($sObject, $sTitle, $aColumns)) { return false; }
+			}
 		}
 		
 		return $this;
@@ -1551,7 +1581,7 @@ class nglNest extends nglBranch {
 	}
 
 	private function CreateStructure() {
-		$sSQL = $this->owl->dbStructure();
+		$sSQL = self::call("owl")->dbStructure();
 		$sSQL .= <<<SQL
 
 -- sentences --
@@ -1604,9 +1634,12 @@ SQL;
 			$sSQLStructure .= "CREATE TABLE `".$sTable."` (\n";
 			$sSQLStructure .= "\t`id` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT NOT NULL,\n";
 			$sSQLStructure .= "\t`imya` CHAR(32) NOT NULL DEFAULT '',\n";
-			$sSQLStructure .= "\t`state` ENUM('0', '1') NULL DEFAULT '1',\n";
+			$sSQLStructure .= "\t`state` ENUM('0', '1') NULL DEFAULT '1' COMMENT 'NULL=eliminado, 0=inactivo, 1=activo',\n";
 			$sSQLStructure .= "\t".\implode(",\n\t", $aFields);
-			$sSQLStructure .= "\n) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;\n";
+			$sSQLStructure .= "\n) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci";
+			if(!empty($this->owl["nest"]["objects"][$sTable]["comment"])) { $sSQLStructure .= " COMMENT '".\addslashes($this->owl["nest"]["objects"][$sTable]["comment"])."'";	}
+			$sSQLStructure .= ";\n";
+
 			if(\is_array($aIndex) && \count($aIndex)) { $sSQLStructure .= \implode("\n", $aIndex)."\n"; }
 			$sSQLStructure .= "\n";
 		} else if(isset($this->aAlterField[$sTable])) {

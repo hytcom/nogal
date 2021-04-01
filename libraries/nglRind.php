@@ -3484,7 +3484,7 @@ namespace nogal {
 								$sFilePath = self::call()->clearPath($vArguments["value"]);
 								$sAuth = (isset($vArguments["userpwd"])) ? $vArguments["userpwd"] : "0";
 								$sBody = (isset($vArguments["body"])) ? $vArguments["body"] : "0";
-								$sReturn .= $sAuthorization.' = \base64_encode("'.$sAuth.'");'.$this->EOL;
+								$sReturn .= $sAuthorization.' = "'.$sAuth.'";'.$this->EOL;
 								$sReturn .= $sBodyContent.' = '.$sBody.';'.$this->EOL;
 								$sReturn .= $sDataVar.' = Rind::readFile("'.$sFilePath.'", null, '.$sAuthorization.', '.$sBodyContent.'); ';
 							break;
@@ -3606,13 +3606,13 @@ namespace nogal {
 								\array_walk('.$sKeys.', function (&'.$sKey.') { '.$sKey.' = \trim('.$sKey.', " \t\n\r\0\x0B"); });
 								if(\is_array('.$sDataVar.')) {
 									if(\is_array(\current('.$sDataVar.'))) {
-										if(\count('.$sKeys.')==\count(\current('.$sDataVar.'))) { 
+										if(\is_array('.$sKeys.') && \count('.$sKeys.')==\count(\current('.$sDataVar.'))) { 
 											foreach('.$sDataVar.' as '.$sKey.' => '.$aValue.') {
 												'.$sDataVar.'['.$sKey.'] = \array_combine('.$sKeys.', '.$aValue.');
 											}
 										}
 									} else {
-										if(\count('.$sKeys.')==\count(\current('.$sDataVar.'))) { 
+										if(\is_array('.$sKeys.') && \count('.$sKeys.')==\count('.$sDataVar.')) { 
 											'.$sDataVar.' = \array_combine('.$sKeys.', '.$sDataVar.');
 										} else {
 											'.$sDataVar.' = [];
@@ -3893,7 +3893,6 @@ namespace {
 			global $ngl;
 			$aOptions = ["CURLOPT_SSL_VERIFYPEER" => false];
 			if($sAuth!==0) {
-				$sAuth = \base64_decode($sAuth);
 				$aAuth = \explode(" ", $sAuth, 2);
 				$sAuthMethod = \strtolower($aAuth[0]);
 				if($sAuthMethod=="basic") {

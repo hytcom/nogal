@@ -206,6 +206,13 @@ class nglDBMySQL extends nglBranch implements iNglDataBase {
 		return $this->link;
 	}
 
+	public function ifexists() {
+		list($sTable) = $this->getarguments("table", \func_get_args());
+		$sBase = $this->argument("base");
+		$chk = $this->link->query("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '".$sBase."' AND TABLE_NAME = '".$sTable."' LIMIT 1");
+		return $chk->num_rows ? true : false;
+	}
+
 	public function import() {
 		list($sFilePath,$sTable) = $this->getarguments("file,table", \func_get_args());
 		if($sFilePath===null) { return false; }

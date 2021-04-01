@@ -197,6 +197,13 @@ class nglDBPostgreSQL extends nglBranch implements iNglDataBase {
 		return $this->link;
 	}
 
+	public function ifexists() {
+		list($sTable,$sBase) = $this->getarguments("table,base", \func_get_args());
+		$sSchema = $this->argument("schema");
+		$nChk = \pg_fetch_result(\pg_query($this->link, "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE table_schema = '".$sSchema."' AND table_name = '".$sTable."'"),0,0);
+		return !$nChk ? true : false;
+	}
+
 	public function import() {
 		list($sFilePath,$sTable) = $this->getarguments("file,table", \func_get_args());
 		if($sFilePath===null) { return false; }

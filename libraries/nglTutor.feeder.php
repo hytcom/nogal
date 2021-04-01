@@ -105,12 +105,15 @@ class nglTutor extends nglTrunk {
 				\trigger_error("Only logged users can run this method", E_USER_ERROR);
 			}
 
+			$alvin = self::call("alvin");
 			if(!empty($sGrants)) {
-				if(!self::call("alvin")->loaded()) {
-					if(!self::call("alvin")->autoload()) { \trigger_error("Alvin is not loaded", E_USER_ERROR); exit(); }
+				if(!$alvin->loaded()) {
+					if(!$alvin->autoload()) { \trigger_error("Alvin is not loaded", E_USER_ERROR); exit(); }
 				}
 				
-				if(!self::call("alvin")->check($sGrants)) { \trigger_error("You do not have grants to execute this action", E_USER_ERROR); exit(); }
+				if($alvin->profile()=="ADMIN") { return $this; }
+
+				if(!$alvin->check($sGrants)) { \trigger_error("You do not have grants to execute this action", E_USER_ERROR); exit(); }
 				return $this;
 			}
 		}

@@ -1,6 +1,6 @@
 [checksum]
-md5 = "619b5b85735ffbda4111fba753be6fd6"
-sha1 = "a475e1bf4359e48a56e456d06c7f49ed030ebe5e"
+md5 = "ef6fff7824d4c8b0a9b003d8323a9325"
+sha1 = "563328bdc1729154ded82e639a3143dbc5faf5a3"
 
 [documentation]
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/mysql.md"
@@ -12,6 +12,7 @@ charset = "Juego de caracteres con el que se ejecutarán las consultas"
 check_colnames = "Activa el chequeo de los nombre de las columnas en la tabla activa"
 debug = "Cuando es TRUE el método retorna la sentencia SQL en lugar de ejecutarla"
 do = "Cuando es TRUE el método query ejecuta la sentencia pero no retorna resultado"
+engine = "Motor de tablas predeterminado"
 error_description = "Ante un error mostrará la descripción del mismo"
 error_query = "Ante un error mostrará la consulta que le dió origen"
 file = "Ruta del archivo a exportar ó importar"
