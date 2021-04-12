@@ -1,4 +1,4 @@
-# 2.9.2 - 202104011500
+# 2.9.2 - 202104121730
 ## file
 - se añadió la opción **CURLOPT_FOLLOWLOCATION** al método **read**
 
@@ -14,6 +14,7 @@
 
 ## owl
 - se agregaron opciones en el campo **roles** de la tabla **__ngl_owl_structure__** en el método **dbStructure**
+- nuevo método **imyaOf**
 
 ## pgsql
 - nuevo método **ifexists**

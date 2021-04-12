@@ -367,6 +367,20 @@ SQL;
 		return false;
 	}
 
+	public function imyaOf() {
+		list($sImya) = $this->getarguments("id", \func_get_args());
+
+		$sSQL = $this->JsqlParser('{
+			"columns":["name"],
+			"tables":["__ngl_owl_structure__"],
+			"where":[["code","eq","('.\substr($sImya, 0, 12).')"]]
+		}');
+		$table = $this->db->query($sSQL);
+
+		if($table->rows()) { return $table->get("name"); }
+		return false;
+	}
+
 	public function insert() {
 		if(!$this->bInternalCall) { $this->Logger(); }
 
