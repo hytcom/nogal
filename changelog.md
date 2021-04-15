@@ -1,4 +1,4 @@
-# 2.9.2 - 202104121730
+# 2.9.2 - 202104151600
 ## file
 - se añadió la opción **CURLOPT_FOLLOWLOCATION** al método **read**
 
@@ -25,6 +25,7 @@
 
 ## tutor
 - se añadió la clausula admin al método **alvin**
+- ahora **Nulls** acepta **true** para procesar todos los argumentos
 
 ________________________________________________________________________________
 # 2.9.1 - 202103111900

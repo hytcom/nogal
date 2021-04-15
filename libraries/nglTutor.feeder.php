@@ -159,6 +159,7 @@ class nglTutor extends nglTrunk {
 
 	final protected function Nulls($aData, $aNulls=null) {
 		if($aNulls===null) { $aNulls = $this->aNulls; }
+		if(\current($aNulls)===true) { $aNulls = \array_keys($aData); }
 		if(!\is_array($aNulls) || !\count($aNulls)) { return $aData; }
 		return self::call()->emptyToNull($aData, $aNulls);
 	}
