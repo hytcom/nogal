@@ -1,9 +1,10 @@
-# 2.9.2 - 202104151600
+# 2.9.2 - 202104209000
 ## file
 - se añadió la opción **CURLOPT_FOLLOWLOCATION** al método **read**
 
 ## mysql
 - nuevo método **ifexists**
+- se cambió chartset a **utf8mb4**
 
 ## nest
 - fix error en el método **load** cuando no existe un registro **owl**

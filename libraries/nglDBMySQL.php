@@ -24,7 +24,7 @@ class nglDBMySQL extends nglBranch implements iNglDataBase {
 		$vArguments							= [];
 		$vArguments["autoconn"]				= ['self::call()->istrue($mValue)', false];
 		$vArguments["base"]					= ['$mValue', "test"];
-		$vArguments["charset"]				= ['$mValue', "utf8"];
+		$vArguments["charset"]				= ['$mValue', "utf8mb4"];
 		$vArguments["check_colnames"]		= ['self::call()->istrue($mValue)', true];
 		$vArguments["debug"]				= ['self::call()->istrue($mValue)', false];
 		$vArguments["do"]					= ['self::call()->istrue($mValue)', false];
