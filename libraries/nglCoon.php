@@ -23,7 +23,7 @@ class nglCoon extends nglBranch implements inglBranch {
 		$vArguments["bodyauth"]				= ['$mValue', false]; // solo en metodos POST
 		$vArguments["ctype"]				= ['(string)$mValue', "json"]; // csv | json | text | xml
 		$vArguments["data"]					= ['$mValue'];
-		$vArguments["key"]					= ['$mValue', "SOME_STRONG_KEY"];
+		$vArguments["key"]					= ['$mValue', "*sTr0N6k3Y@"];
 		$vArguments["method"]				= ['(string)$mValue', "POST"];
 		$vArguments["port"]					= ['$mValue', null];
 		$vArguments["token"]				= ['$mValue', null];
@@ -235,6 +235,16 @@ class nglCoon extends nglBranch implements inglBranch {
 			\header("Content-Type: text/plain", true);
 			return (\is_array($aData)) ? self::call()->imploder(["\t", "\n"], $aData) : $aData;
 		}
+	}
+
+	public function tokenEncode() {
+		list($sToken) = $this->getarguments("token", func_get_args());
+		return self::call()->tokenEncode($sToken, $this->argument("key"), "ALVIN TOKEN");
+	}
+
+	public function tokenDecode() {
+		list($sToken) = $this->getarguments("token", func_get_args());
+		return self::call()->tokenDecode($sToken, $this->argument("key"));
 	}
 }
 

@@ -172,6 +172,14 @@ class nglFiles extends nglFeeder implements inglFeeder {
 		
 		$sSource = self::call()->sandboxPath($sSource);
 		$sDestine = self::call()->sandboxPath($sDestine);
+		if(!\is_dir($sDestine)) {
+			if(@\mkdir($sDestine)) {
+				@\chmod($sDestine, NGL_CHMOD_FOLDER);
+				$sLog = "mkdir\t".$sDestine."\n";
+			} else {
+				self::errorMessage($this->object, 1003, \dirname($sDestine));
+			}
+		}
 
 		$sMode = ($bIncludeHidden) ? "signed-h" : "signed";		
 		$aFiles = $this->ls($sSource, $sMask, "signed", $bRecursive);

@@ -131,18 +131,19 @@ class nglFn extends nglTrunk {
 		"return" : "array"
 	} **/
 	public function arrange($mSource, $aArrange) {
+		if(!\is_array($aArrange)) { self::errorMessage("fn", null, '$aArrange must be of the type array', "die"); }
 		if(\is_string($mSource)) {
-			\preg_match_all("/./u", $mSource, $aDisarrange);
-			$aDisarrange = $aDisarrange[0];
+			$aDisarrange = self::call("unicode")->str_split($mSource);
 		} else {
 			$aDisarrange = $mSource;
 		}
-		
+
 		$sFill 			= self::call()->unique(6);
 		$nDisarrange	= \count($aDisarrange);
 		$aOrdered		= \array_fill(0, $nDisarrange, $sFill);
 		$aCounter		= \array_keys($aOrdered);
 		$nArrange 		= \count($aArrange);
+
 		if($nArrange<$nDisarrange) {
 			$nMultiplier = \ceil($nDisarrange/$nArrange);
 			$aArrange = self::call()->arrayRepeat($aArrange, $nMultiplier);
@@ -159,11 +160,11 @@ class nglFn extends nglTrunk {
 			unset($aCounter[$nKey]);
 			\reset($aCounter);
 
-			$aOrdered[$nKey] = $aDisarrange[++$y];
+			if(isset($aDisarrange[++$y])) { $aOrdered[$nKey] = $aDisarrange[$y]; }
 			if(!\count($aCounter)) { break; }
 		}
-		
-		return (\is_string($mSource)) ? \implode($aOrdered) : $aOrdered;;
+
+		return (\is_string($mSource)) ? \implode($aOrdered) : $aOrdered;
 	}
 
 	/** FUNCTION {
@@ -1353,9 +1354,9 @@ class nglFn extends nglTrunk {
 		"return" : "array"
 	} **/
 	public function disarrange($mSource, $aArrange) {
+		if(!\is_array($aArrange)) { self::errorMessage("fn", null, '$aArrange must be of the type array', "die"); }
 		if(\is_string($mSource)) {
-			\preg_match_all("/./u", $mSource, $aSource);
-			$aItems = $aSource[0];
+			$aItems = self::call("unicode")->str_split($mSource);
 		} else {
 			$aItems = $mSource;
 		}
@@ -2670,12 +2671,12 @@ class nglFn extends nglTrunk {
 
 		// token
 		$sToken = \substr($sToken, 0, -64);
-
+		
 		// secure arrange
 		$sSignKey = self::call()->hex2dec($sSign);
-		$sToken	= self::call()->arrange($sToken, \str_split($sSignKey, 2));
+		$sToken	= self::call()->arrange($sToken, self::call("unicode")->str_split($sSignKey, 2));
 
-		// cheque firma
+		// chequeo firma
 		if(\substr(\md5($sToken),0,-(\strlen($aSign[1])+2)) != $sSign) {
 			return false;
 		}
@@ -2683,12 +2684,12 @@ class nglFn extends nglTrunk {
 		// key
 		$sKey 		= \sha1($sKey);
 		$sKey		= self::call()->hex2dec($sKey);
-		$aKey 		= \str_split($sKey, 2);
+		$aKey 		= self::call("unicode")->str_split($sKey, 2);
 		$aKeyRev 	= \array_reverse($aKey);
 
 		// token
 		$sToken = \preg_replace("/\s/", "", $sToken);
-		$aToken = \str_split($sToken, 2);
+		$aToken = self::call("unicode")->str_split($sToken, 2);
 
 		$x = 0;
 		$aClear = [];
@@ -2728,7 +2729,7 @@ class nglFn extends nglTrunk {
 		$sChars = "0123456789aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ";
 
 		// source to hex
-		$aSource = \str_split($sSource);
+		$aSource = self::call("unicode")->str_split($sSource);
 		foreach($aSource as &$sChar) {
 			$sChar = self::call()->dec2hex(ord($sChar), 2);
 		}
@@ -2738,6 +2739,8 @@ class nglFn extends nglTrunk {
 		$sKey		= self::call()->hex2dec($sKey);
 		$aKey 		= \str_split($sKey, 2);
 		$aSource	= self::call()->disarrange($aSource, $aKey);
+
+		// echo implode("", $aSource)."\n";
 
 		// fill token
 		$aKey = \array_reverse($aKey);
@@ -2761,7 +2764,7 @@ class nglFn extends nglTrunk {
 		}
 		
 		// token data
-		$sTokenData	= \implode($aToken);
+		$sTokenData	= \implode("", $aToken);
 		
 		// length
 		$sLength = $sChars[\rand(22,61)].self::call()->dec2hex(\count($aSource)).$sChars[\rand(22,61)];
@@ -2771,6 +2774,7 @@ class nglFn extends nglTrunk {
 		$sSign = \md5($sTokenData);
 		$sSign = $sSignKey = \substr($sSign,0,-strlen($sLength));
 		$sSign .= $sLength;
+
 		$sLastLine = self::call()->unique(32).self::call()->unique(32);
 		for($x=0; $x<32; $x+=2) {
 			$sLastLine[$y] = $sSign[$x];
@@ -2779,14 +2783,16 @@ class nglFn extends nglTrunk {
 		}
 
 		// secure disarrange
+		$sSignKey2 = $sSignKey;
 		$sSignKey = self::call()->hex2dec($sSignKey);
-		$sTokenData	= self::call()->disarrange($sTokenData, \str_split($sSignKey, 2));
+		$aKey = self::call("unicode")->str_split($sSignKey, 2);
+		$sTokenData	= self::call()->disarrange($sTokenData, $aKey);
 
 		// token
 		if($sTokenTitle===false) {
 			$sToken = $sTokenData.$sLastLine;
 		} else {
-			$sTokenData	= \implode("\n", \str_split($sTokenData, 64));
+			$sTokenData	= \implode("\n", self::call("unicode")->str_split($sTokenData, 64));
 			$sTokenTitle = \substr($sTokenTitle, 0, 58); 
 			$sToken	 = "/-- ".\str_pad($sTokenTitle." ", 58, "-")."-/\n";
 			$sToken	.= $sTokenData."\n";

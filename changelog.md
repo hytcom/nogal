@@ -1,3 +1,17 @@
+# 2.9.3 - 202104262130
+## coon
+- nuevos metodos **tokenEncode** y **tokenDecode**
+
+## files
+- fix en **copyr** si la carpeta de destino no existe es creada
+
+## fn
+- fix errores menores en **arrange** y **disarrange**
+
+## unicode
+- nuevo método **str_plit**
+
+_______________________________________________________________________________
 # 2.9.2 - 202104209000
 ## file
 - se añadió la opción **CURLOPT_FOLLOWLOCATION** al método **read**

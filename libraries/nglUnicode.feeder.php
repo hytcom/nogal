@@ -922,6 +922,19 @@ class nglUnicode extends nglTrunk {
 		return str_pad($sText, ($nLength-$nDiff), $sString, $nType);
 	}
 
+	public function str_split($sText, $nLength=1) {
+		$aText = preg_split("//u", $sText, -1, PREG_SPLIT_NO_EMPTY);
+		if($nLength > 1) {
+			$aChunks = array_chunk($aText, $nLength);
+			foreach($aChunks as $x => $sChunk) {
+				$aChunks[$x] = \implode("", (array)$sChunk);
+			}
+			$aText = $aChunks;
+		}
+
+		return $aText;
+	}
+
 	/** FUNCTION {
 		"name" : "unescape", 
 		"type" : "public",
