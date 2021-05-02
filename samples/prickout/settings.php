@@ -71,11 +71,11 @@ Ej:
 	$NGL_REFERER_IGNORES[] = "/folder/filename.php";
 **/
 // chequeos
-$NGL_REFERER_CHECKS										= array();
+$NGL_REFERER_CHECKS										= [];
 $NGL_REFERER_CHECKS[]									= "/tutor/";
 
 // excepciones
-$NGL_REFERER_IGNORES									= array();
+$NGL_REFERER_IGNORES									= [];
 
 
 #===============================================================================
@@ -92,27 +92,68 @@ Ej:
 	$NGL_ONCECODE_IGNORES[] = "/folder/filename.php";
 **/
 // chequeos
-$NGL_ONCECODE_CHECKS									= array();
+$NGL_ONCECODE_CHECKS									= [];
 $NGL_ONCECODE_CHECKS[]									= "/tutor/";
 
 // excepciones
-$NGL_ONCECODE_IGNORES									= array();
+$NGL_ONCECODE_IGNORES									= [];
 
 
 #===============================================================================
 #	VARIABLES DEL PROYECTO
 #===============================================================================
-$ENV["gtools"] = array();
-$ENV["gtools"]["apikey"] = null;
-$ENV["gtools"]["maps"] = array(
-	//eg: , Buenos Aires, Argentina
-	"bound" => "",
+// social
+// $ENV["social"] = [
+// 	"whatsapp" => "5491100000000",
+// 	"instagram" => "",
+// 	"facebook" => "",
+// 	"twitter" => "",
+// 	"youtube" => ""
+// ];
 
-	//eg: obelisco, Buenos Aires, Argentina
-	"center" => "",
+// mercado pago
+// $ENV["mp"] = [
+// 	"public" => "",
+// 	"private" => ""
+// ];
+
+// google services
+// $ENV["gtools"] = [
+	// gmail
+// 	"gmail" => [
+// 		"name" => NGL_PROJECT,
+// 		"user" => "gmailuser",
+// 		"pass" => "gmailpass"
+// 	],
+
+	// google analytics
+// 	"gtag" => "",
 	
-	//eg: ["buenos", "aires", "argentina"]
-	"clearwords" => []
-);
+	// maps
+// 	"apikey" => "API-KEY",
+// 	"maps" => [
+// 		//, Buenos Aires, Argentina
+// 		"bound" => "",
+
+// 		// obelisco, Buenos Aires, Argentina
+// 		"center" => "obelisco, Buenos Aires, Argentina",
+		
+// 		//["buenos", "aires", "argentina"]
+// 		"clearwords" => []
+// 	],
+
+	// recaptcha
+// 	"recaptcha" => [
+// 		"secret" => "SECRET-KEY",
+// 		"public" => "PUBLIC-KEY"
+// 	]
+// ];
+
+// web service
+// $ENV["ws"] = [
+// 	"url" => "https://...",
+// 	"auth" => "basic",
+// 	"token"=> "bm9nYTpub2dhbA=="
+// ];
 
 ?>

@@ -3980,6 +3980,10 @@ namespace {
 			$sUsername = (isset($_SESSION[NGL_SESSION_INDEX]["ALVIN"]["username"])) ? $_SESSION[NGL_SESSION_INDEX]["ALVIN"]["username"] : null;
 			if($sRindID!==null) {
 				$rind = self::this($sRindID);
+
+				$mAlvinType = $rind->alvin_type;
+				if($mAlvinType=="none") { return true; }
+
 				$SET = $rind->getSET();
 				$sGrants = \preg_replace_callback(
 					"/<\?php echo Rind::this\(\"[0-9a-z]+\"\)->SET(.*?);\?>/is",
@@ -3993,9 +3997,8 @@ namespace {
 					$sGrants
 				);
 				if($sGrants===false) { return false; }
-				$mAlvinType = $rind->alvin_type;
 				if(!empty($sGrants)) {
-					if($mAlvinType=="none" || $sUsername=="admin") { return true; }
+					if($sUsername=="admin") { return true; }
 					if(\is_array($mAlvinType) && \in_array($sUsername, $mAlvinType)) { return true; }
 				}
 			}
