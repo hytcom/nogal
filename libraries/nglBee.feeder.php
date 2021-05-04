@@ -40,7 +40,12 @@ class nglBee extends nglFeeder implements inglFeeder {
 		$this->sDelimiter = "(\r\n|\n)";
 		$this->aLibs = self::Libraries();
 		$this->aObjs = [];
-		$this->aVars = [];
+		$this->aVars = [
+			"_SESSION" => $_SESSION,
+			"_SERVER" => $_SERVER,
+			"_ENV" => $_ENV,
+			"ENV" => $GLOBALS["ENV"]
+		];
 		$this->aLoops = [];
 		$this->sSeparator = "\t";
 		$this->bDump = false;
@@ -220,6 +225,8 @@ class nglBee extends nglFeeder implements inglFeeder {
 		$this->sSeparator = $sSeparator;
 	}
 
+	// @get ENV now
+	// @get ENV [now, date]
 	private function FuncGet() {
 		@list($sVarname, $mIndex) = \func_get_args();
 		$mVar = ($sVarname==='-$:') ? $this->output : $this->aVars[$sVarname];

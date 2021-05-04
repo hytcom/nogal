@@ -1,3 +1,11 @@
+# 2.9.4 - 202105041830
+## bee
+- se incluyeron las variables **_SESSION, _SERVER, _ENV y ENV** en el método **get**
+
+# owl
+- nuevo método **alvinWhere**
+
+________________________________________________________________________________
 # 2.9.3 - 202104262130
 ## coon
 - nuevos metodos **tokenEncode** y **tokenDecode**

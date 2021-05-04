@@ -1048,7 +1048,7 @@ SQL;
 		return true;
 	}
 
-	final private function AlvinSQL($sJSQL) {
+	final private function AlvinSQL($sJSQL, $bOnlyWhere=false) {
 		if($this->AlvinInit()) {
 			$sTableName = ($this->bChildMode) ? $this->sChildTable : $this->sObject;
 			$sRole = self::call("alvin")->role();
@@ -1059,14 +1059,18 @@ SQL;
 
 				$sHash = self::call()->unique(16);
 				$sHashNot = self::call()->unique(16);
-				$aJSQL = self::call("jsql")->decode($sJSQL);
-				if(isset($aJSQL["where"])) {
-					$aJSQL["where"] = [$aJSQL["where"], "AND", [[$sTableName.".imya", "in", $sHash], "OR", [$sTableName.".imya", "notin", $sHashNot]]];
+				if(!$bOnlyWhere) {
+					$aJSQL = self::call("jsql")->decode($sJSQL);
+					if(isset($aJSQL["where"])) {
+						$aJSQL["where"] = [$aJSQL["where"], "AND", [[$sTableName.".imya", "in", $sHash], "OR", [$sTableName.".imya", "notin", $sHashNot]]];
+					} else {
+						$aJSQL["where"] = [[$sTableName.".imya", "in", $sHash], "OR", [$sTableName.".imya", "notin", $sHashNot]];
+					}
+					$sSQL = $this->JsqlParser($aJSQL);
 				} else {
-					$aJSQL["where"] = [[$sTableName.".imya", "in", $sHash]];
+					$sSQL = "((".$sJSQL." IN (".$sHash.")) OR (".$sJSQL." NOT IN (".$sHashNot.")))";
 				}
-				$sSQL = $this->JsqlParser($aJSQL);
-			
+				
 				// consulta final
 				$sSQL = \str_replace($sHash, "SELECT imya FROM __ngl_owl_index__ WHERE (role IS NULL OR role = '".$sRole."' ".$sRoles.")", $sSQL);
 				$sSQL = \str_replace($sHashNot, "SELECT imya FROM __ngl_owl_index__ WHERE 1", $sSQL);
@@ -1078,6 +1082,11 @@ SQL;
 		}
 
 		return $sSQL;
+	}
+
+	final public function alvinWhere() {
+		list($sJSQL) = $this->getarguments("jsql", \func_get_args());
+		return $this->AlvinSQL($sJSQL, true);
 	}
 
 	private function CrossRows($sTable, $sWhere=false, $aConditions=null) {
