@@ -61,7 +61,7 @@ class nglCoon extends nglBranch implements inglBranch {
 						if(!\is_array($mData)) { $mData = \json_decode($mData); }
 						$mData["NGL-REQUEST-AUTHORIZATION"] = $sAuth;
 					}
-					$mContent = (\is_array($mData)) ? \json_encode($mData) : $mData;
+					$mContent = (\is_array($mData)) ? \json_encode($mData, JSON_HEX_APOS) : $mData;
 				} else {
 					$mContent = (!\is_array($mData)) ? \json_decode($mData, true) : $mData;
 				}

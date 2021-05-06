@@ -2,7 +2,10 @@
 ## bee
 - se incluyeron las variables **_SESSION, _SERVER, _ENV y ENV** en el método **get**
 
-# owl
+## coon
+- se añadió JSON_HEX_APOS en el método **request**
+
+## owl
 - nuevo método **alvinWhere**
 
 ________________________________________________________________________________
