@@ -1075,10 +1075,10 @@ SQL;
 				$sSQL = \str_replace($sHash, "SELECT imya FROM __ngl_owl_index__ WHERE (role IS NULL OR role = '".$sRole."' ".$sRoles.")", $sSQL);
 				$sSQL = \str_replace($sHashNot, "SELECT imya FROM __ngl_owl_index__ WHERE 1", $sSQL);
 			} else {
-				$sSQL = $this->JsqlParser($sJSQL);
+				$sSQL = (!$bOnlyWhere) ? $this->JsqlParser($sJSQL) : "";
 			}
 		} else {
-			$sSQL = $this->JsqlParser($sJSQL);
+			$sSQL = (!$bOnlyWhere) ? $this->JsqlParser($sJSQL) : "";
 		}
 
 		return $sSQL;
