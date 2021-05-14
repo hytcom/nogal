@@ -1058,7 +1058,7 @@ class nglFn extends nglTrunk {
 			$aRow[$sParent] = $mParent;
 			$aPrepare[$mParent][] = $aRow;
 		}
-		\reset($aPrepare);
+		\ksort($aPrepare);
 		return $this->listToTreeCreator($aPrepare, \current($aPrepare), $sId, $sChildren);
 	}
 

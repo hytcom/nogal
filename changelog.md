@@ -1,3 +1,11 @@
+# 2.9.5 - 202105140030
+## bee
+- se quitó la variable **_SESSION** del método **get** en el modo consola
+
+## fn
+- fix error de orden en **listToTree**
+
+________________________________________________________________________________
 # 2.9.4 - 202105041830
 ## bee
 - se incluyeron las variables **_SESSION, _SERVER, _ENV y ENV** en el método **get**

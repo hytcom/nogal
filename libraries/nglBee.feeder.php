@@ -40,15 +40,17 @@ class nglBee extends nglFeeder implements inglFeeder {
 		$this->sDelimiter = "(\r\n|\n)";
 		$this->aLibs = self::Libraries();
 		$this->aObjs = [];
-		$this->aVars = [
-			"_SESSION" => $_SESSION,
+		$this->aLoops = [];
+		$this->sSeparator = "\t";
+		$this->bDump = false;
+
+		$aVars = [
 			"_SERVER" => $_SERVER,
 			"_ENV" => $_ENV,
 			"ENV" => $GLOBALS["ENV"]
 		];
-		$this->aLoops = [];
-		$this->sSeparator = "\t";
-		$this->bDump = false;
+		if(isset($_SESSION)) { $aVars["_SESSION"] = $_SESSION; }
+		$this->aVars = $aVars;
 	}
 
 	public function bzzz($sSentences, $bAutoSave=false) {
