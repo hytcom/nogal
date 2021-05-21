@@ -246,8 +246,6 @@ class nglTree extends nglBranch implements inglBranch {
 			$nId = $aParent[$mIndex];
 			$aTrace[] = $aParent;
 		}
-		print_r($this->aFlat);
-		print_r($aTrace);
 		return \array_reverse($aTrace);
 	}
 	
