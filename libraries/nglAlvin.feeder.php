@@ -282,6 +282,7 @@ SQL;
 		if(!empty($sRoles) && \file_exists($this->sAlvinPath.NGL_DIR_SLASH."roles")) {
 			$sRolesTree = \file_get_contents($this->sAlvinPath.NGL_DIR_SLASH."roles");
 			if($sRolesTree = @self::call("crypt")->type("rsa")->base64(true)->key(NGL_ALVIN)->decrypt($sRolesTree)) {
+				\nogal\dump($sRolesTree);
 				$aRoles = \json_decode($sRolesTree, true);
 				if(\is_array($aRoles)) {
 					$tree = self::call("tree")->loadtree($aRoles);
