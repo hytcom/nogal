@@ -221,7 +221,7 @@ class nglTree extends nglBranch implements inglBranch {
 
 	public function get() {
 		list($nId) = $this->getarguments("id", \func_get_args());
-		die($this->aFlat);
+		print_r($this->aFlat);
 		if(isset($this->aFlat[$nId])) {
 			return $this->aFlat[$nId];
 		}
