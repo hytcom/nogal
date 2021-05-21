@@ -221,7 +221,6 @@ class nglTree extends nglBranch implements inglBranch {
 
 	public function get() {
 		list($nId) = $this->getarguments("id", \func_get_args());
-		print_r($this->aFlat);
 		if(isset($this->aFlat[$nId])) {
 			return $this->aFlat[$nId];
 		}
@@ -247,6 +246,7 @@ class nglTree extends nglBranch implements inglBranch {
 			$nId = $aParent[$mIndex];
 			$aTrace[] = $aParent;
 		}
+		\nogal\dump($aTrace);
 		return \array_reverse($aTrace);
 	}
 	
