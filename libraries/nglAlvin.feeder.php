@@ -283,7 +283,6 @@ SQL;
 			$sRolesTree = \file_get_contents($this->sAlvinPath.NGL_DIR_SLASH."roles");
 			if($sRolesTree = @self::call("crypt")->type("rsa")->base64(true)->key(NGL_ALVIN)->decrypt($sRolesTree)) {
 				$aRoles = \json_decode($sRolesTree, true);
-				\nogal\dump($aRoles); exit();
 				if(\is_array($aRoles)) {
 					$tree = self::call("tree")->loadtree($aRoles);
 					$aUserRoles = \explode(",", $sRoles);
@@ -291,11 +290,13 @@ SQL;
 					foreach($aUserRoles as $sRole) {
 						$aChain[] = $sRole;
 						$aChain += $tree->childrenChain($sRole, null);
+						\nogal\dump($aChain);
 					}
 					return \implode(",", \array_unique($aChain));
 				}
 			}
 		}
+		exit();
 		return "";
 	}
 
