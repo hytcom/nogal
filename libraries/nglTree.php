@@ -274,7 +274,6 @@ class nglTree extends nglBranch implements inglBranch {
 			$mIndex =  $this->attribute("id_column");
 			$mChildren =  $this->attribute("children");
 			$aChain = [];
-			\nogal\dump($aChain); exit();
 			$this->ChildrenChainer($aChain, $aChildren, $mIndex, $mChildren);
 			return ($sSeparator===null) ? $aChain : \implode($sSeparator, $aChain);
 		}
