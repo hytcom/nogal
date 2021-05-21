@@ -246,7 +246,7 @@ class nglTree extends nglBranch implements inglBranch {
 			$nId = $aParent[$mIndex];
 			$aTrace[] = $aParent;
 		}
-		\nogal\dump($aTrace);
+		print_r($aTrace);
 		return \array_reverse($aTrace);
 	}
 	
