@@ -285,12 +285,12 @@ SQL;
 				$aRoles = \json_decode($sRolesTree, true);
 				if(\is_array($aRoles)) {
 					$tree = self::call("tree")->loadtree($aRoles);
-					\nogal\dump($tree->tree);
 					$aUserRoles = \explode(",", $sRoles);
 					$aChain = [$aUserRoles[0]];
 					foreach($aUserRoles as $sRole) {
 						$aChain[] = $sRole;
 						$aChain += $tree->childrenChain($sRole, null);
+						\nogal\dump($aChain);
 					}
 					return \implode(",", \array_unique($aChain));
 				}
