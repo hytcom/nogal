@@ -289,14 +289,12 @@ SQL;
 					$aChain = [$aUserRoles[0]];
 					foreach($aUserRoles as $sRole) {
 						$aChain[] = $sRole;
-						$aChain += $tree->childrenChain($sRole, null);
-						\nogal\dump($aChain);
+						$aChain = \array_merge($aChain, $tree->childrenChain($sRole, null));
 					}
 					return \implode(",", \array_unique($aChain));
 				}
 			}
 		}
-		exit();
 		return "";
 	}
 

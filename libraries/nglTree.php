@@ -263,7 +263,6 @@ class nglTree extends nglBranch implements inglBranch {
 				$aChildren = $aChildren[$aItem[$mIndex]][$mChildren];
 			}
 		}
-
 		return $aChildren;
 	}
 

@@ -1,4 +1,7 @@
 # 2.9.5 - 202105140030
+## alvin
+- fix error en **roleschain**
+
 ## bee
 - se quitó la variable **_SESSION** del método **get** en el modo consola
 
