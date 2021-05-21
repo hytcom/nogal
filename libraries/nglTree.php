@@ -256,7 +256,7 @@ class nglTree extends nglBranch implements inglBranch {
 		$mIndex =  $this->attribute("id_column");
 		$mChildren =  $this->attribute("children");
 		$aTrace = $this->trace($nId);
-
+\nogal\dump($nId, $aTrace);
 		if(\is_array($aTrace) && \count($aTrace)) {
 			foreach($aTrace as $aItem) {
 				if(empty($aChildren[$aItem[$mIndex]][$mChildren])) { return []; }
@@ -274,7 +274,6 @@ class nglTree extends nglBranch implements inglBranch {
 			$mIndex =  $this->attribute("id_column");
 			$mChildren =  $this->attribute("children");
 			$aChain = [];
-			\nogal\dump($aChildren);
 			$this->ChildrenChainer($aChain, $aChildren, $mIndex, $mChildren);
 			return ($sSeparator===null) ? $aChain : \implode($sSeparator, $aChain);
 		}
