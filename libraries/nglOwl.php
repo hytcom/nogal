@@ -1521,7 +1521,7 @@ SQL;
 					}
 				}
 
-				$vData = ["state"=>null];
+				$vData = ["state"=>null, "code"=>null];
 			} else if($nState==2) {
 				// suspencion (state = 0)
 				$vData = ["state"=>0];
