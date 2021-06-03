@@ -5,7 +5,7 @@
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => 'edae3bd6620bc9b517ed2a1d6cea3952ed0bc098',
+        'reference' => '6131a1d99e285fa0ee6eb0c7cebcf56f8e15caf0',
         'name' => '__root__',
         'dev' => true,
     ),
@@ -16,7 +16,7 @@
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => 'edae3bd6620bc9b517ed2a1d6cea3952ed0bc098',
+            'reference' => '6131a1d99e285fa0ee6eb0c7cebcf56f8e15caf0',
             'dev_requirement' => false,
         ),
         'aferrandini/phpqrcode' => array(
