@@ -53,6 +53,33 @@ class FriendlyErrors extends TestCase
 		}
 	}
 
+	public function testExecutableNotFoundWithVersionCheckingOptions()
+	{
+		# Issue #210, reported by @samwilson
+
+		$currentPath = getenv('PATH');
+
+		$expected = array();
+		$expected[] = 'Error! The command "/nowhere/tesseract" was not found.';
+		$expected[] = '';
+		$expected[] = 'Make sure you have Tesseract OCR installed on your system:';
+		$expected[] = 'https://github.com/tesseract-ocr/tesseract';
+		$expected[] = '';
+		$expected[] = "The current \$PATH is $currentPath";
+		$expected = join(PHP_EOL, $expected);
+
+		try {
+			(new TesseractOCR())
+				->executable('/nowhere/tesseract')
+				->imageData('irrelevant', 1234)
+				->withoutTempFiles()
+				->run();
+			throw new \Exception('TesseractNotFoundException not thrown');
+		} catch (TesseractNotFoundException $e) {
+			$this->assertEquals($expected, $e->getMessage());
+		}
+	}
+
 	public function testUnsuccessfulCommand()
 	{
 		$expected = array();
@@ -66,9 +93,9 @@ class FriendlyErrors extends TestCase
 		switch (true) {
 
 			case ($this->isVersion('3.02')):
-				$expected[] = 'read_params_file: Can\'t open quiet';
 				$expected[] = 'Error in pixReadStream: Unknown format: no pix returned';
 				$expected[] = 'Error in pixRead: pix not read';
+				$expected[] = 'Unsupported image type.';
 				break;
 
 			case ($this->isVersion('3.03')):
@@ -116,6 +143,6 @@ class FriendlyErrors extends TestCase
 	protected function isVersion($version)
 	{
 		exec('tesseract --version 2>&1', $output);
-		return $output[0] == "tesseract $version";
+		return strpos($output[0], "tesseract $version") !== false;
 	}
 }

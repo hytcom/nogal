@@ -12,8 +12,18 @@ if (in_array('e2e', $argv))
 
 // setting up code coverage
 if (extension_loaded('xdebug')) {
-	$coverage = new \PHP_CodeCoverage;
-	$coverage->filter()->addDirectoryToWhitelist('./src');
+	if (class_exists('\PHP_CodeCoverage')) {
+		$coverage = new \PHP_CodeCoverage;
+		$coverage->filter()->addDirectoryToWhitelist('./src');
+	} else {
+		$filter = new \SebastianBergmann\CodeCoverage\Filter;
+		$filter->includeDirectory('./src');
+		$selector = new \SebastianBergmann\CodeCoverage\Driver\Selector;
+		$coverage = new \SebastianBergmann\CodeCoverage\CodeCoverage(
+			$selector->forLineCoverage($filter),
+			$filter
+		);
+	}
 	$coverage->start('tests');
 }
 
@@ -26,24 +36,25 @@ $rc = 0;
 foreach ($tests as $test) {
 	echo str_replace(__NAMESPACE__.'\\', '', $test), PHP_EOL;
 
-	$results = (new $test)->run();
+	$testInstance = new $test;
+	$results = $testInstance->run();
 	foreach ($results as $name => $result) {
 		switch ($result['status']) {
 			case 'fail':
-				$status = "\e[31m✕";
+				$status = "\033[31m✕";
 				break;
 			case 'pass':
-				$status = "\e[32m✓";
+				$status = "\033[32m✓";
 				break;
 			case 'skip':
-				$status = "\e[33m‖";
+				$status = "\033[33m‖";
 				break;
 		}
-		echo "\t{$status} {$name}\e[0m", PHP_EOL;
+		echo "\t{$status} {$name}\033[0m", PHP_EOL;
 
 		if ($result['status'] == 'fail') {
 			$rc++;
-			echo "\e[35m{$result['msg']}\e[0m", PHP_EOL;
+			echo "\033[35m{$result['msg']}\033[0m", PHP_EOL;
 		}
 	}
 	echo PHP_EOL;
@@ -52,7 +63,17 @@ foreach ($tests as $test) {
 // saving coverage results
 if (isset($coverage)) {
 	$coverage->stop();
-	$writer = new \PHP_CodeCoverage_Report_Clover;
+	$reportClass = class_exists('\PHP_CodeCoverage_Report_Clover')
+		? '\PHP_CodeCoverage_Report_Clover'
+		: '\SebastianBergmann\CodeCoverage\Report\Clover';
+	$writer = new $reportClass;
 	$writer->process($coverage, 'coverage.xml');
+
+	// dev
+	//$reportClass = class_exists('\PHP_CodeCoverage_Report_HTML')
+	//	? '\PHP_CodeCoverage_Report_HTML'
+	//	: '\SebastianBergmann\CodeCoverage\Report\Html\Facade';
+	//$writer = new $reportClass;
+	//@$writer->process($coverage, 'coverage-report');
 }
 exit($rc);

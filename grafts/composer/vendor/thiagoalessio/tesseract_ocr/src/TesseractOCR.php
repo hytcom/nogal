@@ -82,6 +82,7 @@ class TesseractOCR
 
 	public function executable($executable)
 	{
+		FriendlyErrors::checkTesseractPresence($executable);
 		$this->command->executable = $executable;
 		return $this;
 	}
@@ -112,12 +113,22 @@ class TesseractOCR
 		return $this;
 	}
 
-	public function whitelist()
+	public function allowlist()
 	{
 		$concat = function ($arg) { return is_array($arg) ? join('', $arg) : $arg; };
-		$whitelist = join('', array_map($concat, func_get_args()));
-		$this->command->options[] = Option::config('tessedit_char_whitelist', $whitelist);
+		$allowlist = join('', array_map($concat, func_get_args()));
+		$this->command->options[] = Option::config('tessedit_char_whitelist', $allowlist);
 		return $this;
+	}
+
+	public function whitelist()
+	{
+		$warningMsg = 'Notice: whitelist is deprecated, use allowlist instead.';
+		trigger_error($warningMsg, E_USER_NOTICE);
+
+		$concat = function ($arg) { return is_array($arg) ? join('', $arg) : $arg; };
+		$allowlist = join('', array_map($concat, func_get_args()));
+		return $this->allowlist($allowlist);
 	}
 
 	public function version()
@@ -145,7 +156,7 @@ class TesseractOCR
 
 	private function isConfigFile($name)
 	{
-		return in_array($name, ['digits', 'hocr', 'pdf', 'quiet', 'tsv', 'txt']);
+		return in_array($name, array('digits', 'hocr', 'pdf', 'quiet', 'tsv', 'txt'));
 	}
 
 	private function isOption($name)
