@@ -250,7 +250,7 @@ class nglSystemVars extends nglTrunk {
 		$vVersion					= [];
 		$vVersion["name"]			= "nogal";
 		$vVersion["description"]	= "the most simple PHP Framework";
-		$vVersion["version"]		= \file_get_contents(NGL_PATH_FRAMEWORK.NGL_DIR_SLASH."version.txt");
+		$vVersion["version"]		= \file_get_contents(NGL_PATH_FRAMEWORK.NGL_DIR_SLASH."version");
 		$vVersion["author"]			= "hytcom";
 		$vVersion["site"]			= "https://hytcom.net";
 		$vVersion["documentation"]	= "https://github.com/hytcom/wiki/tree/master/nogal";
