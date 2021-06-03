@@ -23,7 +23,7 @@ class nglCoon extends nglBranch implements inglBranch {
 		$vArguments["bodyauth"]				= ['$mValue', false]; // solo en metodos POST
 		$vArguments["ctype"]				= ['(string)$mValue', "json"]; // csv | json | text | xml
 		$vArguments["data"]					= ['$mValue'];
-		$vArguments["key"]					= ['$mValue', "*sTr0N6k3Y@"];
+		$vArguments["key"]					= (NGL_ALVIN!==null) ? ['$mValue', NGL_ALVIN] : ['$mValue', "*sTr0N6k3Y@"];
 		$vArguments["method"]				= ['(string)$mValue', "POST"];
 		$vArguments["port"]					= ['$mValue', null];
 		$vArguments["token"]				= ['$mValue', null];
@@ -52,7 +52,7 @@ class nglCoon extends nglBranch implements inglBranch {
 
 		$sCType = strtolower($sCType);
 		$mContent = "";
-		
+
 		switch($sCType) {
 			case "json":
 				$sContentType = "application/json";
@@ -189,7 +189,7 @@ class nglCoon extends nglBranch implements inglBranch {
 			} else if($sAuthMethod=="bearer") {
 				$mAuth = $aAuth[1];
 			} else if($sAuthMethod=="alvin") {
-				$sToken = self::call()->tokenDecode($aAuth[1], $this->argument("key"));
+				$sToken = $this->tokenDecode($aAuth[1]);
 				if($sToken!==false) {
 					$mAuth = $sToken;
 					$this->args("token", $sToken);

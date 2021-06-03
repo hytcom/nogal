@@ -1,10 +1,3 @@
-[checksum]
-md5 = "83f1a93d41f757a9adb92fa4dfb1c32c"
-sha1 = "3b44ca7517935d6f6e8bc0f8619553be53410f9a"
-
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/zip.md"
-
 [arguments]
 content = "Contenido dinámico para filepath"
 downname = "Nombre del archivo generado para descarga directa"

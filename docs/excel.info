@@ -1,10 +1,3 @@
-[checksum]
-md5 = "f14987233b6677765f0dd1b497aea2f5"
-sha1 = "7e96271d86e883ab33016bf5230de08da8ffbacd"
-
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/excel.md"
-
 [arguments]
 calculate = "Activa y desactiva el cálculo de fórmulas"
 colnames = "Habilita el uso de la primer fila del rango como claves del array en el método getall"
@@ -23,3 +16,7 @@ sheet = "Crea o selecciona una hoja dentro del documento"
 styles = "Array de estilos CSS del rango"
 title = "Nombre de la hoga activa"
 unmergefill = "Descombina las celdas agrupadas, colocando el mismo valor en todas"
+
+[errors]
+1000 = "No se pudo hallar la librería \PhpOffice\PhpSpreadsheet\Spreadsheet. Ejecutar 'compose update' en la carpeta grafts/composer"
+1001 = "Error en el formato de los datos. Se espera un Array bidimensional con el mismo número de columnas"

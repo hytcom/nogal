@@ -77,6 +77,11 @@ class nglGraftPDF extends nglScion {
 	}
 
 	final public function __init__() {
+		if(!\class_exists("\Mpdf\Mpdf")) {
+			$this->__errorMode__("die");
+			self::errorMessage($this->object, 1000);
+		}
+
 		require_once(__DIR__."/composer/vendor/paragonie/random_compat/lib/random.php");
 		$this->sCSS = "";
 	}

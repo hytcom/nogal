@@ -1,14 +1,2 @@
-[checksum]
-md5 = "7fd6628af3200fab9d91b9682c1da3dd"
-sha1 = "b3be54526adb32de1261973b9dadc00107a87d6d"
-
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/shift.md"
-
 [errors]
-1001 = "JSON - profundidad máxima de pila excedida"
-1002 = "JSON - desbordamiento o los modos no coinciden"
-1003 = "JSON - carácter de control inesperado encontrado"
-1004 = "JSON - error de sintáxis en la estructura JSON"
-1005 = "JSON - error enlos caracteres UTF-8, posiblemente mal codificados"
-1006 = "JSON - error desconocido"
+1001 = "No se pudo encontrar la extención PECL YAML. Ver https://www.php.net/manual/es/yaml.installation.php"

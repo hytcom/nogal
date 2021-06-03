@@ -52,6 +52,13 @@ class nglGraftQR extends nglScion {
 		$this->qr = new \PHPQRCode\QRcode();
 	}
 
+	final public function __init__() {
+		if(!\class_exists("\PHPQRCode\QRcode")) {
+			$this->__errorMode__("die");
+			self::errorMessage($this->object, 1000);
+		}
+	}
+
 	/** FUNCTION {
 		"name" : "image",
 		"type" : "public",

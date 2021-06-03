@@ -1,10 +1,3 @@
-[checksum]
-md5 = "69a8b28f69897c05260b96d4373d6ef3"
-sha1 = "a54e925ad40ef4231afe256f8c2cd1885c537a94"
-
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/file.md"
-
 [arguments]
 content = "Contenido del archivo"
 curl_options = "Opciones CURL para este tipo de conexiones, http://php.net/manual/en/function.curl-setopt.php"

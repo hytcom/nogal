@@ -26,4 +26,7 @@ $NGL_GRAFTS["pdf"] 			= ["nglGraftPDF", false];
 // phpqrcode (codigos QR)
 $NGL_GRAFTS["qr"] 			= ["nglGraftQR", false];
 
+// AWS S3
+$NGL_GRAFTS["s3"] 			= ["nglGraftAWSS3", false];
+
 ?>

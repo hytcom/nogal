@@ -40,6 +40,13 @@ class nglGraftDOM extends nglScion {
 		require_once(self::path("grafts").NGL_DIR_SLASH."classes".NGL_DIR_SLASH."simple_html_dom.php");
 	}
 
+	final public function __init__() {
+		if(!\class_exists("\simple_html_dom")) {
+			$this->__errorMode__("die");
+			self::errorMessage($this->object, 1000);
+		}
+	}
+
 	public function load() {
 		list($sContent,$bLowerCase,$sBrText,$sSpanText,$bTagsClosed,$sCharset) = $this->getarguments("content,lowercase,brtext,spantext,tagsclosed,charset", \func_get_args());
 		$this->dom = new \simple_html_dom(

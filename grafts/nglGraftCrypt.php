@@ -11,10 +11,6 @@ Implementa la clase 'phpseclib', de algoritmos de encriptación
 
 https://github.com/hytcom/wiki/blob/master/nogal/docs/crypt.md
 
-# error codes
-1001 = Invalid key format
-1002 = Decrypt Faild! Invalid key or String
-
 */
 namespace nogal;
 
@@ -53,6 +49,13 @@ class nglGraftCrypt extends nglScion {
 		$vAlgorithms["rsa"]			= "\phpseclib\Crypt\RSA";
 		$vAlgorithms["twofish"]		= "\phpseclib\Crypt\Twofish";
 		$this->vAlgorithms			= $vAlgorithms;
+	}
+
+	final public function __init__() {
+		if(!\class_exists("\phpseclib\Crypt\Base")) {
+			$this->__errorMode__("die");
+			self::errorMessage($this->object, 1000);
+		}
 	}
 
 	public function decrypt() {

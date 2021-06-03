@@ -42,6 +42,10 @@ class nglGraftMarkdown extends nglScion {
 	}
 
 	final public function __init__() {
+		if(!\class_exists("\Parsedown")) {
+			$this->__errorMode__("die");
+			self::errorMessage($this->object, 1000);
+		}
 		$this->md->setUrlsLinked($this->argument("links"));
 		$this->md->setBreaksEnabled($this->argument("nl2br"));
 		$this->md->setMarkupEscaped($this->argument("html"));

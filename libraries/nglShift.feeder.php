@@ -319,6 +319,7 @@ class nglShift extends nglTrunk {
 
 			case "yml":
 			case "yaml":
+				if(!\function_exists("yaml_parse")) { $this->__errorMode__("die"); self::errorMessage($this->object, 1001); }
 				$mData = \preg_replace(["/^\t/is", "/\t+/"], "  ", $mData);
 				$aData = \yaml_parse($mData);
 				break;
@@ -370,6 +371,7 @@ class nglShift extends nglTrunk {
 			
 			case "yml":
 			case "yaml":
+				if(!\function_exists("yaml_emit")) { $this->__errorMode__("die"); self::errorMessage($this->object, 1001); }
 				return \yaml_emit($aData);
 
 			case "array":

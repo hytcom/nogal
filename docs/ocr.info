@@ -1,10 +1,3 @@
-[checksum]
-md5 = "2dfff1e742789c82c0a629ab1b3c4ec2"
-sha1 = "bd68501562c5abdb0d24e759879de95d6e66db9b"
-
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/ocr.md"
-
 [arguments]
 dictionary = "Ruta relativa a NGL_SANDBOX de un archivo con el diccionario de palabras normales"
 digits = "Prepara la lectura para identificar dígitos"
@@ -13,3 +6,6 @@ langs = "Lenguaje o lenguajes separador por , (coma)"
 patterns = "Ruta relativa a NGL_SANDBOX de un archivo con expresiones regulares que ayudan a la lectura"
 savefile = "Ruta del archivo con el resultado de la lectura, relativa a NGL_SANDBOX"
 whitelist = "Array de caracteres admitidos en la lectura"
+
+[errors]
+1000 = "No se pudo hallar la librería \thiagoalessio\TesseractOCR. Ejecutar 'compose update' en la carpeta grafts/composer"

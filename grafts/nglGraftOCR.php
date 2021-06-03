@@ -34,6 +34,13 @@ class nglGraftOCR extends nglScion {
 		$this->ocr->tempDir(NGL_PATH_TMP);
 	}
 
+	final public function __init__() {
+		if(!\class_exists("\thiagoalessio\TesseractOCR")) {
+			$this->__errorMode__("die");
+			self::errorMessage($this->object, 1000);
+		}
+	}
+
 	public function load() {
 		list($sFilePath) = $this->getarguments("filepath", \func_get_args());
 		$sFilePath = self::call()->sandboxPath($sFilePath);

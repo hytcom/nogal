@@ -6,7 +6,7 @@
     'aliases' => 
     array (
     ),
-    'reference' => 'bf9861efc61717cb7b953a7b82aa3c1ec6f5f90c',
+    'reference' => '639fab0dd3b82e12b6510bcd27f25c8ec1e71bfb',
     'name' => '__root__',
   ),
   'versions' => 
@@ -18,7 +18,7 @@
       'aliases' => 
       array (
       ),
-      'reference' => 'bf9861efc61717cb7b953a7b82aa3c1ec6f5f90c',
+      'reference' => '639fab0dd3b82e12b6510bcd27f25c8ec1e71bfb',
     ),
     'aferrandini/phpqrcode' => 
     array (
@@ -28,6 +28,42 @@
       array (
       ),
       'reference' => '3c1c0454d43710ab5bbe19a51ad4cb41c22e3d46',
+    ),
+    'aws/aws-sdk-php' => 
+    array (
+      'pretty_version' => '3.183.9',
+      'version' => '3.183.9.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => '3b3aafdceac4cb820e2ae65a8785e4d07db471a7',
+    ),
+    'guzzlehttp/guzzle' => 
+    array (
+      'pretty_version' => '7.3.0',
+      'version' => '7.3.0.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => '7008573787b430c1c1f650e3722d9bba59967628',
+    ),
+    'guzzlehttp/promises' => 
+    array (
+      'pretty_version' => '1.4.1',
+      'version' => '1.4.1.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => '8e7d04f1f6450fef59366c399cfad4b9383aa30d',
+    ),
+    'guzzlehttp/psr7' => 
+    array (
+      'pretty_version' => '1.8.2',
+      'version' => '1.8.2.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => 'dc960a912984efb74d0a90222870c72c87f10c91',
     ),
     'maennchen/zipstream-php' => 
     array (
@@ -64,6 +100,15 @@
       array (
       ),
       'reference' => '7daf07f15334ed59a276bd52131dcca48794cdbd',
+    ),
+    'mtdowling/jmespath.php' => 
+    array (
+      'pretty_version' => '2.6.0',
+      'version' => '2.6.0.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => '42dae2cbd13154083ca6d70099692fef8ca84bfb',
     ),
     'myclabs/deep-copy' => 
     array (
@@ -132,6 +177,13 @@
       ),
       'reference' => '2dfb5f6c5eff0e91e20e913f8c5452ed95b86621',
     ),
+    'psr/http-client-implementation' => 
+    array (
+      'provided' => 
+      array (
+        0 => '1.0',
+      ),
+    ),
     'psr/http-factory' => 
     array (
       'pretty_version' => '1.0.1',
@@ -150,6 +202,13 @@
       ),
       'reference' => 'f6561bf28d520154e4b0ec72be95418abe6d9363',
     ),
+    'psr/http-message-implementation' => 
+    array (
+      'provided' => 
+      array (
+        0 => '1.0',
+      ),
+    ),
     'psr/log' => 
     array (
       'pretty_version' => '1.1.3',
@@ -167,6 +226,15 @@
       array (
       ),
       'reference' => '408d5eafb83c57f6365a3ca330ff23aa4a5fa39b',
+    ),
+    'ralouphie/getallheaders' => 
+    array (
+      'pretty_version' => '3.0.3',
+      'version' => '3.0.3.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => '120b605dfeb996808c31b6477290a714d356e822',
     ),
     'setasign/fpdi' => 
     array (

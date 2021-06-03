@@ -102,6 +102,14 @@ class nglGraftExcel extends nglScion {
 	final protected function __declareVariables__() {
 	}
 
+
+	final public function __init__() {
+		if(!\class_exists("\PhpOffice\PhpSpreadsheet\Spreadsheet")) {
+			$this->__errorMode__("die");
+			self::errorMessage($this->object, 1000);
+		}
+	}
+
 	public function load() {
 		list($sFileName,$sFontFamily,$nFontSize) = $this->getarguments("filename,fontfamily,fontsize", \func_get_args());
 		$this->args(["filename"=>$sFileName]);
@@ -261,10 +269,9 @@ class nglGraftExcel extends nglScion {
 		} else {
 			$sEmptyValue = $this->argument("empty");
 			if(!self::call()->isArrayArray($mContent)) {
-				self::errorMode("die");
+				$this->__errorMode__("die");
 				self::errorMessage($this->object, 1001);
 			}
-			
 			if($bColnames) { \array_unshift($mContent, \array_keys(\current($mContent))); }
 			$this->excel->getActiveSheet()->fromArray($mContent, $sEmptyValue, $sCell);
 		}

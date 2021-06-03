@@ -49,6 +49,11 @@ $ENV["referer"]											= (isset($_SERVER["HTTP_REFERER"])) ? $_SERVER["HTTP_R
 $ENV["redirect_url"]									= (isset($_SERVER["REDIRECT_URL"])) ? $_SERVER["REDIRECT_URL"] : "";
 $ENV["redirect_query_string"]							= (isset($_SERVER["REDIRECT_QUERY_STRING"])) ? $_SERVER["REDIRECT_QUERY_STRING"] : "";
 
+// session ID
+if(isset($_SESSION)) {
+	$ENV["SID"]											= SID;
+}
+
 // login
 $ENV["alvin"]											= false;
 $ENV["alvin_home"]										= NGL_URL."/home";

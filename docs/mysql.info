@@ -1,10 +1,3 @@
-[checksum]
-md5 = "b847c979e9cd85b3829539b4ad3b45e2"
-sha1 = "374cbb049f93028233a34117182c464e4e25b7d0"
-
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/mysql.md"
-
 [arguments]
 autoconn = "Cuando es TRUE, ejecuta el método connect luego de cargar las configuraciones"
 base = "Nombre de la base de datos"

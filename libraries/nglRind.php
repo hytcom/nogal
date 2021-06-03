@@ -433,6 +433,7 @@ namespace nogal {
 				$aConstants = self::call()->truelize($aConstants[0]);
 			}
 
+			$aConstants["SID"] = true;
 			$this->setSET("CONSTANTS", $aConstants);
 			$this->bInitConstants = true;
 			return \implode(",", \array_keys($aConstants));

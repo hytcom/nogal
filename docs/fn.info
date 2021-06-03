@@ -1,7 +1,2 @@
-[checksum]
-md5 = "85786e9087b85b18f5f6ca399506ed24"
-sha1 = "d041ae4918ce7d89910cd4b784075298ada94419"
-
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/fn.md"
-
+[errors]
+1001 = "Calculadora Binaria no instalada. Ver https://www.php.net/manual/es/bc.installation.php"

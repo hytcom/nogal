@@ -1,10 +1,3 @@
-[checksum]
-md5 = "95a8b47e28b53774ec92584d897b60a5"
-sha1 = "22d88e60ecc4a4ad7145a23923dc18a8289ad330"
-
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/qr.md"
-
 [arguments]
 content = "Contenido del código"
 eclevel = "Nivel de corrección de errores:\
@@ -15,3 +8,6 @@ eclevel = "Nivel de corrección de errores:\
 "
 margin = "Margen entre el borde de la imagen y el contenido del código"
 size = "Cantidad de pixels por punto"
+
+[errors]
+1000 = "No se pudo hallar la librería \PHPQRCode\QRcode. Ejecutar 'compose update' en la carpeta grafts/composer"

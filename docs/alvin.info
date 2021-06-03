@@ -1,10 +1,3 @@
-[checksum]
-md5 = "e599d153a9155b91fa2a9a6788e56d22"
-sha1 = "57510f275f940729da928439c0311f0a59b59250"
-
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/alvin.md"
-
 [errors]
 1001 = Clave de encriptación indefinida
 1002 = Token inválido o vacío

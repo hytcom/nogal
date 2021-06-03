@@ -408,7 +408,8 @@ class nglFiles extends nglFeeder implements inglFeeder {
 		$aPath = \glob($sPath, GLOB_BRACE);
 
 		$aDirs  = [];
-		$sObjectIndex = "file.".self::call()->unique();
+		// $sObjectIndex = "file.".self::call()->unique();
+		$sObjectIndex = "file";
 		foreach($aPath as $sFile) {
 			$bDir = is_dir($sFile);
 			if($sMode=="info") {

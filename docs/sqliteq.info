@@ -1,10 +1,3 @@
-[checksum]
-md5 = "9855d8ab91b0149cd168eb47f8d68439"
-sha1 = "a613c2c048396ce1f99fbd4b79fc1e80fc337e72"
-
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/sqliteq.md"
-
 [arguments]
 column = "Nombre de una columna del grupo de resultados.\
 	En el método getAll, cuando el nombre este presedido de un #, el valor de la columna será utilizado como indice asociativo.\

@@ -18,6 +18,7 @@ class nglZip extends nglBranch implements inglBranch {
 
 	private $zip;
 	private $aErrors;
+	private $sPWD;
 
 	final protected function __declareArguments__() {
 		$vArguments							= [];
@@ -49,6 +50,7 @@ class nglZip extends nglBranch implements inglBranch {
 		$aErrors[\ZipArchive::ER_READ]		= "Read error (".\ZipArchive::ER_READ.")";
 		$aErrors[\ZipArchive::ER_SEEK]		= "Seek error (".\ZipArchive::ER_SEEK.")";
 		$this->aErrors = $aErrors;
+		$this->sPWD = null;
 		$this->zip = null;
 	}
 
@@ -79,15 +81,28 @@ class nglZip extends nglBranch implements inglBranch {
 		return $this;
 	}
 
+	public function cd() {
+		list($sFilePath) = $this->getarguments("filepath", \func_get_args());
+		$this->sPWD = ($sFilePath=="/") ? null : $sFilePath;
+		return $this;
+	}
+
+	public function pwd() {
+		return ($this->sPWD) ?  "/" : $this->sPWD;
+	}
+
 	public function create() {
 		if($this->zip===null) { self::errorMessage($this->object, 1001); return false; }
 		list($sFilePath,$sContent) = $this->getarguments("filepath,content", \func_get_args());
 		
+		if($this->sPWD!==null && $sFilePath[0]!="/") { $sFilePath = $this->sPWD."/".$sFilePath; }
 		if($sContent!==null) {
 			$this->zip->addFromString($sFilePath, $sContent);
 		} else {
 			$this->zip->addEmptyDir($sFilePath);
 		}
+
+		return $this;
 	}
 
 	public function add() {

@@ -1298,11 +1298,12 @@ class nglFn extends nglTrunk {
 		"return" : "string"
 	} **/
 	public function dec2hex($sDecimal, $nLength=0) {
+		if(!\function_exists("bcmod")) { $this->__errorMode__("die"); self::errorMessage($this->object, 1001); }
 		$sDecimal = (string)$sDecimal;
 		$sHexaDecimal = "";
 		$aHexValues = ["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"];
 		while($sDecimal!="0") {
-			$sHexaDecimal = $aHexValues[bcmod($sDecimal,"16")].$sHexaDecimal;
+			$sHexaDecimal = $aHexValues[\bcmod($sDecimal,"16")].$sHexaDecimal;
 			$sDecimal = \bcdiv($sDecimal, "16", 0);
 		}
 
@@ -1725,6 +1726,7 @@ class nglFn extends nglTrunk {
 		"return" : "string"
 	} **/
 	public function hex2dec($sHexaDecimal) {
+		if(!\function_exists("bcmod")) { $this->__errorMode__("die"); self::errorMessage($this->object, 1001); }
 		$aDecValues = [
 			"0" => "0", "1" => "1", "2" => "2",
 			"3" => "3", "4" => "4", "5" => "5",

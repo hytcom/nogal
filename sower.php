@@ -60,6 +60,8 @@ if(PHP_SAPI!="cli") {
 	if(!isset($_SESSION[NGL_SESSION_INDEX])) {
 		$_SESSION[NGL_SESSION_INDEX] = ["SESS" => [],"ONCECODES" => []];
 	}
+
+	\define("SID", \session_id());
 	$ngl("sysvar")->sessionVars();
 	$ngl("validate");
 }

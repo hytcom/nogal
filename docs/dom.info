@@ -1,10 +1,3 @@
-[checksum]
-md5 = "151eacb7b371d6bf121e7f20e1208871"
-sha1 = "4153a94ae78ad0d9fd934e70dea18e3a137220ad"
-
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/dom.md"
-
 [arguments]
 brtext = "Texto utilizado para reemplazar las etiquetas <br> al retornar texto"
 charset = "Juego de caracteres del contenido HTML"
@@ -14,3 +7,6 @@ lowercase = "Fuerza a que los selectores esten en minúscula"
 selector = "Selector del objetos, similiar a jQuery"
 spantext = "Texto utilizado para reemplazar las etiquetas <span> al retornar texto"
 tagsclosed = "Verifica que el texto HTML sea válido"
+
+[errors]
+1000 = "No se pudo hallar la librería \simple_html_dom. Verificar la carpeta grafts/classes"

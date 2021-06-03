@@ -1,3 +1,31 @@
+# 2.9.6 - 202106031430
+## general
+- se añadió la constante **SID** con el id de la session actual
+- se agregó el error 1000 en los **grafts** que indica la falta del objeto fuente
+
+## coon
+- se estableció la constante **NGL_ALVIN** como **key** cuando esta sea distinta de NULL
+- se cambió el uso del método **fn:tokenDecode** por uno propio del objeto
+
+## files
+- cambio menor
+
+## fn
+- mensaje de error al no encontrar las funciones BCMATH
+
+## rind
+- se añadió de manera permanente a la constante **SID** como constante permitida
+
+## s3
+- NUEVO OBJETO (beta). Gestor para AWS S3
+
+## shift
+- mensaje de error al no encontrar el paquete YAML
+
+## zip
+- se agregaron los métodos **cd** y **pwd** para el manejo de directorios dentro del zip
+
+________________________________________________________________________________
 # 2.9.5 - 202105140030
 ## alvin
 - fix error en **roleschain**

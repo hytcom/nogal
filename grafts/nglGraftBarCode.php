@@ -38,6 +38,13 @@ namespace nogal {
 		final protected function __declareVariables__() {
 		}
 
+		final public function __init__() {
+			if(!\class_exists("\Picqer\Barcode\BarcodeGenerator")) {
+				$this->__errorMode__("die");
+				self::errorMessage($this->object, 1000);
+			}
+		}
+
 		public function base64() {
 			list($sContent, $sType, $nSize, $nMargin, $nHeight, $sColor) = $this->getarguments("content,type,size,margin,height,color", \func_get_args());
 			$code = new \Picqer\Barcode\BarcodeGeneratorPNG();

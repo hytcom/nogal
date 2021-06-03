@@ -1,10 +1,3 @@
-[checksum]
-md5 = "76f4dba5866acff1d491a866876dcd80"
-sha1 = "a5decdc0b8123be2e62ee8aaea8d7dde01c31177"
-
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/barcode.md"
-
 [arguments]
 color = "Color de las barras en formato #RRGGBB"
 content = "Contenido del código"
@@ -43,3 +36,6 @@ type = "Algoritmo utilizado para generar el código. Códigos soportados:\
 	PHARMA_CODE\
 	PHARMA_CODE_TWO_TRACKS\
 "
+
+[errors]
+1000 = "No se pudo hallar la librería \Picqer\Barcode\BarcodeGenerator. Ejecutar 'compose update' en la carpeta grafts/composer"
