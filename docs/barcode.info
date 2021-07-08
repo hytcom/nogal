@@ -1,3 +1,10 @@
+[checksum]
+md5 = "fa436d36c2172b7534068299ba2318f3"
+sha1 = "4024b9563c66f6de4b12e8b210200f48ff561e6f"
+
+[documentation]
+url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/barcode.md"
+
 [arguments]
 color = "Color de las barras en formato #RRGGBB"
 content = "Contenido del código"

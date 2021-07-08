@@ -1,3 +1,10 @@
+[checksum]
+md5 = "12def64bbec44f7adaf402caadaa2100"
+sha1 = "7c626110615afcaf6bf7f34d773a26dda461c467"
+
+[documentation]
+url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/pdf.md"
+
 [arguments]
 css = "Reglas CSS"
 content = "Contanido del PDF"

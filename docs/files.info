@@ -1,3 +1,10 @@
+[checksum]
+md5 = "fe322cebc3ccda6cde86fbc5a3c43ee2"
+sha1 = "7105e337d6fb97df6a047f3e0afce02bdfb544e1"
+
+[documentation]
+url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/files.md"
+
 [errors]
 1001 = "Acceso denegado"
 1002 = "Falló al crear el archivo o directorio"

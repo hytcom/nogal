@@ -1,3 +1,10 @@
+[checksum]
+md5 = "b3371cf2c46708d88ae56022bdf0be2e"
+sha1 = "26c24b63364b6d7bd8e1dd400387aa4a6ffef5bd"
+
+[documentation]
+url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/mail.md"
+
 [arguments]
 attach = "Ruta de un archivo adjunto relativa a NGL_SANDBOX"
 attach_content = "Contenido que puede ser enviado como archivo adjunto"

@@ -1,3 +1,10 @@
+[checksum]
+md5 = "8972532d4314ea8d1a27418e03903b5c"
+sha1 = "d1a2ee482966f8091c1f2eea3b3ce07035b44705"
+
+[documentation]
+url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/owl.md"
+
 [arguments]
 alvin = "Activa y desactiva los chequeos ALVIN"
 cascade = "Activa y desactiva el borrado en cascada"

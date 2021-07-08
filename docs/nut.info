@@ -1,3 +1,10 @@
+[checksum]
+md5 = "d2e1babe0f2240e9e5d5b43f1d35de7a"
+sha1 = "0b0f9027723b24d3662dc4ba143c84b31e98c007"
+
+[documentation]
+url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/nut.md"
+
 [errors]
 1001 = "El NUT no existe"
 1002 = "Los nuts no puede contener métodos públicas"

@@ -1,3 +1,10 @@
+[checksum]
+md5 = "95f93773caf480e319c441d15417e2ce"
+sha1 = "52897a1b9da35242e685c8da4f047414bde732ab"
+
+[documentation]
+url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/set.md"
+
 [arguments]
 data = "Cadena de valores separados por splitter"
 index = "Indice del elemento activo"

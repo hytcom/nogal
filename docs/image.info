@@ -1,3 +1,10 @@
+[checksum]
+md5 = "ca543f696da342eeeade8bb5d19724d5"
+sha1 = "3729da4f7a1514581d9c1dd748fee4cb315a114b"
+
+[documentation]
+url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/image.md"
+
 [arguments]
 alpha = "Determina si la siguiente copia tendra fondo transparente"
 canvas_color = "Valor hexadecimal del color del canvas"

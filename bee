@@ -17,13 +17,13 @@ $ php bee -s							modo consola silencioso
 
 // config
 \define("NGL_BEE", true);
-$FRAMEWORKPATH = "nogal.php";
+$FRAMEWORKPATH = __DIR__."/nogal.php";
 
 // run
 if(\file_exists($FRAMEWORKPATH)) {
 	require_once($FRAMEWORKPATH);
 	$bSilent = $bReturn = false;
-	$sBee = \array_shift($argv);
+	$sBee = \basename(\array_shift($argv));
 
 	if(NGL_TERMINAL && $bee = $ngl("bee")) {
 		if(\count($argv) && $argv[0]=="-s") { $bSilent = true; \array_shift($argv); }

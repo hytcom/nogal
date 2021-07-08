@@ -1,3 +1,10 @@
+[checksum]
+md5 = "fcc6557f7a6720e31d17a85adb4f7a7e"
+sha1 = "c6a27f801296d4e9c60d3e164d4e2d2a4cfcd2d3"
+
+[documentation]
+url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/tree.md"
+
 [arguments]
 children = "Nombre de la clave en la que se anidarán las dependencias"
 colid = "Nombre de la clave con el ID principal"

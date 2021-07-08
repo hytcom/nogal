@@ -1,3 +1,10 @@
+[checksum]
+md5 = "478d866943b758ba350809fdca541e29"
+sha1 = "b9e04d1fcbacd3f72919d355579a59dbc02ae843"
+
+[documentation]
+url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/qr.md"
+
 [arguments]
 content = "Contenido del código"
 eclevel = "Nivel de corrección de errores:\

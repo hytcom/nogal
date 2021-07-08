@@ -1,3 +1,10 @@
+[checksum]
+md5 = "198e38d7fce64ae5e0979e422ac31ddc"
+sha1 = "09878a5fa44672b2d142f65db70f1207e551be8b"
+
+[documentation]
+url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/sqlite.md"
+
 [arguments]
 autoconn = "Cuando es TRUE, ejecuta el método connect luego de cargar las configuraciones"
 base = "Ruta del archivo de base de datos"

@@ -1,3 +1,10 @@
+[checksum]
+md5 = "7b9921d4fad4259232fe38a3d65b5b8f"
+sha1 = "dc20f1a8cc2bab3df0f9557c4a39283c3cc5dac5"
+
+[documentation]
+url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/nest.md"
+
 [arguments]
 about = "Tabla o Vista sobre la que queremos obtener información"
 after = "Nombre del campo luego del cual se insertará un nuevo campo"

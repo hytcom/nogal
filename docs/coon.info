@@ -1,3 +1,10 @@
+[checksum]
+md5 = "84570391dd7e718ae38217aad4e92b29"
+sha1 = "4d55755458d25d1e10f35afb48799687ddf04d8b"
+
+[documentation]
+url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/coon.md"
+
 [arguments]
 apiname = "Nombre de la API"
 auth = "Tipo de autenticación: basic, bearer ó alvin"

@@ -1,3 +1,10 @@
+[checksum]
+md5 = "b1ab336578c466c5945f624514745f1c"
+sha1 = "9bfccbe993d4d8e71fe42647d334bff1c25c01f2"
+
+[documentation]
+url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/dbase.md"
+
 [arguments]
 autoconn = "Establece la autoconexión"
 base = "Ruta relativa a NGL_SANDBOX del archivo .dbf"

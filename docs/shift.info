@@ -1,2 +1,9 @@
+[checksum]
+md5 = "6d6ed06db5d754f402dacdbc40c8dea3"
+sha1 = "719aba74e7f283c193084006fcace3e504236210"
+
+[documentation]
+url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/shift.md"
+
 [errors]
 1001 = "No se pudo encontrar la extención PECL YAML. Ver https://www.php.net/manual/es/yaml.installation.php"

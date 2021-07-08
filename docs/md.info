@@ -1,3 +1,10 @@
+[checksum]
+md5 = "722e2ef7d8d9d0e58ca6396047a7ffc5"
+sha1 = "0b30b3af3287266de336001d291a17b0426d53b1"
+
+[documentation]
+url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/md.md"
+
 [arguments]
 content = "Contenido del documento"
 html = "Activa el uso de código HTML"

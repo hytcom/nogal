@@ -1,3 +1,22 @@
+# 2.9.7 - 202107081630
+## bee
+- cambios menores en el uso por línea de comandos
+
+## files
+- fix error en el método **ls** debido al cambio de la version 2.9.6
+
+## nest
+- se pasó de 16 a 32 caracteres en el tipo de campo **code**
+- ahora se permite determinar el tipo de **index** para los campos **pid**
+
+## rind
+- el argumento **multiple** del comando **mergefile** ahora acepta **NUTS**. El **nut** es evaluado unicamente al momento de generar el **cache**
+- se cambió la finalidad del método **InnerRind2php** hasta ahora en deshuso
+
+## zip
+- fix error en el método **cd** cuando el directorio es **..**
+
+________________________________________________________________________________
 # 2.9.6 - 202106031430
 ## general
 - se añadió la constante **SID** con el id de la session actual

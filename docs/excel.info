@@ -1,3 +1,10 @@
+[checksum]
+md5 = "0757e0736b4977b479778b93e26c254a"
+sha1 = "01b7b185bf2863ce59fbf484395ec8169e13b314"
+
+[documentation]
+url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/excel.md"
+
 [arguments]
 calculate = "Activa y desactiva el cálculo de fórmulas"
 colnames = "Habilita el uso de la primer fila del rango como claves del array en el método getall"

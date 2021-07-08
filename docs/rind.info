@@ -1,3 +1,10 @@
+[checksum]
+md5 = "dc28acb95cecda3486262cb6ff7c9450"
+sha1 = "9f5c2fdc7e110cec3e4e688ada08dd8725fa12a2"
+
+[documentation]
+url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/rind.md"
+
 [arguments]
 alvin_mode = "Estable el modo de validación Alvin.\
 	all: todas las validaciones están activas\

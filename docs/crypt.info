@@ -1,3 +1,10 @@
+[checksum]
+md5 = "93e8bed9519eb55143930e4eb60dd33a"
+sha1 = "b8a2a8dc14ecc91177db2d6f4241e903db38921b"
+
+[documentation]
+url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/crypt.md"
+
 [arguments]
 base64 = "Activa el modo de ingreso/respuesta en base64"
 key = "Clave de encriptación"
