@@ -11,13 +11,13 @@ $ php bee -m "<COMMAND>|<COMMAND>"		modo multiple
 $ php bee -m@ "<COMMAND>@<COMMAND>"		modo multiple con @ como separador
 $ php bee -s -m "<COMMAND>|<COMMAND>"	modo multiple silencioso
 $ php bee -r -m "<COMMAND>|<COMMAND>"	modo multiple retorno (valor crudo)
-$ php bee -s							modo consola silencioso. para finalizar, usar bzzz
+$ php bee -s							modo consola silencioso
 $ php bee								modo consola. para finalizar, usar bzzz
 ------------------------------------------------------------------------------*/
 
 // config
 \define("NGL_BEE", true);
-$FRAMEWORKPATH = __DIR__."/nogal.php";
+$FRAMEWORKPATH = "/usr/share/nogal/nogal.php";
 
 // run
 if(\file_exists($FRAMEWORKPATH)) {

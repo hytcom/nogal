@@ -1,0 +1,71 @@
+<?php
+
+namespace nogal;
+$this->TutorCaller(self::requirer());
+
+class tutor<{=CAMELNAME=}> extends nglTutor {
+
+	private $db;
+	
+	protected function init($aArguments=[]) {
+		$this->db = self::call("mysql");
+		$this->debuggable = false; // el tutor admite debug
+		$this->aNulls = [true]; // listar los campos que en caso de estar vacios deberán guardarse como NULL. Usar TRUE para indicar TODOS
+		// $this->aEmpty = []; // listar los campos que en caso de ser NULL deben guardarse como vacios
+		// $this->aZeros = []; // listar los campos que en caso de ser NULL o vacios, deben guardarse como zeros
+	}
+
+	protected function insert($aArguments=[]) {
+		if(!count($aArguments)) { return false; }
+		// $this->alvin("<{=LOWERNAME=}>.insert");
+		$aArguments = $this->Sanitize($aArguments);
+
+		// if(!empty($aArguments["_FILES"])) { $this->attachs(); }
+
+		// insert
+		$aArguments = $this->db->escape($aArguments);
+		return $this->db->insert("<{=LOWERNAME=}>", $aArguments);
+	}
+
+	protected function update($aArguments=[]) {
+		if(!count($aArguments)) { return false; }
+		// $this->alvin("<{=LOWERNAME=}>.update");
+		$aArguments = $this->Sanitize($aArguments);
+
+		// if(!empty($aArguments["_FILES"])) { $this->attachs(); }
+
+		// update
+		$aArguments = $this->db->escape($aArguments);
+		return $this->db->update("<{=LOWERNAME=}>", $aArguments, "id='".(int)$aArguments["id"]."'");
+	}
+
+	/* adjuntos ------------------------------------------------------------
+		INPUTFILENAME = nombre del campo en el formulario HTML
+		path = ruta donde se alojará el adjunto
+		copies: solo aplica para JPG y PNG
+			path = ruta donde se alojará la copia
+			img-size = tamaño de la copia INTxINT ó INT que en combinación con img-bgcolor creará una copia cuadrada de INT de lado
+			img-bgcolor = color de relleno cuanto img-size sea un INT
+		
+		retorna datos de los adjuntos cargados, queda a criterio del programador donde almacenarlos
+	*/
+	private function attachs() {
+		return self::call("tutor.master")->unlock()->run("upload", [
+			"INPUTFILENAME" => [
+				"path" => NGL_PATH_PUBLIC."/files/<{=LOWERNAME=}>",
+				"copies" => [
+					["path" => NGL_PATH_PUBLIC."/files/<{=LOWERNAME=}>/thumbs", "img-size"=>"200", "img-bgcolor"=>"#FFFFFF"]
+				]
+			],
+			"INPUTFILENAME2" => [
+				"path" => NGL_PATH_PUBLIC."/files/<{=LOWERNAME=}>",
+				"copies" => [
+					["path" => NGL_PATH_PUBLIC."/files/<{=LOWERNAME=}>/thumbs", "img-size"=>"200", "img-bgcolor"=>"#FFFFFF"],
+					["path" => NGL_PATH_PUBLIC."/files/<{=LOWERNAME=}>/thumbs400", "img-size"=>"400x500", "img-bgcolor"=>"#FFFFFF"]
+				]
+			]
+		]);	
+	}
+}
+
+?>

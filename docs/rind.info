@@ -1,6 +1,6 @@
 [checksum]
-md5 = "f20e3e5150fbac85be880d8d615ab61f"
-sha1 = "45cd2f93c5d1cac9f6a2aaf32dc6035e39961981"
+md5 = "4f80039c21d30b4bffb83f20b9a8d9a9"
+sha1 = "903bba0de8a6faa625393cbd61b5f91930595497"
 
 [documentation]
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/rind.md"
@@ -67,3 +67,4 @@ Las configuraciones request sobreescriben las de variables. Ej:\
 1005 = "Estructura JSON inválida"
 1006 = "No se pudo escribir el archivo cache. Permiso denegado"
 1007 = "Nombre de Loop inválido"
+1008 = "La carpeta cache no existe y no pudo ser creada. Permiso denegado"

@@ -1,0 +1,21 @@
+<?php
+
+$sNogalDirs = self::call()->imya();
+
+$sBuffer = \file_get_contents($sDestine."/html/config.php");
+$sBuffer = \str_replace(["<{=ROOTDIR=}>", "<{=NOGALDIRS=}>"], [$sDestine, $sNogalDirs], $sBuffer);
+\file_put_contents($sDestine."/html/config.php", $sBuffer);
+
+$nMask = \umask(0); 
+\mkdir($sDestine."/html/".$sNogalDirs, 0775);
+\mkdir($sDestine."/html/".$sNogalDirs."/cache", 0777);
+\mkdir($sDestine."/html/".$sNogalDirs."/conf", 0775);
+\mkdir($sDestine."/html/".$sNogalDirs."/data", 0775);
+\mkdir($sDestine."/html/".$sNogalDirs."/nuts", 0775);
+\mkdir($sDestine."/html/".$sNogalDirs."/logs", 0777);
+\mkdir($sDestine."/html/".$sNogalDirs."/tmp", 0777);
+\mkdir($sDestine."/html/".$sNogalDirs."/tutors", 0775);
+\umask($nMask);
+\unlink(__FILE__);
+
+?>

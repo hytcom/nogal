@@ -1,6 +1,6 @@
 [checksum]
-md5 = "0012ccba18caabe31e1b12b57195b312"
-sha1 = "0ca78410fe1e84f5d34dab00ceca0c67402c1da7"
+md5 = "cf89070aa70ad65988037ac8ced2c195"
+sha1 = "dc715056d30e61db579db956c06dbb44911cce2f"
 
 [documentation]
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/pecker.md"
