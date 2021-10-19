@@ -1,6 +1,6 @@
 [checksum]
-md5 = "db86d2c297c33a65b029de88061202b6"
-sha1 = "2581a8185c4b2e4439de2ecb8509eb99a7663275"
+md5 = "ad14955da612ef3f52da8aa449224809"
+sha1 = "948e85627181521086f0012706e5ce13a251a7e1"
 
 [documentation]
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/bee.md"
