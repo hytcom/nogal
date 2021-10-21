@@ -3,64 +3,107 @@
 /** bee for shell --------------------------------------------------------------
 Para activar la consola se deberá definir la constante NGL_BEE como true y
 configurar la ruta del arrancador del framework
-
-$ php bee <COMMAND>						modo inline
-$ php bee -s <COMMAND>					modo inline silencioso
-$ php bee -r <COMMAND>					modo inline retorno (valor crudo)
-$ php bee -m "<COMMAND>|<COMMAND>"		modo multiple
-$ php bee -m@ "<COMMAND>@<COMMAND>"		modo multiple con @ como separador
-$ php bee -s -m "<COMMAND>|<COMMAND>"	modo multiple silencioso
-$ php bee -r -m "<COMMAND>|<COMMAND>"	modo multiple retorno (valor crudo)
-$ php bee -s							modo consola silencioso
-$ php bee								modo consola. para finalizar, usar bzzz
 ------------------------------------------------------------------------------*/
 
 // config
 \define("NGL_BEE", true);
 $FRAMEWORKPATH = __DIR__."/html/config.php";
 
+$HELP = <<<HELP
+
+--------------------------------------------------------------------------------
+ nogal bee -S:
+--------------------------------------------------------------------------------
+Uso:
+    php bee [OPTIONS] <COMMAND>
+    php bee [OPTIONS] -m"<COMMAND><SEPARATOR><COMMAND>"
+    php bee [OPTIONS] (modo consola. para finalizar, usar bzzz)
+
+Comandos:
+    Las sintaxis de los comandos pueden ser:
+        <OBJECT> <METHOD> [<ARGUMENT> ... <ARGUMENT>]
+       <OBJECT>:<METHOD> [<ARGUMENT> ... <ARGUMENT>]
+
+Opciones:
+    -h    ayuda
+    -s    modo silencioso, no tiene salida
+    -r    retorna el valor crudo de la respusts (raw)
+    -f    carga el código a ejecutar, desde un archivo
+    -m    permite ejecutar multiples comandos en línea
+    -m@   multiples comandos con un separador distinto a |, en este caso, @
+
+Ejemplo
+    # en línea
+    php bee fn:imya
+
+    # consola
+    php bee
+    file load https://cdn.upps.cloud/json/material-design-colors.json
+    -$: read
+    shift convert ["-$:", "json-ttable"]
+    bzzz
+
+--------------------------------------------------------------------------------
+
+HELP;
+
 // run
 if(\file_exists($FRAMEWORKPATH)) {
 	require_once($FRAMEWORKPATH);
-	$bSilent = $bReturn = false;
+	$bSilent = $bReturn = $bFromFile = false;
 	$sBee = \basename(\array_shift($argv));
 
 	if(NGL_TERMINAL && $bee = $ngl("bee")) {
-		$aOptions = \getopt("s::r::m::");
+		$aOptions = \getopt("h::s::r::m::f::");
+		if(isset($aOptions["h"])) {
+			die($HELP."\n");
+		}
+
 		if(\count($argv)) {
 			foreach($argv as $k => $sArg) { if($sArg[0]=="-") { unset($argv[$k]); } }
 		}
 		if(isset($aOptions["s"])) { $bSilent = true; }
 		if(isset($aOptions["r"])) { $bReturn = true; }
-		if($sBee=="bee" && !\count($argv)) {
-			$aBuffer = [];
-			while(true) {
-				$sInput = \readline();
-				if($sInput=="bzzz") { break; }
-				$aBuffer[] = $sInput;
+		if(isset($aOptions["f"])) {
+			if(file_exists($aOptions["f"])) {
+				$sCommand = \file_get_contents($aOptions["f"]);
+				$bFromFile = true;
+			} else {
+				$ngl()->out("\nFile not found ".$aOptions["f"]."\n", "error"); exit();
 			}
-			$sCommand = \implode("\n",$aBuffer);
-		} else {
-			$sCommand = \implode(" ",$argv);
-			if(isset($aOptions["m"])) {
-				$sSplitter = empty($aOptions["m"]) ? "|" : $aOptions["m"];
-				$sBuffer = $sCommand;
-				$aBuffer = \explode($sSplitter, $sBuffer);
+		}
+
+		if(!$bFromFile) {
+			if($sBee=="bee" && !\count($argv)) {
+				$aBuffer = [];
+				while(true) {
+					$sInput = \readline();
+					if($sInput=="bzzz") { break; }
+					$aBuffer[] = $sInput;
+				}
 				$sCommand = \implode("\n",$aBuffer);
+			} else {
+				$sCommand = \implode(" ",$argv);
+				if(isset($aOptions["m"])) {
+					$sSplitter = empty($aOptions["m"]) ? "|" : $aOptions["m"];
+					$sBuffer = $sCommand;
+					$aBuffer = \explode($sSplitter, $sBuffer);
+					$sCommand = \implode("\n",$aBuffer);
+				}
 			}
 		}
 
 		$sResponse = $bee->dump(true)->bzzz($sCommand);
 		if($bee->error()) {
 			if(!$bReturn) {
-				$ngl()->out("\n".$sResponse."\n", "error");
+				$ngl()->out("\n".$sResponse."\n", "error"); exit();
 			} else {
 				exit("NULL");
 			}
 		} else {
 			if(!$bSilent) {
 				if(!$bReturn) {
-					$ngl()->out($sResponse, "success");
+					$ngl()->out($sResponse, "success"); exit();
 				} else {
 					exit($sResponse);
 				}
@@ -68,7 +111,7 @@ if(\file_exists($FRAMEWORKPATH)) {
 		}
 		exit();
 	} else {
-		$ngl()->out("\nBee only bzzz on Terminal\n", "error");
+		$ngl()->out("\nBee only bzzz on Terminal\n", "error"); exit();
 	}
 } else {
 	exit("\nFile could not be found: ".$FRAMEWORKPATH."\n");

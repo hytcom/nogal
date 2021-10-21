@@ -1,0 +1,3 @@
+file load https://cdn.upps.cloud/json/material-design-colors.json
+-$: read
+shift convert ["-$:", "json-ttable"]
