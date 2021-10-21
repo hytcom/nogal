@@ -12,7 +12,7 @@ $aExtension = [
 	"html" => "text/html",
 	"yml" => "application/yml"
 ];
-if(!empty($PRICKOUT["extension"]) && $aExtension[$PRICKOUT["extension"]]) {
+if(!empty($PRICKOUT["extension"]) && !empty($aExtension[$PRICKOUT["extension"]])) {
 	$sExtension = $PRICKOUT["extension"];
 	header("Content-Type: ".$aExtension[$PRICKOUT["extension"]]);
 }
@@ -21,6 +21,7 @@ $sPath = $ngl("files")->absPath($PRICKOUT["dirname"]);
 $sBuffer = $ngl("rind")
 	->root(NGL_PATH_PRICKOUT)
 	->gui(NGL_PATH_PRICKOUT."/../gui")
+	->curdir($ngl()->clearPath($sPath, false, NGL_DIR_SLASH, false))
 	->stamp($PRICKOUT["filename"].".".$sExtension)
 ;
 
