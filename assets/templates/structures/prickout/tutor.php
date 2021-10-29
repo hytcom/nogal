@@ -3,14 +3,7 @@
 // determinacion del origen de datos ---------------------------------------------------------------
 if(isset($_SERVER["REQUEST_METHOD"])) {
 	$aRequest = ($_SERVER["REQUEST_METHOD"]=="GET") ? $_GET : $_POST; // datos enviados
-	// control de archivos adjuntos
-	$aRequest["_FILES"] = false;
-	if(isset($_FILES)) {
-		foreach($_FILES as $x => $aFile) {
-			if($aFile["error"]!==0) { unset($_FILES[$x]); }
-		}
-		if(count($_FILES)) { $aRequest["_FILES"] = true; }
-	}
+	$aRequest["_FILES"] = (!empty($_FILES)) ? true : false;
 }
 
 // ejecucion del tutor -----------------------------------------------------------------------------
@@ -29,23 +22,30 @@ try {
 	if($tutor->debugging()) { exit($response); }
 
 	// respuesta ---------------------------------------------------------------------------------------
-	if(is_array($response) && isset($response["NGL_REDIRECT"])) {
-		$aRequest["NGL_REDIRECT"] = $response["NGL_REDIRECT"];
-		unset($response["NGL_REDIRECT"]);
+	if(is_array($response)) {
+		if(isset($response["NGL_REDIRECT"])) { $aRequest["NGL_REDIRECT"] = $response["NGL_REDIRECT"]; unset($response["NGL_REDIRECT"]); }
+		if(isset($response["NGL_LOCATION"])) { $aRequest["NGL_LOCATION"] = $response["NGL_LOCATION"]; unset($response["NGL_LOCATION"]); }
 	}
 
 	$sResponse = json_encode($response);
-	if(isset($aRequest["NGL_REDIRECT"])) { 
-		if(strpos($aRequest["NGL_REDIRECT"], "?")!==false) {
+	if(!empty($aRequest["NGL_REDIRECT"]) || !empty($aRequest["NGL_LOCATION"])) {
+		$sURL = (!empty($aRequest["NGL_LOCATION"])) ? $aRequest["NGL_LOCATION"] : $aRequest["NGL_REDIRECT"];
+		if(strpos($sURL, "?")!==false) {
 			$sURL = $ngl("url")
-				->url($aRequest["NGL_REDIRECT"])
+				->url($sURL)
 				->update("params", array("response" => base64_encode($sResponse)))
 				->unparse()
 			;
 		} else {
-			$sURL = $aRequest["NGL_REDIRECT"]."?response=".base64_encode($sResponse);
+			$sURL = $sURL."?response=".base64_encode($sResponse);
 		}
-		exit($sURL);
+
+		if(!empty($aRequest["NGL_LOCATION"])) {
+			header("location:".$sURL);
+			exit();
+		} else {
+			die($sURL);
+		}
 	} else {
 		die($sResponse);
 	}

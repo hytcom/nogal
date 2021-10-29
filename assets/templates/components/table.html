@@ -1,0 +1,22 @@
+<table class="table">
+	<thead>
+		<tr class="headers">
+			<th width="50" class="text-right">#</th>
+			<rind:loop><@name>data</@name><@source>{$_SET.tabledata.0}</@source><@content><th>{#self.#key}</th></@content></rind:loop>
+			<th>&nbsp;</th>
+		</tr>
+	</thead>
+	<tbody>
+		<rind:loop>
+			<@source>{$_SET.tabledata}</@source>
+			<@content>
+				<tr id="numrow_{__imya__}">
+					<th class="text-right">{#line}</th>
+					<rind:loop><@source>{#self.#data}</@source><@content><td>{#self.#current}</td></@content></rind:loop>
+					<td><a href="update?imya={__imya__}">editar</a></td>
+				</tr>
+			</@content>
+			<@empty><tr><td colspan="2" class="text-center">- no se hallaron registros -</td></tr></@empty>
+		</rind:loop>
+	</tbody>
+</table>
