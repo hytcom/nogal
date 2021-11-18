@@ -24,7 +24,7 @@ nglRoot::defineConstant("NGL_PROJECT_RELEASE",									"lasted");
 
 // RUTAS -----------------------------------------------------------------------
 // document_root
-nglRoot::defineConstant("NGL_DOCUMENT_ROOT",									(!empty($_SERVER["DOCUMENT_ROOT"]) ? $_SERVER["DOCUMENT_ROOT"] : $_SERVER["PWD"]));
+nglRoot::defineConstant("NGL_DOCUMENT_ROOT",									(!empty($_SERVER["DOCUMENT_ROOT"]) ? $_SERVER["DOCUMENT_ROOT"] : \dirname($_SERVER["PHP_SELF"])));
 
 // directorio project
 nglRoot::defineConstant("NGL_PATH_PROJECT",										NGL_DOCUMENT_ROOT);
