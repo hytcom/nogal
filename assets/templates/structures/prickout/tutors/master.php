@@ -9,26 +9,6 @@ class tutorMaster extends nglTutor {
 		$this->Lockable();
 	}
 
-	protected function tags($aArguments=false) {
-		if(empty($aArguments)) { return false; }
-		$db = self::call("mysql");
-		$owl = self::call("owl");
-		$owl->connect($db);
-		$aArguments = $db->escape($aArguments);
-
-		$owl->select("tagged");
-		$chk = $db->query("SELECT `imya` FROM `tagged` WHERE `entity` = '".$aArguments["entity"]."'");
-		if(!$chk->rows()) {
-			$owl->insert(["entity"=>$aArguments["entity"], "tags"=>$aArguments["tags"]]);
-		} else {
-			$owl->update(["imya"=>$chk->get("imya"), "tags"=>$aArguments["tags"]]);
-		}
-		$aTags = \array_filter(self::call()->explodeTrim(",", $aArguments["tags"]));
-		if(\count($aTags)) {
-			return $db->query("INSERT IGNORE INTO `tags` () VALUES ('".\implode("'),('", $aTags)."')");
-		}
-	}
-
 	/*
 		$aUploads = $this->master->unlock()->run("upload", array(
 			"image" => array("path" => NGL_PATH_PUBLIC.NGL_DIR_SLASH."files"), // upload simple

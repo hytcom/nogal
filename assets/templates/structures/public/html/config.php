@@ -18,7 +18,7 @@ https://github.com/hytcom/wiki/blob/master/nogal/docs/constants.md
 define("NGL_PROJECT",															"NOGAL");
 
 // version del proyecto
-define("NGL_PROJECT_RELEASE",													"lasted");
+define("NGL_PROJECT_RELEASE",													"latest");
 
 // RUTAS -----------------------------------------------------------------------
 // document_root
@@ -194,6 +194,11 @@ if(file_exists(NGL_PATH_FRAMEWORK."/nogal.php")) {
     require_once(NGL_PATH_FRAMEWORK."/nogal.php");
 } else {
 	if(!defined("NGL_IM_GARDENER")) { die("Call the Gardener"); }
+}
+
+// constantes del proyecto
+if(file_exists(NGL_PATH_PROJECT."/constants.php")) {
+    require_once(NGL_PATH_PROJECT."/constants.php");
 }
 
 ?>

@@ -9,7 +9,7 @@ class tutorOBJECTNAME extends nglTutor {
 	private $owl;
 	
 	protected function init($aArguments=[]) {
-		$this->db = self::call("mysql");
+		$this->db = self::call(DB_CONNECTOR)->connect();
 		$this->owl = self::call("owl");
 		$this->owl->connect($this->db);
 		$this->owl->select("OBJECTNAME");

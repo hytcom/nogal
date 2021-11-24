@@ -22,7 +22,7 @@ $ENV["theme"]											= NGL_URL;
 $ENV["css"]												= NGL_URL."/css";
 $ENV["js"]												= NGL_URL."/js";
 $ENV["storage"]											= NGL_URL."/files";
-$ENV["cdn"]												= "https://cdn.upps/rel-".NGL_PROJECT_RELEASE;
+$ENV["cdn"]												= "https://cdn.upps.cloud/rel-".NGL_PROJECT_RELEASE;
 $ENV["site"]											= NGL_URL;
 
 // archivos
