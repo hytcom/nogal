@@ -11,6 +11,6 @@ ___
 # CONSTANTES
 #===============================================================================
 // foobar
-define("DB_CONNECTOR",															"mysql");
+// define("DB_CONNECTOR",															"mysql");
 
 ?>

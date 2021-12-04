@@ -80,7 +80,7 @@ define("NGL_SESSION_INDEX",														"NOGAL");
 define("NGL_PASSWORD_KEY",														null);
 
 // control de accesos y generacion de passwords (NULL para desactivar)
-define("NGL_ALVIN",																null);
+define("NGL_ALVIN",																true);
 
 // tipo de carga de ALVIN-TOKEN (TOKEN|TOKENUSER|PROFILE)
 define("NGL_ALVIN_MODE",														"PROFILE");
@@ -165,7 +165,7 @@ define("NGL_FALLEN",															false);
 define("NGL_GARDENER", 															false);
 
 // activa/desactiva a bee (NULL para desactivar)
-define("NGL_BEE", 																null);
+define("NGL_BEE", 																true);
 
 // separador de directorios
 define("NGL_DIR_SLASH",															"/");

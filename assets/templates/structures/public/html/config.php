@@ -165,7 +165,7 @@ define("NGL_PATH_TUTORS",														NGL_PATH_PROJECT."/<{=NOGALDIRS=}>/tutors
 // define("NGL_GARDENER", 														false);
 
 // activa/desactiva a bee (NULL para desactivar)
-// define("NGL_BEE", 															null);
+define("NGL_BEE", 															null);
 
 // separador de directorios
 // define("NGL_DIR_SLASH",														"/");
