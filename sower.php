@@ -17,10 +17,9 @@ if(!\defined("NGL_CHARSET")) {
 @\header("Charset: ".NGL_CHARSET);
 
 // tipo de archivo
-if(!\defined("NGL_CONTENT_TYPE")) {
-	\define("NGL_CONTENT_TYPE", "text/html");
+if(\defined("NGL_CONTENT_TYPE") && !empty(NGL_CONTENT_TYPE)) {
+	@header("Content-Type: ".NGL_CONTENT_TYPE);
 }
-@header("Content-Type: ".NGL_CONTENT_TYPE);
 
 // ruta del framework
 if(!\defined("NGL_PATH_FRAMEWORK")) {

@@ -19,6 +19,11 @@ url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/alvin.md"
 1011 = Nombre de permiso inválido
 1012 = No se pudieron cargar los permisos
 
+[config]
+_help = "login: url del archivo para login. Default /login\
+logout: url del archivo para logout. Default /logout
+"
+
 [firewall-ignore]
 _help = "Archivos ignorados por ALVIN al momento de la carga\
 La URL de los archivos son relativas al valor de la constante NGL_URL y deben comenzar con /\

@@ -1,0 +1,615 @@
+{
+	"types": [
+		{"label":"BIGINT","value":"BIGINT"},
+		{"label":"CHAR","value":"CHAR"},
+		{"label":"DATE","value":"DATE"},
+		{"label":"DATETIME","value":"DATETIME"},
+		{"label":"DECIMAL","value":"DECIMAL"},
+		{"label":"ENUM","value":"ENUM"},
+		{"label":"INT","value":"INT"},
+		{"label":"MEDIUMINT","value":"MEDIUMINT"},
+		{"label":"MEDIUMTEXT","value":"MEDIUMTEXT"},
+		{"label":"SMALLINT","value":"SMALLINT"},
+		{"label":"TEXT","value":"TEXT"},
+		{"label":"TIME","value":"TIME"},
+		{"label":"TIMESTAMP","value":"TIMESTAMP"},
+		{"label":"TINYINT","value":"TINYINT"},
+		{"label":"VARCHAR","value":"VARCHAR"}
+	],
+
+	"fields": {
+		"address":		{"alias":"address","type":"VARCHAR","length":"128","null":true},
+		"amount":		{"alias":"amount","type":"DECIMAL","length":"12,2","null":true},
+		"attach":		{"alias":"attach","type":"INT","length":"10","attrs":["UNSIGNED"],"index":"INDEX","null":true},
+		"bigint":		{"alias":"bigint","type":"BIGINT","length":"","attrs":["UNSIGNED"],"null":true},
+		"bint":			{"alias":"bigint","type":"BIGINT","length":"","attrs":["UNSIGNED"],"null":true},
+		"boolean":		{"alias":"boolean","type":"ENUM","length":"'0','1'","default":"'0'","null":true},
+		"code":			{"alias":"code","type":"CHAR","length":"16","attrs":"","index":"UNIQUE","null":true},
+		"coord":		{"alias":"coord","type":"VARCHAR","length":"32","null":true},
+		"coords":		{"alias":"coords","type":"VARCHAR","length":"64","null":true},
+		"date":			{"alias":"date","type":"DATE","length":"","null":true},
+		"datetime":		{"alias":"datetime","type":"DATETIME","length":"","null":true},
+		"decimal":		{"alias":"decimal","type":"DECIMAL","length":"12,4","null":true},
+		"email":		{"alias":"email","type":"VARCHAR","length":"96","null":true},
+		"enum":			{"alias":"enum","type":"ENUM","length":"'0','1'","default":"__NGL_NULL_VALUE__","null":false},
+		"fk":			{"alias":"fk","type":"INT","length":"10","attrs":["UNSIGNED"],"index":"INDEX","null":true},
+		"imya":			{"alias":"imya","type":"CHAR","length":"32","attrs":"","index":"UNIQUE","null":true},
+		"int":			{"alias":"int","type":"INT","length":"","attrs":["UNSIGNED"],"null":true},
+		"mediumint":	{"alias":"mediumint","type":"MEDIUMINT","length":"","attrs":["UNSIGNED"],"null":true},
+		"memo":			{"alias":"memo","type":"MEDIUMTEXT","length":"","null":true},
+		"mint":			{"alias":"mediumint","type":"MEDIUMINT","length":"","attrs":["UNSIGNED"],"null":true},
+		"name":			{"alias":"name","type":"VARCHAR","length":"64","null":true},
+		"now":			{"alias":"now","type":"TIMESTAMP","length":"","default":"CURRENT_TIMESTAMP","null":true},
+		"percentage":	{"alias":"decimal","type":"DECIMAL","length":"5,2","null":true},
+		"phone":		{"alias":"phone","type":"VARCHAR","length":"32","null":true},
+		"sint":			{"alias":"smallint","type":"SMALLINT","length":"","attrs":["UNSIGNED"],"null":true},
+		"smallint":		{"alias":"smallint","type":"SMALLINT","length":"","attrs":["UNSIGNED"],"null":true},
+		"text":			{"alias":"text","type":"TEXT","length":"","null":true},
+		"time":			{"alias":"time","type":"TIME","length":"","null":true},
+		"timestamp":	{"alias":"timestamp","type":"TIMESTAMP","length":"","null":true},
+		"tint": 		{"alias":"tinyint","type":"TINYINT","length":"","attrs":["UNSIGNED"],"null":true},
+		"tinyint":		{"alias":"tinyint","type":"TINYINT","length":"","attrs":["UNSIGNED"],"null":true},
+		"varchar":		{"alias":"varchar","type":"VARCHAR","length":"255","null":true},
+		"year":			{"alias":"year","type":"SMALLINT","length":"4","attrs":["UNSIGNED"],"null":true},
+		"zipcode":		{"alias":"zipcode","type":"VARCHAR","length":"16","null":true}
+	},
+
+	"presets": {
+		"base":{
+			"code": {"alias":"code", "label":"Código"},
+			"nombre": {"alias":"name", "label":"Nombre"}
+		},
+
+		"files":{
+			"parent":{
+				"label":"Parent",
+				"type":"VARCHAR",
+				"length":"32",
+				"null":true,
+				"comment":"Imya del objeto relacionado"
+			},
+			"datetime":{
+				"label":"Fecha",
+				"type":"TIMESTAMP",
+				"length":"",
+				"default":"CURRENT_TIMESTAMP",
+				"null":true
+			},
+			"realname":{
+				"label":"Nombre Real",
+				"type":"VARCHAR",
+				"length":"128",
+				"null":true,
+				"comment":"Nombre del archivo en el filesystem"
+			},
+			"filename":{
+				"label":"Nombre del Archivo",
+				"type":"VARCHAR",
+				"length":"128",
+				"null":true,
+				"comment":"Nombre original del archivo"
+			},
+			"size":{
+				"label":"Tamaño",
+				"type":"INT",
+				"length":"10",
+				"attrs":["UNSIGNED"],
+				"null":true
+			},
+			"extension":{
+				"label":"Extención",
+				"type":"VARCHAR",
+				"length":"16",
+				"null":true
+			},
+			"mimetype":{
+				"label":"MimeType",
+				"type":"VARCHAR",
+				"length":"128",
+				"null":true
+			},
+			"image":{
+				"label":"Imagen",
+				"type":"ENUM",
+				"length":"'0','1'",
+				"default":"'0'",
+				"null":true,
+				"comment":"0= no es imagen, 1 = es imagen"
+			},
+			"caption":{
+				"label":"Título",
+				"type":"TEXT",
+				"null":true
+			},
+			"tags":{
+				"label":"Etiquetas",
+				"type":"TEXT",
+				"null":true,
+				"comment":"Separadas por coma"
+			}
+		},
+
+		"users":{
+			"wrong":{
+				"label":"Fallos",
+				"type":"TINYINT",
+				"length":"3",
+				"attrs":["UNSIGNED"],
+				"null":true,
+				"comment":"cantidad de fallos en intentos de login"
+			},
+			"fullname":{
+				"label":"Nombre Completo",
+				"type":"VARCHAR",
+				"length":"128",
+				"null":true
+			},
+			"username":{
+				"label":"Usuario",
+				"type":"VARCHAR",
+				"length":"128",
+				"null":true,
+				"index":"UNIQUE"
+			},
+			"password":{
+				"label":"Contraseña",
+				"type":"VARCHAR",
+				"length":"255",
+				"null":true
+			},
+			"email":{
+				"label":"E-mail",
+				"type":"VARCHAR",
+				"length":"96",
+				"null":true
+			},
+			"profile":{
+				"label":"Perfil",
+				"type":"VARCHAR",
+				"length":"16",
+				"null":true,
+				"comment":"Nombre del perfil del usuario"
+			},
+			"roles":{
+				"label":"Roles",
+				"type":"VARCHAR",
+				"length":"255",
+				"null":true,
+				"comment":"Lista de roles separados por coma, donde el primer valor es el rol principal"
+			},
+			"alvin":{
+				"label":"Token",
+				"type":"TEXT",
+				"null":true,
+				"comment":"Alvin Token"
+			}
+		},
+
+		"bookmarks":{
+			"pid":{
+				"type":"@users"
+			},
+			"titulo":{
+				"label":"Título",
+				"alias":"name",
+				"comment":"Nombre del favorito"
+			},
+			"link":{
+				"label":"Link",
+				"alias":"varchar",
+				"comment":"URL del favorito"
+			}
+		},
+
+		"direcciones":{
+			"alias":{
+				"label":"Alias",
+				"type":"VARCHAR",
+				"length":"32",
+				"null":true
+			},
+			"direccion_principal":{
+				"label":"Dirección Principal",
+				"alias":"boolean"
+			},
+			"direccion":{
+				"label":"Dirección",
+				"alias":"address"
+			},
+			"coords":{
+				"label":"Coordenadas",
+				"alias":"coords"
+			},
+			"dias":{
+				"label":"Días de Atención",
+				"type":"VARCHAR",
+				"length":"32",
+				"null":true
+			},
+			"observaciones":{
+				"label":"Observaciones",
+				"type":"TEXT",
+				"null":true
+			}
+		},
+
+		"contactos":{
+			"nombre":{
+				"label":"Nombre",
+				"type":"VARCHAR",
+				"length":"128",
+				"null":true
+			},
+			"email":{
+				"label":"E-mail",
+				"type":"VARCHAR",
+				"length":"96",
+				"null":true
+			},
+			"telefono":{
+				"label":"Teléfono",
+				"type":"VARCHAR",
+				"length":"32",
+				"null":true
+			},
+			"celular":{
+				"label":"Celular",
+				"type":"VARCHAR",
+				"length":"32",
+				"null":true
+			},
+			"direccion":{
+				"label":"Dirección",
+				"type":"VARCHAR",
+				"length":"128",
+				"null":true
+			},
+			"fecha_de_nacimiento":{
+				"label":"Fecha de Nacimiento",
+				"type":"DATE",
+				"length":"",
+				"null":true
+			},
+			"observaciones":{
+				"label":"Observaciones",
+				"type":"TEXT",
+				"null":true
+			}
+		},
+
+		"entidades":{
+			"cuit":{
+				"label":"CUIT",
+				"type":"VARCHAR",
+				"length":"11",
+				"null":true
+			},
+			"razon_social":{
+				"label":"Razón Social",
+				"type":"VARCHAR",
+				"length":"64",
+				"null":true
+			},
+			"email":{
+				"label":"E-mail",
+				"type":"VARCHAR",
+				"length":"96",
+				"null":true
+			},
+			"telefono":{
+				"label":"Teléfono",
+				"type":"VARCHAR",
+				"length":"32",
+				"null":true
+			},
+			"fax":{
+				"label":"Fax",
+				"type":"VARCHAR",
+				"length":"32",
+				"null":true
+			},
+			"web":{
+				"label":"Web",
+				"type":"VARCHAR",
+				"length":"255",
+				"null":true
+			},
+			"responsable":{
+				"label":"Responsable",
+				"type":"VARCHAR",
+				"length":"128",
+				"null":true
+			},
+			"observaciones":{
+				"label":"Observaciones",
+				"type":"TEXT",
+				"null":true
+			}
+		},
+
+		"mensajes":{
+			"usuario":{
+				"label":"Usuario",
+				"alias":"fk"
+			},
+			"fecha_y_hora":{
+				"label":"Fecha y Hora",
+				"alias":"now"
+			},
+			"mensaje":{
+				"label":"Mensaje",
+				"type":"TEXT",
+				"null":true
+			}
+		},
+
+		"mensajes_adjuntos":{
+			"archivo":{
+				"label":"Archivo",
+				"alias":"fk"
+			}
+		},
+
+		"comprobantes":{
+			"entidad":{
+				"label":"Entidad",
+				"alias":"fk"
+			},
+			"forma_de_pago":{
+				"label":"Forma de Pago",
+				"alias":"fk"
+			},
+			"fecha_y_hora":{
+				"label":"Fecha y Hora",
+				"alias":"now"
+			},
+			"notas":{
+				"label":"Notas",
+				"label":"Mensaje",
+				"type":"TEXT",
+				"null":true
+			}
+		},
+
+		"comprobantes_detalles":{
+			"pid":{
+				"alias":"fk"
+			},
+			"producto":{
+				"lable": "Producto",
+				"alias":"fk"
+			},
+			"cantidad":{
+				"label":"Cantidad",
+				"alias":"int"
+			},
+			"precio":{
+				"label":"Precio",
+				"alias":"amount"
+			},
+			"descuento":{
+				"label":"Descuento",
+				"alias":"percentage"
+			},
+			"iva":{
+				"label":"IVA",
+				"alias":"percentage"
+			}
+		},
+
+		"productos":{
+			"descripcion":{
+				"alias":"text",
+				"label":"Descripción"
+			},
+			"stock":{
+				"alias":"smallint",
+				"label":"Stock"
+			},
+			"stock_minimo":{
+				"alias":"smallint",
+				"label":"Stock Mínimo"
+			},
+			"rubro":{
+				"alias":"fk",
+				"label":"rubro"
+			},
+			"code":{
+				"alias":"code",
+				"label":"Código"
+			},
+			"nombre":{
+				"alias":"name",
+				"label":"Nombre"
+			},
+			"modulo":{
+				"alias":"int",
+				"label":"Modulo"
+			},
+			"imagen":{
+				"alias":"fk",
+				"label":"Imagen"
+			},
+			"compra":{
+				"alias":"smallint",
+				"label":"Compra"
+			}
+		}
+	},
+
+	"presetfields": [
+		{
+			"group":"Relaciones",
+			"label":"Depende de =>",
+			"value":"1",
+			"form":{"element":"input"}
+		},
+		{
+			"group":"Relaciones",
+			"label":"Vinculado con =>",
+			"value":"2",
+			"form":{"element":"select"}
+		},
+		{
+			"group":"Campos",
+			"label":"Archivo",
+			"value":"attach",
+			"form":{"element":"attacher"}
+		},
+		{
+			"group":"Campos",
+			"label":"Código Unico (16)",
+			"value":"code",
+			"form":{"element":"input"}
+		},
+		{
+			"group":"Campos",
+			"label":"CP (16)",
+			"value":"zipcode",
+			"form":{"element":"input"}
+		},
+		{
+			"group":"Campos",
+			"label":"Coordenada",
+			"value":"coords",
+			"form":{"element":"coord"}
+		},
+		{
+			"group":"Campos",
+			"label":"Coordenadas (par)",
+			"value":"coords",
+			"form":{"element":"coords"}
+		},
+		{
+			"group":"Campos",
+			"label":"Decimal (12,4)",
+			"value":"decimal",
+			"form":{"element":"input", "class":"form-decimal"}
+		},
+		{
+			"group":"Campos",
+			"label":"Dirección (128)",
+			"value":"address",
+			"form":{"element":"input"}
+		},
+		{
+			"group":"Campos",
+			"label":"Días de la Semana",
+			"value":"varchar",
+			"form":{"element":"days"}
+		},
+		{
+			"group":"Campos",
+			"label":"E-mail (96)",
+			"value":"email",
+			"form":{"element":"email"}
+		},
+		{
+			"group":"Campos",
+			"label":"Fecha y Hora Actual",
+			"value":"now",
+			"form":{"element":"date"},
+			"table":{"class":"format-datetime"}
+		},
+		{
+			"group":"Campos",
+			"label":"Fecha y Hora",
+			"value":"datetime",
+			"form":{"element":"date"},
+			"table":{"class":"format-datetime"}
+		},
+		{
+			"group":"Campos",
+			"label":"Fecha",
+			"value":"date",
+			"form":{"element":"date", "type":"datepicker"},
+			"table":{"class":"format-date"}
+		},
+		{
+			"group":"Campos",
+			"label":"Hora",
+			"value":"time",
+			"form":{"element":"date", "type":"timepicker"},
+			"table":{"class":"format-time"}
+		},
+		{
+			"group":"Campos",
+			"label":"Imya",
+			"value":"imya",
+			"form":{"element":"select"}
+		},
+		{
+			"group":"Campos",
+			"label":"Monto (12,2)",
+			"value":"amount",
+			"form":{"element":"input", "class":"form-amount"},
+			"table":{"class":"format-money"}
+		},
+		{
+			"group":"Campos",
+			"label":"Nombre (64)",
+			"value":"name",
+			"form":{"element":"input"}
+		},
+		{
+			"group":"Campos",
+			"label":"Número (-2.147.483.648 a 2.147.483.647)",
+			"value":"int",
+			"form":{"element":"input"}
+		},
+		{
+			"group":"Campos",
+			"label":"Número Chico (-32.768 a 32.767)",
+			"value":"smallint",
+			"form":{"element":"input"}
+		},
+		{
+			"group":"Campos",
+			"label":"Número Grande",
+			"value":"bigint",
+			"form":{"element":"input"}
+		},
+		{
+			"group":"Campos",
+			"label":"Número Mediano (-8.388.608 a 8.388.607)",
+			"value":"mediumint",
+			"form":{"element":"input"}
+		},
+		{
+			"group":"Campos",
+			"label":"Número Pequeño (-128 a 127)",
+			"value":"tinyint",
+			"form":{"element":"input"}
+		},
+		{
+			"group":"Campos",
+			"label":"Si/No",
+			"value":"boolean",
+			"form":{"element":"switch", "source":[{"label":"SI", "value":"1"}]}
+		},
+		{
+			"group":"Campos",
+			"label":"Teléfono (32)",
+			"value":"phone",
+			"form":{"element":"input"}
+		},
+		{
+			"group":"Campos",
+			"label":"Texto (255)",
+			"value":"varchar",
+			"form":{"element":"input"}
+		},
+		{
+			"group":"Campos",
+			"label":"Texto Grande (16.777.215)",
+			"value":"memo",
+			"form":{"element":"textarea"}
+		},
+		{
+			"group":"Campos",
+			"label":"Texto Mediano (65.535)",
+			"value":"text",
+			"form":{"element":"textarea"}
+		}
+	]
+}

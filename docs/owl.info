@@ -1,6 +1,6 @@
 [checksum]
-md5 = "893c3fe58f0847878400c59159d03449"
-sha1 = "8008ee0fba649643ef449ab17240d215b35151f5"
+md5 = "82c27de88c5a1bcfa0be8b0f97a471d5"
+sha1 = "f246b7f205d014dfa65f4293775ffc082edc1b87"
 
 [documentation]
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/owl.md"
@@ -22,7 +22,7 @@ insert_mode = "Modo del método insert. Valores admitidos:\
 	IGNORE el comando no aborta incluso si ocurren errores durante la ejecución\
 "
 join_level = "Límite de búsque de relaciones entre tablas"
-jsql = "Sentencia JSQL para ser ejecutada utilizando el método query"
+jsqlq = "Sentencia JSQL para ser ejecutada utilizando el método query"
 object = "Nombre del Objeto que se establecerá como activo"
 owlog = "Activa y desactiva el log en la tabla __ngl_owl_log__"
 owlog_changelog = "Activa y desactiva el uso del changelog en la tabla __ngl_owl_log__"

@@ -32,6 +32,11 @@ if(isset($_SERVER["REDIRECT_URL"]) || isset($_SERVER["REDIRECT_SCRIPT_URL"])) {
 	$PRICKOUT = $ngl()->prickout($REDIRECTURL, NGL_PATH_PRICKOUT);
 
 	if($PRICKOUT[0]!==false) {
+		$sExtension = \strtolower(\pathinfo($PRICKOUT[0], PATHINFO_EXTENSION));
+		if($sExtension!=="php") {
+			$sMimeType = $ngl()->mimeType($sExtension);
+			@header("Content-Type: ".$sMimeType);
+		}
 		require_once($PRICKOUT[0]);
 		exit();
 	} else {

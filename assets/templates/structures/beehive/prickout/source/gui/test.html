@@ -1,0 +1,55 @@
+<rind:set>
+	<@name>data</@name>
+	<@value>https://cdn.buenosaires.gob.ar/datosabiertos/datasets/salud/postas-de-vacunacion-covid-19/postas_vacunacion_covid.geojson</@value>
+	<@method>file,jsondec,[features]</@method>
+</rind:set>
+<!DOCTYPE html  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+	<head>
+ 		<title>nogal::rind Test Page</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<script type="text/javascript" src="//cdn.upps.cloud/js/jquery-2.1.3.min.js"></script>
+		<script type="text/javascript" src="//cdn.upps.cloud/js/bootstrap-4.1.2.min.js"></script>
+		<link rel="stylesheet" href="//cdn.upps.cloud/css/bootstrap-4.1.2.min.css" />
+		<link rel="stylesheet" href="//cdn.upps.cloud/css/bootstrap-plus-1.0.css" />
+	</head>
+
+	<body>
+		<div class="container-fluid">
+			<h1>Postas de vacunación COVID-19</h1>
+			<div class="row m-md my-o">
+				<div class="col">
+					<div class="row">
+						<div class="col-6">
+							<table class="table table-bordered table-sm text-md">
+								<thead>
+									<tr>
+										<th>#</th>
+										<th>Efector</th>
+										<th>Domicilio</th>
+										<th>Coordenadas</th>
+									</tr>
+								</thead>
+								<tbody>
+									<rind:loop>
+										<@name>loop</@name>
+										<@source>{$_SET.data}</@source>
+										<@content>
+											<tr>
+												<td>{#line}</td>
+												<td>{self.properties.efector}</td>
+												<td>{self.properties.direccion}</td>
+												<td>{self.geometry.coordinates.0};{self.geometry.coordinates.1}</td>
+											</tr>
+										</@content>
+									</rind:loop>
+								</tbody>
+							</table>
+						</div>
+						<div class="col-6 text-md"><rind:dump>{$_SET.data}</rind:dump></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

@@ -1,6 +1,6 @@
 [checksum]
-md5 = "acdbbf1f292bb61add63520b6347f319"
-sha1 = "89a77e0776438d8af76be70513a6e9ff4ababf84"
+md5 = "9cbe455bb6b6962f7c0aee473ff4737f"
+sha1 = "1c59580b01225de93d34aefecea6a143dd8137ec"
 
 [documentation]
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/rind.md"
@@ -23,7 +23,7 @@ constants = "Listado separado por comas, de constantes PHP permitidas en las pla
 curdir = "Path simulado del archivo PHP que llamó a la plantilla, si no se especifica se utilizará el path real"
 debug = "Retorna el código fuente de mergefile en lugar de evaluarlo"
 fill_urls = "Activa el autocompletar del fullpath de las url en los href, src y background"
-gui = "Path del repositorio de plantillas"
+gui = "Path del repositorio de plantillas. Utilizar ./ para referenciar al PHP actual"
 http_support = "Admite urls en los paths de archivos"
 include_support = "Habilita el uso de mergefile"
 loops_limit = "Limite para loops numéricos"

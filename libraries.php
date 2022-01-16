@@ -5,7 +5,6 @@ $NGL_LIBS["bee"]			= ["nglBee", true];
 
 // base de datos
 $NGL_LIBS["dbase"]			= ["nglDBase", false];
-$NGL_LIBS["jsql"]			= ["nglJSQL", true];
 $NGL_LIBS["mysql"]			= ["nglDBMySQL", false];
 $NGL_LIBS["mysqlq"]			= ["nglDBMySQLQuery", false];
 $NGL_LIBS["nest"] 			= ["nglNest", false]; // ORM Manager
@@ -16,6 +15,11 @@ $NGL_LIBS["pgsqlq"]			= ["nglDBPostgreSQLQuery", false];
 $NGL_LIBS["qparser"]		= ["nglQParser", true]; // Parser SQL
 $NGL_LIBS["sqlite"]			= ["nglDBSQLite", false];
 $NGL_LIBS["sqliteq"]		= ["nglDBSQLiteQuery", false];
+
+// jsql
+$NGL_LIBS["jsql"]			= ["nglJSQL", true];
+$NGL_LIBS["jsqlmysql"]		= ["nglJSQLMySQL", true];
+$NGL_LIBS["jsqlpgsql"]		= ["nglJSQLPostgreSQL", true];
 
 // fechas
 $NGL_LIBS["dates"] 			= ["nglDates", true];

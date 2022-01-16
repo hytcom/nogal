@@ -44,7 +44,11 @@ function call($sObjectName=null, $aArguments=[]) {
 }
 
 function dump() {
-	echo \nogal\nglRoot::call()->dump(...\func_get_args());
+	if(NGL_TERMINAL) {
+		echo \nogal\nglRoot::call()->dump(...\func_get_args());
+	} else {
+		echo \nogal\nglRoot::call()->dumphtml(...\func_get_args());
+	}
 }
 
 function dumpc() {

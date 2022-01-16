@@ -1,6 +1,6 @@
 <?php
 
-$NGL_ALVIN_LOGIN		= NGL_URL."/login";
+$NGL_ALVIN_LOGIN		= "/login";
 
 $NGL_ALVIN_SAFEPATHS 	= [];
 $NGL_ALVIN_SAFEPATHS[]	= "/gardener";
@@ -18,6 +18,11 @@ $NGL_ALVIN_STRICTS = [];
 $ALVINCFG = NGL_PATH_CONF.NGL_DIR_SLASH."alvin.conf";
 if(\file_exists($ALVINCFG)) {
 	$ALVINCFG = $ngl()->parseConfigString(\file_get_contents($ALVINCFG), true);
+
+	if(isset($ALVINCFG["config"]) && \count($ALVINCFG["config"])) {
+		$NGL_ALVIN_LOGIN = $ALVINCFG["config"]["login"];
+	}
+
 	if(isset($ALVINCFG["firewall-ignore"]) && \count($ALVINCFG["firewall-ignore"])) {
 		$NGL_ALVIN_IGNORES = \array_merge($NGL_ALVIN_IGNORES, \array_keys($ALVINCFG["firewall-ignore"]));
 	}
@@ -93,6 +98,6 @@ if(NGL_ALVIN!==null) {
 	}
 }
 
-unset($NGL_ALVIN, $NGL_ALVIN_SAFEPATHS, $NGL_ALVIN_IGNORES, $NGL_ALVIN_STRICT, $NGL_ALVIN_STRICTS, $NGL_ALVIN_LOGIN);
+unset($NGL_ALVIN, $NGL_ALVIN_SAFEPATHS, $NGL_ALVIN_IGNORES, $NGL_ALVIN_STRICT, $NGL_ALVIN_STRICTS);
 
 ?>

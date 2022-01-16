@@ -37,4 +37,23 @@ interface iNglDBQuery extends iNglClient {
 	public function toArray();	// retorna un array con todas las filas del conjunto de resultados en modo asociativo y resetea el puntero
 }
 
+interface iNglJSQL extends inglFeeder {
+	public function colAdd($aJSQL);
+	public function colDrop($aJSQL);
+	public function colModify($aJSQL);
+	public function colRename($aJSQL);
+	public function column($mColumn);
+	public function comment($aJSQL);
+	public function create($aJSQL);
+	public function datatypes(); // debe retornar un array con la equivalencia de tipos de datos. Indices en mayúsculas
+	public function delete($aJSQL);
+	public function drop($aJSQL);
+	public function index($aJSQL);
+	public function indexdrop($aJSQL);
+	public function insert($aJSQL);
+	public function rename($aJSQL);
+	public function select($aJSQL);
+	public function update($aJSQL);
+}
+
 ?>

@@ -1,6 +1,6 @@
 [checksum]
-md5 = "b847c979e9cd85b3829539b4ad3b45e2"
-sha1 = "374cbb049f93028233a34117182c464e4e25b7d0"
+md5 = "555426738df3a731b1d7cc71f47fae9b"
+sha1 = "4187d8ec68fd437168cddc7dd3bbfa922d32868f"
 
 [documentation]
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/mysql.md"
@@ -9,6 +9,7 @@ url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/mysql.md"
 autoconn = "Cuando es TRUE, ejecuta el método connect luego de cargar las configuraciones"
 base = "Nombre de la base de datos"
 charset = "Juego de caracteres con el que se ejecutarán las consultas"
+collate = "Conjunto de reglas que se aplican al juego de caracteres charset"
 check_colnames = "Activa el chequeo de los nombre de las columnas en la tabla activa"
 debug = "Cuando es TRUE el método retorna la sentencia SQL en lugar de ejecutarla"
 do = "Cuando es TRUE el método query ejecuta la sentencia pero no retorna resultado"
@@ -25,17 +26,6 @@ insert_mode = "Tipo de modo INSERT. Valores admitidos:\
 	REPLACE si el nuevo registro duplica un valor PRIMARY KEY o UNIQUE, el antiguo registro es eliminado\
 	IGNORE el comando no aborta incluso si ocurren errores durante la ejecución\
 "
-jsql = "Sentencia SQL en formato JSON o Array, donde los índices son:\
-	columns\
-	tables\
-	where\
-	group\
-	having\
-	order\
-	offset\
-	limit\
-"
-jsql_eol = "Salto de linea luego de cada parte de la sentencia"
 pass = "Contraseña para acceder a la base de datos"
 port = "Puerto donde escucha el servidor MySQL"
 socket = "Especifica el socket o la tubería con nombre que debería usarse"

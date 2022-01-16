@@ -1,9 +1,10 @@
 [checksum]
-md5 = "eab44c071ba0149600ddac977222aae4"
-sha1 = "7a28c27a6125e99cf99570b7e9898d319c36fc55"
+md5 = "708bfdab1ead8611503886622931ba76"
+sha1 = "42306376abca5a9fc54e9850f111bbc45e12aa36"
 
 [documentation]
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/jsql.md"
 
 [errors]
-1005 = "Estructura JSON inválida"
+1001 = "Estructura JSON inválida"
+1002 = "Falta declarar el tipo de dato"

@@ -1,13 +1,13 @@
 [checksum]
-md5 = "1c4477f0800106bbeb60b72a5490cea0"
-sha1 = "ceb807b4591b67bd853eeec0738f998619ba7c51"
+md5 = "d6fb29fab80d11abc169f734bef85005"
+sha1 = "ad6d48936bb9a7258d3f7254f686e3fc14f8aad2"
 
 [documentation]
 url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/pgsql.md"
 
 [arguments]
 autoconn = "Cuando es TRUE, ejecuta el método connect luego de cargar las configuraciones"
-base = "Nombre de la base de datos"
+base = "Nombre de la base de datos y esquema activo. Formato: basename.schema"
 charset = "Juego de caracteres con el que se ejecutarán las consultas"
 check_colnames = "Activa el chequeo de los nombre de las columnas en la tabla activa"
 conflict_action = "Acción a ejecutar en caso de conflicto en los INSERT cuando el modo de insersión es CONFLICT\
@@ -45,7 +45,6 @@ jsql = "Sentencia SQL en formato JSON o Array, donde los índices son:\
 jsql_eol = "Salto de linea luego de cada parte de la sentencia"
 pass = "Contraseña para acceder a la base de datos"
 port = "Puerto donde escucha el servidor MySQL"
-schema = "Esquema activo"
 sql = "Ultima sentencia SQL ejecutada o próxima a ejecutarse"
 table = "Nombre de la tabla activa en los métodos INSERT y UPDATE"
 update_mode = "Tipo de modo UPDATE. Valores admitidos:\

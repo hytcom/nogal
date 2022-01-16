@@ -45,9 +45,6 @@ define("NGL_PATH_DATA",															NGL_PATH_PROJECT."/<{=NOGALDIRS=}>/data");
 // project grafts (third-party)
 // define("NGL_PATH_GRAFTS",													NGL_PATH_PROJECT."/grafts");
 
-// nuts
-define("NGL_PATH_NUTS",															NGL_PATH_PROJECT."/<{=NOGALDIRS=}>/nuts");
-
 // repositorio de sesiones para los modos fs o sqlite
 // define("NGL_PATH_SESSIONS",													NGL_PATH_PROJECT."/sessions");
 
@@ -58,16 +55,16 @@ define("NGL_PATH_LOGS",															NGL_PATH_PROJECT."/<{=NOGALDIRS=}>/logs");
 define("NGL_PATH_TMP",															NGL_PATH_PROJECT."/<{=NOGALDIRS=}>/tmp");
 
 // contenedor de operaciones con archivos
-// define("NGL_SANDBOX",														NGL_PATH_PROJECT);
+define("NGL_SANDBOX",														    NGL_PATH_PROJECT."/<{=NOGALDIRS=}>");
+
+// directorio de código fuente para el uso de prickout
+// define("NGL_PATH_PRICKOUT",														NGL_PATH_PROJECT."/prickout/app");
 
 // tutores - chequeos de REFERER y ONCECODE
 define("NGL_PATH_TUTORS",														NGL_PATH_PROJECT."/<{=NOGALDIRS=}>/tutors");
 
-// reglas para la validacion de variables
-// define("NGL_PATH_VALIDATE",													NGL_PATH_PROJECT."/validate");
-
-// directorio de código fuente para el uso de prickout
-// define("NGL_PATH_PRICKOUT",													NGL_PATH_PROJECT."/prickout");
+// nuts
+define("NGL_PATH_NUTS",															NGL_PATH_PROJECT."/<{=NOGALDIRS=}>/nuts");
 
 // URL del proyecto
 // define("NGL_URL",															((isset($_SERVER["HTTP_HOST"])) ? ((isset($_SERVER["HTTPS"]) && !empty($_SERVER["HTTPS"])) ? "https" : "http")."://".$_SERVER["HTTP_HOST"] : ""));
@@ -81,6 +78,9 @@ define("NGL_PATH_TUTORS",														NGL_PATH_PROJECT."/<{=NOGALDIRS=}>/tutors
 
 // control de accesos y generacion de passwords (NULL para desactivar)
 // define("NGL_ALVIN",															null);
+
+// url del login
+// define("NGL_ALVIN_LOGIN",													NGL_URL."/login");
 
 // tipo de carga de ALVIN-TOKEN (TOKEN|TOKENUSER|PROFILE)
 // define("NGL_ALVIN_MODE",														"PROFILE");
@@ -165,7 +165,7 @@ define("NGL_PATH_TUTORS",														NGL_PATH_PROJECT."/<{=NOGALDIRS=}>/tutors
 // define("NGL_GARDENER", 														false);
 
 // activa/desactiva a bee (NULL para desactivar)
-define("NGL_BEE", 															null);
+define("NGL_BEE", 															    true);
 
 // separador de directorios
 // define("NGL_DIR_SLASH",														"/");
