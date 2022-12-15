@@ -1,0 +1,39 @@
+@set data [{"name":"bart", "age":"10", "gender":"M", "friends": ["milhouse", "nelson"]}, {"name":"lisa", "age":"8", "gender":"F"}, {"name":"homero", "age":"34", "gender":"M"}, {"name":"tod", "age":"12", "gender":"X"}]
+
+@print ""
+@print "--------------------"
+@print "Datos Crudos"
+@print "--------------------"
+@dump {$data}
+
+@print ""
+@print ""
+@print ""
+@print "--------------------"
+@print " Analisis de Datos  "
+@print "--------------------"
+
+@loop {$data}
+	
+	@set row -$:
+
+	@php strtoupper {$row.name}
+	@print -$:
+
+	@if "{$row.age}" < 13
+		@if "{$row.gender}" == "M"
+			@print "  es un niño de {$row.age} años"
+		else
+			@print "  es una niña de {$row.age} años"
+		endif
+	endif
+
+	@if "{$row.age}" > 13
+		@print ""
+		@print "  ------------------------------------"
+		@print "   Alerta!! hay un adulto en el grupo"
+		@exit  "  ------------------------------------"
+	endif
+
+	@print ""
+endloop

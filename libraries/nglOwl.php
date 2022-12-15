@@ -1,28 +1,15 @@
 <?php
 /*
-# Nogal
+# nogal
 *the most simple PHP Framework* by hytcom.net
-GitHub @hytcom
+GitHub @hytcom/nogal
 ___
-  
-# owlm
-## nglOwl *extends* nglBranch [2018-11-02]
-Owl es el ORM de NOGAL y permite ejecutar operaciones sobre distintos objetos de base de datos.
-Entre las funciones del objecto se encuentran:
-- consulta de listados de registros directos y con referencias cruzadas
-- consulta de un registro en particular
-- administración de objetos depentientes, como por ejemplo los datos una empresa y sus empleados
-- uso de foreignkeys a nivel objeto, sin importar el driver de base de datos
-- validación de datos por medio del objeto https://github.com/hytcom/wiki/blob/master/nogal/docs/validate.md
-- permite añadir, modificar, suspender y eliminar (eliminado lógico) registros
-- eliminación de registros en cascada
 
-https://github.com/hytcom/wiki/blob/master/nogal/docs/own.md
-https://github.com/hytcom/wiki/blob/master/nogal/docs/owluso.md
-
+# owl
+https://hytcom.net/nogal/docs/objects/own.md
+https://hytcom.net/nogal/docs/objects/owluso.md
 */
 namespace nogal;
-
 class nglOwl extends nglBranch {
 
 	private $db;
@@ -41,12 +28,12 @@ class nglOwl extends nglBranch {
 	private $bViewFields;
 	private $query;
 	private $jsql;
+	private $alvin;
 
 	final protected function __declareArguments__() {
 		$vArguments							= [];
-		$vArguments["alvin"]				= ['self::call()->istrue($mValue)', true];
 		$vArguments["cascade"]				= ['self::call()->istrue($mValue)', false];
-		$vArguments["child"]				= ['strtolower($mValue)', null];
+		$vArguments["child"]				= ['\strtolower($mValue)', null];
 		$vArguments["data"]					= ['(array)$mValue', null];
 		$vArguments["db"]					= ['$mValue', null];
 		$vArguments["debug"]				= ['self::call()->istrue($mValue)', false];
@@ -56,22 +43,22 @@ class nglOwl extends nglBranch {
 		$vArguments["id"]					= ['$this->GetID($mValue)', null];
 		$vArguments["inherit"]				= ['self::call()->istrue($mValue)', false];
 		$vArguments["insert_mode"]			= ['$mValue', "INSERT"];
-		$vArguments["jsqlq"]				= ['$mValue', null];
 		$vArguments["join_level"]			= ['(int)$mValue', 2];
+		$vArguments["jsqlq"]				= ['$mValue', null];
+		$vArguments["object"]				= ['\strtolower($mValue)', null];
 		$vArguments["owlog"]				= ['self::call()->istrue($mValue)', true];
 		$vArguments["owlog_changelog"]		= ['self::call()->istrue($mValue)', false];
-		$vArguments["object"]				= ['strtolower($mValue)', null];
-		$vArguments["subobject"]			= ['strtolower($mValue)', null];
+		$vArguments["subobject"]			= ['\strtolower($mValue)', null];
 		$vArguments["use_history"]			= ['self::call()->istrue($mValue)', false];
-		$vArguments["view_alias"]			= ['strtolower($mValue)', "auto"];
+		$vArguments["view_alias"]			= ['\strtolower($mValue)', "auto", ["all","joins","auto","none"]];
 		$vArguments["view_children"]		= ['self::call()->istrue($mValue)', false];
 		$vArguments["view_columns"]			= ['$mValue', null];
 		$vArguments["view_deleted"]			= ['self::call()->istrue($mValue)', false];
 		$vArguments["view_eol"]				= ['$mValue', ""];
 		$vArguments["view_joins"]			= ['self::call()->istrue($mValue)', false];
-		$vArguments["view_mode"]			= ['strtolower($mValue)', "sql"];
+		$vArguments["view_mode"]			= ['\strtolower($mValue)', "sql", ["jsql","sql"]];
 		$vArguments["view_parent"]			= ['self::call()->istrue($mValue)', false];
-		
+
 		return $vArguments;
 	}
 
@@ -93,14 +80,13 @@ class nglOwl extends nglBranch {
 		$this->bChildMode = false;
 		$this->bInternalCall = false;
 		$this->aTmpChildren = [];
-		
-		// if(NGL_ALVIN) { $this->args(array("alvin"=>true)); }
 	}
 
 	final public function __init__() {
 		$this->bViewFields = false;
+		$this->alvin = null;
 	}
-	
+
 	public function child() {
 		list($sChild) = $this->getarguments("child", \func_get_args());
 		if(!$this->sObject) { self::errorMessage($this->object, 1001); }
@@ -131,82 +117,33 @@ class nglOwl extends nglBranch {
 				$aChildren = \array_values($aChildren);
 			}
 		}
-		
+
 		return $aChildren;
 	}
 
 	public function close() {
 		return $this->db->close();
 	}
-	
+
 	public function columns() {
 		if(!$this->sObject) { return false; }
 		return $this->vObjects[$this->sObject]["columns"];
 	}
-	
+
 	public function connect($driver) {
 		return $this->load($driver);
 	}
 
 	public function dbStructure() {
 		$aStructures = [];
-		$aStructures[] = $this->jsql->query(<<<SQL
-{
-	"query": "create",
-	"table" : "__ngl_owl_index__",
-	"comment" : "Indice de los registros de las tablas que hagan uso de roles",
-	"attrs" : ["ENGINE=MyISAM", "DEFAULT", "CHARSET=utf8mb4", "COLLATE=utf8mb4_unicode_ci"],
-	"columns" : [
-		{"name":"id", "type":"INT", "index":"PRIMARY", "autoinc":"true"},
-		{"name":"imya", "type":"CHAR", "length":"32", "index":"INDEX", "comment":"imya del registro en la tabla de origen"},
-		{"name":"role", "type":"VARCHAR", "length":"32", "null":"true", "index":"INDEX", "default":"null", "comment":"role a partir del cual se obtiene acceso"}
-	]
-}
-SQL);
-
-$aStructures[] = $this->jsql->query(<<<SQL
-{
-	"query": "create",
-	"table" : "__ngl_owl_log__",
-	"comment" : "Log de operaciones realizadas mediante el objeto OWL",
-	"attrs" : ["ENGINE=MyISAM", "DEFAULT", "CHARSET=utf8mb4", "COLLATE=utf8mb4_unicode_ci"],
-	"columns" : [
-		{"name":"id", "type":"INT", "index":"PRIMARY", "autoinc":"true"},
-		{"name":"imya", "type":"CHAR", "length":"32", "index":"INDEX", "comment":"imya del registro en la tabla de origen"},
-		{"name":"user", "type":"SMALLINT", "null":"true", "index":"INDEX", "comment":"id del usuario que ejecutó la acción"},
-		{"name":"action", "type":"ENUM", "length":"'insert','delete','suspend','toggle','update','unsuspend'", "default":"'insert'", "comment":"tipo de acción"},
-		{"name":"date", "type":"DATETIME", "comment":"fecha y hora de la ejecución"},
-		{"name":"ip", "type":"VARCHAR", "length":"35", "null":"true", "comment":"dirección de IP del usuario"},
-		{"name":"changelog", "type":"MEDIUMTEXT", "null":"true", "comment":"cuando el argumento owlog_changelog del objeto OWL sea true, se almacenará un JSON con la versión anterior de los datos"}
-	]
-}
-SQL);
-
-$aStructures[] = $this->jsql->query(<<<SQL
-{
-	"query": "create",
-	"table" : "__ngl_owl_structure__",
-	"comment" : "Estructuras de los objetos (tablas) de el entorno OWL",
-	"attrs" : ["ENGINE=MyISAM", "DEFAULT", "CHARSET=utf8mb4", "COLLATE=utf8mb4_unicode_ci"],
-	"columns" : [
-		{"name":"id", "type":"INT", "index":"PRIMARY", "autoinc":"true"},
-		{"name":"name", "type":"VARCHAR", "length":"128", "index":"INDEX", "comment":"nombre del objeto"},
-		{"name":"code", "type":"VARCHAR", "length":"32", "index":"UNIQUE", "comment":"código del objeto. Que luego formará parte de el IMYA de cada registro del mismo"},
-		{"name":"roles", "type":"ENUM", "length":"'0', '1', '2', '3'", "default":"'1'", "comment":"determina si el objeto esta sujeto a roles"},
-		{"name":"columns", "type":"TEXT", "comment":"JSON con los nombres de las columnas del objeto"},
-		{"name":"foreignkey", "type":"TEXT", "null":"true", "comment":"relaciones externas"},
-		{"name":"relationship", "type":"TEXT", "null":"true", "comment":"relaciones con otros objetos en formato JSON"},
-		{"name":"validate_insert", "type":"TEXT", "null":"true", "comment":"reglas del validación para los datos para el objeto VALIDATE al momento del INSERT"},
-		{"name":"validate_update", "type":"TEXT", "null":"true", "comment":"reglas del validación para los datos para el objeto VALIDATE al momento del UPDATE"}
-	]
-}
-SQL);
-
+		$sOwlFile = NGL_PATH_FRAMEWORK.NGL_DIR_SLASH."assets".NGL_DIR_SLASH."data".NGL_DIR_SLASH."nest.json";
+		if(\file_exists($sNestFile)) {
+			$aOwl = \json_decode(\file_get_contents($sOwlFile), true);
+			foreach($aOWL as $sQuery) {
+				$aStructures[] = $this->jsql->query($sQuery);
+			}
+		}
 		return \implode("\n\n", $aStructures);
-	}
-
-	public function dbMysqlStructure() {
-
 	}
 
 	public function delete() {
@@ -249,7 +186,7 @@ SQL);
 
 	public function duplicate() {
 		list($mID,$bChildren) = $this->getarguments("id,duplicate_children", \func_get_args());
-		
+
 		$aNewIDs = [];
 		if(!$this->bChildMode) {
 			$data = $this->get($mID, false, false, false);
@@ -312,9 +249,9 @@ SQL);
 			]}';
 			$sView = $this->viewchildren("jsql",$sAliasMode,$mJoins,$bDeleted);
 		}
-		
+
 		if($sView==false) { return self::errorMessage($this->object, 1001); }
-		
+
 		if($this->bChildMode) { $this->bChildMode = false; }
 		$sJSQL = $this->jsql->appener($sJSQL, $sView);
 
@@ -335,7 +272,7 @@ SQL);
 			if($sJSQL==false) { return self::errorMessage($this->object, 1001); }
 
 			if($this->attribute("current")) {
-				if(!empty($sFilter)) { 
+				if(!empty($sFilter)) {
 					$sChildrenWhere = '{"where": [["['.$this->sChildTableAlias.'.pid]", "eq", "'.$this->attribute("current").'"], "AND"]}';
 				} else {
 					$sChildrenWhere = '{"where": [["['.$this->sChildTableAlias.'.pid]", "eq", "'.$this->attribute("current").'"]]}';
@@ -414,7 +351,7 @@ SQL);
 				$aIDs[] = $this->insert($aInput);
 				$this->bInternalCall = false;
 			}
-			
+
 			return $aIDs;
 		}
 
@@ -453,26 +390,21 @@ SQL);
 			$this->attribute("last_id", $nRowID);
 			$this->attribute("last_imya", $vData["imya"]);
 			$nRows = $insert->rows();
-			
+
 			if($nRows) {
 				// log
 				$this->OwLog($vData["imya"], "insert");
-				
+
 				// roles
-				if($bAlvin = $this->AlvinInit()) {
-					$this->db->insert("__ngl_owl_index__", [
-						"imya"	=> $vData["imya"],
-						"role"	=> self::call("alvin")->role()
-					], "INSERT", false, true);
-				}
+				if($this->alvin) { $this->alvin->insert($vData["imya"]); }
 			}
-			
+
 			if(!$this->bChildMode) {
 				$this->attribute("current", $nRowID);
 			} else {
 				$this->bChildMode = false;
 			}
-		
+
 			$insert->destroy();
 			$insert = null;
 		}
@@ -485,26 +417,50 @@ SQL);
 		list($driver) = $this->getarguments("db", \func_get_args());
 		$this->db = $driver;
 		if(\method_exists($this->db, "connect")) { $this->db->connect(); }
-		if(\method_exists($this->db, "jsql")) { $this->jsql = $this->db->jsql(); }
+		if(!\method_exists($this->db, "jsql")) {
+			$this->__errorMode__("die");
+			self::errorMessage($this->object, 1000);
+		}
+		$this->jsql = $this->db->jsql();
+
+		if(NGL_ALVIN!==null) {
+			$this->alvin = new \nogal\nglAlvinOWL($this->db, self::call("alvin")->autoload());
+			if(!$this->alvin->loaded()) {
+				$this->__errorMode__("die");
+				self::errorMessage($this->object, 1006);
+			}
+		}
 		return $this;
 	}
 
 	public function query() {
 		list($sJSQL) = $this->getarguments("jsqlq", \func_get_args());
-		$sSQL = $this->AlvinSQL($sJSQL);
+
+		// alvin
+		if($this->alvin) {
+			$sTableName = ($this->bChildMode) ? $this->sChildTable : $this->sObject;
+			if(!$this->alvin->loaded()) {
+				$this->__errorMode__("die");
+				self::errorMessage($this->object, 1006);
+			}
+			$sSQL = $this->alvin->sql($sTableName, $sJSQL);
+		} else {
+			$sSQL = $this->jsql->query($sJSQL);
+		}
+
 		$this->attribute("query", $sSQL);
 		if($this->debug) { echo self::call()->dump($sSQL); }
 		$this->query = $this->db->query($sSQL);
 		return $this->query;
 	}
-	
+
 	public function relationship() {
 		if(!$this->sObject) { self::errorMessage($this->object, 1001); }
 		list($bJoins,$bChildren,$bParent,$nJoinLevel) = $this->getarguments("view_joins,view_children,view_parent,join_level", \func_get_args());
 
 		$aReturn = [];
 		if(!$this->sObject) { self::errorMessage($this->object, 1001); }
-		
+
 		$sErrors = "";
 		$vObject = $this->vObjects[$this->sObject];
 		if(!isset($vObject["tables"])) { return false; }
@@ -538,7 +494,7 @@ SQL);
 			}
 
 			// FROM (va antes por el continue en los joins)
-			if($vTable["type"]=="main" || !count($aReturn)) {
+			if($vTable["type"]=="main" || !\count($aReturn)) {
 				$aUsed[$this->sObject] = true;
 				$aReturn[] = "MAIN TABLE `".$this->sObject."`";
 			} else if($vTable["type"]=="children" && $bChildren) {
@@ -577,7 +533,7 @@ SQL);
 
 			if(isset($aUsed[$sTable])) { unset($vTables[$sTable]); }
 		}
-		
+
 		if(!empty($sErrors)) {
 			$this->Logger("warning", $sErrors);
 		}
@@ -623,13 +579,13 @@ SQL);
 		$table->destroy();
 		$table = null;
 
-		// tabla 
+		// tabla
 		$vMain = [
-			"name"		=>	$vObject["name"], 
-			"alias"		=>	$vObject["name"], 
-			"type"		=>	"main", 
-			"parent"	=>	((isset($vObject["relationship"]["parent"])) ? "__parent" : ""), 
-			"level"		=>	0, 
+			"name"		=>	$vObject["name"],
+			"alias"		=>	$vObject["name"],
+			"type"		=>	"main",
+			"parent"	=>	((isset($vObject["relationship"]["parent"])) ? "__parent" : ""),
+			"level"		=>	0,
 			"columns"	=>	$vObject["columns"]
 		];
 		$aTables = array($vObject["name"] => $vMain);
@@ -644,7 +600,7 @@ SQL);
 					"tables":["__ngl_owl_structure__"],
 					"where":[["[name]","eq","'.$vObject["relationship"]["parent"].'"]]
 				}');
-		
+
 				$this->attribute("query", $sSQL);
 				$parent = $this->db->query($sSQL);
 				if($parent->rows()) {
@@ -667,7 +623,7 @@ SQL);
 								"tables":["__ngl_owl_structure__"],
 								"where":[["[name]","eq","'.$aPJoin["name"].'"]]
 							}');
-					
+
 							$this->attribute("query", $sSQL);
 							$parentjoin = $this->db->query($sSQL);
 
@@ -746,13 +702,13 @@ SQL);
 		$mUpdate = $this->UpdateData(\func_get_args(), 3);
 		return ($mUpdate===0) ? false : $mUpdate;
 	}
-	
+
 	public function update() {
 		if(!$this->bInternalCall) { $this->Logger(); }
 		$mUpdate = $this->UpdateData(\func_get_args());
 		return ($mUpdate===false) ? false : $mUpdate;
 	}
-	
+
 	public function upsert() {
 		if(!$this->bInternalCall) { $this->Logger(); }
 
@@ -795,7 +751,7 @@ SQL);
 				$aTable = \explode(".", $aColumn[0]);
 				$aSelected[$aTable[0]] = true;
 				$sAlias = ((isset($aColumn[1])) ? $aColumn[1] : str_replace(".", "_", $aColumn[0]));
-				$aSelect[$sAlias] = '["['.$aTable[0].'].['.$aTable[1].']","'.$sAlias.'"]';
+				$aSelect[$sAlias] = '["'.$aTable[0].'.'.$aTable[1].'","'.$sAlias.'"]';
 			}
 		}
 
@@ -859,11 +815,11 @@ SQL);
 					$aUsed[$sTable] = true;
 					$sFrom = '[
 						"'.$vTable["name"].'",
-						"'.$sTable.'", 
+						"'.$sTable.'",
 						[
 							["['.$sTable.'.pid]","eq","['.$vTable["join"].'.'.$vTable["using"].']"]
 					';
-					
+
 					if(!$bDeleted && in_array("state", $vTables[$sTable]["columns"])) { $sFrom .= ',"AND",["['.$sTable.'.state]","isnot","NULL"]'; }
 					$sFrom .= ']]';
 					$aFrom[] = $sFrom;
@@ -936,12 +892,12 @@ SQL);
 							$sColumnAlias = (isset($aSelect[$sField])) ? $sTable."_".$sField : $sField;
 							break;
 					}
-					
+
 					if(isset($aSelect[$sColumnAlias])) {
 						$sErrors .= "duplicate alias '".$sColumnAlias."' for `".$sTable."`.`".$sField."`\n";
 						continue;
 					}
-					
+
 					$aSelect[$sColumnAlias] = '["'.$sTable.'.'.$sField.'","'.$sColumnAlias.'"]';
 				}
 			}
@@ -1017,13 +973,13 @@ SQL);
 						$sColumnAlias = (isset($aSelect[$sField])) ? $sTable."_".$sField : $sField;
 						break;
 				}
-				
-				
+
+
 				if(isset($aSelect[$sColumnAlias])) {
 					$sErrors .= "duplicate alias '".$sColumnAlias."' for `".$sTable."`.`".$sField."`\n";
 					continue;
 				}
-				
+
 				$aSelect[$sColumnAlias] = '"'.$sTable.'.'.$sField.'","'.$sColumnAlias.'"';
 			}
 
@@ -1038,60 +994,13 @@ SQL);
 				}
 			}
 		}
-		
+
 		if(!empty($sErrors)) {
 			$this->Logger("warning", $sErrors);
 		}
 
 		$sView = '{"columns" : ['.\implode(', ', $aSelect).'], "tables" : ['.\implode(', ', $aFrom).']}';
 		return (strtolower($sOutputMode)=="jsql") ? $sView : $this->jsql->query($sView, $this->view_eol);
-	}
-
-	private function AlvinInit() {
-		if(NGL_ALVIN===null || !$this->alvin) { return false; }
-		if(!self::call("alvin")->loaded()) { return (self::call("alvin")->autoload()===false) ? false : true; }
-		return true;
-	}
-
-	private function AlvinSQL($sJSQL, $bOnlyWhere=false) {
-		if($this->AlvinInit()) {
-			$sTableName = ($this->bChildMode) ? $this->sChildTable : $this->sObject;
-			$sRole = self::call("alvin")->role();
-			$role = $this->db->query("SELECT id FROM __ngl_owl_structure__ WHERE name = '".$sTableName."' AND roles = '1'");
-			if(!empty($sRole) && \strtoupper($sRole)!="ADMIN" && $role->rows()) {
-				$sChain = self::call("alvin")->rolechain();
-				$sRoles = (!empty($sChain)) ? "OR role IN ('".\str_replace(",", "','", $sChain)."')" : "";
-
-				$sHash = self::call()->unique(16);
-				$sHashNot = self::call()->unique(16);
-				if(!$bOnlyWhere) {
-					$aJSQL = $this->jsql->decode($sJSQL);
-					if(isset($aJSQL["where"])) {
-						$aJSQL["where"] = [$aJSQL["where"], "AND", [["[".$sTableName.".imya]", "in", $sHash], "OR", ["[".$sTableName.".imya]", "notin", $sHashNot]]];
-					} else {
-						$aJSQL["where"] = [["[".$sTableName.".imya]", "in", $sHash], "OR", ["[".$sTableName.".imya]", "notin", $sHashNot]];
-					}
-					$sSQL = $this->jsql->query($aJSQL);
-				} else {
-					$sSQL = "((".$sJSQL." IN (".$sHash.")) OR (".$sJSQL." NOT IN (".$sHashNot.")))";
-				}
-				
-				// consulta final
-				$sSQL = \str_replace($sHash, "SELECT imya FROM __ngl_owl_index__ WHERE (role IS NULL OR role = '".$sRole."' ".$sRoles.")", $sSQL);
-				$sSQL = \str_replace($sHashNot, "SELECT imya FROM __ngl_owl_index__ WHERE 1=1", $sSQL);
-			} else {
-				$sSQL = (!$bOnlyWhere) ? $this->jsql->query($sJSQL) : "";
-			}
-		} else {
-			$sSQL = (!$bOnlyWhere) ? $this->jsql->query($sJSQL) : "";
-		}
-
-		return $sSQL;
-	}
-
-	final public function alvinWhere() {
-		list($sJSQL) = $this->getarguments("jsql", \func_get_args());
-		return $this->AlvinSQL($sJSQL, true);
 	}
 
 	private function CrossRows($sTable, $sWhere=false, $aConditions=null) {
@@ -1101,11 +1010,11 @@ SQL);
 			$sSQL = $this->jsql->query('{"columns":["foreignkey"], "tables":["__ngl_owl_structure__"], "where":[["[name]","eq","'.$sTable.'"]]}');
 			$this->attribute("query", $sSQL);
 			$foreignkey = $this->db->query($sSQL);
-			
+
 			$sForeignKey = $foreignkey->get("foreignkey");
 			$foreignkey->destroy();
 			$foreignkey = null;
-			
+
 			$vForeignKey = $this->jsql->decode($sForeignKey);
 		}
 
@@ -1117,7 +1026,7 @@ SQL);
 					$aConditions["where"] = [$sWhere];
 					$aConditions["from"] = [];
 				}
-			
+
 				foreach($aFields as $nKey => $sField) {
 					$sIndex = \md5($sTable.$vForeignKey["fields"][$nKey].$sCrossTable.$sField);
 					$aConditions["where"][$sIndex] = '
@@ -1130,13 +1039,27 @@ SQL);
 				$aConditions["from"][$sTable]		= $sTable;
 				$aConditions["from"][$sCrossTable]	= $sCrossTable;
 
-				// query
-				$sSQL = $this->AlvinSQL('{
-					"query":"select",
-					"columns":["'.$sCrossTable.'.id"],
-					"tables":["'.\implode('","', $aConditions["from"]).'"],
-					"where":['.\implode(',"AND",', $aConditions["where"]).']
-				}');
+				// alvin
+				$sTableName = ($this->bChildMode) ? $this->sChildTable : $this->sObject;
+				if($this->alvin) {
+					$sTableName = ($this->bChildMode) ? $this->sChildTable : $this->sObject;
+					if(!$this->alvin->loaded()) {
+						$this->__errorMode__("die");
+						self::errorMessage($this->object, 1006);
+					}
+					$sSQL = $this->alvin->sql($sTableName, '{
+						"query":"select",
+						"columns":["'.$sCrossTable.'.id"],
+						"tables":["'.\implode('","', $aConditions["from"]).'"],
+						"where":['.\implode(',"AND",', $aConditions["where"]).']
+					}');
+					if($sSQL===false) {
+						$this->__errorMode__("die");
+						self::errorMessage($this->object, 1006);
+					}
+				} else {
+					$sSQL = $this->jsql->query($sJSQL);
+				}
 
 				$aRows = [];
 				$this->attribute("query", $sSQL);
@@ -1162,7 +1085,7 @@ SQL);
 						$vCrossRows = \array_merge($vCrossRows, $this->CrossRows($sCrossTable, false, $aConditions));
 					}
 				}
-				
+
 				if($sWhere===false) { $aConditions = null; }
 			}
 		}
@@ -1185,7 +1108,7 @@ SQL);
 				}
 			}
 		}
-		
+
 		return $nRows;
 	}
 
@@ -1206,8 +1129,8 @@ SQL);
 
 		if(self::call()->isInteger($mID)) {
 			$sJSQL = $this->jsql->query('{
-				"columns":["id"], 
-				"tables":["'.$sTableName.'"], 
+				"columns":["id"],
+				"tables":["'.$sTableName.'"],
 				"where":[
 					["['.$sTableName.'.id]","eq","'.$mID.'"],
 					"AND",
@@ -1232,7 +1155,7 @@ SQL);
 				"tables":["'.$sTableName.'"],
 				"where":[["['.$sTableName.'.'.$aWhere[0].']","'.$aWhere[1].'","'.$aWhere[2].'"]]
 			}');
-	
+
 			$this->attribute("query", $sJSQL);
 			$id = $this->db->query($sJSQL);
 			if($id->rows()) {
@@ -1261,7 +1184,7 @@ SQL);
 			return false;
 		}
 	}
-	
+
 	private function GetRelationship(&$aTables, $vObject, $sAlias, $aParents) {
 		$this->x = 0;
 		$this->GetRelationshipChildren($aTables, $vObject, $sAlias, $aParents);
@@ -1292,8 +1215,8 @@ SQL);
 			if(!$sAlias) { $sAlias = $sObjectName; }
 
 			$sSQL = $this->jsql->query('{
-				"columns":["name","columns","relationship"], 
-				"tables":["__ngl_owl_structure__"], 
+				"columns":["name","columns","relationship"],
+				"tables":["__ngl_owl_structure__"],
 				"where":[["[name]","eq","'.$mObject.'"]]
 			}');
 
@@ -1353,7 +1276,7 @@ SQL);
 				$aTablesToJoin[] = $aTablesJoinsGroup[0];
 			}
 		}
-		
+
 		// joins
 		foreach($aTablesToJoin as $vTable) {
 			$sUsingField				= ($bChildren) ? "id" : (\array_key_exists("using", $vTable) ? $vTable["using"] : null);
@@ -1438,7 +1361,7 @@ SQL);
 		if(\is_array($aArguments) && \count($aArguments)==1 && \is_array($mCurrent) && \is_array(current($mCurrent))) {
 			$aArguments = $mCurrent;
 		}
-		
+
 		// update multiple
 		if(\is_array($aArguments) && \count($aArguments)>1 && \is_array($mCurrent)) {
 			$bChildMode = $this->bChildMode;
@@ -1477,7 +1400,7 @@ SQL);
 			// hijos
 			$sTable = $this->sChildTable;
 			if(!$this->attribute("current")) { self::errorMessage($this->object, 1002); }
-			
+
 			$aWhere = [];
 			$aWhere[] = '["['.$sTable.'.pid]","eq","'.$this->attribute('current').'"],"AND",["['.$sTable.'.state]","isnot","NULL"]';
 			if(isset($vData["id"])) {
@@ -1548,7 +1471,7 @@ SQL);
 							$update = $this->db->update($sChildTable, $vData, $sChildWhere);
 							if(!$update->rows()) {
 								$vData = ["state"=>1];
-								$sChildWhere = $this->jsql->query('{"query":"where", "where":[["[pid]","eq","'.$nRowID.'"],"AND",["[state]","eq","0"]]}');							
+								$sChildWhere = $this->jsql->query('{"query":"where", "where":[["[pid]","eq","'.$nRowID.'"],"AND",["[state]","eq","0"]]}');
 								$update = $this->db->update($sChildTable, $vData, $sChildWhere);
 							}
 						}
@@ -1584,7 +1507,7 @@ SQL);
 				}
 				$update = $this->db->update($sTable, $vData, $sSQLWhere);
 			}
-			
+
 			if($update) {
 				$nRows += $update->rows();
 				if($nRows) {
@@ -1616,7 +1539,7 @@ SQL);
 	}
 
 	private function Validate($vData, $sRules, $bIgnoreDefault=false) {
-		$vValidate = self::call("validate")->validate($vData, $sRules, $bIgnoreDefault); 
+		$vValidate = self::call("validate")->validate($vData, $sRules, $bIgnoreDefault);
 		$this->attribute("validate", $vValidate);
 		if(isset($vValidate["errors"]) && $vValidate["errors"]===0) {
 			$vData = \array_merge($vData, $vValidate["values"]);
@@ -1624,6 +1547,76 @@ SQL);
 		}
 
 		return false;
+	}
+}
+
+// Alvin Owl
+class nglAlvinOWL {
+
+	private $db;
+	private $jsql;
+	private $alvin;
+	private $sSign;
+	private $sChain;
+	private $bLoaded;
+
+	public function __construct($db, $alvin) {
+		$this->db = $db;
+		$this->jsql = $db->jsql();
+		$this->alvin = $alvin;
+		$this->bLoaded = false;
+
+		if($alvin->loaded()) {
+			$aToken = $this->alvin->token();
+			if(!empty($aToken["owl"])) {
+				$this->sSign = !empty($aToken["owl"]["sign"]) ? $aToken["owl"]["sign"] : null;
+				$aChain = (!empty($aToken["owl"]["access"]) && count($aToken["owl"]["access"])) ? $aToken["owl"]["access"] : [];
+				if($this->sSign!==null) { \array_unshift($aChain, $this->sSign); }
+				$this->sChain = "'".\implode("','", $aChain)."'";
+				$this->bLoaded = true;
+			}
+		}
+
+		return $this;
+	}
+
+	public function loaded() {
+		return $this->bLoaded;
+	}
+
+	public function sql($sTableName, $sJSQL) {
+		if(!$this->bLoaded) { return false; }
+
+		$role = $this->db->query("SELECT id FROM __ngl_owl_structure__ WHERE name = '".$sTableName."' AND roles = '1'");
+		if(!empty($this->sSign) && \strtoupper($this->sSign)!="ADMIN" && $role->rows()) {
+			$sRoleFilter = (!empty($this->sChain)) ? "OR role IN (".$this->sChain.")" : "";
+
+			$sHash = \md5(microtime().rand(0,999));
+			$sHashNot = \md5($sHash);
+
+			$aJSQL = $this->jsql->decode($sJSQL);
+			if(isset($aJSQL["where"])) {
+				$aJSQL["where"] = [$aJSQL["where"], "AND", [["[".$sTableName.".imya]", "in", $sHash], "OR", ["[".$sTableName.".imya]", "notin", $sHashNot]]];
+			} else {
+				$aJSQL["where"] = [["[".$sTableName.".imya]", "in", $sHash], "OR", ["[".$sTableName.".imya]", "notin", $sHashNot]];
+			}
+			$sSQL = $this->jsql->query($aJSQL);
+
+			// consulta final
+			$sSQL = \str_replace("'".$sHash."'", "SELECT imya FROM __ngl_owl_index__ WHERE (role IS NULL ".$sRoleFilter.")", $sSQL);
+			$sSQL = \str_replace("'".$sHashNot."'", "SELECT imya FROM __ngl_owl_index__ WHERE 1=1", $sSQL);
+		} else {
+			$sSQL = $this->jsql->query($sJSQL);
+		}
+
+		return $sSQL;
+	}
+
+	public function insert($sImya) {
+		$this->db->insert("__ngl_owl_index__", [
+			"imya"	=> $sImya,
+			"role"	=> $this->sSign
+		], "INSERT", false, true);
 	}
 }
 

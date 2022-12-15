@@ -1,0 +1,12 @@
+<?php
+
+$sBuffer = \file_get_contents($sDestine."/config.php");
+$sBuffer = \str_replace("<{=ROOTDIR=}>", $sDestine, $sBuffer);
+\file_put_contents($sDestine."/config.php", $sBuffer);
+
+\chmod($sDestine."/ground/cache", 0777);
+\chmod($sDestine."/ground/logs", 0777);
+\chmod($sDestine."/ground/tmp", 0777);
+\unlink(__FILE__);
+
+?>

@@ -1,7 +1,10 @@
 <?php
-
+/*
+# nogal
+*the most simple PHP Framework* by hytcom.net
+GitHub @hytcom/nogal
+*/
 namespace nogal;
-
 class nglTutor extends nglTrunk {
 
 	private $aAllowedMethods;
@@ -38,7 +41,7 @@ class nglTutor extends nglTrunk {
 			$sTutorFile = self::call()->clearPath(NGL_PATH_TUTORS.NGL_DIR_SLASH.$sTutorName.".php");
 			if(\file_exists($sTutorFile)) {
 				require_once($sTutorFile);
-				
+
 				$this->TutorName = $sTutorName;
 				$sClassName = __NAMESPACE__."\\tutor".$sTutorName;
 
@@ -53,7 +56,7 @@ class nglTutor extends nglTrunk {
 						self::errorMessage($this->object, 1001);
 					}
 				}
-				
+
 				// metodos permitidos del tutor
 				$aAllowedMethods = ["debug"=>true];
 				$aMethods = $reflection->getMethods(\ReflectionMethod::IS_PROTECTED);
@@ -90,12 +93,12 @@ class nglTutor extends nglTrunk {
 		if(!isset($this->aAllowedMethods[\strtolower($sMethod)])) { \trigger_error("Nonexistent method", E_USER_ERROR); }
 		if($this->bLocked) { \trigger_error("Can't run methods from a locked tutor", E_USER_ERROR); }
 		if($this->bLockable) { $this->lock(); }
-		
+
 		if(\method_exists($this, $sMethod)) {
 			$this->MethodName($sMethod);
 			return \call_user_func([$this, $sMethod], $aArguments);
 		}
-		
+
 		return null;
 	}
 
@@ -110,7 +113,7 @@ class nglTutor extends nglTrunk {
 				if(!$alvin->loaded()) {
 					if(!$alvin->autoload()) { \trigger_error("Alvin is not loaded", E_USER_ERROR); exit(); }
 				}
-				
+
 				if($alvin->profile()=="ADMIN") { return $this; }
 
 				if(!$alvin->check($sGrants)) { \trigger_error("You do not have grants to execute this action", E_USER_ERROR); exit(); }
@@ -125,7 +128,7 @@ class nglTutor extends nglTrunk {
 		if(!$this->debuggable) { return "[[TUTOR-DEBUG]]<br /><br />Debug is not allowed"; }
 		$fn = self::call("fn");
 		$aArguments = ($this->sMethodName=="debug" && \count($_FILES)) ? \array_merge(\func_get_args(), $_FILES) : \func_get_args();
-		return 
+		return
 			"[[TUTOR-DEBUG]]".
 			"<br /><br />".
 			"<pre>\n".

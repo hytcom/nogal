@@ -27,10 +27,12 @@ $NGL_LIBS["dates"] 			= ["nglDates", true];
 // gestion de imagenes
 $NGL_LIBS["image"] 			= ["nglImage", false];
 
-// gestion de archivos y directorios
+// gestion de rutas, archivos y directorios
+$NGL_LIBS["ants"]			= ["nglAnts", false];
 $NGL_LIBS["file"] 			= ["nglFile", false];
 $NGL_LIBS["files"] 			= ["nglFiles", true];
 $NGL_LIBS["ftp"]	 		= ["nglFTP", false];
+$NGL_LIBS["sow"] 			= ["nglSow", true];
 
 // grafts
 $NGL_LIBS["graft"] 			= ["nglGraft", false];
@@ -43,6 +45,8 @@ $NGL_LIBS["rind"] 			= ["nglRind", false];
 
 // security
 $NGL_LIBS["alvin"] 			= ["nglAlvin", true];
+$NGL_LIBS["crypt"] 			= ["nglCrypt", false];
+$NGL_LIBS["jwt"] 			= ["nglJWT", false];
 
 // sets
 $NGL_LIBS["set"] 			= ["nglSet", false];
@@ -50,11 +54,7 @@ $NGL_LIBS["set"] 			= ["nglSet", false];
 // tree
 $NGL_LIBS["tree"] 			= ["nglTree", false];
 
-// tutor
-// $NGL_LIBS["tutor"] 			= ["nglTutor", false];
-
 // web
-$NGL_LIBS["coon"] 			= ["nglCoon", false];
 $NGL_LIBS["url"] 			= ["nglURL", false];
 
 // zip

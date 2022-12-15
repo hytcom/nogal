@@ -1,53 +1,14 @@
 <?php
 /*
-# Nogal
+# nogal
 *the most simple PHP Framework* by hytcom.net
-GitHub @hytcom
+GitHub @hytcom/nogal
 ___
-  
-# mysql
-## nglQParser *extends* nglBranch *implements* inglFeeder [2020-04-02]
-Parsea sentencias SQL y retorna un array con los datos de las misma
 
-https://github.com/hytcom/wiki/blob/master/nogal/docs/qparser.md
-
-
-CREATE TABLE `log` (
-	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-	`table` CHAR(128) NOT NULL,
-	`row` INT UNSIGNED NOT NULL,
-	`user` SMALLINT UNSIGNED DEFAULT NULL,
-	`date` DATETIME NOT NULL,
-	`ip` CHAR(45) NOT NULL DEFAULT '',
-	`changelog` MEDIUMTEXT NULL DEFAULT NULL
-) 
--- ------
-SELECT `name`, `ip`, `date` FROM `log` WHERE (`table` = 'dodo' AND '2020-01-01'>`date`) OR `ip` = '127.0.0.1' ORDER BY `user`, `row` LIMIT 0,12
--- ------
-SELECT 
-	`log`.`name`, 
-	`log`.`ip`, 
-	`log`.`date`, 
-	`users`.`username` 
-FROM 
-	`log`, `users` 
-WHERE 
-	`users`.`id` = `log`.`user` AND (`table` = 'dodo' AND '2020-01-01'>`date`) OR `ip` = '127.0.0.1' 
-ORDER BY `user`, `row`
--- ------
-SELECT `name`, `ip`, `date` FROM `log` ORDER BY `user`, `row`
--- ------
-INSERT INTO `log` (`name`, `ip`, `date`) VALUES('ariel (el capo)', '127.0.0.1', '2020-03-31')
--- ------
-UPDATE `log` SET `name` = 'ariel', `ip`='127.0.0.1', `date`='2020-03-31' WHERE `id` = '234' AND `table` = 'dodo'
--- ------
-DELETE FROM `log`  WHERE `log`.`id` = '234' AND `table` = 'dodo'
--- ------
-DELETE FROM `log`
-
+# qparser
+https://hytcom.net/nogal/docs/objects/qparser.md
 */
 namespace nogal;
-
 class nglQParser extends nglFeeder implements inglFeeder {
 
 	final public function __init__($mArguments=null) {
@@ -60,15 +21,15 @@ class nglQParser extends nglFeeder implements inglFeeder {
 		switch($sSQLCase) {
 			case "DESCRIBE":
 				return ["DESCRIBE", [\substr($sSQL, 8)]];
-			
+
 			case "CREATE":
 				\preg_match("/(create table )(.*?)\((.*?)\)$/is", $sSQL, $aMatchs);
 				return ["CREATE", [$aMatchs[2], self::call()->explodeTrim(",", $aMatchs[3])]];
-			
+
 			case "TRUNCATE":
 				return ["TRUNCATE", [\substr($sSQL, 8)]];
 				break;
-				
+
 			case "SELECT":
 				$aReturn = [];
 				\preg_replace_callback([
@@ -96,7 +57,7 @@ class nglQParser extends nglFeeder implements inglFeeder {
 				}
 				unset($aReturn["SELECT"]);
 				return ["SELECT", $aReturn];
-			
+
 			case "INSERT":
 				$aReturn = $aParse = [];
 				\preg_replace_callback([
@@ -115,7 +76,7 @@ class nglQParser extends nglFeeder implements inglFeeder {
 				$aReturn["VALUES"] = $this->ParseFields($aParse["VALUES"]);
 				$aReturn["SET"] = \array_combine($aReturn["FIELDS"], $aReturn["VALUES"]);
 				return ["INSERT", $aReturn];
-				
+
 			case "UPDATE":
 				$aReturn = $aParse = [];
 				\preg_replace_callback([
@@ -128,7 +89,7 @@ class nglQParser extends nglFeeder implements inglFeeder {
 					},
 					$sSQL
 				);
-				
+
 				$aReturn["FROM"] = $this->ParseTables($aParse["UPDATE"])[0];
 				$aSet = [];
 				$this->ParseWhere($aParse["SET"], false, $aSet);
@@ -144,7 +105,7 @@ class nglQParser extends nglFeeder implements inglFeeder {
 					$aReturn["WHERE_PARTS"] = $aWhere;
 				}
 				return ["UPDATE", $aReturn];
-	
+
 			case "DELETE":
 				$aReturn = $aParse = [];
 				\preg_replace_callback([
@@ -165,7 +126,7 @@ class nglQParser extends nglFeeder implements inglFeeder {
 					$aReturn["WHERE_PARTS"] = $aWhere;
 				}
 				return ["DELETE", $aReturn];
-	
+
 			default:
 				return false;
 		}

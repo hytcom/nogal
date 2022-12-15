@@ -1,32 +1,27 @@
 <?php
 /*
-# Nogal
+# nogal
 *the most simple PHP Framework* by hytcom.net
-GitHub @hytcom
+GitHub @hytcom/nogal
 ___
-  
-# mysql
-## nglDBPostgreSQLQuery *extends* nglBranch *implements* iNglDBQuery [2018-08-21]
-Controla los resultados generados por consultas a la bases de datos MySQL
 
-https://github.com/hytcom/wiki/blob/master/nogal/docs/pgsqlq.md
-
+# pgsqlq
+https://hytcom.net/nogal/docs/objects/pgsqlq.md
 */
 namespace nogal;
-
 class nglDBPostgreSQLQuery extends nglBranch implements iNglDBQuery {
 
 	private $db		= null;
 	private $cursor = null;
-	
+
 	final protected function __declareArguments__() {
 		$vArguments							= [];
 		$vArguments["column"]				= ['$mValue', null];
 		$vArguments["get_mode"]				= ['$this->GetMode($mValue)', \PGSQL_ASSOC];
 		$vArguments["link"]					= ['$mValue', null];
 		$vArguments["query"]				= ['$mValue', null];
-		$vArguments["sentence"]				= ['(string)$mValue', null];
 		$vArguments["query_time"]			= ['$mValue', null];
+		$vArguments["sentence"]				= ['(string)$mValue', null];
 
 		return $vArguments;
 	}
@@ -39,7 +34,7 @@ class nglDBPostgreSQLQuery extends nglBranch implements iNglDBQuery {
 		$vAttributes["_allrows"]			= null;
 		$vAttributes["_columns"]			= null;
 		$vAttributes["_rows"]				= null;
-		
+
 		return $vAttributes;
 	}
 
@@ -76,7 +71,7 @@ class nglDBPostgreSQLQuery extends nglBranch implements iNglDBQuery {
 		$this->attribute("_allrows", $nRows);
 		return $nRows;
 	}
-	
+
 	public function columns() {
 		if($this->attribute("_columns")!==null) { return $this->attribute("_columns"); }
 
@@ -85,7 +80,7 @@ class nglDBPostgreSQLQuery extends nglBranch implements iNglDBQuery {
 		for($x=0; $x<$nCols; $x++) {
 			$aGetColumns[] = \pg_field_name($this->cursor, $x);
 		}
-		
+
 		$this->attribute("_columns", $aGetColumns);
 		return $aGetColumns;
 	}
@@ -97,11 +92,11 @@ class nglDBPostgreSQLQuery extends nglBranch implements iNglDBQuery {
 		} else {
 			$nRows = \pg_num_rows($this->cursor);
 		}
-		
+
 		$this->attribute("_rows", $nRows);
 		return $nRows;
 	}
-	
+
 	public function destroy() {
 		if(!\is_bool($this->cursor)) { $this->free(); }
 		$this->db = null;
@@ -140,7 +135,7 @@ class nglDBPostgreSQLQuery extends nglBranch implements iNglDBQuery {
 				$sColumn = $aColumn[0];
 				$sValue = (\count($aColumn)>1) ? $aColumn[1] : $aColumn[0];
 				$bKeyValue = true;
-			}			
+			}
 		}
 
 		$this->reset();
@@ -167,11 +162,11 @@ class nglDBPostgreSQLQuery extends nglBranch implements iNglDBQuery {
 			} else if($bKeyValue) {
 				while($aRow = \pg_fetch_array($this->cursor, null, $nMode)) {
 					$aGetAll[$aRow[$sColumn]] = $aRow[$sValue];
-				}			
+				}
 			} else {
 				while($aRow = \pg_fetch_array($this->cursor, null, $nMode)) {
 					$aGetAll[] = $aRow[$sColumn];
-				}			
+				}
 			}
 		} else {
 			while($aRow = \pg_fetch_array($this->cursor, null, $nMode)) {

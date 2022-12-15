@@ -1,9 +1,9 @@
-[checksum]
-md5 = "d6fb29fab80d11abc169f734bef85005"
-sha1 = "ad6d48936bb9a7258d3f7254f686e3fc14f8aad2"
-
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/pgsql.md"
+[info]
+_help = "### pgsql\
+Gestor de conexiones PostgreSQL\
+\
+https://github.com/hytcom/wiki/blob/master/nogal/docs/pgsql.md\
+"
 
 [arguments]
 autoconn = "Cuando es TRUE, ejecuta el método connect luego de cargar las configuraciones"
@@ -19,30 +19,20 @@ conflict_target = "Target del conflicto en los INSERT cuando el modo de insersi�
 	constraint_name\
 	WHERE...\
 "
+coontype = "Tipo de conexión"
 debug = "Cuando es TRUE el método retorna la sentencia SQL en lugar de ejecutarla"
 do = "Cuando es TRUE el método query ejecuta la sentencia pero no retorna resultado"
-coontype = "Tipo de conexión"
 error_query = "Ante un error mostrará la consulta que le dió origen"
+field = "Nombre del campo activo"
 file = "Ruta del archivo a exportar ó importar"
+file_enclosed = "Encierra los datos en los métodos export e import"
 file_eol = "Caracter de fin de línea en los métodos export e import"
 file_separator = "Separador de campos en los métodos export e import"
-file_enclosed = "Encierra los datos en los métodos export e import"
 host = "Puede ser o un nombre de host o una dirección IP. Pasando el valor NULL o la cadena localhost se asumirá el host local"
 insert_mode = "Tipo de modo INSERT. Valores admitidos:\
 	INSERT inserta nuevos registros\
 	CONFLICT en caso de conflictos con conflict_target, ejecuta conflict_action\
 "
-jsql = "Sentencia SQL en formato JSON o Array, donde los índices son:\
-	columns\
-	tables\
-	where\
-	group\
-	having\
-	order\
-	offset\
-	limit\
-"
-jsql_eol = "Salto de linea luego de cada parte de la sentencia"
 pass = "Contraseña para acceder a la base de datos"
 port = "Puerto donde escucha el servidor MySQL"
 sql = "Ultima sentencia SQL ejecutada o próxima a ejecutarse"

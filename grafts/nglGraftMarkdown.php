@@ -1,23 +1,14 @@
 <?php
-
-namespace nogal;
-
-/** CLASS {
-	"name" : "nglGraftMarkdown",
-	"object" : "md",
-	"type" : "instanciable",
-	"revision" : "20171124",
-	"extends" : "nglBranch",
-	"interfaces" : "inglFeeder",
-	"description" : "Implementa http://parsedown.org/",
-	"arguments": {
-		"content" : ["string", "Contenido markdown", "test1234"],
-	}
-} **/
-
 /*
-echo $ngl("md.")->get('Hello _Parsedown_!');
+# nogal
+*the most simple PHP Framework* by hytcom.net
+GitHub @hytcom/nogal
+___
+
+# md
+https://hytcom.net/nogal/docs/objects/md.md
 */
+namespace nogal;
 class nglGraftMarkdown extends nglScion {
 
 	public $md = null;
@@ -25,9 +16,9 @@ class nglGraftMarkdown extends nglScion {
 	final protected function __declareArguments__() {
 		$vArguments				= [];
 		$vArguments["content"]	= ['(string)$mValue', "test1234"];
+		$vArguments["html"]		= ['$this->SetMarkupHTML($mValue)', true];
 		$vArguments["links"]	= ['$this->SetUrlsLinked($mValue)', true];
 		$vArguments["nl2br"]	= ['$this->SetNewLineToBreak($mValue)', true];
-		$vArguments["html"]		= ['$this->SetMarkupHTML($mValue)', true];
 		return $vArguments;
 	}
 
@@ -46,9 +37,9 @@ class nglGraftMarkdown extends nglScion {
 			$this->__errorMode__("die");
 			self::errorMessage($this->object, 1000);
 		}
-		$this->md->setUrlsLinked($this->argument("links"));
-		$this->md->setBreaksEnabled($this->argument("nl2br"));
-		$this->md->setMarkupEscaped($this->argument("html"));
+		$this->md->setUrlsLinked($this->links);
+		$this->md->setBreaksEnabled($this->nl2br);
+		$this->md->setMarkupEscaped(!$this->html);
 	}
 
 	public function format() {
@@ -56,7 +47,7 @@ class nglGraftMarkdown extends nglScion {
 		$sMDCode = $this->md->text($sContent);
 		return $sMDCode;
 	}
-	
+
 	public function formatfile() {
 		list($sFileName) = $this->getarguments("filepath", \func_get_args());
 		$sFileName = self::call()->sandboxPath($sFileName);
@@ -79,11 +70,11 @@ class nglGraftMarkdown extends nglScion {
 
 	protected function SetMarkupHTML($bBoolean) {
 		$bBoolean = self::call()->isTrue($bBoolean);
-		$this->md->setMarkupEscaped($bBoolean);
+		$this->md->setMarkupEscaped(!$bBoolean);
 		return $bBoolean;
 	}
 
-	// plantuml 
+	// plantuml
 	private function PlantUML($sMDCode) {
 		return \preg_replace_callback(
 			'/```plantuml(.*?)```/is',
@@ -114,7 +105,7 @@ class nglGraftMarkdown extends nglScion {
 		if($b == 1) { return "_"; }
 		return "?";
 	}
-	
+
 	private function PlantAppend3bytes($b1, $b2, $b3) {
 		$c1 = $b1 >> 2;
 		$c2 = (($b1 & 0x3) << 4) | ($b2 >> 4);
@@ -127,7 +118,7 @@ class nglGraftMarkdown extends nglScion {
 		$r .= $this->PlantEncode6bit($c4 & 0x3F);
 		return $r;
 	}
-	
+
 	private function PlantEncode64($c) {
 		$str = "";
 		$len = \strlen($c);

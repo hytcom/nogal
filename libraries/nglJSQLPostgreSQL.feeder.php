@@ -1,19 +1,15 @@
 <?php
 /*
-# Nogal
+# nogal
 *the most simple PHP Framework* by hytcom.net
-GitHub @hytcom
+GitHub @hytcom/nogal
 ___
-  
+
 # jsqlpgsql
-## nglJSQLPostgreSQL *extends* nglFeeder *implements* inglFeeder [2021-12-08]
-Parser jsql para Postgres
-
-https://github.com/hytcom/wiki/blob/master/nogal/docs/jsql.md
-
+Parser jsql para MySQL
+https://hytcom.net/nogal/docs/objects/jsql.md
 */
 namespace nogal;
-
 self::call("jsql",null,true);
 class nglJSQLPostgreSQL extends nglJSQL implements iNglJSQL {
 
@@ -25,7 +21,7 @@ class nglJSQLPostgreSQL extends nglJSQL implements iNglJSQL {
 	public function colDef($aColumn) {
 		$sOldName = (!empty($aColumn["oldname"]) && $aColumn["oldname"]!=$aColumn["name"]) ? "`".$aColumn["oldname"]."` " : "";
 		$sName = $sOldName."\"".$aColumn["name"]."\"";
-		
+
 		if(!empty($aColumn["autoinc"]) && self::call()->isTrue($aColumn["autoinc"])) {
 			$sType = "SERIAL";
 		} else {
@@ -54,7 +50,7 @@ class nglJSQLPostgreSQL extends nglJSQL implements iNglJSQL {
 			"after"		=> $sAfter
 		];
 	}
-	
+
 	public function colDrop($aJSQL) {
 		// return "ALTER TABLE ".$this->column($aJSQL["table"])." DROP `".$aJSQL["column"]."`;";
 	}
@@ -194,7 +190,7 @@ class nglJSQLPostgreSQL extends nglJSQL implements iNglJSQL {
 
 	private function SelDel($sType, $aJSQL) {
 		$aSQL = [];
-		
+
 		// columns
 		if($sType=="select") { $aSQL["columns"] = !empty($aJSQL["columns"]) ? \implode(", ", \array_map([$this,"column"], $aJSQL["columns"])) : "*"; }
 
@@ -209,13 +205,13 @@ class nglJSQLPostgreSQL extends nglJSQL implements iNglJSQL {
 					$aFrom[] = "LEFT JOIN ".$this->column($aTable, true)." ON (".$this->where($aTable[2]).")";
 				}
 			}
-			
+
 			$aSQL["tables"] = "FROM ".\implode(" ", $aFrom);
 		}
 
 		// where
 		$aSQL["where"] = (isset($aJSQL["where"])) ? "WHERE ".$this->where($aJSQL["where"]) : "";
-		
+
 		// group by
 		if(isset($aJSQL["group"])) {
 			$aGroup = [];
@@ -224,10 +220,10 @@ class nglJSQLPostgreSQL extends nglJSQL implements iNglJSQL {
 			}
 			$aSQL["group"] = "GROUP BY ".\implode(", ", $aGroup);
 		}
-		
+
 		// having
 		if(isset($aJSQL["having"])) { $aSQL["having"] = "HAVING ".$this->where($aJSQL["having"]); }
-		
+
 		// order by
 		if(isset($aJSQL["order"])) {
 			$aOrder = [];
@@ -240,7 +236,7 @@ class nglJSQLPostgreSQL extends nglJSQL implements iNglJSQL {
 			}
 			$aSQL["order"] = "ORDER BY ".\implode(", ", $aOrder);
 		}
-		
+
 		// limit
 		if(isset($aJSQL["limit"])) {
 			if(isset($aJSQL["offset"])) {
@@ -249,7 +245,7 @@ class nglJSQLPostgreSQL extends nglJSQL implements iNglJSQL {
 				$aSQL["limit"] = "LIMIT ".(int)$aJSQL["limit"];
 			}
 		}
-		
+
 		// sentencia SQL
 		return \strtoupper($sType)." ".\implode(" ", $aSQL);
 	}
@@ -269,7 +265,7 @@ class nglJSQLPostgreSQL extends nglJSQL implements iNglJSQL {
 					$aFrom[] = "LEFT JOIN ".$this->column($aTable, true)." ON (".$this->where($aTable[2]).")";
 				}
 			}
-			
+
 			if($sType=="insert") {
 				$aSQL["tables"] = "INSERT INTO ".\implode(" ", $aFrom);
 			} else {
@@ -285,7 +281,7 @@ class nglJSQLPostgreSQL extends nglJSQL implements iNglJSQL {
 		if($sType=="update") {
 			$aSQL["where"] = (isset($aJSQL["where"])) ? "WHERE ".$this->where($aJSQL["where"]) : "";
 		}
-		
+
 		// order by
 		if(isset($aJSQL["order"])) {
 			$aOrder = [];
@@ -307,7 +303,7 @@ class nglJSQLPostgreSQL extends nglJSQL implements iNglJSQL {
 				$aSQL["limit"] = "LIMIT ".(int)$aJSQL["limit"];
 			}
 		}
-		
+
 		// sentencia SQL
 		return \implode(" ", $aSQL);
 	}

@@ -1,53 +1,24 @@
 <?php
+/*
+# nogal
+*the most simple PHP Framework* by hytcom.net
+GitHub @hytcom/nogal
+___
 
+# files
+https://hytcom.net/nogal/docs/objects/files.md
+*/
 namespace nogal;
-
-/** CLASS {
-	"name" : "nglFiles",
-	"object" : "files",
-	"type" : "main",
-	"revision" : "20160201",
-	"extends" : "nglBranch",
-	"interfaces" : "inglFeeder",
-	"description" : "Métodos frecuentes para el manejo de archivos y directorios."
-} **/
 class nglFiles extends nglFeeder implements inglFeeder {
-	
+
 	private $sSandBox;
 
 	final public function __init__($mArguments=null) {
-		$this->sSandBox = (\defined("NGL_SANDBOX")) ?  \realpath(NGL_SANDBOX) : \realpath(NGL_PATH_PROJECT);
+		$this->sSandBox = (\defined("NGL_SANDBOX")) ?  \realpath(NGL_SANDBOX) : \realpath(NGL_PATH_GARDEN);
 	}
 
-	/** FUNCTION {
-		"name" : "absPath",
-		"type" : "public",
-		"description" : "formatea un path como absoluto limpiando doble barras o referencias atras (..)",
-		"parameters" : { 
-			"$sPath" : ["string", "Path"],
-			"$sSlash" : ["string", "Separador de directorios.", "NGL_DIR_SLASH"]
-		},
-		"examples" : {
-			"Ejemplo 1" : "
-				$path = "/home/user/docs/../../user2/readme.txt";
-				echo $ngl("files")->absPath($path, "/");
-				
-				#salida
-				"/home/user2/readme.txt"
-			",
-			
-			"Ejemplo 2" : "
-				$path = "/home/user/docs/../../user2/readme.txt";
-				echo $ngl("files")->absPath($path, "_");
-				
-				#salida
-				"home_user2_readme.txt"
-			"
-		},
-		"return" : "string"
-	} **/
 	public function absPath($sPath, $sSlash=NGL_DIR_SLASH) {
-		$sStart = ($sPath[0]==$sSlash) ? $sSlash : "";
+		$sStart = (!empty($sPath) && $sPath[0]==$sSlash) ? $sSlash : "";
 		if(\strtoupper(\substr(PHP_OS, 0, 3))=="WIN") {
 			if(\strpos($sPath, ":")) {
 				list($sStart, $sPath) = \explode(":", $sPath, 2);
@@ -57,7 +28,7 @@ class nglFiles extends nglFeeder implements inglFeeder {
 
 		$sPath = \str_replace(["/", "\\"], $sSlash, $sPath);
 		$aPath = \array_filter(\explode($sSlash, $sPath), "strlen");
-		
+
 		$aAbsolute = [];
 		foreach($aPath as $sDir) {
 			if($sDir==".") { continue; }
@@ -67,109 +38,21 @@ class nglFiles extends nglFeeder implements inglFeeder {
 				$aAbsolute[] = $sDir;
 			}
 		}
-		
+
 		$sAbsolutePath = $sStart.\implode($sSlash, $aAbsolute);
 		return $sAbsolutePath;
 	}
 
-	/** FUNCTION {
-		"name" : "basePaths",
-		"type" : "public",
-		"description" : "Retorna la porción común de dos paths desde el inicio. Previa a la comparación limpia los paths con <b>nglFn::clearPath</b>",
-		"parameters" : { 
-			"$sPath1" : ["string", "path 1"],
-			"$sPath2" : ["string", "path 2"],
-			"$sSlash" : ["string", "Separador de directorios.", "NGL_DIR_SLASH"]
-		},
-		"examples" : {
-			"Ejemplo" : "
-				$path1 = "/home/user/docs/readme.txt";
-				$path2 = "/home/user/docs/images/picture.jpg";
-				echo $ngl("files")->basePaths($path1, $path2);
-				
-				#salidas
-				"/home/user/docs/"
-			"
-		},
-		"return" : "string"
-	} **/
 	public function basePaths($sPath1, $sPath2, $sSlash=NGL_DIR_SLASH) {
 		$sPath1 = self::call()->clearPath($sPath1, false, $sSlash);
 		$sPath2 = self::call()->clearPath($sPath2, false, $sSlash);
 		return self::call()->strCommon($sPath1, $sPath2);
 	}
 
-	/** FUNCTION {
-		"name" : "copyr",
-		"type" : "public",
-		"description" : "
-			Copia archivos y directorios de manera recursiva. Retorna un Array de 2 indices:
-			<ul>
-				<li><b>0:</b> Cantidad de archivos copiados y directorios creados.</li>
-				<li><b>1:</b> Log con el detalla de cada una de las operaciones.</li>
-			</ul>
-		",
-		"parameters" : { 
-			"$sSource" : ["string", "Origen de la copia"],
-			"$sDestine" : ["string", "Destino de la copia"],
-			"$sMask" : ["string", "Mascara de archivos. Una expresion regular o un array de ellas que será tratado con OR"],
-			"$bRecursive" : ["boolean", "Determina si se deben incluir carpetas y sub-carpetas", "true"],
-			"$bIncludeHidden" : ["boolean", "Determina si se deben copiar los archivos y carpetas ocultos", "false"],
-			"$bLog" : ["boolean", "Activa el log", "false"]
-		},
-		"examples" : {
-			"Copia completa" : "
-				$path1 = "/home/user/mydocs";
-				$path2 = "/home/user2/mydocs";
-				print_r($ngl("files")->copyr($path1, $path2));
-				
-				#salidas
-				Array (
-					[0] => 13
-					[1] =>
-						copy	"/home/user/mydocs/data.pdf" => "/home/user2/mydocs/data.pdf"
-						mkdir	"/home/user2/mydocs/docs"
-						copy	"/home/user/mydocs/docs/bar.doc" => "/home/user2/mydocs/docs/bar.doc"
-						copy	"/home/user/mydocs/docs/foo.doc" => "/home/user2/mydocs/docs/foo.doc"
-						mkdir 	"/home/user2/mydocs/images"
-						copy	"/home/user/mydocs/images/image1.jpg" => "/home/user2/mydocs/images/image1.jpg"
-						copy	"/home/user/mydocs/images/image2.jpg" => "/home/user2/mydocs/images/image2.jpg"
-						copy	"/home/user/mydocs/images/image3.jpg" => "/home/user2/mydocs/images/image3.jpg"
-						copy	"/home/user/mydocs/images/picture1.jpg" => "/home/user2/mydocs/images/picture1.jpg"
-						copy	"/home/user/mydocs/images/picture2.jpg" => "/home/user2/mydocs/images/picture2.jpg"
-						copy	"/home/user/mydocs/images/picture3.jpg" => "/home/user2/mydocs/images/picture3.jpg"
-						copy	"/home/user/mydocs/images/picture4.jpg" => "/home/user2/mydocs/images/picture4.jpg"
-						copy	"/home/user/mydocs/readme.txt" => "/home/user2/mydocs/readme.txt"
-				)
-			", 
-			
-			"Copia selectiva" : "
-				$path1 = "/home/user/mydocs";
-				$path2 = "/home/user2/mydocs";
-				$out = $ngl("files")->copyr($path1, $path2, array("*.doc", "image*"));
-				print_r($out);
-				
-				#salidas
-				Array (
-					[0] => 7
-					[1] =>
-						mkdir	"/home/user2/mydocs/docs"
-						copy	"/home/user/mydocs/docs/bar.doc" => "/home/user2/mydocs/docs/bar.doc"
-						copy	"/home/user/mydocs/docs/foo.doc" => "/home/user2/mydocs/docs/foo.doc"
-						mkdir 	"/home/user2/mydocs/images"
-						copy	"/home/user/mydocs/images/image1.jpg" => "/home/user2/mydocs/images/image1.jpg"
-						copy	"/home/user/mydocs/images/image2.jpg" => "/home/user2/mydocs/images/image2.jpg"
-						copy	"/home/user/mydocs/images/image3.jpg" => "/home/user2/mydocs/images/image3.jpg"
-				)
-			"
-		},
-		"seealso" : ["nglFiles::unlinkr"],
-		"return" : "array"
-	} **/
 	public function copyr($sSource, $sDestine, $sMask="*", $bRecursive=true, $bIncludeHidden=true, $mCase=false, $bLog=false) {
 		$aLog = [];
 		$nCopied = 0;
-		
+
 		$sSource = self::call()->sandboxPath($sSource);
 		$sDestine = self::call()->sandboxPath($sDestine);
 		if(!\is_dir($sDestine)) {
@@ -181,7 +64,7 @@ class nglFiles extends nglFeeder implements inglFeeder {
 			}
 		}
 
-		$sMode = ($bIncludeHidden) ? "signed-h" : "signed";		
+		$sMode = ($bIncludeHidden) ? "signed-h" : "signed";
 		$aFiles = $this->ls($sSource, $sMask, "signed", $bRecursive);
 		if($sMask!=="*") {
 			$aDirs = $aTmpDirs = [];
@@ -191,7 +74,7 @@ class nglFiles extends nglFeeder implements inglFeeder {
 					$aTmpDirs[$sDirname] = true;
 				}
 			}
-			
+
 			$aTmpDirs =\array_keys($aTmpDirs);
 			foreach($aTmpDirs as $sDirname) {
 				$sPath = "*".\strtok($sDirname, NGL_DIR_SLASH);
@@ -200,7 +83,7 @@ class nglFiles extends nglFeeder implements inglFeeder {
 					$aDirs[] = $sPath;
 				}
 			}
-			
+
 			$aFiles = \array_merge($aDirs, $aFiles);
 		}
 
@@ -209,7 +92,7 @@ class nglFiles extends nglFeeder implements inglFeeder {
 		foreach($aFiles as $sFile) {
 			$nDir = (!empty($sFile) && $sFile[0]=="*") ? 1 : 0;
 			$sFile = \substr($sFile, $nSource+$nDir);
-			
+
 			$sSourceFile = self::call()->clearPath($sSource.NGL_DIR_SLASH.$sFile);
 			$sDestineFile = self::call()->clearPath($sDestine.NGL_DIR_SLASH.$sFile);
 			if($mCase=="lower") {
@@ -219,7 +102,7 @@ class nglFiles extends nglFeeder implements inglFeeder {
 			} else if($mCase=="secure") {
 				$sDestineFile = self::call()->secureName($sDestineFile, NGL_DIR_SLASH.".:");
 			}
-			
+
 			if(!$nDir) {
 				\copy($sSourceFile, $sDestineFile);
 				@\chmod($sDestineFile, NGL_CHMOD_FILE);
@@ -233,155 +116,25 @@ class nglFiles extends nglFeeder implements inglFeeder {
 					self::errorMessage($this->object, 1003, \dirname($sDestineFile));
 				}
 			}
-			
+
 			$nCopied++;
 			if($bLog) { $aLog[] = $sLog; }
 		}
-		
+
 		$aReport = [];
 		$aReport[]	= $nCopied;
 		if($bLog) { $aReport[] = \implode($aLog); }
-		
+
 		return $aReport;
 	}
 
-	/** FUNCTION {
-		"name" : "ls",
-		"type" : "public",
-		"description" : "lista el contenido de un directorio",
-		"parameters" : { 
-			"$sPath" : ["string", "Directorio", "."], 
-			"$mMask" : ["string", "Mascara de archivos. Una expresión regular o un array de ellas que será tratado con OR. Este parámetro será tratado con preg_quote", "null"],
-			"$sMode" : ["string", "
-				Modos de salida de información.<br />
-				<ul>
-					<li><b>single:</b> array con los paths completos de los archivos y directorios listados</li>
-					<li><b>signed:</b> idem anterior pero con un * antepuesto cuando el path corresponda a un directorio</li>
-					<li><b>info:</b> información detallada de los archivos y directorios listados, sujeto a la disponibilidad del dato
-						<ul>
-							<li><b>type:</b> file o dir</li>
-							<li><b>basename:</b> nombre del archivo</li>
-							<li><b>extension:</b> extensión del archivo</li>
-							<li><b>filename:</b> nombre del archivo sin extensión</li>
-							<li><b>protocol:</b> protocolo del archivo</li>
-							<li><b>path:</b> path completo desde $sPath</li>
-							<li><b>bytes:</b> tamaño en bytes</li>
-							<li><b>size:</b> tamaño en la unidad de medida mas grande</li>
-							<li><b>chmod:</b> permisos</li>
-							<li><b>timestamp:</b> fecha UNIX</li>
-							<li><b>date:</b> fecha en formato Y-m-d H:i:s</li>
-							<li><b>image:</b> true o false</li>
-						</ul>
-					</li>
-					<li><b>single-h:</b> idem single pero incluirá los archivos y carpetas que comienzen con . (ocultos)</li>
-					<li><b>signed-h:</b> idem signed pero incluirá los archivos y carpetas que comienzen con . (ocultos)</li>
-					<li><b>info-h:</b> idem info pero incluirá los archivos y carpetas que comienzen con . (ocultos)</li>
-				</ul>
-			", "single"],
-			"$bRecursive" : ["boolean", "Búsqueda en modo recursivo", "false"],
-			"$sChildren" : ["string", "Nombre del nodo que se utilizará para anidar resultados cuando $bRecursive=true", "_children"],
-			"$bIni" : ["boolean", "Reservada para uso interno de la función", "true"]
-		},
-		"examples" : {
-			"Modo SINGLE (no recursivo)" : "
-				$ls = $ngl("files")->ls("public_html");
-				print_r($ls);
-				
-				# salida
-				Array (
-					[0] => public_html/files
-					[1] => public_html/functions.js
-					[2] => public_html/gallery.html
-					[3] => public_html/images
-					[4] => public_html/index.html
-					[5] => public_html/robots.txt
-					[6] => public_html/styles.css
-				)
-			",
-			"Modo SINGLE (recursivo)" : "
-				$ls = $ngl("files")->ls("public_html", "*", "single", true);
-				print_r($ls);
-				
-				# salida
-				Array (
-					[0] => public_html/files
-					[1] => public_html/files/document.docx
-					[2] => public_html/files/info.docx
-					[3] => public_html/functions.js
-					[4] => public_html/gallery.html
-					[5] => public_html/images
-					[6] => public_html/images/image1.gif
-					[7] => public_html/images/image2.gif
-					[8] => public_html/images/image3.gif
-					[9] => public_html/index.html
-					[10] => public_html/robots.txt
-					[11] => public_html/styles.css
-				)
-			",
-			"Modo SIGNED (no recursivo)" : "
-				$ls = $ngl("files")->ls("public_html", "*", "signed");
-				print_r($ls);
-				
-				# salida
-				Array (
-					[0] => *public_html/files
-					[1] => public_html/functions.js
-					[2] => public_html/gallery.html
-					[3] => *public_html/images
-					[4] => public_html/index.html
-					[5] => public_html/robots.txt
-					[6] => public_html/styles.css
-				)
-			",
-			"Modo INFO (no recursivo)" : "
-				$ls = $ngl("files")->ls("public_html/files", "*.docx", "info");
-				print_r($ls);
-				
-				# salida
-				Array (
-					[document.docx] => Array (
-						[type] => file
-						[basename] => document.docx
-						[extension] => docx
-						[filename] => document
-						[protocol] => filesystem
-						[path] => public_html/files/document.docx
-						[bytes] => 364495
-						[size] => 355.95KB
-						[chmod] => 0666
-						[timestamp] => 1361469382
-						[date] => 2013-02-21 14:56:22
-						[mime] => application/vnd.openxmlformats-officedocument.wordprocessingml.document
-						[image] => 
-					)
-
-					[info.docx] => Array (
-						[type] => file
-						[basename] => info.docx
-						[extension] => docx
-						[filename] => info
-						[protocol] => filesystem
-						[path] => public_html/files/info.docx
-						[bytes] => 87310
-						[size] => 85.26KB
-						[chmod] => 0666
-						[timestamp] => 1425914852
-						[date] => 2015-03-09 12:27:32
-						[mime] => application/vnd.openxmlformats-officedocument.wordprocessingml.document
-						[image] => 
-					)
-				)
-			"
-		},
-		"return" : "array"
-	} **/
 	public function ls($sPath=".", $mMask=null, $sMode="single", $bRecursive=false, $sChildren="_children", $bIni=true) {
 		if(\strpos($sMode, "-")) {
 			$sMode = \strstr($sMode, "-", true);
 			$bHiddenFiles = true;
 		}
 		$sMode = \strtolower($sMode);
-	
+
 		if($bIni) {
 			$sPath = \str_replace("*", "", $sPath);
 			$sPath = self::call()->clearPath($sPath);
@@ -397,7 +150,7 @@ class nglFiles extends nglFeeder implements inglFeeder {
 			} else {
 				$sMask = "/".\preg_quote($mMask)."/i";
 			}
-			
+
 			$sMask = \str_replace("\*", ".*", $sMask);
 		} else {
 			$sMask = $mMask;
@@ -426,11 +179,11 @@ class nglFiles extends nglFeeder implements inglFeeder {
 					} else if(!$sMask || ($sMask && \preg_match($sMask, $sFile))) {
 						$aDirs[$vTree["basename"]] = $vTree;
 					}
-					
+
 				}
 			} else {
 				if(!$sMask || ($sMask && \preg_match($sMask, $sFile))) {
-					$sFilename = ($sMode=="signed" && $bDir) ? "*".$sFile : $sFile; 
+					$sFilename = ($sMode=="signed" && $bDir) ? "*".$sFile : $sFile;
 					$aDirs = \array_merge($aDirs, [$sFilename]);
 				}
 
@@ -442,42 +195,7 @@ class nglFiles extends nglFeeder implements inglFeeder {
 
 		return $aDirs;
 	}
-	
-	/** FUNCTION {
-		"name" : "lsprint",
-		"type" : "public",
-		"description" : "imprime el árbol de un directorio de manera recursiva",
-		"parameters" : { 
-			"$sPath" : ["string", "Directorio", "."], 
-			"$mMask" : ["string", "Mascara de archivos. Una expresión regular o un array de ellas que será tratado con OR", "null"],
-			"$sChildren" : ["string", "Nombre del nodo que se utilizará para anidar resultados cuando $bRecursive=true", "_children"]
-		},
-		"examples" : {
-			"Ejemplo" : "
-				echo $ngl("files")->lsprint("bootstrap");
-			
-				# salida
-				bootstrap
-				├── css/
-				│   ├── bootstrap.css
-				│   ├── bootstrap.css.map
-				│   ├── bootstrap.min.css
-				│   ├── bootstrap-theme.css
-				│   ├── bootstrap-theme.css.map
-				│   └── bootstrap-theme.min.css
-				├── js/
-				│   ├── bootstrap.js
-				│   └── bootstrap.min.js
-				└── fonts/
-					├── glyphicons-halflings-regular.eot
-					├── glyphicons-halflings-regular.svg
-					├── glyphicons-halflings-regular.ttf
-					├── glyphicons-halflings-regular.woff
-					└── glyphicons-halflings-regular.woff2
-			",
-		},
-		"return" : "array"
-	} **/
+
 	public function lsprint($sPath=".", $mMask=null, $sChildren="_children") {
 		$aLs = $this->ls($sPath, $mMask, "info", true, $sChildren);
 		$aList = self::call()->treeWalk($aLs, function($aFile, $nLevel, $bFirst, $bLast) {
@@ -493,12 +211,6 @@ class nglFiles extends nglFeeder implements inglFeeder {
 		return implode($aList);
 	}
 
-	/** FUNCTION {
-		"name" : "maxUploadSize",
-		"type" : "public",
-		"description" : "Retorna el máximo tamaño de archivo soportado por al configuración del servidor",
-		"return" : "int"
-	} **/
 	public function maxUploadSize() {
 		$nUpload 	= \ini_get("upload_max_filesize");
 		$nUpload 	= self::call()->strSizeDecode($nUpload);
@@ -509,16 +221,6 @@ class nglFiles extends nglFeeder implements inglFeeder {
 		return \min($nUpload, $nPost, $nMemory);
 	}
 
-	/** FUNCTION {
-		"name" : "mkdirr",
-		"type" : "public",
-		"description" : "Crea un directorio. Si el directorio ya existe y $bForce es TRUE, mkdir le agregará al nombre del directorio el sufijo _N donde N es el número de directorio con el mismo nombre +1 ",
-		"parameters" : { 
-			"$sPath" : ["string", "Directorio", "."], 
-			"$bForce" : ["boolean", "Fuerza la creación del directorio", "false"]
-		},
-		"return" : "boolean"
-	} **/
 	public function mkdirr($sPath, $bForce=false) {
 		$sPath = self::call()->sandboxPath($sPath);
 		if(!$bForce) {
@@ -553,20 +255,10 @@ class nglFiles extends nglFeeder implements inglFeeder {
 			}
 			@\chmod($sPath, NGL_CHMOD_FOLDER);
 		}
-		
+
 		return true;
 	}
-	
-	/** FUNCTION {
-		"name" : "RebuildFILES",
-		"type" : "private",
-		"description" : "Toma el array $aFiles (de estructura igual a $_FILES) y lo reordena de manera recursiva, para optener una lectura mas natural",
-		"parameters" : { 
-			"$aFiles" : ["array", "Array de archivos"], 
-			"$bTop" : ["boolean", "Indica cual es la primer iteración del método", "true"],
-		},
-		"return" : "array"
-	} **/
+
 	private function RebuildFILES($aFiles, $bTop=true) {
 		$vFiles = [];
 		foreach($aFiles as $sName => $aFile){
@@ -593,66 +285,7 @@ class nglFiles extends nglFeeder implements inglFeeder {
 
 		return $vFiles;
 	}
-	
-	/** FUNCTION {
-		"name" : "unlinkr",
-		"type" : "public",
-		"description" : "
-			Elimina archivos y directorios de manera recursiva. Retorna un Array de 2 indices:
-			<ul>
-				<li><b>0:</b> Cantidad de archivos y directorios eliminados</li>
-				<li><b>1:</b> Log con el detalla de cada una de las operaciones</li>
-			</ul>
-		",
-		"parameters" : { 
-			"$sSource" : ["string", "Target de borrado. Si el target es un directorio y la cadena NO termina con un slash, el mismo tambien será eliminado luego de vaciarse."], 
-			"$sMask" : ["string", "Mascara de archivos. Una expresion regular o un array de ellas que será tratado con OR", "*"],
-			"$bRecursive" : ["boolean", "Determina si se deben incluir carpetas y sub-carpetas", "true"],
-			"$bIncludeHidden" : ["boolean", "Determina si se deben eliminar los archivos y carpetas ocultos", "false"],
-			"$bLog" : ["boolean", "Activa el log", "true"]
-		},
-		"examples" : {
-			"Borrado completo" : "
-				$del = $ngl("files")->unlinkr("/home/user2/mydocs");
-				print_r($del);
 
-				#salidas
-				Array (
-					[0] => 9
-					[1] =>
-						delete	"/home/user2/mydocs/docs/bar.doc"
-						delete	"/home/user2/mydocs/docs/foo.doc"
-						delete 	"/home/user2/mydocs/docs"
-						delete	"/home/user2/mydocs/images/image1.jpg"
-						delete	"/home/user2/mydocs/images/image2.jpg"
-						delete	"/home/user2/mydocs/images/image3.jpg"
-						delete	"/home/user2/mydocs/images/image3.jpg"
-						delete 	"/home/user2/mydocs/images"
-						delete 	"/home/user2/mydocs"
-				)
-			",
-			"Borradon sólo el contenido" : "
-				$del = $ngl("files")->unlinkr("/home/user2/mydocs/");
-				print_r($del);
-
-				#salidas
-				Array (
-					[0] => 9
-					[1] =>
-						delete	"/home/user2/mydocs/docs/bar.doc"
-						delete	"/home/user2/mydocs/docs/foo.doc"
-						delete 	"/home/user2/mydocs/docs"
-						delete	"/home/user2/mydocs/images/image1.jpg"
-						delete	"/home/user2/mydocs/images/image2.jpg"
-						delete	"/home/user2/mydocs/images/image3.jpg"
-						delete	"/home/user2/mydocs/images/image3.jpg"
-						delete 	"/home/user2/mydocs/images"
-				)
-			"
-		},
-		"seealso" : ["nglFiles::copyr"],
-		"return" : "array"
-	} **/
 	public function unlinkr($sSource, $sMask="*", $bRecursive=true, $bIncludeHidden=false, $bLog=false) {
 		$sMode = ($bIncludeHidden) ? "signed-h" : "signed";
 		$aFiles = $this->ls($sSource, $sMask, $sMode, $bRecursive);
@@ -660,14 +293,14 @@ class nglFiles extends nglFeeder implements inglFeeder {
 
 		$sEnd = \substr($sSource, -1, 1);
 		if($sMask=="*" && $sEnd!="/" && $sEnd!="\\") { $aFiles[] = "*".$sSource; }
-		
+
 		$aLog = [];
 		$nDeleted = 0;
 
 		foreach($aFiles as $sFile) {
 			$nDir = (!empty($sFile) && $sFile[0]=="*") ? 1 : 0;
 			$sFile = \substr($sFile, $nDir);
-		
+
 			if(\file_exists($sFile)) {
 				if(!$nDir) {
 					@\unlink($sFile);
@@ -681,28 +314,14 @@ class nglFiles extends nglFeeder implements inglFeeder {
 				if($bLog) { $aLog[] = "error \t".$sFile."\n"; }
 			}
 		}
-		
+
 		$aReport = [];
 		$aReport[]	= $nDeleted;
 		if($bLog) { $aReport["log"] = \implode($aLog); }
-		
+
 		return $aReport;
 	}
 
-	/** FUNCTION {
-		"name" : "upload",
-		"type" : "public",
-		"description" : "
-			Aplica move_uploaded_file a los multiples archivos encontrados en $_FILES y retorna un reporte
-		",
-		"parameters" : { 
-			"$mDestine" : ["mixed", "Ruta de destino o array asociativo de las mismas, donde cada índice será el mismo que en el array $_FILES"], 
-			"$bOriginalName" : ["boolean", "copia el archivo con su nombre original"], 
-			"$aExtensions" : ["array", "de extensiones soportadas"], 
-			"$nLimit" : ["int", "Tamaño máximo soportado para los archivos. Si no se especifica se aplicará el valor de <b>nglFiles::maxUploadSize</b>", "null"],
-		},
-		"return" : "array"
-	} **/
 	public function upload($mDestine, $bOriginalName=false, $aExtensions=null, $nLimit=null) {
 		$vUploads = ["errors"=>0, "report"=>[], "files"=>[]];
 
@@ -733,17 +352,17 @@ class nglFiles extends nglFeeder implements inglFeeder {
 
 						case UPLOAD_ERR_NO_FILE:
 							$vUploads["errors"]++;
-							$vUploads["report"][$sIndex] = self::errorMessage($this->object, 1013); 
+							$vUploads["report"][$sIndex] = self::errorMessage($this->object, 1013);
 							break;
 
 						case UPLOAD_ERR_NO_TMP_DIR:
 							$vUploads["errors"]++;
-							$vUploads["report"][$sIndex] = self::errorMessage($this->object, 1014); 
+							$vUploads["report"][$sIndex] = self::errorMessage($this->object, 1014);
 							break;
 
 						case UPLOAD_ERR_CANT_WRITE:
 							$vUploads["errors"]++;
-							$vUploads["report"][$sIndex] = self::errorMessage($this->object, 1015); 
+							$vUploads["report"][$sIndex] = self::errorMessage($this->object, 1015);
 							break;
 
 						default:
@@ -777,9 +396,9 @@ class nglFiles extends nglFeeder implements inglFeeder {
 						$vFile["mimetype"]	= $vFile["type"];
 						$vFile["image"]		= $bIsImage;
 						$vFile["field"]		= $mIndex;
-						
+
 						unset($vFile["error"], $vFile["tmp_name"], $vFile["name"], $vFile["type"]);
-						
+
 						$vUploads["files"][$sIndex] 	= $vFile;
 						$vUploads["report"][$sIndex]	= "OK";
 					} else {
@@ -789,7 +408,7 @@ class nglFiles extends nglFeeder implements inglFeeder {
 				}
 			}
 		}
-		
+
 		return $vUploads;
 	}
 }

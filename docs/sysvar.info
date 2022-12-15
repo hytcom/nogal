@@ -1,7 +1,7 @@
-[checksum]
-md5 = "f580a8aa5344f439556b7b0b4ae54911"
-sha1 = "fb76838f9118e105996abfa533660d85e212bd6e"
-
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/sysvar.md"
-
+[info]
+_help = "### sysvar\
+Objeto CORE\
+Establece y almacena las variables de entorno\
+\
+https://github.com/hytcom/wiki/blob/master/nogal/docs/sysvar.md\
+"

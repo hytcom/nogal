@@ -1,0 +1,26 @@
+<?php defined("NGL_SOWED") || exit();
+
+// determinacion del origen de datos ---------------------------------------------------------------
+if(isset($_SERVER["REQUEST_METHOD"])) {
+	$aRequest = ($_SERVER["REQUEST_METHOD"]=="GET") ? $_GET : $_POST; // datos enviados
+}
+
+// ejecucion del nut -----------------------------------------------------------------------------
+try {
+	$aNut = \explode("/", NGL_GARDENS_PLACE["URLPATH"]);
+	\array_shift($aNut);
+	$sNut = \array_shift($aNut);
+	$sMethod = (isset($aNut[0])) ? \array_shift($aNut) : $sNut;
+	$aRequest["_NUT"] = [
+		"path" => NGL_GARDENS_PLACE["URLPATH"],
+		"name" => $sNut,
+		"method" => $sMethod,
+		"args" => $aNut
+	];
+	$nut = $ngl("nut.".$sNut);
+	echo $nut->run($sMethod, $aRequest);
+} catch (Exception $e) {
+	die($e->getMessage());
+}
+
+?>

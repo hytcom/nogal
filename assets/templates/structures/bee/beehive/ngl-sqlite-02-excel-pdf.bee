@@ -1,0 +1,38 @@
+# ==============================================================================
+# IMPORTANTE
+# antes de ejecutar, se debe ejecutar el ejemplo ngl-sqlite-01-load-csv.bee 
+# para generar la carga de datos
+# ==============================================================================
+
+# creacion de la DB
+sqlite base {@NGL_PATH_TMP}/demo.sqlite
+-$: pass demo
+-$: connect
+-$: error_description true
+-$: error_query true
+@set db -$:
+
+# consulta de datos
+{$db} query "SELECT * FROM estaciones WHERE ramal = 'Mitre'"
+-$: getall
+
+# ------------------------------------------
+# desescapar los bloques de a uno a la vez
+# ------------------------------------------
+
+# salida a terminal ------------------------------------------------------------
+shift texttable -$:
+
+
+# salida a excel ---------------------------------------------------------------
+# @set data -$:
+# excel load {@NGL_PATH_TMP}/demo.xls
+# -$: set ["A1", "{$data}"]
+# -$: save
+
+
+# salida a pdf -----------------------------------------------------------------
+# shift html ["-$:", {"border":"1"}]
+# @set data -$:
+# pdf load {@NGL_PATH_TMP}/demo.pdf
+# -$: save {$data}

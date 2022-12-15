@@ -1,7 +1,26 @@
-[checksum]
-md5 = "a9ccf3d55f4e6989e4fef7a7d264b15a"
-sha1 = "88424bee11f597116ab29248ca29ec642fbae8fa"
+[info]
+_help = "### sess\
+Objeto CORE\
+Gesiona el almacenamiento y recuperación de información asociada con una sesión o varias sesiones.\
+Esta clase permite gestionar las sesiones en base de datos o de manera nativa.\
+\
+Para sessiones en bases de datos\
+DROP TABLE IF EXISTS `__ngl_sessions__`;\
+CREATE TABLE `__ngl_sessions__` (\
+	`id` VARCHAR(32) NOT NULL DEFAULT '',\
+	`expire` INT(11) NOT NULL DEFAULT '0',\
+	`persistent` ENUM('0', '1') NOT NULL DEFAULT '0',\
+	`data` BLOB NOT NULL,\
+	PRIMARY KEY (`id`) \
+);\
+CREATE INDEX `expire_idx` ON `__ngl_sessions__` (`expire` DESC);\
+CREATE INDEX `persistent_idx` ON `__ngl_sessions__` (`persistent`);\
+\
+https://github.com/hytcom/wiki/blob/master/nogal/docs/sess.md\
+"
 
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/sess.md"
-
+[errors]
+0001 = "Las sesiones nativas de PHP no soportan el método count"
+0002 = "Las sesiones nativas de PHP no soportan el método destroyAll"
+0003 = "Las sesiones nativas de PHP no soportan el método persistent"
+0004 = "Las sesiones nativas de PHP no soportan el método showSessions"

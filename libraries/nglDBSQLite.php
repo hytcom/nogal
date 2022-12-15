@@ -1,69 +1,14 @@
 <?php
+/*
+# nogal
+*the most simple PHP Framework* by hytcom.net
+GitHub @hytcom/nogal
+___
 
+# sqlite
+https://hytcom.net/nogal/docs/objects/sqlite.md
+*/
 namespace nogal;
-
-/** CLASS {
-	"name" : "nglDBSQLite",
-	"object" : "sqlite",
-	"type" : "instanciable",
-	"revision" : "20160201",
-	"extends" : "nglBranch",
-	"interfaces" : "iNglDataBase",
-	"description" : "Gestiona conexciones con bases de datos SQLite.",
-	"configfile" : "sqlite.conf",
-	"variables" : {
-		"$link" : ["private", "Puntero"],
-		"$vModes" : ["private", "Modos de INSERT y UPDATE"]
-	},
-	"arguments": {
-		"autoconn" : ["boolean", "Cuando es TRUE, ejecuta el método connect luego de crear el objeto. Sólo usar en TRUE cuando se utilicen archivos .conf", "false"],
-		"base" : ["string", "Ruta del archivo de base de datos", "null"],
-		"check_colnames" : ["boolean", "Activa el chequeo de los nombre de las columnas en la tabla activa", "true"],
-		"debug" : ["boolean", "Cuando es TRUE él método retorna la sentencia SQL en lugar de ejecutarla", "false"],
-		"do" : ["boolean", "Cuando es TRUE el método query ejecuta la sentencia pero no retorna resultado", "false"],
-		"error_description" : ["boolean", "Ante un error mostrará la descripción del mismo", "false"],
-		"error_query" : ["boolean", "Ante un error mostrará la consulta que le dió origen", "false"],
-		"flags" : ["string", "Banderas opcionales para determinar cómo abrir la base de datos SQLite", "SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE"],
-		"insert_mode" : ["string", "Tipo de modo INSERT. Valores admitidos:
-			<ul>
-				<li><b>INSERT:</b> inserta nuevos registros</li>
-				<li><b>REPLACE:</b> si el nuevo registro duplica un valor PRIMARY KEY o UNIQUE, el antiguo registro es eliminado</li>
-				<li><b>IGNORE:</b> el comando no aborta incluso si ocurren errores durante la ejecución</li>
-			</ul>
-		", "INSERT"],
-		"jsql" : ["mixed", "
-			Sentencia SQL en formato JSON o Array:
-			<ul>
-				<li>columns</li>
-				<li>tables</li>
-				<li>where</li>
-				<li>group</li>
-				<li>having</li>
-				<li>order</li>
-				<li>offset</li>
-				<li>limit</li>
-			</ul>
-		", "null"],
-		"jsql_eol" : ["string", "Salto de linea luego de cada parte de la sentencia", ""],
-		"pass" : ["string", "Clave de encriptación opcional usada cuando se encripta o desencripta una base de datos", "null"],
-		"sql" : ["string", "Ultima sentencia SQL ejecutada o próxima a ejecutarse", "null"],
-		"table" : ["string", "Nombre de la tabla activa en los métodos INSERT y UPDATE", "null"],
-		"update_mode" : ["string", "Tipo de modo UPDATE. Valores admitidos:
-			<ul>
-				<li><b>UPDATE:</b> actualiza los registros especificados</li>
-				<li><b>REPLACE:</b> crea un nuevo registro en caso de no hallar el registro especificados</li>
-				<li><b>IGNORE:</b> el comando no aborta incluso si ocurren errores durante la ejecución</li>
-			</ul>
-		", "UPDATE"],
-		"values" : ["string", "Datos enviados a los métodos INSERT y UPDATE. Valores admitidos:
-			<ul>
-				<li><b>array asociativo:</b> donde cada clave es el nombre del campo en la tabla</li>
-				<li><b>cadena de variables:</b> con el mismo formato que las pasadas por medio de una URL. El valor será analizado utilizando <b>parse_str</b></li>
-			</ul>
-		", "null"],
-		"where" : ["string", "Cadena que representa una condición SQL WHERE", "null"]
-	}
-} **/
 class nglDBSQLite extends nglBranch implements iNglDataBase {
 
 	private $link;
@@ -80,13 +25,11 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 		$vArguments["error_query"]			= ['self::call()->istrue($mValue)', false];
 		$vArguments["field"]				= ['$mValue', null];
 		$vArguments["flags"]				= ['(int)$mValue', (SQLITE3_OPEN_READWRITE | SQLITE3_OPEN_CREATE)];
-		$vArguments["insert_mode"]			= ['$mValue', "INSERT"];
-		$vArguments["jsql"]					= ['$mValue', null];
-		$vArguments["jsql_eol"]				= ['$mValue', ""];
+		$vArguments["insert_mode"]			= ['\strtoupper($mValue)', "INSERT",["INSERT","REPLACE","IGNORE"]];
 		$vArguments["pass"]					= ['$mValue', null];
 		$vArguments["sql"]					= ['$mValue', null];
 		$vArguments["table"]				= ['(string)$mValue', null];
-		$vArguments["update_mode"]			= ['\strtoupper($mValue)', "UPDATE"];
+		$vArguments["update_mode"]			= ['\strtoupper($mValue)', "UPDATE",["UPDATE","REPLACE","IGNORE"]];
 		$vArguments["values"]				= ['$mValue', null];
 		$vArguments["where"]				= ['$mValue', null];
 
@@ -113,27 +56,10 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 		}
 	}
 
-	/** FUNCTION {
-		"name" : "close",
-		"type" : "public",
-		"description" : "Finaliza la conexión con la base de datos",
-		"return": "boolean"
-	} **/
 	public function close() {
 		return $this->link->close();
 	}
 
-	/** FUNCTION {
-		"name" : "connect",
-		"type" : "public",
-		"description" : "Establece la conexión con la base de datos",
-		"parameters" : { 
-			"$sBase" : ["string", "", "argument::base"],
-			"$sPass" : ["string", "", "argument::pass"],
-			"$nFlags" : ["string", "", "argument::flags"]
-		},
-		"return": "$this"
-	} **/
 	public function connect() {
 		list($sBase, $sPass, $nFlags) = $this->getarguments("base,pass,flags", \func_get_args());
 		$sPass = self::passwd($sPass, true);
@@ -142,23 +68,11 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 		return $this;
 	}
 
-	/** FUNCTION {
-		"name" : "destroy",
-		"type" : "public",
-		"description" : "Cierra la conexión y destruye el objeto",
-		"return": "boolean"
-	} **/
 	public function destroy() {
 		$this->link->close();
 		return parent::__destroy__();
-	}	
+	}
 
-	/** FUNCTION {
-		"name" : "Error",
-		"type" : "private",
-		"description" : "Muestra el mensaje de Error generado por el fallo más reciente",
-		"return": "mixed"
-	} **/
 	private function Error() {
 		$sMsgError = "";
 		if($this->error_description) {
@@ -171,16 +85,31 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 		return self::errorMessage("SQLite", $this->link->lastErrorCode(), $sMsgError);
 	}
 
-	/** FUNCTION {
-		"name" : "escape",
-		"type" : "public",
-		"description" : "Escapa un valor para ser incluído de manera segura en una sentencia SQL",
-		"parameters" : { 
-			"$mValues" : ["mixed", "", "argument::values"]
-		},
-		"input": "values",
-		"return": "mixed"
-	} **/
+	public function describe() {
+		list($sTable) = $this->getarguments("table", \func_get_args());
+
+		$columns = $this->link->query("PRAGMA table_info(".$sTable.")");
+		$aFields = [];
+		while($aGetColumn = $columns->fetchArray(SQLITE3_ASSOC)) {
+			$aFields[$aGetColumn["cid"]] = [
+				"name" => $aGetColumn["name"],
+				"type" => $aGetColumn["type"],
+				"default" => $aGetColumn["dflt_value"],
+				"nullable" => $aGetColumn["notnull"] ? 'NO' : 'YES',
+				"index" => $aGetColumn["pk"] ? "PRIMARY KEY" : ""
+			];
+		}
+
+		$indexes = $this->link->query("PRAGMA index_list(".$sTable.")");
+		while($aIndex = $indexes->fetchArray(SQLITE3_ASSOC)) {
+			$index = $this->link->query("PRAGMA index_info('".$aIndex["name"]."')");
+			$aIndexCID = $index->fetchArray(SQLITE3_ASSOC);
+			$aFields[$aIndexCID["cid"]]["index"] = $aIndex["unique"] ? "UNIQUE" : "INDEX";
+		}
+
+		return $aFields;
+	}
+
 	public function escape() {
 		list($mValues) = $this->getarguments("values", \func_get_args());
 
@@ -213,15 +142,6 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 		return $mEscapedValues;
 	}
 
-	/** FUNCTION {
-		"name" : "exec",
-		"type" : "public",
-		"description" : "Ejecuta una sentencia SQL y retorna un objecto <b>SQLite3Result</b>",
-		"parameters" : { 
-			"$sQuery" : ["string", "", "argument::sql"]
-		},
-		"return": "SQLite3Result object"
-	} **/
 	public function exec() {
 		list($sQuery) = $this->getarguments("sql", \func_get_args());
 		if($this->debug) { return $sQuery; }
@@ -235,17 +155,6 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 		return $this->link;
 	}
 
-	/** FUNCTION {
-		"name" : "jsqlParser",
-		"type" : "public",
-		"description" : "Convierte una sentencia JSQL y retorna una sentencia SQL",
-		"parameters" : { 
-			"$mJSQL" : ["mixed", "", "argument::jsql"],
-			"$sEOL" : ["string", "Salto de linea que se insertará luego de cada parte de la sentencia", "argument::jsql_eol"] 
-		},
-		"seealso" : ["nglJSQL"],
-		"return" : "string"
-	} **/
 	public function jsqlParser() {
 		list($mJSQL, $sEOL) = $this->getarguments("jsql,jsql_eol", \func_get_args());
 		$aJSQL = (\is_string($mJSQL)) ? self::call("jsql")->decode($mJSQL) : $mJSQL;
@@ -282,12 +191,12 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 				}
 				$vSQL["columns"] = "SET ".$sSelect.$sEOL;
 				break;
-			
+
 			case "where":
 				return self::call("jsql")->conditions($aJSQL["where"]);
 				break;
 		}
-		
+
 		// tables
 		if(isset($aJSQL["tables"])) {
 			$sFirstTable = array_shift($aJSQL["tables"]);
@@ -299,7 +208,7 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 					$aFrom[] = "LEFT JOIN ".self::call("jsql")->column($aTable, "")." ON (".self::call("jsql")->conditions($aTable[2]).")".$sEOL;
 				}
 			}
-			
+
 			switch($sType) {
 				case "select":
 					$vSQL["tables"] = "FROM ".$sEOL.\implode(" ", $aFrom);
@@ -317,7 +226,7 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 
 		// where
 		$vSQL["where"] = (isset($aJSQL["where"])) ? "WHERE ".$sEOL.self::call("jsql")->conditions($aJSQL["where"]) : "";
-		
+
 		// group by
 		if(isset($aJSQL["group"])) {
 			$aGroup = [];
@@ -326,10 +235,10 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 			}
 			$vSQL["group"] = "GROUP BY ".$sEOL.\implode(", ", $aGroup);
 		}
-		
+
 		// having
 		if(isset($aJSQL["having"])) { $vSQL["having"] = "HAVING ".$sEOL.self::call("jsql")->conditions($aJSQL["having"]); }
-		
+
 		// order by
 		if(isset($aJSQL["order"])) {
 			$aOrder = [];
@@ -342,7 +251,7 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 			}
 			$vSQL["order"] = "ORDER BY ".$sEOL.\implode(", ".$sEOL, $aOrder);
 		}
-		
+
 		if(isset($aJSQL["limit"])) {
 			if(isset($aJSQL["offset"])) {
 				$vSQL["limit"] = "LIMIT ".(int)$aJSQL["offset"].", ".(int)$aJSQL["limit"];
@@ -350,7 +259,7 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 				$vSQL["limit"] = "LIMIT ".(int)$aJSQL["limit"];
 			}
 		}
-		
+
 		// sentencia SQL
 		$sSQL = "";
 		switch($sType) {
@@ -369,20 +278,11 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 		return $sSQL;
 	}
 
-	/** FUNCTION {
-		"name" : "mexec",
-		"type" : "public",
-		"description" : "Ejecuta varias sentencias SQL separadas por ; y retorna un array de objectos <b>SQLite3Result</b>",
-		"parameters" : { 
-			"$sQuery" : ["string", "", "argument::sql"]
-		},
-		"return": "array"
-	} **/
 	public function mexec() {
 		list($sQuery) = $this->getarguments("sql", \func_get_args());
 		$aQueries = self::call()->strtoArray($sQuery, ";");
 		if($this->debug) { return $aQueries; }
-		
+
 		$aResults = [];
 		foreach($aQueries as $sQuery) {
 			$sQuery = trim($sQuery);
@@ -394,21 +294,10 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 				}
 			}
 		}
-		
+
 		return $aResults;
 	}
 
-	/** FUNCTION {
-		"name" : "mquery",
-		"type" : "public",
-		"description" : "Ejecuta varias sentencias SQL separadas por ; y retorna un array de objectos <b>nglDBSQLiteQuery</b>, o TRUE cuando DO esta activo",
-		"parameters" : { 
-			"$sQuery" : ["string", "", "argument::sql"],
-			"$bDO" : ["boolean", "", "argument::do"]
-		},
-		"input": "sql, debug",
-		"return": "array"
-	} **/
 	public function mquery() {
 		list($sQuery,$bDO) = $this->getarguments("sql,do", \func_get_args());
 		$sQuery = \preg_replace("/^--(.*?)$/m", "", $sQuery);
@@ -437,36 +326,7 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 
 		return $aResults;
 	}
-	
-	/** FUNCTION {
-		"name" : "insert",
-		"type" : "public",
-		"description" : "Inserta un nuevo registro en una tabla",
-		"parameters" : { 
-			"$sTable" : ["string", "", "argument::table"],
-			"$mValues" : ["mixed", "", "argument::values"],
-			"$sMode" : ["string", "", "argument::insert_mode"]
-		},
-		"examples" : {
-			"datos en array": "
-				$foo = $ngl("sqlite.foobar");
-				$foo->base = "shop.sqlite";
-				$foo->connect();
-				
-				$data = array("foo"=>"foovalue", "bar"=>"barvalue");
-				$foo->insert("tablename", $data);
-			",
-			"datos como cadena de variables": "
-				$foo = $ngl("sqlite.foobar");
-				$foo->base = "shop.sqlite";
-				$foo->connect();
-				
-				$data="foobar&bar=barvalue"
-				$foo->insert("tablename", $data, "replace");
-			"
-		},
-		"return": "SQLite3Result object"
-	} **/
+
 	public function insert() {
 		list($sTable, $mValues, $sMode, $bCheckColumns) = $this->getarguments("table,values,insert_mode,check_colnames", \func_get_args());
 
@@ -482,26 +342,10 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 				return $this->query($sSQL);
 			}
 		}
-		
+
 		return false;
 	}
 
-	/** FUNCTION {
-		"name" : "PrepareValues",
-		"type" : "private",
-		"description" : "
-			Auxiliar de los métodos <b>insert</b> y <b>update</b>.
-			Prepara el <b>array asociativo</b> o la <b>cadena de variables</b> para ser utilizados en las sentencias.
-			Cuando los valores sean pasados como una <b>cadena de variables</b> estos serán tratados con <b>escape</b> para garantizar la seguridad del comando SQL.
-		",
-		"parameters" : { 
-			"$sType" : ["string", "Tipo de operación, INSERT o UPDATE"],
-			"$sTable" : ["string", "Nombre de la tabla"],
-			"$mValues" : ["mixed", "Datos en forma de array asociativo o cadena de variables"],
-			"$bCheckColumns" : ["boolean", "Activa el chequeo de columnas en la tabla", "true"]
-		},
-		"return": "SQLite3Result object"
-	} **/
 	private function PrepareValues($sType, $sTable, $mValues, $bCheckColumns) {
 		if(\is_array($mValues)) {
 			$aValues = $mValues;
@@ -511,7 +355,7 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 		} else {
 			return false;
 		}
-		
+
 		// campos validos
 		$aFields = \array_keys($aValues);
 		if($bCheckColumns) {
@@ -523,7 +367,7 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 			$columns->finalize();
 			$columns = null;
 		}
-		
+
 		// limpieza de campos inexistentes
 		$aNewValues = [];
 		if($bCheckColumns && !\count($aFields)) { return $aNewValues; }
@@ -540,31 +384,13 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 					if($bCheckColumns && !\in_array($sField, $aFields)) { unset($aValues[$sField]); continue; }
 					$mValue = ($mValue===null) ? "NULL" : "'".$mValue."'";
 					$aNewValues[] = "`".$sField."` = ".$mValue."";
-				}		
+				}
 			}
 		}
-		
+
 		return $aNewValues;
 	}
 
-	/** FUNCTION {
-		"name" : "query",
-		"type" : "public",
-		"description" : "Ejecuta una sentencia SQL y retorna un objecto <b>nglDBSQLiteQuery</b>",
-		"parameters" : { 
-			"$sQuery" : ["string", "", "argument::sql"],
-			"$bDO" : ["boolean", "", "argument::do"]
-		},
-		"examples": {
-			"conexión": "
-				$foo = $ngl("sqlite.foobar");
-				$foo->base = "shop.sqlite";
-				$foo->connect();
-				$bar = $foo->query("SELECT * FROM `users`");
-			"
-		},
-		"return": "nglDBSQLiteQuery object"
-	} **/
 	public function query() {
 		list($sQuery,$bDO) = $this->getarguments("sql,do", \func_get_args());
 
@@ -574,7 +400,7 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 		if(!$query = @$this->link->query($sQuery)) {
 			return $this->Error();
 		}
-		
+
 		if($bDO) {
 			if(method_exists($query, "finalize")) { $query->finalize(); }
 			return true;
@@ -591,36 +417,6 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 		return '"'.\str_replace(".",'"."',$sField).'"';
 	}
 
-	/** FUNCTION {
-		"name" : "update",
-		"type" : "public",
-		"description" : "Actualiza todos los registros que cumplan con la condición <b>$sWhere</b>",
-		"parameters" : { 
-			"$sTable" : ["string", "", "argument::table"],
-			"$mValues" : ["mixed", "", "argument::values"],
-			"$sWhere" : ["string", "", "argument::where"],
-			"$sMode" : ["string", "", "argument::update_mode"]
-		},
-		"examples" : {
-			"datos en array": "
-				$foo = $ngl("sqlite.foobar");
-				$foo->base = "shop.sqlite";
-				$foo->connect();
-				
-				$data = array("foo"=>"foovalue", "bar"=>"barvalue");
-				$foo->update("tablename", $data, "`id`='7'");
-			",
-			"datos como cadena de variables": "
-				$foo = $ngl("sqlite.foobar");
-				$foo->base = "shop.sqlite";
-				$foo->connect();
-				
-				$data="foobar&bar=barvalue"
-				$foo->update("tablename", $data, "`id`='7'", "ignore");
-			"
-		},
-		"return": "SQLite3Result object"
-	} **/
 	public function update() {
 		list($sTable, $mValues, $sWhere, $sMode, $bCheckColumns, $bDO) = $this->getarguments("table,values,where,update_mode,check_colnames,do", \func_get_args());
 
@@ -633,7 +429,7 @@ class nglDBSQLite extends nglBranch implements iNglDataBase {
 				return $this->query($sSQL, $bDO);
 			}
 		}
-		
+
 		return false;
 	}
 }

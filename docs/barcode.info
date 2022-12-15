@@ -1,9 +1,9 @@
-[checksum]
-md5 = "fa436d36c2172b7534068299ba2318f3"
-sha1 = "4024b9563c66f6de4b12e8b210200f48ff561e6f"
-
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/barcode.md"
+[info]
+_help = "### barcode\
+Implementa la clase 'barcode-generator', para generar Códigos de Barras\
+\
+https://github.com/hytcom/wiki/blob/master/nogal/docs/barcode.md\
+"
 
 [arguments]
 color = "Color de las barras en formato #RRGGBB"
@@ -45,4 +45,5 @@ type = "Algoritmo utilizado para generar el código. Códigos soportados:\
 "
 
 [errors]
-1000 = "No se pudo hallar la librería \Picqer\Barcode\BarcodeGenerator. Ejecutar 'compose update' en la carpeta grafts/composer"
+1000 = "Falta librería. Ejecutar 'composer update' en la carpeta NOGAL/grafts/composer"
+1001 = "Falta librería. Ejecutar 'composer update' en la carpeta NOGAL/grafts/composer luego de agregar a composer.json el paquete:"

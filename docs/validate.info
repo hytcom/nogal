@@ -1,9 +1,36 @@
-[checksum]
-md5 = "a59cb576235b08be8b6853164ce7ab0f"
-sha1 = "bcae194eaac668bd300aa627814ec804615deb3a"
-
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/validate.md"
+[info]
+_help = "### validate\
+Objeto CORE\
+Validación de variables basada en reglas\
+Cuenta con dos valores de configuración que impactan en el procesamiento de la variable **$_REQUEST**\
+	- proccess: Determina si se procesa o no la variable **$_REQUEST**. Default: **1**\
+	- from: Origen de la solicitud (HTTP_REFERER) LOCAL | ALL | HOST1,HOST2,HOSTn | IP1,IP2,IPn. Default: **LOCAL**\
+\
+Tipos de validaciones soportadas
+	all: Cualquier tipo de contenido\
+	alpha: Cadena compuesta unicamente por letras y espacios\
+	base64: Cadena en formato base64\
+	color: Color en formato hexadecimal #RGB, #RRGGBB ó #RRGGBBAA\
+	coords: par de geo coordenadas separadas por coma o punto y coma\
+	date: Fecha en formato YYYY-mm-dd\
+	datetime: Fecha y hora en formato YYYY-mm-dd HH:ii:ss\
+	email: Dirección de correo\
+	filename: Nombre de archivo\
+	html: Cualquier tipo de contenido. El valor será tratado con HTMLENTITIES\
+	imya: IMYA\
+	int: Números enteros [^0-9]\
+	number: Números formateados [0-9.,-]\
+	ipv4: Dirección IPV4\
+	ipv6: Dirección IPV6\
+	regex: Validación por expresiones regulares. La expresión regular es pasada por medio de la option pattern\
+	text: Cadena compuesta por letras, números, simbolos de uso frecuente y espacios\
+	time: Hora en formato YYYY-mm-dd HH:ii:ss\
+	url: URL http o ftp, segura o no\
+	string: Cadena compuesta por letras, números y espacios\
+	symbols: Solo símbolos y espacios\
+\
+https://github.com/hytcom/wiki/blob/master/nogal/docs/validate.md\
+"
 
 [request]
 _help = "Determina si se procesa o no la variable $_REQUEST. Valores posibles 0 ó 1\

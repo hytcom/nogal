@@ -1,0 +1,70 @@
+# ---------------------------------------------------
+# desescapar los bloques de carga de a uno a la vez
+# ---------------------------------------------------
+
+# carga de arbol
+tree source_type json-file
+-$: load {@NGL_PATH_DATA}/tree_example.json
+
+
+# carga de ramas individuales
+# tree source_type b-json-file
+# -$: load {@NGL_PATH_DATA}/tree_branches_example.json
+
+
+# ------------------------------------------
+# desescapar los bloques de a uno a la vez
+# ------------------------------------------
+
+# imprime el arbol -------------------------------------------------------------
+-$: show name
+
+
+# array multidimencional -------------------------------------------------------
+# -$: tree
+
+
+# array unidimencional ---------------------------------------------------------
+# -$: flat
+
+
+# obtener una rama -------------------------------------------------------------
+# -$: get 10
+
+
+# obtener el trace una rama ----------------------------------------------------
+# -$: trace 10
+
+
+# obtener todas las ramas completas para una columna ---------------------------
+# -$: branches name
+
+
+# obtener todas las ramas completas para una columna con otro separador --------
+# -$: branches ["name", " -> "]
+
+
+# obtener el padre de una rama -------------------------------------------------
+# -$: parent 10
+
+
+# obtener los ids de los hijos de una rama en formato cadena -------------------
+# -$: parentsChain 10
+
+
+# obtener los hijos de una rama ------------------------------------------------
+# -$: children 2
+
+
+# obtener los ids de los hijos de una rama en formato cadena -------------------
+# -$: childrenChain 2
+
+
+# añade una rama ---------------------------------------------------------------
+# -$: branch [{"id":"14", "parent":"9", "name":"rosa" }]
+# -$: show name
+
+
+# modifica una rama ------------------------------------------------------------
+# -$: branch [{"id":"12", "parent":"4", "name":"albino" }]
+# -$: show name

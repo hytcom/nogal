@@ -47,12 +47,12 @@ $ngl = new nglRoot($NGL_LIBS, $NGL_GRAFTS);
 unset($NGL_LIBS, $NGL_GRAFTS);
 
 // fuera de linea
-if(NGL_FALLEN) { $ngl()->errorPages(503); }
+if(NGL_FALLEN) { $ngl()->errorHTTP(503); }
 
 // session
-if(PHP_SAPI!="cli") {
-	if(\file_exists(NGL_PATH_PROJECT."/session.php")) {
-		require_once(NGL_PATH_PROJECT."/session.php");
+if(!NGL_TERMINAL) {
+	if(\file_exists(NGL_PATH_GARDEN."/session.php")) {
+		require_once(NGL_PATH_GARDEN."/session.php");
 	} else {
 		\session_start();
 	}
@@ -60,14 +60,14 @@ if(PHP_SAPI!="cli") {
 		$_SESSION[NGL_SESSION_INDEX] = ["SESS" => [],"ONCECODES" => []];
 	}
 
-	\define("SID", \session_id());
+	if(!\defined("SID")) { \define("SID", \session_id()); }
 	$ngl("sysvar")->sessionVars();
 	$ngl("validate");
 }
 
-// configuraciones del proyecto activo
-if(\file_exists(NGL_PATH_PROJECT."/settings.php")) {
-	require_once(NGL_PATH_PROJECT."/settings.php");
+// variables de entorno del proyecto
+if(\file_exists(NGL_PATH_GARDEN."/.env")) {
+	$ENV = $ngl()->parseConfigFile(NGL_PATH_GARDEN."/.env", true);
 }
 
 // alvin
@@ -77,7 +77,14 @@ if(NGL_ALVIN!==null || NGL_AUTHORIZED_IPS!==null) {
 	}
 }
 
-// cargado
+// nogal sembrado
 \define("NGL_SOWED", true);
+
+// rutas y redirecciones
+if(!NGL_TERMINAL && NGL_PATH_CROWN!==null) {
+	require_once(NGL_PATH_FRAMEWORK."/gardener.php");
+} else {
+	\define("NGL_GARDENS_PLACE", null);
+}
 
 ?>

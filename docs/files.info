@@ -1,9 +1,9 @@
-[checksum]
-md5 = "e9d73fb4447758ce47a9c3bd29d3d75f"
-sha1 = "bc3797458e44abba444a68bce444796667019337"
-
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/files.md"
+[info]
+_help = "### files\
+Métodos frecuentes para el manejo de archivos y directorios
+\
+https://github.com/hytcom/wiki/blob/master/nogal/docs/files.md\
+"
 
 [errors]
 1001 = "Acceso denegado"

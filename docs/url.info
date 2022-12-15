@@ -1,9 +1,26 @@
-[checksum]
-md5 = "2c11540a1d4562599f8f6a256bd826f1"
-sha1 = "c3d3f37642ffeafc797d61ab38a7962b2d7cd8a9"
-
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/url.md"
+[info]
+_help = "### url\
+Parsea URLs en sus diferentes componentes, permite actualizarlos y volver conformar la dirección\
+\
+Las URLs son parseadas en los atributos:\
+	- basename: nombre completo del archivo
+	- url: URL completa
+	- dirname: directorio del archivo
+	- extension: extensión del archivo
+	- filename: nombre sin extensión del archivo
+	- fragment: Referencia interna en el documento
+	- host: Dominio
+	- path: Path completo del archivo apuntado
+	- params: Request query parseado como array
+	- pass: Contraseña (en caso de existir)
+	- port: Puerto
+	- query: Request query
+	- scheme: Protocolo
+	- ssl: Determina si el protocolo es un protocolo seguro
+	- user: Nombre de usuario (en caso de existir)\
+\
+https://github.com/hytcom/wiki/blob/master/nogal/docs/url.md\
+"
 
 [arguments]
 argument = "Argumento que desea modificarse"

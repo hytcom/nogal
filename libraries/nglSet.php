@@ -1,79 +1,28 @@
 <?php
-
-namespace nogal;
-
-/** CLASS {
-	"name" : "nglSet",
-	"object" : "set",
-	"type" : "instanciable",
-	"revision" : "20150930",
-	"extends" : "nglBranch",
-	"interfaces" : "inglBranch",
-	"description" : "Operaciones con listas.",
-	"arguments": {
-		"data" : ["string", "Cadena de valores separados por <b>splitter</b>", ""],
-		"splitter" : ["string", "Separador utilizado en <b>data</b>", ","],
-		"item" : ["mixed", "Elemento activo del set"],
-		"index" : ["int", "Indice del elemento activo", "null"],
-		"referer" : ["int", "Posición de referencia en relación a <b>place</b> cuando este es: before ó after", "null"],
-		"place" : ["string", "Nueva posicion para el item, (first|before|after|last)", "last"],
-		"needle" : ["mixed", "Valor de un elemento a buscar utilizando nglSet::find", "null"],
-		"regex" : ["boolean", "Indica si <b>needle</b> es ó no una expresión regular", "false"]
-	}
-	
-} **/
-
 /*
-/*
-$s = $ngl("set.")->load("anana,banana,coco,damasco");
-// $s->startzero();
-$s->startone();
-echo "list: ".$s->text()."<br />";
-echo "list: ".$s->get(3)."<br />";
+# nogal
+*the most simple PHP Framework* by hytcom.net
+GitHub @hytcom/nogal
+___
 
-// $s->insert("pera");
-// echo "list: ".$s->text()."<br />";
-
-$s->insert("frutilla","after",3);
-echo "list: ".$s->text()."<br />";
-
-/*
-echo "<br />";
-$s->update("BANANAS",2);
-echo "list: ".$s->text()."<br />";
-
-exit();
-
-echo "list: ".$s->text()."<br />";
-$n = $s->indexof("anana");
-$m = $s->indexof("pera");
-$s->swap($n,$m);
-echo "list: ".$s->text()."<br />";
-
-
-$s->jump($n);
-while(true) {
-	echo "borrando: ".$s->get("current")."<br />";
-	if($s->delete()===false) { break; }
-	echo "list: ".$s->text()."<br />";
-}
-echo "list: ".$s->text()."<br />";
+# set
+https://hytcom.net/nogal/docs/objects/set.md
 */
-
+namespace nogal;
 class nglSet extends nglBranch implements inglBranch {
-	
+
 	private $bZero;
 
 	final protected function __declareArguments__() {
 		$vArguments					= [];
 		$vArguments["data"]			= ['(string)$mValue'];
-		$vArguments["splitter"]		= ['(string)$mValue', ","];
-		$vArguments["item"]			= ['$mValue'];
 		$vArguments["index"]		= ['(int)$mValue', null];
-		$vArguments["referer"]		= ['(int)$mValue', null];
-		$vArguments["place"]		= ['$mValue', "last"];
+		$vArguments["item"]			= ['$mValue'];
 		$vArguments["needle"]		= ['$mValue', null];
+		$vArguments["place"]		= ['$mValue', "last"];
+		$vArguments["referer"]		= ['(int)$mValue', null];
 		$vArguments["regex"]		= ['self::call()->isTrue($mValue)', false];
+		$vArguments["splitter"]		= ['(string)$mValue', ","];
 		return $vArguments;
 	}
 
@@ -85,7 +34,7 @@ class nglSet extends nglBranch implements inglBranch {
 		$vAttributes["current"]		= null;
 		return $vAttributes;
 	}
-	
+
 	final protected function __declareVariables__() {
 	}
 
@@ -95,14 +44,17 @@ class nglSet extends nglBranch implements inglBranch {
 
 	public function startzero(){
 		$this->bZero = true;
+		return $this;
 	}
 
 	public function startone(){
 		$this->bZero = false;
+		return $this;
 	}
 
 	private function Index(&$nIndex) {
 		if(!$this->bZero) { $nIndex--; }
+		return $nIndex;
 	}
 
 	public function find() {
@@ -138,7 +90,7 @@ class nglSet extends nglBranch implements inglBranch {
 	public function length() {
 		return $this->attribute("length");
 	}
-	
+
 	public function prev() {
 		$nCurrent = $this->attribute("current");
 		if($nCurrent==0) { return false; }
@@ -201,19 +153,19 @@ class nglSet extends nglBranch implements inglBranch {
 		return $this;
 	}
 
-	/** FUNCTION {
-	update: Reasigna la posicion de un item en un Set de datos.
-	Input:
-		$mSet = Set de datos;
-		$sCurrent = item a ordenar;
-		$sPlace = nueva posicion para el item, (first|before|after|last);
-		$nReferer = posicion de referencia cuando $sPlace = (before|after);
-	**/
 	public function insert() {
 		list($sCurrent, $sPlace, $nReferer) = $this->getarguments("item,place,referer", \func_get_args());
 
 		$aSet = $this->attribute("array");
 		$this->Index($nReferer);
+
+		if($nReferer!==null) {
+			if($nReferer>count($aSet)) {
+				$sPlace = "last";
+			} else if($nReferer<0) {
+				$sPlace = "first";
+			}
+		}
 
 		// ordenamiento
 		$sPlace = \strtolower($sPlace);
@@ -221,7 +173,7 @@ class nglSet extends nglBranch implements inglBranch {
 			case ($sPlace=="first"):
 				\array_unshift($aSet, $sCurrent);
 				break;
-		
+
 			case ($sPlace=="before" && $nReferer!==null):
 				$aSet = \array_reverse($aSet, true);
 
@@ -230,23 +182,20 @@ class nglSet extends nglBranch implements inglBranch {
 					$aNewSequence[] = $mItem;
 					if($nKey==$nReferer) { $aNewSequence[] = $sCurrent; }
 				}
+
 				$aSet = ($sPlace=="before") ? \array_reverse($aNewSequence, true) : $aNewSequence;
 				break;
-			
+
 			case ($sPlace=="last"):
 			default:
 				$aSet[] = $sCurrent;
 				break;
 		}
-	
+
 		$this->RebuildAttributes($aSet);
 		return $this;
 	}
-	
-	/*
-	Elimina y conserva la posición del puntero
-	Cuando la posicion del puntero sea igual al rango de la lista, el metodo reseteara el puntero y retornara false
-	*/
+
 	public function delete() {
 		list($nIndex) = $this->getarguments("index", \func_get_args());
 		if($nIndex==null) {
@@ -256,7 +205,8 @@ class nglSet extends nglBranch implements inglBranch {
 		}
 
 		$aSet = $this->attribute("array");
-		if(isset($aSet[$nIndex])) {
+		if($nIndex<0) { $nIndex = count($aSet)-1; }
+		if(\array_key_exists($nIndex, $aSet)) {
 			unset($aSet[$nIndex]);
 			if($this->bZero) { $nIndex++; }
 			$this->RebuildAttributes($aSet, $nIndex);
@@ -276,7 +226,7 @@ class nglSet extends nglBranch implements inglBranch {
 		}
 
 		$aSet = $this->attribute("array");
-		if(isset($aSet[$nIndex])) {
+		if(\array_key_exists($nIndex, $aSet)) {
 			$aSet[$nIndex] = $sItem;
 			if($this->bZero) { $nIndex++; }
 			$this->RebuildAttributes($aSet, $nIndex);

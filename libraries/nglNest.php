@@ -1,17 +1,12 @@
 <?php
 /*
-# Nogal
+# nogal
 *the most simple PHP Framework* by hytcom.net
-GitHub @hytcom
+GitHub @hytcom/nogal
 ___
-  
+
 # nest
-## nglNest *extends* nglBranch [2018-10-29]
-Nest es la herramienta para crear y mantener la estructura de base de datos del objeto [owl](https://github.com/hytcom/wiki/blob/master/nogal/docs/owl.md), en MySQSL.  
-
-https://github.com/hytcom/wiki/blob/master/nogal/docs/nest.md
-https://github.com/hytcom/wiki/blob/master/nogal/docs/owluso.md
-
+https://hytcom.net/nogal/docs/objects/nest.md
 */
 namespace nogal;
 
@@ -40,37 +35,37 @@ class nglNest extends nglBranch {
 		$vArguments							= [];
 		$vArguments["about"]				= ['$mValue', null];
 		$vArguments["after"]				= ['$mValue', true];
+		$vArguments["canvas_height"]		= ['(int)$mValue', 900];
+		$vArguments["canvas_width"]			= ['(int)$mValue', 1800];
 		$vArguments["comment"]				= ['$mValue'];
 		$vArguments["core"]					= ['self::call()->istrue($mValue)', false];
 		$vArguments["db"]					= ['$this->SetBase($mValue)', null];
 		$vArguments["der"]					= ['self::call()->istrue($mValue)', false];
-		$vArguments["structure"]			= ['$mValue', null];
-		$vArguments["newname"]				= ['$mValue', null];
-		$vArguments["select"]				= ['$this->SetObject($mValue)', null];
-		$vArguments["type"]					= ['$mValue', "varchar"];
-		$vArguments["field"]				= ['$mValue', null];
-		$vArguments["using"]				= ['$mValue', null];
-		$vArguments["label"]				= ['$mValue', null];
+		$vArguments["enclosed"]				= ['$mValue', '"'];
 		$vArguments["entity"]				= ['$mValue', null];
-		$vArguments["title"]				= ['$mValue', null];
-		$vArguments["filepath"]				= ['$mValue', null];
+		$vArguments["eol"]					= ['$mValue', "\r\n"];
+		$vArguments["field"]				= ['$mValue', null];
 		$vArguments["fields"]				= ['(array)$mValue', null];
-		$vArguments["run"]					= ['(boolean)$mValue', false];
-		$vArguments["nestdata"]				= ['$this->SetNestData($mValue)', null];
-		$vArguments["left"]					= ['(int)$mValue', 0];
-		$vArguments["top"]					= ['(int)$mValue', 0];
-		$vArguments["objcfg_var"]			= ['$mValue', null];
-		$vArguments["objcfg_val"]			= ['(int)$mValue', 0];
-		$vArguments["canvas_width"]			= ['(int)$mValue', 1800];
-		$vArguments["canvas_height"]		= ['(int)$mValue', 900];
+		$vArguments["filepath"]				= ['$mValue', null];
 		$vArguments["gui_part"]				= ['$mValue', "table"];
+		$vArguments["label"]				= ['$mValue', null];
+		$vArguments["left"]					= ['(int)$mValue', 0];
+		$vArguments["nestdata"]				= ['$this->SetNestData($mValue)', null];
+		$vArguments["newname"]				= ['$mValue', null];
 		$vArguments["normalize_code"]		= ['$mValue', "Código"];
 		$vArguments["normalize_name"]		= ['$mValue', "Nombre"];
-		$vArguments["enclosed"]				= ['$mValue', '"'];
-		$vArguments["splitter"]				= ['$mValue', ";"];
-		$vArguments["eol"]					= ['$mValue', "\r\n"];
+		$vArguments["objcfg_val"]			= ['(int)$mValue', 0];
+		$vArguments["objcfg_var"]			= ['$mValue', null];
 		$vArguments["roles"]				= ['(int)$mValue', 0];
-		
+		$vArguments["run"]					= ['(boolean)$mValue', false];
+		$vArguments["select"]				= ['$this->SetObject($mValue)', null];
+		$vArguments["splitter"]				= ['$mValue', ";"];
+		$vArguments["structure"]			= ['$mValue', null];
+		$vArguments["title"]				= ['$mValue', null];
+		$vArguments["top"]					= ['(int)$mValue', 0];
+		$vArguments["type"]					= ['$mValue', "varchar"];
+		$vArguments["using"]				= ['$mValue', null];
+
 		return $vArguments;
 	}
 
@@ -137,7 +132,7 @@ class nglNest extends nglBranch {
 	protected function SetNestData($sNestFile=null) {
 		$sNestFile = self::call()->clearPath($sNestFile);
 		$sNestFile = self::call()->sandboxPath($sNestFile);
-		if(!\file_exists($sNestFile)) { $sNestFile = NGL_PATH_DATA."/nest.json"; }
+		if(!\file_exists($sNestFile)) { $sNestFile = NGL_PATH_FRAMEWORK.NGL_DIR_SLASH."assets".NGL_DIR_SLASH."data".NGL_DIR_SLASH."nest.json"; }
 		if(\file_exists($sNestFile)) {
 			$sJsonNest = \file_get_contents($sNestFile);
 			$aJsonNest = \json_decode($sJsonNest, true);
@@ -152,12 +147,12 @@ class nglNest extends nglBranch {
 			$this->aFields 			= $aFields;
 			$this->aPresets			= $aPresets;
 			$this->aPresetFields	= $aPresetFields;
-		}		
+		}
 	}
 
 	public function add() {
 		if($this->attribute("objtype")!="table") {
-			self::errorMessage($this->object, 1012); // invalid action on a view
+			self::errorMessage($this->object, 1003);
 			return false;
 		}
 
@@ -221,10 +216,10 @@ class nglNest extends nglBranch {
 		if($sField=="id" || $sField=="imya" || $sField=="state") { return $this; }
 
 		if($sField===null || $sObject===null) {
-			self::errorMessage($this->object, 1005); // empty object or field name
+			self::errorMessage($this->object, 1005);
 			return false;
 		} else if(isset($this->owl["tables"][$sObject][$sField]) && $this->bAlterField===false) {
-			self::errorMessage($this->object, 1006, $sField); // field alredy exists
+			self::errorMessage($this->object, 1006, $sField);
 			return false;
 		}
 
@@ -327,10 +322,10 @@ class nglNest extends nglBranch {
 		$sObject = $this->attribute("object");
 
 		if($sObject==null) {
-			self::errorMessage($this->object, 1001); // empty object name
+			self::errorMessage($this->object, 1001);
 			return false;
 		} else if(!isset($this->owl["tables"][$sObject])) {
-			self::errorMessage($this->object, 1004, $sObject); // object doesn't exists
+			self::errorMessage($this->object, 1004, $sObject);
 			return false;
 		}
 		if($sTitle!==null) { $this->owl["titles"][$sObject] = $sTitle; }
@@ -351,13 +346,13 @@ class nglNest extends nglBranch {
 		list($sObject, $sTitle, $aFields, $sComment) = $this->getarguments("entity,title,fields,comment", \func_get_args());
 
 		if($sObject==null) {
-			self::errorMessage($this->object, 1001); // empty object name
+			self::errorMessage($this->object, 1001);
 			return false;
 		} else if(isset($this->owl["tables"][$sObject])) {
 			if(isset($this->aAutoNormalize[$sObject])) {
 				unset($this->aAutoNormalize[$sObject], $this->owl["tables"][$sObject]);
 			} else {
-				self::errorMessage($this->object, 1002, $sObject); // object alredy exists
+				self::errorMessage($this->object, 1002, $sObject);
 				return false;
 			}
 		} else if(isset($this->aAutoNormalize[$sObject])) {
@@ -407,7 +402,7 @@ class nglNest extends nglBranch {
 					$aTable = \explode(":", $sTable);
 					$sAlias = $sParent."_".$aTable[1];
 					$aRelations[] = "-- PARENT JOINED TO ".$aTable[1]." AS '".$sAlias."' [__parent_".$aTable[1]."] USING ".$aTable[0]." FIELD";
-	
+
 					$aSelect = \array_merge($aSelect, $this->DescribeColumns($aTable[1], $sAlias));
 					$aFrom[] = "LEFT JOIN ".$aTable[1]." ".$sAlias." ON ".$sAlias.".id = ".$sParent.".".$aTable[0];
 				}
@@ -452,7 +447,7 @@ class nglNest extends nglBranch {
 
 		$sRelations = \implode("\n", $aRelations);
 		if($sAbout=="relations") { return $sRelations; }
-		
+
 		$sView = "CREATE VIEW view_".$sObject." AS (\n";
 		$sView .= "\tSELECT\n\t\t".\implode(",\n\t\t", $aSelect)."\n";
 		$sView .= "\tFROM\n\t\t".\implode("\n\t\t", $aFrom)."\n";
@@ -484,7 +479,7 @@ class nglNest extends nglBranch {
 
 	public function drop() {
 		if($this->attribute("objtype")!="table") {
-			self::errorMessage($this->object, 1012); // invalid action on a view
+			self::errorMessage($this->object, 1003);
 			return false;
 		}
 
@@ -524,7 +519,7 @@ class nglNest extends nglBranch {
 
 	public function createCode() {
 		if($this->attribute("objtype")!="table") {
-			self::errorMessage($this->object, 1012); // invalid action on a view
+			self::errorMessage($this->object, 1003);
 			return false;
 		}
 
@@ -538,7 +533,7 @@ class nglNest extends nglBranch {
 
 	public function createNestCode() {
 		if($this->attribute("objtype")!="table") {
-			self::errorMessage($this->object, 1012); // invalid action on a view
+			self::errorMessage($this->object, 1003);
 			return false;
 		}
 
@@ -577,7 +572,7 @@ class nglNest extends nglBranch {
 
 			foreach($aDescribe as $aField) {
 				$sField = \strtolower($aField["name"]);
-				
+
 				if($sField=="id" || $sField=="imya" || $sField=="state") {
 					if(isset($aCurrent)) { continue; }
 					$sField .= "_".$sHash;
@@ -631,7 +626,7 @@ class nglNest extends nglBranch {
 
 	public function generate() {
 		list($bRun) = $this->getarguments("run", \func_get_args());
-		if($this->db===null) { self::errorMessage($this->object, 1009); } // undefined DB driver
+		if($this->db===null) { self::errorMessage($this->object, 1009); }
 
 		$aDbConfig = [];
 		$aDbConfig["debug"] = $this->db->debug;
@@ -745,7 +740,7 @@ class nglNest extends nglBranch {
 				}
 			}
 		}
-		
+
 		if(\is_array($this->aStarred) && \count($this->aStarred)) {
 			// TODO: indices de texto completo, y borrado de indice. llevar a la clase del controlador
 			/*
@@ -776,7 +771,7 @@ class nglNest extends nglBranch {
 				}
 			}
 		}
-		
+
 		// ESTRUCTURA
 		$sJSONCompact = $this->db->escape($sJSONCompact);
 		$sOwlBackup = "owl_".\date("YmdHis");
@@ -788,7 +783,7 @@ class nglNest extends nglBranch {
 
 		$sSQL .= "-- EMPTIES THE TABLE __ngl_owl_structure__ --\n";
 		$sSQL .= "TRUNCATE TABLE ".$this->db->quote("__ngl_owl_structure__").";\n\n";
-		
+
 		// COLUMNAS
 		$sSQL .= "-- BEGIN COLUMNS --\n";
 		if(isset($aOWL["tables"])) {
@@ -819,7 +814,7 @@ class nglNest extends nglBranch {
 			}
 		}
 		$sSQL .= "-- END COLUMNS --\n\n";
-		
+
 		// FOREIGNKEYS
 		if(isset($aOWL["foreignkeys"])) {
 			$sSQL .= "-- BEGIN FOREIGNKEYS --\n";
@@ -829,19 +824,19 @@ class nglNest extends nglBranch {
 					$sRef = \str_replace(".", ":", $sRef);
 					$aRef = \explode(":", $sRef, 3);
 					$aForeignkeys["fields"][$aRef[0]] = $aRef[0];
-		
+
 					if(!isset($aForeignkeys["tables"][$aRef[1]])) { $aForeignkeys["tables"][$aRef[1]] = []; }
 					$aForeignkeys["tables"][$aRef[1]][] = $aRef[2];
 				}
 				$aForeignkeys["fields"] = \array_values($aForeignkeys["fields"]);
 				$sForeignkeys = \json_encode($aForeignkeys);
-		
+
 				$sForeignkeys = $this->db->escape($sForeignkeys);
 				$sSQL .= $this->db->update("__ngl_owl_structure__", ["foreignkey"=>$sForeignkeys], "name='".$sTable."'").";\n";
 			}
 			$sSQL .= "-- END FOREIGNKEYS --\n\n";
 		}
-		
+
 		// JOINS
 		$aJoins = [];
 		if(isset($aOWL["joins"])) {
@@ -856,7 +851,7 @@ class nglNest extends nglBranch {
 				}
 			}
 		}
-		
+
 		if(isset($aOWL["children"])) {
 			foreach($aOWL["children"] as $sTable => $aChildren) {
 				if(!isset($aJoins[$sTable])) { $aJoins[$sTable] = ["joins"=>[], "children"=>[], "parent"=>""]; }
@@ -867,7 +862,7 @@ class nglNest extends nglBranch {
 				}
 			}
 		}
-		
+
 		if(\is_array($aJoins) && \count($aJoins)){
 			$sSQL .= "-- BEGIN JOINS-CHILDREN --\n";
 			foreach($aJoins as $sTable => $aJoin) {
@@ -879,7 +874,7 @@ class nglNest extends nglBranch {
 			}
 			$sSQL .= "-- END JOINS-CHILDREN --\n\n";
 		}
-		
+
 		// VALIDATOR
 		if(isset($aOWL["validator"])) {
 			$sSQL .= "-- BEGIN VALIDATOR --\n";
@@ -888,21 +883,21 @@ class nglNest extends nglBranch {
 				foreach($aFields as $sField => $aRules) {
 					$aField = [];
 					$aField["type"] = $aRules["type"];
-					
+
 					foreach($aRules["options"] as $sOption => $mValue) {
 						if($mValue==="") { unset($aRules["options"][$sOption]); }
 					}
 					if(\is_array($aRules["options"]) && \count($aRules["options"])) { $aField["options"] = $aRules["options"]; }
-					
+
 					if(isset($aRules["rule"])) {
 						foreach($aRules["rule"] as $sRule => $mValue) {
 							if($mValue!=="") { $aField[$sRule] = $mValue; }
 						}
 					}
-		
+
 					$aValidator[$sField] = $aField;
 				}
-		
+
 				$sValidator = \json_encode($aValidator);
 				$sValidator = $this->db->escape($sValidator);
 				$sSQL .= $this->db->update("__ngl_owl_structure__", ["validate_insert"=>$sValidator], "name='".$sTable."'").";\n";
@@ -968,10 +963,10 @@ class nglNest extends nglBranch {
 		$sWith = $this->FormatName($sWith);
 		$sUsing = $this->FormatName($sUsing);
 		if($sField===null || $sObject===null || $sUsing===null) {
-			self::errorMessage($this->object, 1005); // field name, empty object or using name
+			self::errorMessage($this->object, 1005);
 			return false;
 		} else if(!isset($this->owl["tables"][$sObject]) && !isset($this->owl["views"][$sWith]) && !isset($this->owl["foreigns"][$sObject])) {
-			self::errorMessage($this->object, 1011, $sField); // with object dosent exists
+			self::errorMessage($this->object, 1007, $sField);
 			return false;
 		}
 
@@ -1169,7 +1164,7 @@ class nglNest extends nglBranch {
 
 		return false;
 	}
-	
+
 	public function presets() {
 		$aPresets = $this->aPresets;
 		ksort($aPresets);
@@ -1178,7 +1173,7 @@ class nglNest extends nglBranch {
 
 	public function rem() {
 		if($this->attribute("objtype")!="table") {
-			self::errorMessage($this->object, 1012); // invalid action on a view
+			self::errorMessage($this->object, 1003);
 			return false;
 		}
 
@@ -1192,10 +1187,10 @@ class nglNest extends nglBranch {
 
 		$sObject = $this->attribute("object");
 		if($mField===null || $sObject===null) {
-			self::errorMessage($this->object, 1005, $sObject); // empty object or field name
+			self::errorMessage($this->object, 1005, $sObject);
 			return false;
 		} else if(!isset($this->owl["tables"][$sObject][$mField])) {
-			self::errorMessage($this->object, 1008, $sObject.".".$mField); // field doesn't exists
+			self::errorMessage($this->object, 1008, $sObject.".".$mField);
 			return false;
 		}
 
@@ -1237,13 +1232,13 @@ class nglNest extends nglBranch {
 		$sObject = $this->attribute("object");
 		$sNewName = $this->FormatName($sNewName);
 		if($sObject==null || $sNewName==null) {
-			self::errorMessage($this->object, 1001); // empty object name
+			self::errorMessage($this->object, 1001);
 			return false;
 		} else if(!isset($this->owl["tables"][$sObject])) {
-			self::errorMessage($this->object, 1004, $sObject); // object doesn't exists
+			self::errorMessage($this->object, 1004, $sObject);
 			return false;
 		} else if(isset($this->owl["tables"][$sNewName]) && $sObject!=$sNewName) {
-			self::errorMessage($this->object, 1002, $sNewName); // object alredy exists
+			self::errorMessage($this->object, 1002, $sNewName);
 			return false;
 		}
 
@@ -1340,7 +1335,7 @@ class nglNest extends nglBranch {
 				$this->owl["children"][$sParent] = $aChildren;
 			}
 		}
-	
+
 		return $this;
 	}
 
@@ -1350,13 +1345,13 @@ class nglNest extends nglBranch {
 		$sObject = $this->attribute("object");
 		$sJoined = $this->FormatName($sJoined);
 		if($sObject==null || $sJoined==null) {
-			self::errorMessage($this->object, 1001); // empty object name
+			self::errorMessage($this->object, 1001);
 			return false;
 		} else if(!isset($this->owl["tables"][$sObject])) {
-			self::errorMessage($this->object, 1004, $sObject); // object doesn't exists
+			self::errorMessage($this->object, 1004, $sObject);
 			return false;
-		} else if(!isset($this->owl["views"][$sJoined]) && !isset($this->owl["foreigns"][$sJoined])) {
-			self::errorMessage($this->object, 1004, $sJoined); // object doesn't exists
+		} else if(!isset($this->owl["views"][$sJoined]) && !isset($this->owl["foreigns"][$sJoined]) && !isset($this->owl["tables"][$sJoined])) {
+			self::errorMessage($this->object, 1004, $sJoined);
 			return false;
 		}
 
@@ -1388,7 +1383,7 @@ class nglNest extends nglBranch {
 		// views
 		unset($this->owl["foreigns"][$sJoined]["joins"][$sObject]);
 		unset($this->owl["views"][$sJoined]["joins"][$sObject]);
-		
+
 		return $this;
 	}
 
@@ -1460,7 +1455,7 @@ class nglNest extends nglBranch {
 				$aGetColumns = $aData[0];
 				break;
 		}
-	
+
 		// columnas
 		$aColumns = $aFields = [];
 		foreach($aGetColumns as $sColumn) {
@@ -1506,7 +1501,7 @@ class nglNest extends nglBranch {
 				if(!$this->create($sObject, $sTitle, $aColumns)) { return false; }
 			}
 		}
-		
+
 		return $this;
 	}
 
@@ -1543,10 +1538,10 @@ class nglNest extends nglBranch {
 		list($sObject, $sTitle) = $this->getarguments("entity,title", \func_get_args());
 		$sObject = $this->FormatName($sObject);
 		if($sObject==null) {
-			self::errorMessage($this->object, 1001); // empty object name
+			self::errorMessage($this->object, 1001);
 			return false;
 		} else if(isset($this->owl["views"][$sObject]) || isset($this->owl["foreigns"][$sObject])) {
-			self::errorMessage($this->object, 1002, $sObject); // object alredy exists
+			self::errorMessage($this->object, 1002, $sObject);
 			return false;
 		}
 
@@ -1561,10 +1556,10 @@ class nglNest extends nglBranch {
 		list($sObject, $sTitle) = $this->getarguments("entity,title", \func_get_args());
 		$sObject = $this->FormatName($sObject);
 		if($sObject==null) {
-			self::errorMessage($this->object, 1001); // empty object name
+			self::errorMessage($this->object, 1001);
 			return false;
 		} else if(isset($this->owl["views"][$sObject]) || isset($this->owl["foreigns"][$sObject])) {
-			self::errorMessage($this->object, 1002, $sObject); // object alredy exists
+			self::errorMessage($this->object, 1002, $sObject);
 			return false;
 		}
 
@@ -1577,21 +1572,6 @@ class nglNest extends nglBranch {
 
 	private function CreateStructure() {
 		$sSQL = self::call("owl")->connect($this->db)->dbStructure();
-
-		$sSQL .= "\n\n".$this->jsql->query(<<<SQL
-{
-	"query": "create",
-	"table" : "__ngl_sentences__",
-	"comment" : "Almacena sentencias SQL utilizadas en el proyecto. Esta tabla es fundamental para el funcionamiento de NEST",
-	"columns" : [
-		{"name":"name", "type":"VARCHAR", "length":"128", "index":"PRIMARY"},
-		{"name":"type", "type":"ENUM", "length":"'function','procedure','query','structure','trigger','view'", "default":"'query'", "comment":"tipo de sentencia"},
-		{"name":"sentence", "type":"MEDIUMTEXT", "comment":"sentencia SQL"},
-		{"name":"dependencies", "type":"MEDIUMTEXT", "null":"true", "comment":"nombre de tablas/views separados por coma, de las cuales depende la sentencia"},
-		{"name":"notes", "type":"VARCHAR", "length":"255", "null":"true"}
-	]
-}
-SQL);
 		return $sSQL."\n\n-- PROJECT ENTITIES ------------------------------------------------------------\n";
 	}
 
@@ -1604,7 +1584,7 @@ SQL);
 
 		if($this->bUpdate==false || isset($this->aAdd[$sTable]) || isset($this->aAlterField[$sTable]) || $bCreate) {
 			if(\array_key_exists("pid", $aTableFields)) { $aTableFields["pid"] = ["name"=>"pid", "type"=>"INT", "null"=>"true", "index"=>"INDEX"]; }
-			\array_unshift($aTableFields, 
+			\array_unshift($aTableFields,
 				["name"=>"id", "type"=>"INT", "index"=>"PRIMARY", "autoinc"=>"true"],
 				["name"=>"imya", "type"=>"CHAR", "length"=>"32", "index"=>"UNIQUE"],
 				["name"=>"state", "type"=>"ENUM", "length"=>"'0','1'", "default"=>"'1'", "null"=>true, "comment"=>"NULL=eliminado, 0=inactivo, 1=activo"]
@@ -1645,7 +1625,7 @@ SQL);
 						$sSQLStructure .= $this->jsql->query(["query"=>"coladd", "table"=>$sTable, "column"=>$aTableFields[$sField]])."\n";
 					}
 				}
-				
+
 				if(isset($aTableFields[$sField]["oldname"]) && !empty($aTableFields[$sField]["oldindex"])) {
 					$aIndex[] = $this->jsql->query(["query"=>"indexdrop", "table"=>$sTable, "column"=>$aTableFields[$sField]["oldname"]])."\n";
 				}
@@ -1762,10 +1742,10 @@ SQL);
 			$this->attribute("object", $sObject);
 			$this->attribute("objtype", "view");
 		} else {
-			self::errorMessage($this->object, 1004, $sObject); // object doesn't exists
+			self::errorMessage($this->object, 1004, $sObject);
 			return false;
 		}
-		
+
 		return $sObject;
 	}
 
@@ -1804,9 +1784,9 @@ SQL);
 				}
 
 				$aStructure[$sTable] = [
-					"title"		=> $sTitle, 
-					"name"		=> $sTable, 
-					"parent"	=> $sParent, 
+					"title"		=> $sTitle,
+					"name"		=> $sTable,
+					"parent"	=> $sParent,
 					"columns"	=> $aColumns
 				];
 			}
@@ -1819,7 +1799,7 @@ SQL);
 						if(!isset($aStructure[$aJoin[1]]["columns"]["id"]["rjoin"])) {
 							$aStructure[$aJoin[1]]["columns"]["id"]["rjoin"] = [];
 						}
-						
+
 						$aStructure[$aJoin[1]]["columns"]["id"]["rjoin"][$sTable] = ["table"=>$sTable, "using"=>$aJoin[0]];
 					}
 				}

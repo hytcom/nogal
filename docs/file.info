@@ -1,14 +1,22 @@
-[checksum]
-md5 = "227791d2e1063f8201e32659151db2a6"
-sha1 = "df0a90fec6dfb696b17891cddf04d0dfa1269ff2"
-
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/file.md"
+[info]
+_help = "### file\
+Crea un objeto sobre archivos y/o directorio
+\
+https://github.com/hytcom/wiki/blob/master/nogal/docs/file.md\
+"
 
 [arguments]
 content = "Contenido del archivo"
 curl_options = "Opciones CURL para este tipo de conexiones, http://php.net/manual/en/function.curl-setopt.php"
 downname = "Nombre que se asignará al archivo en caso de download"
+extend_info = "Añade a la información del objeto los datos:\
+	bytes\
+	size\
+	chmod\
+	timestamp\
+	date\
+	query\
+"
 filepath = "Ruta del archivo o directorio relativa a NGL_SANDBOX"
 hugefile = "Establece si el archivo es un archivo grande, en los métodos de lectura y escritura"
 length = "Tamaño máximo en bytes del archivo contemplado para lectura o escritura"

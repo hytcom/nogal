@@ -1,5 +1,5 @@
 <?php
-require_once("config.php");
+require_once("<{=NOGALDIRS=}>/config.php");
 ?>
 <!DOCTYPE html>
 <html>
@@ -18,6 +18,7 @@ require_once("config.php");
 			.success { background-color: #00AB00; color: #FFFFFF; font-size: 18px; font-weight: bold; margin: 10px; padding: 10px; text-align: center; }
 			.error { background-color: #AB0000; color: #FFFFFF; margin: 4px; padding: 4px; text-align: center; }
 			h3 { padding: 10px !important; text-align:left; }
+			li a { font-size: 14px; line-height:1.5rem; }
 		</style>
 	</head>
 	<body>
@@ -35,8 +36,8 @@ require_once("config.php");
 				<defs>
 					<style type="text/css">
 						<![CDATA[
-							.cup {fill:#607D8B;fill-rule:nonzero}
-							.trunk {fill:#607D8B;fill-rule:nonzero}
+							.cup {fill:#000000;fill-rule:nonzero}
+							.trunk {fill:#AB0000;fill-rule:nonzero}
 						]]>
 					</style>
 				</defs>
@@ -61,6 +62,28 @@ require_once("config.php");
 			<br /><br />
 			<h3>CONSTANTS</h3>
 			<?php echo $ngl("shift")->html($ngl()->constants(), ["classes"=>"table table-striped table-bordered"]); ?>
+			<br /><br />
+			<h3>TESTS</h3>
+			<table class="class table table-striped table-bordered">
+				<tr class="class-head">
+					<th width="30%" class="class-head-cell">RIND</th>
+					<td class="class-cell">
+						<ul>
+							<li><a href="/test" target="_blank">TEST</a></li>
+							<li><a href="/test-env" target="_blank">TEST-ENV</a></li>
+							<li><a href="/test-nut" target="_blank">TEST-NUT</a></li>
+					</td>
+				</tr>
+				<tr class="class-head">
+					<th class="class-head-cell">NUTS LINKS</th>
+					<td class="class-cell">
+						<ul>
+							<li><a href="/nut/pecan/color" target="_blank">WITHOUT ARGUMENTS</a></li>
+							<li><a href="/nut/pecan/getjson?url=https://cdn.upps.cloud/json/postas_vacunacion_covid.geojson&claim=features&format=json" target="_blank">WITH ARGUMENTS</a></li>
+						</ul>
+					</td>
+				</tr>
+			</table>
 		</div>
 	</body>
 </html>

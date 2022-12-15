@@ -1,7 +1,8 @@
-[checksum]
-md5 = "bb4d6372d09e8b98f175402bc26834d7"
-sha1 = "78a131cec9442e99ba9aff6764a9be9d35395533"
+[info]
+_help = "### dates\
+Utilidades para operaciones con fechas y horas y generación de calendarios\
+\
+https://github.com/hytcom/wiki/blob/master/nogal/docs/dates.md
+"
 
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/dates.md"
-
+[errors]

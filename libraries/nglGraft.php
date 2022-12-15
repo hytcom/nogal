@@ -1,7 +1,12 @@
 <?php
-namespace nogal;
-
 /*
+# nogal
+*the most simple PHP Framework* by hytcom.net
+GitHub @hytcom/nogal
+___
+
+Gestor de librerias Grafts
+
 load:
 	classname
 	path/subpath/classname
@@ -10,6 +15,7 @@ load:
 
 	classname = php classname and php file
 */
+namespace nogal;
 class nglGraft extends nglTrunk {
 
 	public $graft;
@@ -90,7 +96,7 @@ class nglGraft extends nglTrunk {
 				"parameters" => $aParams
 			];
 		}
-		
+
 		return $aMethods;
 	}
 }

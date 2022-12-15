@@ -1,19 +1,14 @@
 <?php
 /*
-# Nogal
+# nogal
 *the most simple PHP Framework* by hytcom.net
-GitHub @hytcom
+GitHub @hytcom/nogal
 ___
-  
-# mysql
-## nglFile *extends* nglBranch *implements* inglBranch [2018-09-08]
-Crea un objeto sobre archivos y/o directorio
 
-https://github.com/hytcom/wiki/blob/master/nogal/docs/file.md
-
+# file
+https://hytcom.net/nogal/docs/objects/file.md
 */
 namespace nogal;
-
 class nglFile extends nglBranch implements inglBranch {
 
 	private $hugeReader;
@@ -25,14 +20,14 @@ class nglFile extends nglBranch implements inglBranch {
 		$vArguments["content"]				= ['$mValue'];
 		$vArguments["curl_options"]			= ['$mValue'];
 		$vArguments["downname"]				= ['(string)$mValue', null];
+		$vArguments["extend_info"]			= ['self::call()->istrue($mValue)', false];
 		$vArguments["filepath"]				= ['(string)$mValue'];
-		$vArguments["saveaspath"]			= ['(string)$mValue', null];
 		$vArguments["hugefile"]				= ['self::call()->istrue($mValue)', false];
 		$vArguments["length"]				= ['(int)$mValue', 0];
 		$vArguments["mimetype"]				= ['(string)$mValue', null];
-		$vArguments["extend_info"]			= ['self::call()->istrue($mValue)', false];
 		$vArguments["outtype"]				= ['(string)$mValue', null];
 		$vArguments["reload"]				= ['self::call()->istrue($mValue)', true];
+		$vArguments["saveaspath"]			= ['(string)$mValue', null];
 		return $vArguments;
 	}
 
@@ -78,7 +73,7 @@ class nglFile extends nglBranch implements inglBranch {
 	public function download() {
 		list($sDownName,$sMimeType) = $this->getarguments("downname,mimetype", \func_get_args());
 		$sFilePath = $this->attribute("path");
-		
+
 		if($sFilePath===null) {
 			self::errorMessage($this->object, 1002);
 			return false;
@@ -109,14 +104,14 @@ class nglFile extends nglBranch implements inglBranch {
 
 	public function fill() {
 		list($sContent,$nLength) = $this->getarguments("content,length", \func_get_args());
-	
+
 		$sFilePath = $this->attribute("path");
 		if($sFilePath===null) {
 			self::errorMessage($this->object, 1002);
 			return false;
 		}
 		if($nLength<1 || $nLength > PHP_INT_MAX) { $nLength = 0; }
-		
+
 		if($sContent===null) { $sContent = "\x00"; }
 		$nContent = \strlen($sContent);
 
@@ -153,7 +148,7 @@ class nglFile extends nglBranch implements inglBranch {
 			$bURL = true;
 			$sProtocol = $sScheme;
 		}
-		
+
 		if($bURL) {
 			$aFilePath = \explode("?", $sFilePath, 2);
 			$sFilePath = $aFilePath[0];
@@ -161,7 +156,7 @@ class nglFile extends nglBranch implements inglBranch {
 			$bIsDir = (\substr($sFilePath, -1)=="/");
 			$vFile["type"] 		= $bIsDir ? "dir" : "file";
 			$vFile["basename"]	= \basename($sFilePath);
-			
+
 			$aBasename = $bIsDir ? [] : \explode(".", $vFile["basename"]);
 			if(\count($aBasename)>1) {
 				$vFile["extension"] = \array_pop($aBasename);
@@ -170,7 +165,7 @@ class nglFile extends nglBranch implements inglBranch {
 				$vFile["extension"] = "";
 				$vFile["filename"] = $vFile["basename"];
 			}
-			
+
 			$vFile["protocol"]	= $sProtocol ;
 			$vFile["path"] 		= $sFilePath;
 			if($this->extend_info) {
@@ -182,14 +177,12 @@ class nglFile extends nglBranch implements inglBranch {
 				$vFile["query"] 	= (isset($aFilePath[1])) ? $aFilePath[1] : "";
 			}
 		} else {
-			$sFilePath = self::call("files")->absPath($sFilePath);
 			$sFilePath = self::call()->sandboxPath($sFilePath);
-
 			if(\file_exists($sFilePath)) {
 				$bIsDir = (\is_dir($sFilePath));
 				$vFile["type"] 		= $bIsDir ? "dir" : "file";
 				$vFile["basename"]	= \basename($sFilePath);
-				
+
 				$aBasename = \explode(".", $vFile["basename"]);
 				if(\count($aBasename)>1) {
 					$vFile["extension"] = \array_pop($aBasename);
@@ -198,7 +191,7 @@ class nglFile extends nglBranch implements inglBranch {
 					$vFile["extension"] = "";
 					$vFile["filename"] = $vFile["basename"];
 				}
-				
+
 				$vFile["protocol"]	= $sProtocol ;
 				$vFile["path"] 		= $sFilePath;
 				if($this->extend_info) {
@@ -221,7 +214,7 @@ class nglFile extends nglBranch implements inglBranch {
 					$vFile["filename"] = $vFile["basename"];
 					$vFile["type"] = "dir";
 				}
-				
+
 				$vFile["protocol"]	= $sProtocol ;
 				$vFile["path"] 		= $sFilePath;
 				if($this->extend_info) {
@@ -276,7 +269,7 @@ class nglFile extends nglBranch implements inglBranch {
 
 			// extensión
 			$sExtension = ($this->attribute("extension")) ? $this->attribute("extension") : "";
-			
+
 			// lectura del archivo
 			$nBuffer = 0;
 			$sBuffer = "";
@@ -311,7 +304,7 @@ class nglFile extends nglBranch implements inglBranch {
 				\curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
 				\curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 
-				$sBuffer = \curl_exec($curl); 
+				$sBuffer = \curl_exec($curl);
 				if(\curl_errno($curl)) { $sBuffer = "CURL ERROR: ".\curl_error($curl); }
 				\curl_close($curl);
 
@@ -338,7 +331,7 @@ class nglFile extends nglBranch implements inglBranch {
 		if($sFilePath===null) {
 			self::errorMessage($this->object, 1002);
 			return false;
-		}	
+		}
 		$this->load($sFilePath);
 		return $this;
 	}
@@ -356,24 +349,7 @@ class nglFile extends nglBranch implements inglBranch {
 		\header("Content-Type: ".$sMimeType);
 		die($this->read());
 	}
-	
-	/** FUNCTION {
-		"name" : "write", 
-		"type" : "public",
-		"description" : "Escribe/reemplaza el contenido del archivo con <b>content</b>. Si el archivo no existe lo crea",
-		"parameters" : {
-			"$sContent" : ["string", "", "argument::content"] 
-		},
-		"input" : "path",
-		"seealso" : ["nglFile::append","nglFile::read"],
-		"examples" : {
-			"Escritura" : "
-				$ngl("file.foo")->load("readme.txt");
-				$ngl("file.foo")->write("hola mundo!");
-			"
-		},
-		"return": "$this"
-	} **/
+
 	public function write() {
 		list($sContent,$bReload) = $this->getarguments("content,reload", \func_get_args());
 		return $this->WriteContent($sContent, $bReload, "wb");
@@ -381,7 +357,6 @@ class nglFile extends nglBranch implements inglBranch {
 
 	public function saveas() {
 		list($sFilePath) = $this->getarguments("saveaspath", \func_get_args());
-		$sFilePath = self::call("files")->absPath($sFilePath);
 		$sFilePath = self::call()->sandboxPath($sFilePath);
 		$this->attribute("path", $sFilePath);
 		$this->attribute("protocol", "filesystem");
@@ -396,22 +371,6 @@ class nglFile extends nglBranch implements inglBranch {
 		return $this;
 	}
 
-	/** FUNCTION {
-		"name" : "WriteContent", 
-		"type" : "protected",
-		"description" : "Escribe contenido en un archivo. Este método es utilizado por <b>append</b> y <b>write</b>",
-		"parameters" : {
-			"$sFilePath" : ["string", "Path del archivo de destino"],
-			"$sContent" : ["string", "Contenido a escribir"],
-			"$bReload" : ["boolean", "
-				Determina si se aplicará el método nglFile::reload sobre el archivo para actualizar la información.
-				Se recomienda usar <b>false</b> cuando se realicen sucesivos nglFile::append
-			", "true"],
-			"$sMode" : ["string", "Modo de escritura (según fopen)", "wb"]
-		},
-		"output" : "bytes,chmod,date,info,size,timestamp",
-		"return": "$this"
-	} **/
 	protected function WriteContent($sContent, $bReload=true, $sMode="wb") {
 		$sFilePath = $this->attribute("path");
 		if($sFilePath===null) {
@@ -456,7 +415,7 @@ class nglFile extends nglBranch implements inglBranch {
 				if($handler = @\fopen($sFilePath, $sMode)) {
 					if(!\file_exists($sFilePath)) { @\chmod($sFilePath, NGL_CHMOD_FILE); }
 					\fwrite($handler, $sContent);
-					
+
 					if(!$this->hugefile) {
 						\fclose($handler);
 						if($bReload) { $this->reload($sFilePath); }

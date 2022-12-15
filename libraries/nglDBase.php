@@ -4,13 +4,9 @@
 *the most simple PHP Framework* by hytcom.net
 GitHub @hytcom
 ___
-  
-# mysql
-## nglDBase *extends* nglBranch *implements* iNglDataBase [2020-03-30]
-Gestor de conexciones con dbase
 
-https://github.com/hytcom/wiki/blob/master/nogal/docs/dbase.md
-
+# dbase
+https://hytcom.net/nogal/docs/objects/dbase.md
 */
 namespace nogal;
 
@@ -30,15 +26,13 @@ class nglDBase extends nglBranch implements iNglDataBase {
 		$vArguments							= [];
 		$vArguments["autoconn"]				= ['self::call()->istrue($mValue)', false];
 		$vArguments["base"]					= ['(string)$mValue', null];
-		$vArguments["table"]				= ['(string)$mValue', null];
-		$vArguments["get_mode"]				= ['$this->GetMode($mValue)', 3];
-		$vArguments["utf8"]					= ['$this->UTF8($mValue)', true];
-		$vArguments["deleted"]				= ['self::call()->istrue($mValue)', false];
-		
-		
-		$vArguments["mode"]					= ['(int)$mValue', 2];
 		$vArguments["debug"]				= ['self::call()->istrue($mValue)', false];
+		$vArguments["deleted"]				= ['self::call()->istrue($mValue)', false];
+		$vArguments["get_mode"]				= ['$this->GetMode($mValue)', 3];
+		$vArguments["mode"]					= ['(int)$mValue', 2];
 		$vArguments["sql"]					= ['$mValue', null];
+		$vArguments["table"]				= ['(string)$mValue', null];
+		$vArguments["utf8"]					= ['$this->UTF8($mValue)', true];
 
 		return $vArguments;
 	}
@@ -75,7 +69,7 @@ class nglDBase extends nglBranch implements iNglDataBase {
 		"name" : "connect",
 		"type" : "public",
 		"description" : "Establece la conexión con la base de datos",
-		"parameters" : { 
+		"parameters" : {
 			"$sBase" : ["string", "", "argument::base"]
 		},
 		"return": "$this"
@@ -98,7 +92,7 @@ class nglDBase extends nglBranch implements iNglDataBase {
 	public function destroy() {
 		$this->link->close();
 		return parent::__destroy__();
-	}	
+	}
 
 	public function handler() {
 		return $this->link;
@@ -151,7 +145,7 @@ class nglDBase extends nglBranch implements iNglDataBase {
 				$sColumn = $aColumn[0];
 				$sValue = (\count($aColumn)>1) ? $aColumn[1] : $aColumn[0];
 				$bKeyValue = true;
-			}			
+			}
 		}
 
 		$this->nResult = 0;
@@ -178,12 +172,12 @@ class nglDBase extends nglBranch implements iNglDataBase {
 			} else if($bKeyValue) {
 				while(@$aRow = $this->Fetch($nMode)) {
 					$aGetAll[$aRow[$sColumn]] = $aRow[$sValue];
-				}			
+				}
 			} else {
 				while(@$aRow = $this->Fetch($nMode)) {
 					$aGetAll[] = $aRow[$sColumn];
-					
-				}			
+
+				}
 			}
 		} else {
 			while(@$aRow = $this->Fetch($nMode)) {
@@ -226,7 +220,7 @@ class nglDBase extends nglBranch implements iNglDataBase {
 
 	public function mquery() {
 	}
-	
+
 	public function insert() {
 	}
 

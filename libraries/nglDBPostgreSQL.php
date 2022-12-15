@@ -1,19 +1,14 @@
 <?php
 /*
-# Nogal
+# nogal
 *the most simple PHP Framework* by hytcom.net
-GitHub @hytcom
+GitHub @hytcom/nogal
 ___
-  
-# potsgresql
-## nglDBPostgreSQL *extends* nglBranch *implements* iNglDataBase [2018-08-21]
-Gestor de conexciones con bases de datos PostgreSQL
 
-https://github.com/hytcom/wiki/blob/master/nogal/docs/potsgresql.md
-
+# pgsql
+https://hytcom.net/nogal/docs/objects/pgsql.md
 */
 namespace nogal;
-
 class nglDBPostgreSQL extends nglBranch implements iNglDataBase {
 
 	private $link;
@@ -25,27 +20,26 @@ class nglDBPostgreSQL extends nglBranch implements iNglDataBase {
 		$vArguments["autoconn"]				= ['self::call()->istrue($mValue)', false];
 		$vArguments["base"]					= ['$this->SetBase($mValue)', "postgres"];
 		$vArguments["charset"]				= ['$mValue', "utf8"];
-		$vArguments["collate"]				= ['$mValue', "en_US"];
 		$vArguments["check_colnames"]		= ['self::call()->istrue($mValue)', true];
-		$vArguments["conflict_action"]		= ['$mValue', "NOTHING"]; // NOTHING | UPDATE
-		$vArguments["conflict_target"]		= ['$mValue', null]; // (column_name) | constraint_name | WHERE... 
+		$vArguments["conflict_action"]		= ['\strtoupper($mValue)', "NOTHING", ["NOTHING","UPDATE"]];
+		$vArguments["conflict_target"]		= ['$mValue', null];
+		$vArguments["coontype"]				= ['$mValue', PGSQL_CONNECT_FORCE_NEW];
 		$vArguments["debug"]				= ['self::call()->istrue($mValue)', false];
 		$vArguments["do"]					= ['self::call()->istrue($mValue)', false];
-		$vArguments["coontype"]				= ['$mValue', PGSQL_CONNECT_FORCE_NEW];
 		$vArguments["error_query"]			= ['self::call()->istrue($mValue)', false];
 		$vArguments["field"]				= ['$mValue', null];
 		$vArguments["file"]					= ['$mValue', null];
+		$vArguments["file_enclosed"]		= ['$mValue', ""];
 		$vArguments["file_eol"]				= ['$mValue', "\n"];
 		$vArguments["file_separator"]		= ['$mValue', "\t"];
-		$vArguments["file_enclosed"]		= ['$mValue', ""];
 		$vArguments["host"]					= ['$mValue', "localhost"];
-		$vArguments["insert_mode"]			= ['$mValue', "INSERT"]; // INSERT | CONFLICT
+		$vArguments["insert_mode"]			= ['\strtoupper($mValue)', "INSERT", ["INSERT","CONFLICT"]];
 		$vArguments["pass"]					= ['$mValue', "root"];
 		$vArguments["port"]					= ['(int)$mValue', 5432];
 		$vArguments["sql"]					= ['$mValue', null];
 		$vArguments["table"]				= ['(string)$mValue', null];
+		$vArguments["update_mode"]			= ['\strtoupper($mValue)', "UPDATE", ["UPDATE","UPDATE ONLY"]];
 		$vArguments["user"]					= ['$mValue', "root"];
-		$vArguments["update_mode"]			= ['strtoupper($mValue)', "UPDATE"]; // UPDATE | UPDATE ONLY
 		$vArguments["values"]				= ['$mValue', null];
 		$vArguments["where"]				= ['$mValue', null];
 
@@ -118,11 +112,11 @@ class nglDBPostgreSQL extends nglBranch implements iNglDataBase {
 
 	public function chkgrants() {
 		$grants = $this->query("
-			SELECT 
+			SELECT
 				r.usename as grantor, e.usename as grantee, nspname, privilege_type, is_grantable
-			FROM pg_namespace, ACLEXPLODE(nspacl) a 
+			FROM pg_namespace, ACLEXPLODE(nspacl) a
 				JOIN pg_user e on a.grantee = e.usesysid
-				JOIN pg_user r on a.grantor = r.usesysid 
+				JOIN pg_user r on a.grantor = r.usesysid
 			WHERE e.usename = '".$this->user."'
 		");
 		return ($grants->rows()) ? $grants->getall() : null;
@@ -133,7 +127,7 @@ class nglDBPostgreSQL extends nglBranch implements iNglDataBase {
 		$bDebug = $this->debug;
 		$this->debug = false;
 		$describe = $this->query("
-			SELECT 
+			SELECT
 				c.column_name AS name,
 				c.data_type AS type,
 				c.character_maximum_length AS length,
@@ -149,20 +143,20 @@ class nglDBPostgreSQL extends nglBranch implements iNglDataBase {
 						cls.oid = (SELECT ('\"' || c.table_name || '\"')::regclass::oid)
 						AND cls.relname = c.table_name
 				) AS comment
-			FROM 
-				information_schema.columns c 
+			FROM
+				information_schema.columns c
 				LEFT JOIN INFORMATION_SCHEMA.key_column_usage k ON (
-					k.table_schema = c.table_schema AND 
-					k.table_name = c.table_name AND 
-					k.column_name = c.column_name 
+					k.table_schema = c.table_schema AND
+					k.table_name = c.table_name AND
+					k.column_name = c.column_name
 				)
 				LEFT JOIN INFORMATION_SCHEMA.table_constraints t ON (
-					t.constraint_name = k.constraint_name AND 
-					t.constraint_schema = k.constraint_schema AND 
+					t.constraint_name = k.constraint_name AND
+					t.constraint_schema = k.constraint_schema AND
 					t.table_name = k.table_name
 				)
-			WHERE 
-				(c.table_catalog || '.' || c.table_schema) = '".$this->base."' AND 
+			WHERE
+				(c.table_catalog || '.' || c.table_schema) = '".$this->base."' AND
 				c.table_name = '".$sTable."'
 		");
 		$this->debug = $bDebug;
@@ -200,8 +194,8 @@ class nglDBPostgreSQL extends nglBranch implements iNglDataBase {
 		}
 		\pg_close($this->link);
 		return parent::__destroy__();
-	}	
-	
+	}
+
 	public function escape() {
 		list($mValues) = $this->getarguments("values", \func_get_args());
 
@@ -248,7 +242,7 @@ class nglDBPostgreSQL extends nglBranch implements iNglDataBase {
 		if($sFilePath===null) { $sFilePath = NGL_PATH_TMP."/export_".\date("YmdHis").".csv"; }
 		$sFilePath = self::call()->sandboxPath($sFilePath);
 		$sEscaped	= '\\';
-	
+
 		$bError = true;
 		if($data = \pg_query($this->link, $sQuery)) {
 			if($csv = @\fopen($sFilePath, "w")) {
@@ -303,7 +297,7 @@ class nglDBPostgreSQL extends nglBranch implements iNglDataBase {
 					$aColumns; break;
 				}
 				\fclose($fp);
-				
+
 				$aColsChecker = [];
 				foreach($aColumns as &$sColumn) {
 					$sColumn = self::call()->secureName($sColumn);
@@ -311,7 +305,7 @@ class nglDBPostgreSQL extends nglBranch implements iNglDataBase {
 					$aColsChecker[$sColumn] = true;
 				}
 				$sCreate = "CREATE TABLE ".$sTable." (".\implode(" TEXT NULL, ", $aColumns)." TEXT NULL);";
-				
+
 				if($this->query($sCreate)===null) { return false; }
 			}
 		}
@@ -348,7 +342,7 @@ class nglDBPostgreSQL extends nglBranch implements iNglDataBase {
 				$sSQL  = "INSERT INTO ".$sTable." ";
 				$sSQL .= '("'.\implode('", "', array_keys($aToInsert)).'") ';
 				$sSQL .= "VALUES (".\implode(",", $aToInsert).")";
-				
+
 				if(\strtoupper($sMode)=="CONFLICT") {
 					$sTarget = $this->conflict_target===null ? "(".$this->pkey($sTable).")" : $this->conflict_target;
 					if(!empty($sTarget) && $sTarget[0]=="(") {
@@ -362,7 +356,7 @@ class nglDBPostgreSQL extends nglBranch implements iNglDataBase {
 				return $this->query($sSQL, $bDO);
 			}
 		}
-		
+
 		return null;
 	}
 
@@ -386,7 +380,7 @@ class nglDBPostgreSQL extends nglBranch implements iNglDataBase {
 				return $this->query($sSQL, $bDO);
 			}
 		}
-		
+
 		return null;
 	}
 
@@ -396,7 +390,7 @@ class nglDBPostgreSQL extends nglBranch implements iNglDataBase {
 		if(empty($sQuery)) { return []; }
 		$aQueries = self::call()->strToArray($sQuery, ";");
 		if($this->debug) { return $aQueries; }
-		
+
 		$aResults = [];
 		if(\count($aQueries)) {
 			foreach($aQueries as $sQuery) {
@@ -410,7 +404,7 @@ class nglDBPostgreSQL extends nglBranch implements iNglDataBase {
 				}
 			}
 		}
-		
+
 		return $aResults;
 	}
 
@@ -438,18 +432,18 @@ class nglDBPostgreSQL extends nglBranch implements iNglDataBase {
 		$bDebug = $this->debug;
 		$this->debug = false;
 		$pk = $this->query("
-			SELECT 
-				k.column_name 
-			FROM 
+			SELECT
+				k.column_name
+			FROM
 				INFORMATION_SCHEMA.table_constraints t
 				JOIN INFORMATION_SCHEMA.key_column_usage k ON (
-					k.constraint_name = t.constraint_name AND 
-					k.constraint_schema = t.constraint_schema AND 
+					k.constraint_name = t.constraint_name AND
+					k.constraint_schema = t.constraint_schema AND
 					k.table_name = t.table_name
 				)
-			WHERE 
-				(t.constraint_catalog || '.' || t.constraint_schema) = '".$this->base."' AND 
-				k.table_name = '".$sTable."' AND 
+			WHERE
+				(t.constraint_catalog || '.' || t.constraint_schema) = '".$this->base."' AND
+				k.table_name = '".$sTable."' AND
 				t.constraint_type = 'PRIMARY KEY'
 		");
 		$this->debug = $bDebug;
@@ -496,10 +490,10 @@ class nglDBPostgreSQL extends nglBranch implements iNglDataBase {
 		$bDebug = $this->debug;
 		$this->debug = false;
 		$tables = $this->query("
-			SELECT table_name \"name\" 
-			FROM INFORMATION_SCHEMA.TABLES 
-			WHERE 
-				(table_catalog || '.' || table_schema) = '".$this->base."' AND 
+			SELECT table_name \"name\"
+			FROM INFORMATION_SCHEMA.TABLES
+			WHERE
+				(table_catalog || '.' || table_schema) = '".$this->base."' AND
 				table_name LIKE '%".$sTable."%'
 			ORDER BY 1
 		");
@@ -519,7 +513,7 @@ class nglDBPostgreSQL extends nglBranch implements iNglDataBase {
 				return $this->query($sSQL, $bDO);
 			}
 		}
-		
+
 		return null;
 	}
 
@@ -581,7 +575,7 @@ class nglDBPostgreSQL extends nglBranch implements iNglDataBase {
 				}
 			}
 		}
-		
+
 		return $aNewValues;
 	}
 }

@@ -1,9 +1,9 @@
-[checksum]
-md5 = "5ede606abb1f665925dd5376ae6a893a"
-sha1 = "fa68618c531c456e4dd8c1935b962d3d7d2889f6"
-
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/ocr.md"
+[info]
+_help = "### ocr\
+Implementa https://github.com/thiagoalessio/tesseract-ocr-for-php
+\
+https://github.com/hytcom/wiki/blob/master/nogal/docs/ocr.md\
+"
 
 [arguments]
 dictionary = "Ruta relativa a NGL_SANDBOX de un archivo con el diccionario de palabras normales"
@@ -15,4 +15,5 @@ savefile = "Ruta del archivo con el resultado de la lectura, relativa a NGL_SAND
 whitelist = "Array de caracteres admitidos en la lectura"
 
 [errors]
-1000 = "No se pudo hallar la librería \thiagoalessio\TesseractOCR. Ejecutar 'compose update' en la carpeta grafts/composer"
+1000 = "Falta librería. Ejecutar 'composer update' en la carpeta NOGAL/grafts/composer"
+1001 = "Falta librería. Ejecutar 'composer update' en la carpeta NOGAL/grafts/composer luego de agregar a composer.json el paquete:"

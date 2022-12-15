@@ -1,5 +1,0 @@
-[errors]
-0001 = "Las sesiones nativas de PHP no soportan el método count"
-0002 = "Las sesiones nativas de PHP no soportan el método destroyAll"
-0003 = "Las sesiones nativas de PHP no soportan el método persistent"
-0004 = "Las sesiones nativas de PHP no soportan el método showSessions"

@@ -1,0 +1,52 @@
+# ==============================================================================
+# IMPORTANTE
+# antes de ejecutar, se debe ejecutar el ejemplo ngl-alvin-01-password.bee o 
+# desescapar la línea 7 para generar las credenciales
+# ==============================================================================
+
+# alvin keys true
+
+# se intenta cargar los grants actuales
+alvin grantsLoad
+
+# se elimina el arbol de grants actual
+-$: grantsFlush
+
+# creación de grants
+# roles
+-$: rolesCreate ["admin", {"label":"Administrador"}]
+-$: rolesCreate ["sales_manager", {"label":"Gerente de Ventas"}]
+-$: rolesCreate ["sales_chief", {"label":"Jefe de Ventas"}]
+-$: rolesCreate ["seller", {"label":"Vendedor", "attribs":{"group":"justice league"}}]
+
+# resources
+-$: resourcesCreate ["banks", {"label": "Bancos", "path":"/banks"}]
+-$: resourcesCreate ["budgets", {"label": "Presupuestos", "path":"/budgets"}]
+-$: resourcesCreate ["products", {"label": "Productos", "path":"/products"}]
+
+# scopes
+-$: scopesCreate ["view", {"label": "Vista", "path":"details"}]
+-$: scopesCreate ["insert", {"label": "Agregar", "path":"insert"}]
+-$: scopesCreate ["update", {"label": "Editar", "path":"update"}]
+-$: scopesCreate ["delete", {"label": "Borrar", "path":"delete"}]
+-$: scopesCreate ["approve", {"label": "Aprobar", "path":"update"}]
+
+# policies
+-$: policiesCreate ["sales_manager", {"label": "Gerente de Ventas", "type":"role", "value":["sales_manager"], "positive":"true"}]
+-$: policiesCreate ["sales_chief", {"label": "Jefe de Ventas", "type":"role", "value":["sales_manager","sales_chief"], "positive":"true"}]
+-$: policiesCreate ["seller", {"label": "Vendedor", "type":"role", "value":["seller"], "positive":"true"}]
+-$: policiesCreate ["office", {"label": "Sucursal", "type":"regex", "value":["employee.office_name",""], "positive":"false"}]
+-$: policiesCreate ["banking_hours", {"label": "Horario bancario", "type":"time", "value":["10:00", "15:00", [1,2,3,4,5]], "positive":"true"}]
+
+# resources
+-$: permissionsCreate ["banks_viewer", {"label":"Vista Bancos", "resource":"banks", "paths":["/reports/banks-balance"], "scopes":["view"], "policies":["sales_chief","banking_hours","office"]}]
+-$: permissionsCreate ["office_seller", {"label":"Vendedor de Sucursal", "resource":"budgets", "scopes":["view","insert","update"], "policies":["seller","office"]}]
+-$: permissionsCreate ["office_sales_chief", {"label":"Jefe de Ventas de Sucursal", "resource":"budgets", "scopes":["delete","approve"], "policies":["sales_chief","office"]}]
+-$: permissionsCreate ["products_viewer", {"label":"Vista pública de Productos", "resource":"products", "scopes":["view"]}]
+-$: permissionsCreate ["products_admin", {"label":"Administrador de Productos", "resource":"products", "scopes":["view","insert","update","delete"], "policies":["sales_manager"]}]
+
+# se guarda el archivo con los grants
+-$: grantsSave
+
+# impresión del arbol de grants
+-$: grants true true

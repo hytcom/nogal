@@ -1,9 +1,9 @@
-[checksum]
-md5 = "12def64bbec44f7adaf402caadaa2100"
-sha1 = "7c626110615afcaf6bf7f34d773a26dda461c467"
-
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/pdf.md"
+[info]
+_help = "### pdf\
+Implementa \Mpdf\Mpdf. https://mpdf.github.io
+\
+https://github.com/hytcom/wiki/blob/master/nogal/docs/pdf.md\
+"
 
 [arguments]
 css = "Reglas CSS"
@@ -15,10 +15,10 @@ footer = "Contenidos del pie de página, considerar margen inferior (bottom)"
 header = "Contenido del Encabezado, considerar margen superior (top)"
 language = "Lenguaje"
 margin = "Array o JSON con los margenes de la página (top,right,bottom,left)"
-margintop = "Margen superior"
-marginright = "Margen derecho"
 marginbottom = "Margen inferior"
 marginleft = "Margen izquierdo"
+marginright = "Margen derecho"
+margintop = "Margen superior"
 output = "Tipo de salida\
 	view = muestra el contenido del documento\
 	download = genera la descarga directa\
@@ -34,7 +34,8 @@ page = "Tamaño de la página\
 	B (Type B paperback 128x198mm)\
 "
 sense = "Sentido de la hoja, P (vertical) ó L (horizontal)"
-tmpdir = "Ruta del directorio temporal relativa a NGL_SANDBOX"
 
 [errors]
-1000 = "No se pudo hallar la librería \Mpdf\Mpdf. Ejecutar 'compose update' en la carpeta grafts/composer"
+1000 = "Falta librería. Ejecutar 'composer update' en la carpeta NOGAL/grafts/composer"
+1001 = "Falta librería. Ejecutar 'composer update' en la carpeta NOGAL/grafts/composer luego de agregar a composer.json el paquete:"
+1002 = "No se puede crear el directorio temporal: "

@@ -1,0 +1,81 @@
+set load ["anana,banana,sandia,damasco,coco"]
+@set list -$:
+
+# ------------------------------------------
+# desescapar los bloques de a uno a la vez
+# ------------------------------------------
+
+# lista como texto -------------------------------------------------------------
+-$: text
+
+
+# setea la lista para que el primer indice sea 0 -------------------------------
+# -$: startzero
+# -$: get 3
+
+
+# setea la lista para que el primer indice sea 1 -------------------------------
+# -$: startone
+# -$: get 3
+
+
+# inserta 'pera' al final de la lista ------------------------------------------
+# -$: insert pera
+# -$: text
+
+
+# inserta 'naranja' al principio de la lista -----------------------------------
+# -$: insert ["naranja", "first"]
+# -$: text
+
+
+# inserta 'frutilla' en la posicion 4 ------------------------------------------
+# -$: insert ["frutilla", "after", 4]
+# -$: text
+
+
+# actualiza a 'platano' la posicion 2 ------------------------------------------
+# -$: update ["platano", 2]
+# -$: text
+
+
+# desordena la lista -----------------------------------------------------------
+# -$: text
+# @print -$:
+# {$list} shuffle
+# -$: text
+
+
+# ordena la lista en modo ascendente -------------------------------------------
+# -$: text
+# @print -$:
+# {$list} sort
+# -$: text
+
+
+# ordena la lista en modo descendente ------------------------------------------
+# -$: text
+# @print -$:
+# {$list} rsort
+# -$: text
+
+
+# intercambia 2 items de la lista ----------------------------------------------
+# -$: text
+# @print -$:
+# {$list} swap ["2", "4"]
+# -$: text
+
+
+# elimina un elemento del set --------------------------------------------------
+# -$: text
+# @print -$:
+# {$list} delete 2
+# -$: text
+
+
+# elimina un elemento del set --------------------------------------------------
+# -$: text
+# @print -$:
+# {$list} indexof "damasco"
+# -$:

@@ -1,19 +1,15 @@
 <?php
 /*
-# Nogal
+# nogal
 *the most simple PHP Framework* by hytcom.net
-GitHub @hytcom
+GitHub @hytcom/nogal
 ___
-  
+
 # jsqlmysql
-## nglJSQLMySQL *extends* nglFeeder *implements* inglFeeder [2021-12-08]
 Parser jsql para MySQL
-
-https://github.com/hytcom/wiki/blob/master/nogal/docs/jsql.md
-
+https://hytcom.net/nogal/docs/objects/jsql.md
 */
 namespace nogal;
-
 self::call("jsql",null,true);
 class nglJSQLMySQL extends nglJSQL implements iNglJSQL {
 
@@ -49,7 +45,7 @@ class nglJSQLMySQL extends nglJSQL implements iNglJSQL {
 		$sAutoinc = (!empty($aColumn["autoinc"]) && self::call()->isTrue($aColumn["autoinc"])) ? "AUTO_INCREMENT" : "";
 		$sComment = !empty($aColumn["comment"]) ? "COMMENT '".\addslashes($aColumn["comment"])."'" : "";
 		$sAfter = !empty($aColumn["after"]) ? "AFTER ".$this->column($aColumn["after"]) : "";
-		
+
 		return [
 			"name"		=> $sName,
 			"type"		=> $sType,
@@ -178,7 +174,7 @@ class nglJSQLMySQL extends nglJSQL implements iNglJSQL {
 
 	private function SelDel($sType, $aJSQL) {
 		$aSQL = [];
-		
+
 		// columns
 		if($sType=="select") { $aSQL["columns"] = !empty($aJSQL["columns"]) ? \implode(", ", \array_map([$this,"column"], $aJSQL["columns"])) : "*"; }
 
@@ -193,13 +189,13 @@ class nglJSQLMySQL extends nglJSQL implements iNglJSQL {
 					$aFrom[] = "LEFT JOIN ".$this->column($aTable, true)." ON (".$this->where($aTable[2]).")";
 				}
 			}
-			
+
 			$aSQL["tables"] = "FROM ".\implode(" ", $aFrom);
 		}
 
 		// where
 		$aSQL["where"] = (isset($aJSQL["where"])) ? "WHERE ".$this->where($aJSQL["where"]) : "";
-		
+
 		// group by
 		if(isset($aJSQL["group"])) {
 			$aGroup = [];
@@ -208,10 +204,10 @@ class nglJSQLMySQL extends nglJSQL implements iNglJSQL {
 			}
 			$aSQL["group"] = "GROUP BY ".\implode(", ", $aGroup);
 		}
-		
+
 		// having
 		if(isset($aJSQL["having"])) { $aSQL["having"] = "HAVING ".$this->where($aJSQL["having"]); }
-		
+
 		// order by
 		if(isset($aJSQL["order"])) {
 			$aOrder = [];
@@ -224,7 +220,7 @@ class nglJSQLMySQL extends nglJSQL implements iNglJSQL {
 			}
 			$aSQL["order"] = "ORDER BY ".\implode(", ", $aOrder);
 		}
-		
+
 		// limit
 		if(isset($aJSQL["limit"])) {
 			if(isset($aJSQL["offset"])) {
@@ -233,7 +229,7 @@ class nglJSQLMySQL extends nglJSQL implements iNglJSQL {
 				$aSQL["limit"] = "LIMIT ".(int)$aJSQL["limit"];
 			}
 		}
-		
+
 		// sentencia SQL
 		return \strtoupper($sType)." ".\implode(" ", $aSQL);
 	}
@@ -253,7 +249,7 @@ class nglJSQLMySQL extends nglJSQL implements iNglJSQL {
 					$aFrom[] = "LEFT JOIN ".$this->column($aTable, true)." ON (".$this->where($aTable[2]).")";
 				}
 			}
-			
+
 			if($sType=="insert") {
 				$aSQL["tables"] = "INSERT INTO ".\implode(" ", $aFrom);
 			} else {
@@ -269,7 +265,7 @@ class nglJSQLMySQL extends nglJSQL implements iNglJSQL {
 		if($sType=="update") {
 			$aSQL["where"] = (isset($aJSQL["where"])) ? "WHERE ".$this->where($aJSQL["where"]) : "";
 		}
-		
+
 		// order by
 		if(isset($aJSQL["order"])) {
 			$aOrder = [];
@@ -291,7 +287,7 @@ class nglJSQLMySQL extends nglJSQL implements iNglJSQL {
 				$aSQL["limit"] = "LIMIT ".(int)$aJSQL["limit"];
 			}
 		}
-		
+
 		// sentencia SQL
 		return \implode(" ", $aSQL);
 	}

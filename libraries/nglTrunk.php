@@ -1,15 +1,21 @@
 <?php
-
+/*
+# nogal
+*the most simple PHP Framework* by hytcom.net
+GitHub @hytcom/nogal
+*/
 namespace nogal;
-
 class nglTrunk extends nglRoot {
+
+	private $sNogalInfo = "https://raw.githubusercontent.com/hytcom/nogal/master/docs/";
+	private $sWikiRepo  = "https://raw.githubusercontent.com/hytcom/wiki/master/nogal/docs/";
 
 	final public function __construct() {
 		if(self::$bLoadAllowed===false) {
 			\trigger_error("Can't instantiate outside of the «nogal» environment", E_USER_ERROR);
 			die();
 		}
-		
+
 		if(\method_exists($this, "__builder__")) {
 			$this->__builder__(\func_get_args());
 		}
@@ -25,7 +31,7 @@ class nglTrunk extends nglRoot {
 				if(isset($aData["documentation"])) { $aExplained["documentation"]["url"] = $aData["documentation"]["url"]; }
 			}
 		} else {
-			if(($sConfig = @\file_get_contents("https://raw.githubusercontent.com/hytcom/nogal-php/master/docs/".$this->object.".info"))) {
+			if(($sConfig = @\file_get_contents($this->sNogalInfo.$this->object.".info"))) {
 				$aData = self::parseConfigString($sConfig, true, true);
 				if(isset($aData["documentation"])) { $aExplained["documentation"]["url"] = $aData["documentation"]["url"]; }
 			}
@@ -58,7 +64,7 @@ class nglTrunk extends nglRoot {
 						case $sValue===false: $sArgument = $sKey." = false"; break;
 						case $sValue===true: $sArgument = $sKey." = true"; break;
 						case \is_numeric($sValue): $sArgument = $sKey." = ".$sValue; break;
-						default: 
+						default:
 							if(\strstr($sValue, '"')!==false) {
 								$sArgument = $sKey." = '".$sValue."'";
 							} else {
@@ -79,8 +85,9 @@ class nglTrunk extends nglRoot {
 		}
 
 		if(empty($sContent)) {
-			\trigger_error("Can't get config file data: https://raw.githubusercontent.com/hytcom/nogal-php/master/docs/".$this->object.".info", E_USER_ERROR);
-			die();
+			$this->__errorMode__("die");
+			$this->__errorShowSource__(false);
+			\trigger_error("Can't get config file data: ".$this->sNogalInfo.$this->object.".info", E_USER_ERROR);
 		}
 
 		if(\is_writeable(NGL_PATH_CONF) && !\file_exists(NGL_PATH_CONF.NGL_DIR_SLASH.$this->object.".conf")) {
@@ -103,7 +110,7 @@ class nglTrunk extends nglRoot {
 				$sValue = '"'.$sValue.'"';
 			}
 
-			$aSections = $this->ConfigFileSections(\file(NGL_PATH_CONF.NGL_DIR_SLASH.$this->object.".conf"));
+			$aSections = self::parseConfigFileSections(NGL_PATH_CONF.NGL_DIR_SLASH.$this->object.".conf");
 			$aConfig = self::parseConfigFile(NGL_PATH_CONF.NGL_DIR_SLASH.$this->object.".conf", true);
 
 			$aKey = !\strpos($sKey, ".") ? ["arguments", $sKey] : \explode(".", $sKey, 2);
@@ -121,7 +128,7 @@ class nglTrunk extends nglRoot {
 				foreach($aSections as $sSection => $sCode) {
 					if($sContent!="") { $sContent .= "\n"; }
 					$sContent .= "[".$sSection."]\n".$sCode;
-				}	
+				}
 
 				if(\is_writeable(NGL_PATH_CONF)) {
 					\file_put_contents(NGL_PATH_CONF.NGL_DIR_SLASH.$this->object.".conf", $sContent);
@@ -140,67 +147,41 @@ class nglTrunk extends nglRoot {
 		}
 	}
 
-	private function ConfigFileSections($aContent) {
-		$aSections = [];
-		$sSection = null;
-		$sSectionContent = "";
-		$sPrevius = "-";
-		foreach($aContent as $sLine) {
-			if(\trim($sPrevius)=="" && \trim($sLine)=="") { continue; }
-			$sPrevius = $sLine;
-			if(\preg_match("/^\[([a-z-A-Z0-9\-\_]+)\]\s+$/is", $sLine, $aMatch)) {
-				if($sSection!==null) {
-					$aSections[$sSection] = $sSectionContent;
-					$sSectionContent = "";
-				}
-				$sSection = $aMatch[1];
-			} else {
-				$sSectionContent .= $sLine;
-			}
-		}
-		$aSections[$sSection] = $sSectionContent;
-		return $aSections;
-	}
-
 	final public function __errorMode__($sMode=NGL_HANDLING_ERRORS_MODE) {
 		return self::errorMode($this->object, $sMode);
 	}
 
-	/** FUNCTION {
-		"name" : "__me__", 
-		"type" : "public",
-		"description" : "Retorna un objeto o array con los nombre objeto y clase a la que instancia",
-		"parameters" : { "$bArray" : ["boolean", "Si el valor es True se retorna un array", "false"] },
-		"examples" : {
-			"objeto" : "
-				$object->name = nombre del objeto;
-				$object->class = nombre de la clase;
-			",
-			"array" : "
-				array(
-				→ "0" => "nombre del objeto",
-				→ "1" => "nombre de la clase",
-				→ "name" => "nombre del objeto",
-				→ "class" => "nombre de la clase",
-				);
-			"
-		},
-		"return" : "object o array"
-	} **/
+	final public function __errorShowSource__($bShow=NGL_HANDLING_ERRORS_BACKTRACE) {
+		return self::errorShowSource($bShow);
+	}
+
 	final public function __me__($bArray=false) {
 		if(!$bArray) {
 			$me = new \stdClass();
 			$me->name = $this->me;
 			$me->class = $this->class;
+			$me->object = $this->object;
 			return $me;
 		} else {
 			$vMe = [];
 			$vMe[0] 		= $this->me;
 			$vMe[1] 		= $this->class;
+			$vMe[2] 		= $this->object;
 			$vMe["name"]	= $this->me;
 			$vMe["class"]	= $this->class;
+			$vMe["object"]	= $this->object;
 			return $vMe;
 		}
+	}
+
+	final public function __help__() {
+		$sFileName = $this->sWikiRepo.$this->object.".md";
+		if(!$sHelp = @\file_get_contents($sFileName)) {
+			$this->__errorMode__("die");
+			$this->__errorShowSource__(false);
+			\trigger_error("Can't get help file data: ".$sFileName, E_USER_ERROR);
+		}
+		return $sHelp;
 	}
 }
 

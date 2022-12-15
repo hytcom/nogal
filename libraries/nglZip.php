@@ -1,16 +1,12 @@
 <?php
 /*
-# Nogal
+# nogal
 *the most simple PHP Framework* by hytcom.net
-GitHub @hytcom
+GitHub @hytcom/nogal
 ___
-  
+
 # zip
-## nglZip *extends* nglBranch *implements* inglBranch [2018-11-29]
-Gestiona archivos .ZIP
-
-https://github.com/hytcom/wiki/blob/master/nogal/docs/zip.md
-
+https://hytcom.net/nogal/docs/objects/zip.md
 */
 namespace nogal;
 
@@ -22,13 +18,13 @@ class nglZip extends nglBranch implements inglBranch {
 
 	final protected function __declareArguments__() {
 		$vArguments							= [];
-		$vArguments["zipfile"]				= ['$mValue', "document.zip"];
-		$vArguments["mode"]					= ['$mValue', "create"]; // create | overwrite | open
-		$vArguments["extract"]				= ['$mValue', null];
-		$vArguments["extract_to"]			= ['$mValue', null];
 		$vArguments["content"]				= ['$mValue', null];
-		$vArguments["filepath"]				= ['$mValue', ""];
 		$vArguments["downname"]				= ['$mValue', "document.zip"];
+		$vArguments["extract_to"]			= ['$mValue', null];
+		$vArguments["extract"]				= ['$mValue', null];
+		$vArguments["filepath"]				= ['$mValue', ""];
+		$vArguments["mode"]					= ['$mValue', "create", ["create","overwrite","open"]];
+		$vArguments["zipfile"]				= ['$mValue', "document.zip"];
 		return $vArguments;
 	}
 
@@ -99,7 +95,7 @@ class nglZip extends nglBranch implements inglBranch {
 	public function create() {
 		if($this->zip===null) { self::errorMessage($this->object, 1001); return false; }
 		list($sFilePath,$sContent) = $this->getarguments("filepath,content", \func_get_args());
-		
+
 		if($this->sPWD!==null && $sFilePath[0]!="/") { $sFilePath = $this->sPWD."/".$sFilePath; }
 		if($sContent!==null) {
 			$this->zip->addFromString($sFilePath, $sContent);
@@ -113,7 +109,7 @@ class nglZip extends nglBranch implements inglBranch {
 	public function add() {
 		if($this->zip===null) { self::errorMessage($this->object, 1001); return false; }
 		list($sFilePath) = $this->getarguments("filepath", \func_get_args());
-		
+
 		$sSandBoxPath = self::call()->sandboxPath($sFilePath);
 		if(\file_exists($sSandBoxPath)) { $this->zip->addFile($sSandBoxPath, $sFilePath); return $this; }
 		self::errorMessage($this->object, 1003, $sSandBoxPath);
@@ -122,7 +118,7 @@ class nglZip extends nglBranch implements inglBranch {
 	public function addDir() {
 		if($this->zip===null) { self::errorMessage($this->object, 1001); return false; }
 		list($sFilePath) = $this->getarguments("filepath", func_get_args());
-		
+
 		$sSandBoxPath = self::call()->sandboxPath($sFilePath);
 		$ls = self::call("files")->ls($sFilePath, "*", "signed", true);
 		foreach($ls as $sFile) {
@@ -134,7 +130,7 @@ class nglZip extends nglBranch implements inglBranch {
 				$this->zip->addFile($sFile, $sLocalFile);
 			}
 		}
-		
+
 		return $this;
 	}
 

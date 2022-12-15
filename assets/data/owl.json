@@ -1,0 +1,61 @@
+[
+	{
+		"query": "create",
+		"table" : "__ngl_owl_index__",
+		"comment" : "Indice de los registros de las tablas que hagan uso de roles",
+		"attrs" : ["ENGINE=MyISAM", "DEFAULT", "CHARSET=utf8mb4", "COLLATE=utf8mb4_unicode_ci"],
+		"columns" : [
+			{"name":"id", "type":"INT", "index":"PRIMARY", "autoinc":"true"},
+			{"name":"imya", "type":"CHAR", "length":"32", "index":"INDEX", "comment":"imya del registro en la tabla de origen"},
+			{"name":"role", "type":"VARCHAR", "length":"64", "null":"true", "index":"INDEX", "default":"null", "comment":"role a partir del cual se obtiene acceso"}
+		]
+	},
+
+	{
+		"query": "create",
+		"table" : "__ngl_owl_log__",
+		"comment" : "Log de operaciones realizadas mediante el objeto OWL",
+		"attrs" : ["ENGINE=MyISAM", "DEFAULT", "CHARSET=utf8mb4", "COLLATE=utf8mb4_unicode_ci"],
+		"columns" : [
+			{"name":"id", "type":"INT", "index":"PRIMARY", "autoinc":"true"},
+			{"name":"imya", "type":"CHAR", "length":"32", "index":"INDEX", "comment":"imya del registro en la tabla de origen"},
+			{"name":"user", "type":"SMALLINT", "null":"true", "index":"INDEX", "comment":"id del usuario que ejecutó la acción"},
+			{"name":"action", "type":"ENUM", "length":"'insert','delete','suspend','toggle','update','unsuspend'", "default":"'insert'", "comment":"tipo de acción"},
+			{"name":"date", "type":"DATETIME", "comment":"fecha y hora de la ejecución"},
+			{"name":"ip", "type":"VARCHAR", "length":"35", "null":"true", "comment":"dirección de IP del usuario"},
+			{"name":"changelog", "type":"MEDIUMTEXT", "null":"true", "comment":"cuando el argumento owlog_changelog del objeto OWL sea true, se almacenará un JSON con la versión anterior de los datos"}
+		]
+	},
+
+	{
+		"query": "create",
+		"table" : "__ngl_owl_structure__",
+		"comment" : "Estructuras de los objetos (tablas) de el entorno OWL",
+		"attrs" : ["ENGINE=MyISAM", "DEFAULT", "CHARSET=utf8mb4", "COLLATE=utf8mb4_unicode_ci"],
+		"columns" : [
+			{"name":"id", "type":"INT", "index":"PRIMARY", "autoinc":"true"},
+			{"name":"name", "type":"VARCHAR", "length":"128", "index":"INDEX", "comment":"nombre del objeto"},
+			{"name":"code", "type":"VARCHAR", "length":"32", "index":"UNIQUE", "comment":"código del objeto. Que luego formará parte de el IMYA de cada registro del mismo"},
+			{"name":"roles", "type":"ENUM", "length":"'0', '1'", "default":"'1'", "comment":"determina si el objeto esta sujeto a roles"},
+			{"name":"columns", "type":"TEXT", "comment":"JSON con los nombres de las columnas del objeto"},
+			{"name":"foreignkey", "type":"TEXT", "null":"true", "comment":"relaciones externas"},
+			{"name":"relationship", "type":"TEXT", "null":"true", "comment":"relaciones con otros objetos en formato JSON"},
+			{"name":"validate_insert", "type":"TEXT", "null":"true", "comment":"reglas del validación para los datos para el objeto VALIDATE al momento del INSERT"},
+			{"name":"validate_update", "type":"TEXT", "null":"true", "comment":"reglas del validación para los datos para el objeto VALIDATE al momento del UPDATE"}
+		]
+	},
+
+	{
+		"query": "create",
+		"table" : "__ngl_sentences__",
+		"comment" : "Almacena sentencias SQL utilizadas en el proyecto. Esta tabla es fundamental para el funcionamiento de NEST",
+		"attrs" : ["ENGINE=MyISAM", "DEFAULT", "CHARSET=utf8mb4", "COLLATE=utf8mb4_unicode_ci"],
+		"columns" : [
+			{"name":"name", "type":"VARCHAR", "length":"128", "index":"PRIMARY"},
+			{"name":"type", "type":"ENUM", "length":"'function','procedure','query','structure','trigger','view'", "default":"'query'", "comment":"tipo de sentencia"},
+			{"name":"sentence", "type":"MEDIUMTEXT", "comment":"sentencia SQL"},
+			{"name":"dependencies", "type":"MEDIUMTEXT", "null":"true", "comment":"nombre de tablas/views separados por coma, de las cuales depende la sentencia"},
+			{"name":"notes", "type":"VARCHAR", "length":"255", "null":"true"}
+		]
+	}
+]

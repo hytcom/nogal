@@ -1,11 +1,10 @@
 {
     "require": {
-        "picqer/php-barcode-generator": "^2.0",
-        "phpseclib/phpseclib": "^2.0.31",
-        "thiagoalessio/tesseract_ocr": "^2.9",
-        "mpdf/mpdf": "^8.0.11",
-        "aferrandini/phpqrcode": "^1.0",
         "phpoffice/phpspreadsheet": "^1.16.0",
+        "picqer/php-barcode-generator": "^2.0",
+        "aferrandini/phpqrcode": "^1.0",
+        "mpdf/mpdf": "^8.0.11",
+        "thiagoalessio/tesseract_ocr": "^2.9",
         "aws/aws-sdk-php": "^3.183"
     }
 }

@@ -1,26 +1,21 @@
 <?php
 /*
-# Nogal
+# nogal
 *the most simple PHP Framework* by hytcom.net
-GitHub @hytcom
+GitHub @hytcom/nogal
 ___
-  
+
 # nut
-## nglNut *extends* nglTrunk [2018-08-22]
-Gestor de los nuts del sistema
-
-https://github.com/hytcom/wiki/blob/master/nogal/docs/nut.md
-https://github.com/hytcom/wiki/blob/master/nogal/docs/nuts.md
-
+https://hytcom.net/nogal/docs/objects/nut.md
+https://hytcom.net/nogal/docs/objects/nuts.md
 */
 namespace nogal;
-
 class nglNut extends nglTrunk {
 
 	public $sNut			= null;
 	private $bSafemode		= true;
 	private $aAllowedMethods;
-	
+
 	protected $ID			= null;
 	protected $class		= "nglNut";
 	protected $me			= "nut";
@@ -56,7 +51,7 @@ class nglNut extends nglTrunk {
 					$sNutName = \ucwords($sNutName);
 					$sNutName = \str_replace(" ", "", $sNutName);
 				}
-				
+
 				$this->sNut = $sNutName;
 				$sClassName = __NAMESPACE__."\\nut".$sNutName;
 
@@ -70,7 +65,7 @@ class nglNut extends nglTrunk {
 						self::errorMessage($this->object, 1002);
 					}
 				}
-				
+
 				// metodos permitidos del nut
 				$aAllowedMethods = [];
 				$aMethods = $reflection->getMethods(\ReflectionMethod::IS_PROTECTED);
@@ -81,7 +76,7 @@ class nglNut extends nglTrunk {
 					}
 				}
 				unset($aAllowedMethods["init"]);
-				
+
 				$this->nut($sNutName, $sClassName, $aAllowedMethods);
 			}
 		}
@@ -120,7 +115,7 @@ class nglNut extends nglTrunk {
 					if(\strpos($sKey, "data-")===0) {
 						$aDataArguments["DATA"][\substr($sKey, 5)] = $mValue;
 					} else {
-						$aDataArguments[$sKey] = $mValue; 
+						$aDataArguments[$sKey] = $mValue;
 					}
 				}
 			}
@@ -135,7 +130,9 @@ class nglNut extends nglTrunk {
 	}
 
 	final protected function SafeMethods($aSafeMethods=null) {
-		if($aSafeMethods!==null) { $this->aSafeMethods = $aSafeMethods; }
+		if($aSafeMethods!==null) {
+			$this->aSafeMethods = \array_unique(\array_merge($this->aSafeMethods, $aSafeMethods));
+		}
 		return $aSafeMethods;
 	}
 
@@ -143,6 +140,11 @@ class nglNut extends nglTrunk {
 		if(\is_array($aArguments) && \count($aArguments)===1 && \array_key_exists("content", $aArguments)) {
 			$aArguments = $aArguments["content"];
 		}
+	}
+
+	final protected function JsonOutput($mData) {
+		if(self::call()->isJson($mData)) { return $mData; }
+		return \json_encode($mData);
 	}
 }
 

@@ -1,3 +1,148 @@
+# 4.0.00 - 202212150000
+## general
+- los paquetes **composer** ahora se instalan bajo demanda
+- cambio de caracter de fin de línea en algunos archivos
+- **NGL_CONTENT_TYPE** ya no está predefinida
+- **NGL_SANDBOX** ahora apunta al raíz del sistema de manera predeterminada, dando a **nogal** dominio sobre cualquier directorio del sistema.
+- se añadió un manejador de excepciones
+- validación por listas en el seteo de argumentos, similar al ENUM de una bade de datos relacional
+- se reemplazaron los términos:
+	- prickout por garden
+	- re-prickout por uproot
+	- \_\_container por planter
+	- nueva constante **NGL_GARDENS_PLACE**, con los datos de la petición
+- nuevo método **errorHTTP**
+- **errorMessage** ahora permite utilizar las siguientes variables en la página de error
+	- OBJECT
+	- TYPE
+	- CODE
+	- TRIGGER
+	- FILE
+	- LINE
+	- ERROR
+	- DETAILS
+	- BACKTRACE
+	- LOG
+- cuando no existan en **NGL_PATH_GARDEN**, los controladores **tutor.php** y **nut.php** serán invocados desde la carpeta **nogal**
+- cambios menores
+
+## alvin
+- [ACTUALIZACION CRITICA]
+- se redefinió el objeto, se reemplazó **alvin-token** por un token **JWT**
+- se deprecó la constante **NGL_ALVIN_MODE**
+- firewall
+	- ahora pude activarse/desactivarse desde alvin.conf
+	- se eliminó el concepto **firewall-strict**
+	- todos los paths requieren login, salvo los presentes en **firewall-ignore**
+	- las urls habilitadas se encuentran determinadas en el token
+
+## ants
+- nuevo objeto **ants** para la gestión de rutas
+
+## bee
+- mejoras en el uso de variables
+- nuevo método **dump**
+- nuevo método **empty**
+- **if** ahora soporta **else**
+- mejoras en la salida de **exit**
+- en la línea de comandos, al pasar una variable por medio del argumento -e, si no se establece un valor, se asume **true**
+
+## branch
+- nuevo método **getprop** que es un alias de **__get__**. Especialmente útil en **bee**
+- internamente el seteo de los argumentos ahora soporta chequeos de listas
+
+## coon
+- [DEPRECADO] se reemplaza por **ants**
+
+## crypt
+- [ACTUALIZACION CRITICA]
+- se deprecó la versión basada en phpseclib
+- nueva versión basada sobre la librería nativa **openssl**
+
+## excel
+- el método **write** ahora se llama **save**
+- fix por **fn:isArrayArray**
+
+## fn
+- se eliminaros los métodos **sow** y **conf**, ahora reemplazados por el objeto **sow**
+- nuevos métodos **fileLoad** y **fileSave**. Aceptan contenidos en los formatos:
+	- serialize
+	- base64
+	- json
+- nuevos métodos **base64URLEncode** y **base64URLDecode**
+- nuevo método **uuid**
+- nuevo método **isPath**. Verifica existencia y modo del path dentro del **sandbox**
+- nuevo método **isMethod**. Verifica que el método HTTP sea válido
+- nuevo método **arrayKeysExists**. Verifica que las claves existan en un array
+- dump ahora también evalúa **resources**
+- redefinicón de modos de chequeo en el método **isArrayArray**
+  - any = **true** cuando al menos un valor sea un array
+  - edges = **true** cuando el primer y último valor sean arrays
+  - edgeskeys = **true** cuando el primer y último valor sean arrays y tengan las mismas claves
+  - strict = **true** cuando todos los valores sean arrays y tengan las mismas claves
+- se mejoró y añadieron 2 nuevas notaciones a **naming**. Notaciones válidas:
+	- **hungarian** (*sHungarianNotation*) variables. La primer letra indica el tipo de dato en inglés
+	- **pascal** (*PascalCase*) clases y funciones No públicas
+	- **camel** (*camelCase*) funciones públicas
+	- **snake** (*snake_case*) tablas y campos en una base de datos
+	- **ssnake** (*SCREAMING_SNAKE_CASE*) constantes
+	- **kebab** (*kebab-case*) URLs
+	- **lower** (*lowercase*) cadena en minúsculas sin caracter para la separación de palabras
+	- **upper** (*UPPERCASE*) cadena en mayúsculas sin caracter para la separación de palabras
+
+## jsql
+- fix por **fn:isArrayArray**
+
+## jwt
+- nuevo objeto **jwt** para la gestión de tokens de autenticación
+
+## nest
+- fix bug en **unjoin**
+
+## nuts
+- nuevo método **JsonOutput**, sólo utilizable desde dentro de un **nut**
+
+## orc
+- fix por **fn:isArrayArray**
+
+## owl
+- nueva integración con **alvin**, a partir del claim owl del token
+
+## pdf
+- se renombró el método **create** a **load**
+- se eliminó el argumento **tmpdir** ahora usa **nogal::tempDir**
+- se cambió el orden en los argumentos de los métodos
+	- **base64**
+	- **download**
+	- **save**
+	- **view**
+
+## pecker
+- fix por **fn:fileLoad** y **fn:fileSave**
+
+## rind
+- fix bug cuando el argumento **gui_path** es **./**
+- ahora los llamados a constantes soportan Arrays
+- si en la primer línea de una plantila se coloca ```<rind:/*!!*/>```, esta sólo será procesada en el contexto de **mergefile**
+- se adaptó el comando **alvin** a la nueva estructura del objeto
+- se incorporó el argumento **alvin** al comando **mergefile**
+
+## shift
+- fix por **fn:isArrayArray**
+- el método **html** ahora soporta tablas anidadas y html entities
+- nuevo método **vectorToArray**
+- nuevo método **sql** que genera sentencias SQL insert
+
+## sow
+- nuevo objeto **sow**, Implementa estructuras de archivos de nogal
+	- skels
+	- skel
+	- conf
+
+## sysvar
+- se añadió la variable **HTTP_CODES**
+
+____________________________________________________________
 # 3.1.01 - 202201161800
 ## general
 - fix **final private** para **PHP8**
@@ -464,7 +609,7 @@ ________________________________________________________________________________
 - nuevos métodos **flag**, **unflag** y **BuildFlags**
 
 ## nest
-- se modificó el método **CreateStructure** 
+- se modificó el método **CreateStructure**
 
 ## owl
 - nuevos métodos **dbStructure** y **ImyaFromID**
@@ -571,7 +716,7 @@ ________________________________________________________________________________
 
 ## validate
 - fix error en validación de enteros
- 
+
 ________________________________________________________________________________
 # 2.7.3 - 202011022100
 ## general
@@ -752,10 +897,10 @@ ________________________________________________________________________________
 
 ## nest
 - nuevo campo **dependencies** en la tabla **\_\_ngl_sentences\_\_**
-  
+
 ## shift
 - mejora en la conversión de *CSV*. Si el argumento **colnames** es **true** escribe en la primer línea las claves del array
-  
+
 ________________________________________________________________________________
 # 2.5.1 - 202008021930
 ## general
@@ -768,5 +913,5 @@ ________________________________________________________________________________
 # START
 v2.5-20200730
 
-## generalgit 
+## generalgit
 - Primera versión pública

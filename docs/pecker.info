@@ -1,9 +1,9 @@
-[checksum]
-md5 = "881538dfce2be5813a20d2c3f3f1869a"
-sha1 = "2633b65f14c020b9af90fe4b839430f2163163eb"
-
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/pecker.md"
+[info]
+_help = "### pecker\
+ETL. Actualmente en desarrollo
+\
+https://github.com/hytcom/wiki/blob/master/nogal/docs/pecker.md\
+"
 
 [arguments]
 analyse_datatype = "analiza los datos de la tabla para determinar normalizaciones y tipos de datos"
@@ -74,7 +74,7 @@ xtable = "nombre de la tabla secundaria contra la que se realizan las operacione
 
 [errors]
 1001 = objeto de base de datos indefinido
-1002 = 
+1002 =
 1003 = tabla indefinida
 1004 = grouper indefinido
 1005 = columna indefinida

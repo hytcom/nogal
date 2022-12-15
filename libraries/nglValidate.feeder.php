@@ -1,58 +1,14 @@
 <?php
+/*
+# nogal
+*the most simple PHP Framework* by hytcom.net
+GitHub @hytcom/nogal
+___
 
+# validate
+https://hytcom.net/nogal/docs/objects/validate.md
+*/
 namespace nogal;
-
-/** CLASS {
-	"name" : "nglValidate",
-	"object" : "validate",
-	"type" : "main",
-	"revision" : "20151027",
-	"extends" : "nglTrunk",
-	"description" : "
-		Validación de variables basada en reglas.
-		
-		nglValidate construye el objeto $validate dentro del framework, el cual es accedido a través de: $<b>ngl("validate")->NOMBRE_DE_METODO(...)</b>
-		
-		Cuenta con dos valores de configuración que impactan en el procesamiento de la variable <b>$_REQUEST</b>:
-		<ul>
-			<li><b>proccess:</b> Determina si se procesa o no la variable <strong>$_REQUEST</strong>. Default: <strong>1</strong></li>
-			<li><b>from:</b> Origen de la solicitud (HTTP_REFERER) LOCAL | ALL | HOST1,HOST2,HOSTn | IP1,IP2,IPn. Default: <strong>LOCAL</strong></li>
-		</ul>
-		
-
-		Los tipos de validaciones soportadas por la clase son<
-		<ul>
-			<li><b>all:</b> Cualquier tipo de contenido</li>
-			<li><b>alpha:</b> Cadena compuesta unicamente por letras y espacios</li>
-			<li><b>base64:</b> Cadena en formato base64</li>
-			<li><b>color:</b> Color en formato hexadecimal #RGB, #RRGGBB ó #RRGGBBAA</li>
-			<li><b>coords:</b> par de geo coordenadas separadas por coma o punto y coma</li>
-			<li><b>date:</b> Fecha en formato YYYY-mm-dd</li>
-			<li><b>datetime:</b> Fecha y hora en formato YYYY-mm-dd HH:ii:ss</li>
-			<li><b>email:</b> Dirección de correo</li>
-			<li><b>filename:</b> Nombre de archivo</li>
-			<li><b>html:</b> Cualquier tipo de contenido. El valor será tratado con HTMLENTITIES</li>
-			<li><b>imya:</b> IMYA</li>
-			<li><b>int:</b> Números enteros [^0-9]</li>
-			<li><b>number:</b> Números formateados [0-9\.\,\-]</li>
-			<li><b>ipv4:</b> Dirección IPV4</li>
-			<li><b>ipv6:</b> Dirección IPV6</li>
-			<li><b>regex:</b> Validación por expresiones regulares. La expresión regular es pasada por medio de la option <b>pattern</b></li>
-			<li><b>text:</b> Cadena compuesta por letras, números, simbolos de uso frecuente y espacios</li>
-			<li><b>time:</b> Hora en formato YYYY-mm-dd HH:ii:ss</li>
-			<li><b>url:</b> URL http o ftp, segura o no</li>
-			<li><b>string:</b> Cadena compuesta por letras, números y espacios</li>
-			<li><b>symbols:</b> Solo símbolos y espacios</li>
-		</ul>
-	",
-	"configfile" : "validate.conf",
-	"variables" : {
-		"$bCheckError" : ["private", "Control de ocurrencia de errores"],
-		"$mVariables" : ["private", "Control de ocurrencia de errores"],
-		"$vVariables" : ["private", "Variables utilizadas dentro de las reglas"],
-		"$vTypes" : ["private", "Tipos de validaciones soportadas"]
-	}
-} **/
 class nglValidate extends nglTrunk {
 
 	protected $class		= "nglValidate";
@@ -84,68 +40,18 @@ class nglValidate extends nglTrunk {
 		}
 	}
 
-	/** FUNCTION {
-		"name" : "addvar",
-		"type" : "public",
-		"description" : "
-			Almacena valores que luego pueden ser utilizados como variables dentro de las reglas. Esto es especialmente util dentro de los archivos <b>.json</b>.
-			Este método retorna el propio objeto, a fin de poder añadir varias variables con una sintaxis cómoda.
-		",
-		"parameters" : {
-			"$sVarName" : ["string", "Nombre que luego se utilizará para invocar el valor"],
-			"$mValue" : ["string", "Valor"]
-		},
-		"examples" : {
-			"Modo de empleo" : '
-				[b][u]Variables PHP[/u][/b]
-				$var1 = "string";
-				$var2 = "milk,rice,sugar,tea";
-				
-
-				[b][u]Añadiendo valores[/u][/b]
-				$ngl("validate")
-					->addvar("type", $var1)
-					->addvar("minlen", "3")
-					->addvar("list", $var2)
-				;
-
-
-				[b][u]Archivo foobar.json[/u][/b]
-				{
-					"type" : "{$type}",
-					"minlength" : "{$minlen}",
-					"in" : "{$list}"
-				}
-
-
-				[b][u]Execución[/u][/b]
-				echo $ngl("validate")->validate("rice", "foobar");
-			'
-		},
-		"return" : "object"
-	} **/
 	public function addvar($sVarName, $mValue) {
 		$this->vVariables[$sVarName] = $mValue;
 		return $this;
 	}
 
-	/** FUNCTION {
-		"name" : "CheckValue",
-		"type" : "private",
-		"description" : "Aplica las reglas <b>$vRules</b> sobre la variable <b>$mSource</b>. Este método es auxiliar de <b>validate</b>",
-		"parameters" : {
-			"$mSource" : ["mixed", "Variable o Array a validar"],
-			"$vRules" : ["array", "Reglas de validación"]
-		},
-		"return" : "mixed"
-	} **/
 	private function CheckValue($mSource, $vRules) {
 		if(!isset($vRules["options"])) { $vRules["options"] = []; }
-		
+
 		if(isset($vRules["options"]["multiple"])) {
 			$aValues = \preg_split("/".$vRules["options"]["multiple"]."/s", $mSource);
 			unset($vRules["options"]["multiple"]);
-			
+
 			$mValue = [];
 			foreach($aValues as $mSource) {
 				$mValue[] = $this->validate($mSource, $vRules);
@@ -170,7 +76,7 @@ class nglValidate extends nglTrunk {
 			}
 
 			$nLength = self::call("unicode")->strlen($mValue);
-			
+
 			// minlength
 			if(isset($vRules["minlength"]) && $nLength < (int)$vRules["minlength"]) {
 				$this->bCheckError = true;
@@ -189,14 +95,14 @@ class nglValidate extends nglTrunk {
 			if($bLess || $bGreat) {
 				$mLess = ($bLess) ? $vRules["lessthan"] : $vRules["greaterthan"];
 				$mGreat = ($bGreat) ? $vRules["greaterthan"] : $vRules["lessthan"];
-				
+
 				$nBetween = self::call()->between($mValue, $mLess, $mGreat);
 
 				if($bLess && !$bGreat && $nBetween>0) { $this->bCheckError = true; return "lessthan"; }
 				if($bGreat && !$bLess && $nBetween<2) { $this->bCheckError = true; return "greaterthan"; }
 				if($bGreat && $bLess && $nBetween!=1) { $this->bCheckError = true; return "between"; }
 			}
-			
+
 			// in
 			if(isset($vRules["in"])) {
 				$aIn = self::call("unicode")->explode(",", $vRules["in"]);
@@ -211,21 +117,10 @@ class nglValidate extends nglTrunk {
 		if(isset($vRules["options"]["quotemeta"]) && self::call()->istrue($vRules["options"]["quotemeta"])) {
 			$mValue = \quotemeta($mValue);
 		}
-		
+
 		return $mValue;
 	}
 
-	/** FUNCTION {
-		"name" : "ClearCharacters",
-		"type" : "private",
-		"description" : "Retorna una cadena despues de compararla contra <b>$aToClean</b>",
-		"parameters" : {
-			"$sString" : ["string", "Valor"],
-			"$aToClean" : ["array", "Array con los caracteres a conservar/eliminar"],
-			"$bInvert" : ["boolean", "Indica si deben retornarse los valores que se encuentran en <b>$aToClean</b> o los que no se encuentran", "false"]
-		},
-		"return" : "string"
-	} **/
 	private function ClearCharacters1($sString, $aToClean, $bInvert=false) {
 		$sNewString = $sInvertString = $sChar = "";
 		$nString = \strlen($sString);
@@ -252,19 +147,10 @@ class nglValidate extends nglTrunk {
 		} else {
 			$sInvertString .= $sChar;
 		}
-		
+
 		return ($bInvert) ? $sInvertString : $sNewString;
 	}
 
-	/** FUNCTION {
-		"name" : "GetRulesFile",
-		"type" : "private",
-		"description" : "Obtiene la configuración de un archivo <b>.json</b> y la retorna en como un Array",
-		"parameters" : {
-			"$sRulesFile" : ["string", "ruta del archivo <b>.json</b> con las reglas de validacion"]
-		},
-		"return" : "array"
-	} **/
 	private function GetRulesFile($sRulesFile) {
 		$sRulesFile = self::call("files")->absPath($sRulesFile);
 		$sRulesFile = self::call()->sandboxPath($sRulesFile);
@@ -273,40 +159,17 @@ class nglValidate extends nglTrunk {
 			$sRules = \trim($sRules);
 			return \json_decode($sRules, true);
 		}
-		
+
 		return null;
 	}
 
-	/** FUNCTION {
-		"name" : "request",
-		"type" : "public",
-		"description" : "
-			Valida y reemplaza los valores de la variable global <b>$_REQUEST</b> en base al archivo <b>REQUEST.json</b>
-			Este método sobreescribe los valores de <b>$_REQUEST</b>. Para obtener los valores originales se deberán consultar <b>$_GET y $_POST</b>.
-			La parametrización del arranque de esta propiedad se efectua desde el archivo <b>NGL_PATH_CONF/validate.conf</b>
-		",
-		"parameters" : {
-			"$sFrom" : ["string", "
-				Especifica el origen válido de la solicitud, a fin de impedir consultas no autorizadas.
-				En caso de que la solicitud provenga de un origen inválido se vaciará <b>$_REQUEST</b>
-				
-				<b>Origenes válidos</b>
-				<ul>
-					<li><b>ALL:</b> Cualquier origen</li>
-					<li><b>LOCAL:</b> Solicitudes provenientes del propio servidor. Este es el comportamiento predeterminado</li>
-					<li><b>Especificas:</b> <b>Hostnames</b> y/o direcciones <b>IP</b> separados por comas (,)</li>
-				</ul>
-			", "LOCAL"]
-		},
-		"return" : "array"
-	} **/
 	public function request($sFrom="LOCAL") {
 		$bProccess = false;
 		if(isset($_SERVER["HTTP_REFERER"])) {
 			$aURL = \parse_url($_SERVER["HTTP_REFERER"]);
 			$sRequestHost = $aURL["host"];
 			$sIP = \gethostbyname($sRequestHost);
-			
+
 			$aHost = \parse_url($_SERVER["HTTP_HOST"]);
 			$sHost = (isset($aHost["host"])) ? $aHost["host"] : $aHost["path"];
 			if($sHost==$sRequestHost) {
@@ -331,13 +194,6 @@ class nglValidate extends nglTrunk {
 		}
 	}
 
-	/** FUNCTION {
-		"name" : "RequestFrom",
-		"type" : "private",
-		"description" : "Analiza la cadena <b>$sFrom</b> y retorna un array de origines para ser utilizados en <b>request</b>",
-		"parameters" : { "$sFrom" : ["string", "Cadena de posibles origenes"] },
-		"return" : "array"
-	} **/
 	private function RequestFrom($sFrom) {
 		$aRequestsFroms = ["LOCAL" => true];
 		if(!empty($sFrom)) {
@@ -353,154 +209,10 @@ class nglValidate extends nglTrunk {
 		return $aRequestsFroms;
 	}
 
-	/** FUNCTION {
-		"name" : "resetvars",
-		"type" : "public",
-		"description" : "Desetea las variables seteadas con <b>ngl:Validate::addvar</b>",
-		"return" : "void"
-	} **/
 	public function resetvars() {
 		$this->vVariables = [];
 	}
 
-	/** FUNCTION {
-		"name" : "validate", 
-		"type" : "public",
-		"description" : "Valida la variable <b>$mVariables</b> aplicando las reglas <b>$mRules</b>. Si <b>$mRules</b> no está definido, retornará <b>NULL</b>",
-		"parameters" : {
-			"$mVariables" : ["mixed", "Variable o Array a validar"],
-			"$mRules" : ["mixed", "
-				Conjunto de reglas que se aplicarán para la validación.
-				$mRules acepta texto JSON, el nombre de un archivo .json o un Array de datos
-				
-				<b>Sintaxsis:</b><br />
-				{
-					<blockquote>
-						<b>nombre_campo</b>: {
-							<blockquote>
-								<b>type</b>: Es el único valor obligatorio. Ver tipos
-									<b>required</b> : 1 o 0
-									<b>default</b> : Valor utilizado cuando el valor no esté seteado o no cumpla con la validación
-									<b>minlength</b>: Longuitud mínima del valor
-									<b>maxlength</b>: Longuitud máxima del valor
-									<b>lessthan</b>: El valor debe ser menor a ... valor alfanumerico
-									<b>greaterthan</b>: El valor debe ser mayor a ... valor alfanumerico
-									<b>in</b>: Lista de valores separados por coma
-
-									<b>options</b>: [
-										<blockquote>
-											<b>addslashes</b> : Especifica si el valor debe ser tratado con <b>addslashes</b> después de ser validado
-											<b>allow</b> : Tipos o grupos de caracteres UTF-8 (nglUnicode::groups) mas el grupo especial <b>SPACES</b>, separados por coma, que aceptará el campo (tipo ALL)
-											<b>decode</b> : Especifica si el valor debe ser tratado con <b>urldecode</b> o <b>rawurldecode</b> antes de ser validado
-											<b>deny</b> : Tipos o grupos de caracteres UTF-8 (nglUnicode::groups) mas el grupo especial <b>SPACES</b>, separados por coma, que aceptará el campo (tipo ALL)
-											<b>encoding</b> : Juego de caracteres empleado durante la conversión htmlentities (tipo HTML)
-											<b>htmlentities</b> : Flags utilizados durante la conversión htmlentities (tipo HTML)
-											<b>multiple</b> : Caracter utilizado para separar el valor de la variable y convertirla en un array de valores. Todas la variables pueden ser multiples
-											<b>pattern</b> : Expresión regular (tipo REGEX)
-											<b>quotemeta</b> : Especifica si el valor debe ser tratado con <b>quotemeta</b> después de ser validado
-											<b>striptags</b> : Determina cuales son las etiquetas permitidas para aplicar <b>strip_tags</b> sobre el valor antes de ser validado (tipos: ALL, ALPHA, HTML, TEXT, STRING)
-										</blockquote>
-									]
-							</blockquote>
-						}
-					</blockquote>
-				}
-
-				Cuando las reglas son del tipo JSON, archivo o texto, se pueden invocar valores variables agregados por medio de <b>addvar</b>, utilizando la sintaxsis {$nombre_variable}
-				
-				Nota: el grupo especial <b>SPACES</b> contiene a los caracteres:
-				<ul>
-					<li>tabulación (ord:9)</li>
-					<li>salto de línea (ord:10)</li>
-					<li>retorno de carro (ord:13)</li>
-					<li>espacio (ord:32)</li>
-				</ul>
-			"],
-			"$bIgnoreDefault" : ["boolean", "Desactiva el uso de valores <b>default</b>", "false"],
-		},
-		"seealso" : ["nglUnicode::groups"],
-		"examples" : {
-			"Reglas JSON en archivo .json" : "
-				El archivo debe estar alojado en la carpeta <b>NGL_PATH_VALIDATE</b> del proyecto
-			
-				$age = 22; 
-				$age = $ngl("validate")->validate($age, "rules_age");
-			",
-
-			"Reglas JSON en línea" : "
-				$rules = "{
-					"type" : "regex",
-					"options" : { "pattern" : "\\\$[0-9]+" },
-					"minlength" : 5
-				}";
-				
-				$var = "$522"; 
-				$var = $ngl("validate")->validate($var, $rules);
-			",
-
-			"Reglas en Array" : "
-				$rules = [];
-				$rules["type"] = "html";
-				$rules["options"] = [
-					\"htmlentities" => \"ENT_COMPAT,ENT_HTML401,ENT_QUOTES\",
-					\"striptags\" => \"<i>\"
-				);
-
-				$var = "<b>prueba de 'validación' de datos <i>HTML</i></b>";
-				$var = $ngl("validate")->validate($var, $rules);
-			",
-
-			"Validación multiple" : "
-				$rules = "{
-					"type" : "email",
-					"options" : { "multiple" : ";" }
-				}";
-
-				$emails = "mail1@foobar.com;mail2@foobar.com;mail3@foobar.com";
-				print_r($ngl("validate")->validate($emails, $rules));
-			",
-
-			"Validación de Arrays" : "
-				$rules = "{
-					"product" : {
-						"type" : "string",
-						"default" : "milk",
-						"in" : "milk,rice,sugar,tea"
-					},
-					
-					"quantity" : {
-						"type" : "int",
-						"greaterthan" : "1",
-						"lessthan" : "20",
-					},
-					
-					"price" : {
-						"type" : "regex",
-						"options" : { "pattern" : "\\\$[0-9]+" },
-						"minlength" : 5
-					}
-				}";
-
-				print_r($ngl("validate")->validate($_POST, $rules));
-			",
-			
-			"Tipo all customizado" : "
-				$rules = [];
-				$rules["type"] = "all";
-				$rules["options"] = [
-					\"allow\" => \"LATIN_BASIC_LOWERCASE,LATIN_BASIC_NUMBERS\",
-					\"striptags\" => true
-				);
-
-				$var = "<b>ESTA ES 'la prueba' <i>1234</i></b>";
-				$var = $ngl("validate")->validate($var, $rules);
-				
-				# retornara: laprueba1234
-			"
-		},
-
-		"return" : "mixed"
-	} **/
 	public function validate($mVariables, $mRules, $bIgnoreDefault=false) {
 		if(\is_array($mRules)) {
 			$aRules = $mRules;
@@ -509,12 +221,12 @@ class nglValidate extends nglTrunk {
 
 			$aRules = self::call()->isJson($sRules, "array");
 			if($aRules===false) {
-				$aRules = $this->GetRulesFile($sRules);	
+				$aRules = $this->GetRulesFile($sRules);
 			}
 		}
 
 		if($aRules===null) { return null; }
-		
+
 		if(!\is_array($mVariables)) {
 			$this->bCheckError = false;
 			$mCheck = $this->CheckValue($mVariables, $aRules);
@@ -597,22 +309,11 @@ class nglValidate extends nglTrunk {
 		return $vCheck;
 	}
 
-	/** FUNCTION {
-		"name" : "ValidateByType",
-		"type" : "private",
-		"description" : "Validador de variables por tipo",
-		"parameters" : {
-			"$mValue" : ["string", "Valor"],
-			"$sType" : ["string", "Tipo de validación"],
-			"$vOptions" : ["array", "Parámetros auxiliares de la validación", "array()"]
-		},
-		"return" : "string"
-	} **/
 	private function ValidateByType($mValue, $sType, $vOptions=[]) {
 		if(\ini_get("magic_quotes_sybase") && (\strtolower(\ini_get("magic_quotes_sybase"))!="off")) {
 			$mValue = \stripslashes($mValue);
 		}
-	
+
 		$aParams = [];
 		$mNewValue = "";
 		$sType = \strtolower($sType);
@@ -625,7 +326,7 @@ class nglValidate extends nglTrunk {
 					$bDeny = true;
 					$aToClean = self::call()->explodeTrim(",", $vOptions["deny"]);
 				}
-				
+
 				if(isset($bDeny)) {
 					$bSpaces = false;
 					foreach($aToClean as $sValue) {
@@ -658,7 +359,7 @@ class nglValidate extends nglTrunk {
 				$vFlags["ENT_XML1"]			= ENT_XML1;
 				$vFlags["ENT_XHTML"]		= ENT_XHTML;
 				$vFlags["ENT_HTML5"]		= ENT_HTML5;
-				
+
 				$sFlags = (isset($vOptions["htmlentities"])) ? $vOptions["htmlentities"] : "ENT_COMPAT,ENT_HTML401";
 				$aFlags = \explode(",", $sFlags);
 
@@ -667,7 +368,7 @@ class nglValidate extends nglTrunk {
 					$sFlag = \trim($sFlag);
 					$nFlag |= $vFlags[\strtoupper($sFlag)];
 				}
-				
+
 				$sEncoding = (isset($vOptions["encoding"])) ? $vOptions["encoding"] : "UTF-8";
 				$mNewValue = \htmlentities($mValue, $nFlag, $sEncoding);
 				break;
@@ -698,7 +399,7 @@ class nglValidate extends nglTrunk {
 					$mNewValue = $mValue;
 				}
 				break;
-				
+
 			case "int":
 				$mNewValue = \preg_replace("/^[^0-9]+$/s", "", $mValue);
 				$mNewValue = (int)$mNewValue;
@@ -745,7 +446,7 @@ class nglValidate extends nglTrunk {
 
 		return $mNewValue;
 	}
-		
+
 	private function ClearCharacters($sString, $aParams=null, $bInvert=false) {
 		$sNewString = $sInvertString = $sChar = "";
 		$nString = \strlen($sString);
@@ -767,13 +468,13 @@ class nglValidate extends nglTrunk {
 		}
 
 		$aIs = self::call("unicode")->ischr($sChar);
-		
+
 		if(isset($aParams["types"][$aIs[0]]) || isset($aParams["groups"][$aIs[1]]) || isset($aParams["chars"][$aIs[2]])) {
 			$sNewString .= $sChar;
 		} else {
 			$sInvertString .= $sChar;
 		}
-		
+
 		return ($bInvert) ? $sInvertString : $sNewString;
 	}
 }

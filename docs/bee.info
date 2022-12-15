@@ -1,7 +1,20 @@
-[checksum]
-md5 = "610a11f202a0b6d7b9638cffe186153a"
-sha1 = "8614baa28a4670e95668b356c13fc8524d5e9657"
+[info]
+_help = "### bee\
+Es el interprete de nogal, y brinda acceso a todos métodos públicos de cualquiera de los objetos del framework, utilizando cadenas de texto plano\
+\
+https://github.com/hytcom/wiki/blob/master/nogal/docs/bee.md\
+"
 
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/bee.md"
+[errors]
+1001 = "Bee no esta disponible"
+1002 = "Debes estar logueado para utilizar la terminal"
+1003 = "Archivo no encontrado: "
+1004 = "Objeto inexistente: "
+1005 = "El método no existe: "
 
+[errors-en]
+1001 = "Bee is not available"
+1002 = "You must login to use the Terminal"
+1003 = "File not found: "
+1004 = "Object does not exist: "
+1005 = "The required method does not exist: "

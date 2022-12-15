@@ -1,0 +1,86 @@
+# imprimir texto
+@print "hola mundo"
+
+# imprimir con color
+@color success
+@print "color success"
+@color danger
+@print "color danger"
+@color warning
+@print "color warning"
+@color info
+@print "color info"
+@color bold
+@print "texto bold"
+@color error
+@print "error"
+@color default
+
+# set variable texto
+@set varname valor
+
+# imprimir variable texto
+@print "varname = {$varname}"
+
+# set objeto de datos
+@set obj {"name":"Bart", "age":"10"}
+
+# imprimir objeto de datos
+@print {$obj}
+
+# imprimir propiedad de un objeto de datos
+@print "{$obj.name} tiene {$obj.age}"
+
+# set array de objetos
+@set data [{"name":"bart", "age":"10", "gender":"M", "friends": ["milhouse", "nelson"]}, {"name":"lisa", "age":"8", "gender":"F"}, {"name":"homero", "age":"34", "gender":"M"}, {"name":"tod", "age":"12", "gender":"X"}]
+
+# imprimir propiedad de un objeto de datos dentro del array
+@print {$data.0.friends.1}
+@print {$data.2.age}
+@print {$data.2.friends}
+
+# impresión de constante
+@print {@NGL_PATH_DATA}
+
+# dump de una variable
+@dump {$obj}
+
+# uso de funciones PHP
+@php strtoupper "hola mundo"
+
+# puntero bee -$:
+# este puntero guarda el resultado del ultimo comando ejecutado
+# excepto de los comandos: @set, @print, @clear
+@print -$:
+
+@php strtoupper "hola mundo cruel"
+@php substr ["-$:", 5, 5]
+@print -$:
+
+# obtiene el valor de una variable o del puntero bee
+@php explode [";", "hola;mundo;cruel"]
+@get -$: 2
+@php strrev -$:
+@print -$:
+
+# llamada a objetos del nogal
+fn imya
+@print -$:
+
+shift texttable {$data}
+@print -$:
+
+# limpieza del puntero bee
+shift texttable {$data}
+@clear
+@print -$:
+
+# objeto nogal a variable
+file load {@NGL_PATH_DATA}/estaciones.csv
+@set f -$:
+@print "Información del Archivo"
+{$f} fileinfo
+shift convert ["-$:", "vector-ttable"]
+
+# abortar script
+@exit -$:

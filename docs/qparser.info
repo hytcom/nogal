@@ -1,7 +1,76 @@
-[checksum]
-md5 = "a828c56dd93d4de930719564b91b8181"
-sha1 = "00a3134524754085138085f97fa7e62596aeca08"
+[info]
+_help = "### qparser\
+Intenta parsear sentencias SQL. En caso de exito retorna un array con los datos de las misma.\
+\
+https://github.com/hytcom/wiki/blob/master/nogal/docs/qparser.md\
+\
+#### Ejemplos de consultas soportadas:\
+\
+CREATE TABLE `log` (\
+	`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,\
+	`table` CHAR(128) NOT NULL,\
+	`row` INT UNSIGNED NOT NULL,\
+	`user` SMALLINT UNSIGNED DEFAULT NULL,\
+	`date` DATETIME NOT NULL,\
+	`ip` CHAR(45) NOT NULL DEFAULT '',\
+	`changelog` MEDIUMTEXT NULL DEFAULT NULL\
+);\
+\
+SELECT `name`, `ip`, `date` FROM `log` WHERE (`table` = 'demo' AND '2020-01-01'>`date`) OR `ip` = '127.0.0.1' ORDER BY `user`, `row` LIMIT 0,12;\
+\
+SELECT \
+	`log`.`name`, \
+	`log`.`ip`, \
+	`log`.`date`, \
+	`users`.`username` \
+FROM \
+	`log`, `users` \
+WHERE \
+	`users`.`id` = `log`.`user` AND (`table` = 'demo' AND '2020-01-01'>`date`) OR `ip` = '127.0.0.1' \
+ORDER BY `user`, `row`;\
+\
+SELECT `name`, `ip`, `date` FROM `log` ORDER BY `user`, `row`;\
+\
+INSERT INTO `log` (`name`, `ip`, `date`) VALUES('ariel (hycom)', '127.0.0.1', '2020-03-31');\
+\
+UPDATE `log` SET `name` = 'ariel', `ip`='127.0.0.1', `date`='2020-03-31' WHERE `id` = '234' AND `table` = 'demo';\
+\
+DELETE FROM `log`  WHERE `log`.`id` = '234' AND `table` = 'demo';\
+\
+DELETE FROM `log`;\
+"
 
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/qparser.md"
+[arguments]
+css = "Reglas CSS"
+content = "Contanido del PDF"
+encoding = "Juego de caracteres predeterminado"
+filename = "Nombre de archivo de salida, en el caso de utilizar el output save, la ruta de salida debe ser relativa a NGL_SANDBOX"
+font = "Nombre de la fuente"
+footer = "Contenidos del pie de página, considerar margen inferior (bottom)"
+header = "Contenido del Encabezado, considerar margen superior (top)"
+language = "Lenguaje"
+margin = "Array o JSON con los margenes de la página (top,right,bottom,left)"
+marginbottom = "Margen inferior"
+marginleft = "Margen izquierdo"
+marginright = "Margen derecho"
+margintop = "Margen superior"
+output = "Tipo de salida\
+	view = muestra el contenido del documento\
+	download = genera la descarga directa\
+	source = código fuente del documento\
+	save = guarda el documento en la ruta especificada\
+"
+page = "Tamaño de la página\
+	A0 - A10, B0 - B10, C0 - C10\
+	4A0, 2A0, RA0 - RA4, SRA0 - SRA4\
+	Letter, Legal, Executive, Folio\
+	Demy, Royal\
+	A (Type A paperback 111x178mm)\
+	B (Type B paperback 128x198mm)\
+"
+sense = "Sentido de la hoja, P (vertical) ó L (horizontal)"
 
+[errors]
+1000 = "Falta librería. Ejecutar 'composer update' en la carpeta NOGAL/grafts/composer"
+1001 = "Falta librería. Ejecutar 'composer update' en la carpeta NOGAL/grafts/composer luego de agregar a composer.json el paquete:"
+1002 = "No se puede crear el directorio temporal: "

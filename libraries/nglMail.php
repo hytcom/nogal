@@ -1,159 +1,15 @@
 <?php
+/*
+# nogal
+*the most simple PHP Framework* by hytcom.net
+GitHub @hytcom/nogal
+___
 
+# mail
+https://hytcom.net/nogal/docs/objects/mail.md
+*/
 namespace nogal;
 
-
-/*
-ACTIVAR GMAIL 
-
-
-Take the step mentioned earlier. Log into your google email account and then go to this link: https://www.google.com/settings/security/lesssecureapps and set "Access for less secure apps" to ON. Test to see if your issue is resolved. If it isn't resolved, as it wasn't for me, continue to Step #2.
-
-Go to https://support.google.com/accounts/answer/6009563 (Titled: "Password incorrect error"). This page says "There are several reasons why you might see a “Password incorrect” error (aka 534-5.7.14) when signing in to Google using third-party apps. In some cases even if you type your password correctly." This page gives 4 suggestions of things to try.
-
-For me, the first suggestion worked:
-Go to https://g.co/allowaccess from a different device you have previously used to access your Google account and follow the instructions.
-Try signing in again from the blocked app.
-
-$mail = $ngl("mail");
-if($s=="imap") {
-	$mail->server	= "imap";
-	$mail->host		= "mail.dominio.com"; 	//"mail.dominio.com";	//"smtp.gmail.com";
-	$mail->secure	= "ssl";				//"tls"; // ssl | tls
-	$mail->port		= 993;					// 465 | 587
-	$mail->user		= "foobar@dominio.com";
-	$mail->pass		= 'asd123';
-} else if($s=="pop3") {
-	$mail->server	= "pop3";
-	$mail->host		= "mail.dominio.com"; 	//"mail.dominio.com";	//"smtp.gmail.com";
-	$mail->secure	= false;				//"tls"; // ssl | tls
-	$mail->port		= 110;					// 465 | 587
-	$mail->user		= "foobar@dominio.com";
-	$mail->pass		= 'asd123';
-} else {
-	$mail->server	= "smtp";
-	$mail->host		= "mail.dominio.com"; 	//"mail.dominio.com";	//"smtp.gmail.com";
-	$mail->secure	= false;				//"tls"; // ssl | tls
-	$mail->port		= 26;					// 465 | 587
-	$mail->user		= "foobar@dominio.com";
-	$mail->pass		= $ngl()->passwd('asd123');
-}
-
-print_r($mail
-	->connect()
-	->login()
-	// ->mailbox("inbox")
-	// ->headers(1,"subject")
-	// ->getAll('SUBJECT "Aviso de transferencia"')
-	// ->getAll()
-	// ->getraw(5)
-	// ->get(6)
-	// ->headers(29,"X-Authority-Analysis")
-	// ->headers(29,"From")
-	
-	->from("Ariel Bottero <".$mail->user.">")
-	->name()
-	->subject("prueba")
-	->message("sigo probando")
-	// ->message("hola!!!!!!!! <img src='cid:achu' /> probandooooo!!!")
-	// ->image("tmp/achu.jpg", "achu")
-	// ->attach("tmp/fantasydragon.jpg")
-	->send("foobar@dominio.com")
-);
-
-
-// echo $mail->log;
-
-*/
-
-
-/** CLASS {
-	"name" : "nglMail",
-	"object" : "mail",
-	"type" : "instanciable",
-	"revision" : "20160201",
-	"extends" : "nglBranch",
-	"interfaces" : "iNglClient",
-	"description" : "
-		Este objeto permite gestionar operaciones sobre los servidores de correo. Recibiendo y enviando mensajes.
-		Entre las funciones del objecto se encuentran:
-			<ul>
-				<li>Revisar correos IMAP</li>
-				<li>Revisar correos POP3</li>
-				<li>Enviar correos via SMTP</li>
-			</ul>
-	",
-	"configfile" : "mail.conf",
-	"variables" : {
-		"$sBoundary" : ["private", "Separador de contenidos"],
-		"$aAttachments" : ["private", "Array con los archivos adjuntos del correo a enviar"],
-		"$socket" : ["private", "Puntero de la conexión con el servidor"],
-		"$sCRLF" : ["private", "Caracteres del salto de línea"],
-		"$nCRLF" : ["private", "Longuitud del salto de línea"],
-		"$sTag" : ["private", "Tag antivo en las conexiones IMAP"],
-		"$sServerType" : ["private", "Tipo de Servidor: smtp | imap | pop3"],
-		"$sSMTPUsername" : ["private", "Nombre de usuario SMTP"],
-		"$sSMTPPassword" : ["private", "Contraseña SMTP"]
-	},
-	"arguments": {
-		"from" : ["string", "Dirección de correo saliente"],
-		"name" : ["string", "Nombre asociado a la dirección de correo saliente", "null"],
-		"reply" : ["string", "Dirección de correo de respuesta", "null"],
-		"reply_name" : ["string", "Nombre asociado a la dirección de correo de respuesta", "null"],
-		"to" : ["string", "Correos de destino, separados cualquier caracter NO válido en una dirección de correo (espacio, coma, punto y coma, etc)", "null"],
-		"cc" : ["string", "Direcciones en copia, separados cualquier caracter NO válido en una dirección de correo (espacio, coma, punto y coma, etc)", "null"],
-		"bcc" : ["string", "Direcciones en copia oculta, separados cualquier caracter NO válido en una dirección de correo (espacio, coma, punto y coma, etc)", "null"],
-		
-		"subject" : ["string", "Asunto del correo a enviar", "null"],
-		"message" : ["string", "Cuerpo del correo", "null"],
-		"attach" : ["string", "Ruta de un archivo adjunto", "null"],
-		"attach_name" : ["string", "Nombre que llevará el archivo adjunto <b>argument::attach</b>", "null"],
-
-		"notify" : ["string", "Dirección del acuse de recibo", "null"],
-		"priority" : ["int", "Prioridad del correo a enviar, de 1 a 5", "null"],
-		"charset" : ["string", "Codificación de caracteres del correo a enviar", "UTF-8"],
-		"timediff" : ["string", "Diferencia horaria entre el cliente y el servidor SMTP", "0 hours"],
-
-		"server" : ["string", "Tipo de servidor al que se realizará la conexión: smtp | imap | pop3", "smtp"],
-		"host" : ["string", "Dominio o IP del servidor"],
-		"secure" : ["string", "Protocolo de seguridad del servidor: SSL, TLS o NULL", "null"],
-		"port" : ["int", "Puerto del servidor"],
-		"user" : ["string", "Nombre de usuario en el servidor"],
-		"pass" : ["string", "Contraseña del servidor"],
-		"timeout" : ["int", "Tiempo de espera del servidor", 20],
-
-		"mailbox" : ["string", "Nombre de la carpeta activa", "INBOX"],
-		"mail" : ["int", "Id del correo activo", "null"],
-		"fields" : ["string", "Nombres, separados por espacios, de los campos del correo activo", "INBOX"],
-		"limit" : ["int", "limite de mail del metodo getall"],
-
-		"smtp_authtype" : ["string", "Método de autenticación: CRAM-MD5 | LOGIN | PLAIN", "null"],
-		"localhost" : ["string", "Nombre del servidor local", "localhost"]
-	},
-	"attributes": {
-		"mail_headers" : ["string", "Cabeceras del correo a enviar"],
-		"mail_body" : ["string", "Cuerpo del correo a enviar"],
-		"mail_from" : ["string", "Dirección del remitente del correo a enviar"],
-		"mail_name" : ["string", "Nombre del remitente del correo a enviar"],
-		"mail_reply" : ["string", "Dirección de respuesta del correo a enviar"],
-		"mail_to" : ["string", "Destinatarios del correo a enviar"],
-		"mail_cc" : ["string", "Destinatarios de las copias del correo a enviar"],
-		"mail_bcc" : ["string", "Destinatarios de las copias ocultas del correo a enviar"],
-		"mail_subject" : ["string", "Asunto del correo a enviar"],
-		"mail_text" : ["string", "Contenido en texto plano del correo a enviar"],
-		"mail_text" : ["string", "Contenido HTML del correo a enviar"],
-		"mail_priority" : ["int", "Prioridad del correo a enviar"],
-		"mail_notify" : ["int", "Dirección de correo para la confirmación de lectura"],
-
-
-		$vAttributes["state"]			= null;
-		$vAttributes["log"]				= null;
-
-		$vAttributes["exists"]			= null;
-		$vAttributes["recent"]			= null;
-
-	}
-} **/
 class nglMail extends nglBranch implements iNglClient {
 
 	private $sBoundary;
@@ -163,7 +19,6 @@ class nglMail extends nglBranch implements iNglClient {
 	private $sCRLF;
 	private $nCRLF;
 	private $sTag;
-	private $sServerType;
 	private $sSMTPUsername;
 	private $sSMTPPassword;
 	private $nSMTPMaxSize;
@@ -177,38 +32,39 @@ class nglMail extends nglBranch implements iNglClient {
 		$vArguments["attach_content"]			= ['$mValue', null];
 		$vArguments["attach_name"]				= ['$mValue', null];
 		$vArguments["attachs_ignore"]			= ['self::call()->isTrue($mValue)', false];
+		$vArguments["authtype"]					= ['\strtoupper($mValue)', "LOGIN", ["LOGIN", "XOAUTH2"]];
 		$vArguments["bcc"]						= ['$mValue', null];
 		$vArguments["cc"]						= ['$mValue', null];
-		$vArguments["charset"]					= ['(string)$mValue', "UTF-8"]; /* (UTF-8 | iso-8859-1) */
-		$vArguments["fields"]					= ['$mValue', null]; /* separados por espacios */
-		$vArguments["flags"]					= ['$mValue', null]; /* separadas por espacios y sin la \ */
+		$vArguments["charset"]					= ['(string)$mValue', "UTF-8"];
+		$vArguments["crypto"]					= ['$mValue', STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT];
+		$vArguments["fields"]					= ['$mValue', null];
+		$vArguments["flags"]					= ['$mValue', null];
 		$vArguments["folder"]					= ['$mValue', "INBOX"];
 		$vArguments["from"]						= ['$this->MailAddress((string)$mValue, "from")'];
-		$vArguments["get_mode"]					= ['$mValue', "headers"]; // headers | all | keys
+		$vArguments["getmode"]					= ['$mValue', "headers"];
 		$vArguments["headers"]					= ['$mValue', "DATE FROM SUBJECT"];
 		$vArguments["host"]						= ['$mValue'];
-		$vArguments["inreplyto"]				= ['$mValue', null]; /* id del mail al que se esta respondiendo */
+		$vArguments["inreplyto"]				= ['$mValue', null];
 		$vArguments["limit"]					= ['(int)$mValue', 25];
 		$vArguments["localhost"]				= ['$mValue', "localhost"];
-		$vArguments["mail"]						= ['$mValue', null]; // id o ids separados por ,
+		$vArguments["mail"]						= ['$mValue', null];
 		$vArguments["message"]					= ['$this->MailMessage((string)$mValue)', null];
 		$vArguments["notify"]					= ['$this->MailNotify((string)$mValue)', null];
 		$vArguments["pass"]						= ['$mValue'];
-		$vArguments["peek"]						= ['self::call()->isTrue($mValue)', false]; // vuelve a marcar como no leido luego de leer
+		$vArguments["peek"]						= ['self::call()->isTrue($mValue)', false];
 		$vArguments["port"]						= ['(int)$mValue'];
 		$vArguments["priority"]					= ['$this->MailPriority((string)$mValue)', null];
-		$vArguments["references"]				= ['$mValue', null]; /* referencia original del mail al que se esta respondiendo, sin el id del mismo */
+		$vArguments["references"]				= ['$mValue', null];
 		$vArguments["reply"]					= ['$this->MailAddress((string)$mValue, "reply")', null];
 		$vArguments["revert"]					= ['self::call()->isTrue($mValue)', true];
 		$vArguments["secure"]					= ['(string)$mValue', null];
-		$vArguments["server"]					= ['$mValue', "smtp"]; /* smtp | imap | pop3 */
-		$vArguments["smtp_authtype"]			= ['$mValue', null]; /* "(CRAM-MD5 | LOGIN | PLAIN)" */
+		$vArguments["server"]					= ['\strtolower($mValue)', "smtp", ["smtp","imap","pop3"]];
+		$vArguments["smtp_authtype"]			= ['$mValue', null];
 		$vArguments["subject"]					= ['$this->MailSubject((string)$mValue)', null];
 		$vArguments["timediff"]					= ['$mValue', "0 hours"];
-		$vArguments["timeout"]					= ['(int)$mValue', "20"];
+		$vArguments["timeout"]					= ['(int)$mValue', "10"];
 		$vArguments["to"]						= ['$mValue', null];
 		$vArguments["user"]						= ['$mValue'];
-
 		return $vArguments;
 	}
 
@@ -223,27 +79,26 @@ class nglMail extends nglBranch implements iNglClient {
 		$vAttributes["mail_to"]				= null;
 		$vAttributes["mail_cc"]				= null;
 		$vAttributes["mail_bcc"]			= null;
-		
+
 		$vAttributes["mail_subject"]		= null;
 		$vAttributes["mail_text"]			= null;
 		$vAttributes["mail_html"]			= null;
 		$vAttributes["mail_priority"]		= null;
 		$vAttributes["mail_notify"]			= null;
-		
+
 		$vAttributes["getted"]				= null;
 		$vAttributes["getted_id"]			= null;
 		$vAttributes["getted_keys"]			= null;
-		$vAttributes["currret_mailbox"]		= null;
 
 		$vAttributes["state"]				= null;
 		$vAttributes["log"]					= null;
 
 		$vAttributes["exists"]				= null;
 		$vAttributes["recent"]				= null;
-		
+
 		return $vAttributes;
 	}
-	
+
 
 	/** FUNCTION {
 	__init__: Ejecuta las configuraciones básicas del objeto.
@@ -293,7 +148,7 @@ class nglMail extends nglBranch implements iNglClient {
 		$sHMAC = \hash_hmac("MD5", $this->sSMTPPassword, $vResponse["text"]);
 		$vResponse = $this->request(\base64_encode($this->sSMTPUsername." ".$sHMAC));
 		if($vResponse["code"]!=235) { return false; }
-		
+
 		return true;
 	}
 
@@ -308,7 +163,7 @@ class nglMail extends nglBranch implements iNglClient {
 		// password
 		$vResponse = $this->request(\base64_encode($this->sSMTPPassword));
 		if($vResponse["code"]!=235) { return false; }
-		
+
 		return true;
 	}
 
@@ -319,23 +174,25 @@ class nglMail extends nglBranch implements iNglClient {
 		// username - password
 		$vResponse = $this->request(\base64_encode("\0".$this->sSMTPUsername."\0".$this->sSMTPPassword));
 		if($vResponse["code"]!=235) { return false; }
-		
+
 		return true;
 	}
 
 	private function BuildMail() {
-		$sFrom			= $this->attribute("mail_from");
-		$sFromMail		= $this->attribute("mail_from_mail");
-		$sReplyTo		= $this->attribute("mail_reply");
-		$sNotify		= $this->attribute("mail_notify");
-		$nPriority		= $this->attribute("mail_priority");
-		$aCC			= $this->attribute("mail_cc");
-		$sSubject		= $this->attribute("mail_subject");
+		$sFrom = $this->mail_from!=null ? $this->mail_from : $this->user;
+		$sFromMail = $this->mail_from_mail!=null ? $this->mail_from_mail : $this->user;
+		if($sFrom==null) { return self::errorMessage($this->object, 1001); }
+
+		$sReplyTo		= $this->mail_reply;
+		$sNotify		= $this->mail_notify;
+		$nPriority		= $this->mail_priority;
+		$aCC			= $this->mail_cc;
+		$sSubject		= $this->mail_subject;
 		$sEncoding 		= (\strtolower($this->charset)!="us-ascii") ? "8bit" : "7bit";
 		$sTime			= \strtotime($this->timediff);
 
 		if($sReplyTo===null) { $sReplyTo = $sFrom; }
-		
+
 		// ENCABEZADOS
 		$sHeaders	 = "Date: ".\date("l j F Y, G:i", $sTime).$this->sCRLF;
 		$sHeaders	.= "MIME-Version: 1.0".$this->sCRLF;
@@ -356,12 +213,12 @@ class nglMail extends nglBranch implements iNglClient {
 		$sHeaders	.= "Subject: ".$sSubject.$this->sCRLF;
 		$sHeaders	.= "Return-Path: <".$sFromMail.">".$this->sCRLF;
 		$sHeaders	.= "Return-Path: <".$sFromMail.">".$this->sCRLF;
-		
+
 		// acuse de recibo
 		if($sNotify!==null) {
 			$sHeaders .= "Disposition-Notification-To: ".$sNotify.$this->sCRLF;
 		}
-		
+
 		// prioridad
 		if($nPriority!==null) {
 			$sHeaders .= "X-Priority: ".$nPriority.$this->sCRLF;
@@ -372,11 +229,11 @@ class nglMail extends nglBranch implements iNglClient {
 
 		// tipo de contenido
 		$sHeaders 	.= "Content-Type: multipart/mixed; boundary=\"".$this->sBoundary."MIX\"".$this->sCRLF;
-		
+
 		// contenido
-		$sTextMessage = $this->attribute("mail_text");
-		$sHTMLMessage = $this->attribute("mail_html");
-		
+		$sTextMessage = $this->mail_text;
+		$sHTMLMessage = $this->mail_html;
+
 		// MENSAJE
 		$sBody	 = "--".$this->sBoundary."MIX".$this->sCRLF;
 		$sBody	.= "Content-Type: multipart/alternative; boundary=\"".$this->sBoundary."ALT\"".$this->sCRLF.$this->sCRLF;
@@ -419,34 +276,40 @@ class nglMail extends nglBranch implements iNglClient {
 	public function connect() {
 		list($sServerType,$sHost,$sSecure,$nPort,$nTimeOut) = $this->getarguments("server,host,secure,port,timeout", \func_get_args());
 
-		$this->sServerType = \strtolower($sServerType);
-		
 		// hostname
 		$vHost = \parse_url($sHost);
 		$sSecure = \strtolower($sSecure);
 		if($sSecure=="ssl") {
 			$sHost = "ssl://".((!isset($vHost["scheme"])) ? $sHost : $vHost["host"]);
-		} else if($sSecure=="tls") {
+		} else {
 			$sHost = (!isset($vHost["scheme"])) ? $sHost : $vHost["host"];
 		}
 
 		$this->Logger("<< ".$sHost.":".$nPort.$this->sCRLF);
-		$this->socket = @\fsockopen($sHost, $nPort, $nError, $sError, $nTimeOut);
+		// $this->socket = @\fsockopen($sHost, $nPort, $nError, $sError, $nTimeOut);
+		$this->socket = @\stream_socket_client($sHost.":".$nPort, $nError, $sError, $nTimeOut);
 
 		if($this->socket===false) {
 			$this->Logger("-- \t\tERROR #".$nError." (".$sError.")".$this->sCRLF);
 			return false;
 		} else {
-			if($this->sServerType=="smtp") { $this->aSMTP = array($sHost, $nPort, $nTimeOut); }
+			\stream_set_timeout($this->socket, $nTimeOut);
+			if($this->server=="smtp") { $this->aSMTP = array($sHost, $nPort, $nTimeOut); }
 			$vResponse = $this->Response("* OK");
 		}
-		
+
+		// // tls
+		// if(\strtolower($this->secure)=="tls") {
+		// 	$this->request("STARTTLS");
+		// 	@\stream_socket_enable_crypto($this->socket, true, STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT);
+		// }
+
 		$this->attribute("state", "CONNECTED");
 		return $this;
 	}
 
 	public function count() {
-		return $this->attribute("exists");
+		return $this->exists;
 	}
 
 	private function DecodingType($sContent, $sType="quoted-printable") {
@@ -468,19 +331,25 @@ class nglMail extends nglBranch implements iNglClient {
 	private function Disconnect() {
 		$this->Logger("-- Connection closed");
 		$this->attribute("state", "CLOSED");
-		if($this->sServerType=="smtp") { $this->request("QUIT"); }
+		if($this->server=="smtp") { $this->request("QUIT"); }
 		@fclose($this->socket);
 		return false;
 	}
 
 	private function Fetch($sMailsId, $sMessagesFilter="ALL") {
-		if($this->attribute("state")=="SELECTED") {
-			if($this->sServerType=="imap") {
+		if($this->state=="SELECTED") {
+			if($this->server=="imap") {
+				// tls
+				if(\strtolower($this->secure)=="tls") {
+					$vResponse = $this->request("STARTTLS");
+					@\stream_socket_enable_crypto($this->socket, true, $this->crypto);
+				}
+
 				$vResponse = $this->request("FETCH ".$sMailsId." (".$sMessagesFilter.")");
 				$aMessages = false;
 				if($vResponse["text"][0]=="*") {
 					$aMessages = [];
-					
+
 					$sResponse = \substr($vResponse["text"], 0, \strpos($vResponse["text"], $this->Tag()));
 					$aResponse = \explode($this->sCRLF, $sResponse);
 
@@ -524,12 +393,12 @@ class nglMail extends nglBranch implements iNglClient {
 				}
 			}
 		}
-		
+
 		return false;
 	}
 
 	private function FindMark($sResponse, $sMark=null) {
-		$sMark = ($sMark!==null) ? $sMark : (($this->sServerType=="imap") ? $this->Tag() : "+OK");
+		$sMark = ($sMark!==null) ? $sMark : (($this->server=="imap") ? $this->Tag() : "+OK");
 		return (\strpos($sResponse, $sMark)!==false);
 	}
 
@@ -564,7 +433,7 @@ class nglMail extends nglBranch implements iNglClient {
 		$sFlag = $this->BuildFlags($sFlags);
 		$this->request("STORE ".$sMailsId." -FLAGS (\\Seen)");
 	}
-	
+
 	private function BuildFlags($sFlags) {
 		$aFlags = \explode(" ", $sFlags);
 		foreach($aFlags as &$sFlag) {
@@ -576,18 +445,18 @@ class nglMail extends nglBranch implements iNglClient {
 	}
 
 	public function get() {
-		if($this->bLogged) { $this->connect()->login()->mailbox($this->attribute("currret_mailbox")); }
-		list($nMailId,$sGetMode) = $this->getarguments("mail,get_mode", \func_get_args());
+		if($this->bLogged) { $this->connect()->login()->mailbox($this->folder); }
+		list($nMailId,$sGetMode) = $this->getarguments("mail,getmode", \func_get_args());
 		$nMailId = $this->MailsIds($nMailId, true);
 		$sGetMode = strtolower($sGetMode);
-		if($nMailId==$this->attribute("getted_id")) {
-			return ($sGetMode=="keys") ? $this->attribute("getted_keys") : $this->attribute("getted");
+		if($nMailId==$this->getted_id) {
+			return ($sGetMode=="keys") ? $this->getted_keys : $this->getted;
 		}
 
 		if($sGetMode=="headers") {
 			return $this->headers($nMailId);
 		} else {
-			if($this->sServerType=="imap") {
+			if($this->server=="imap") {
 				$aResponse = $this->Fetch($nMailId, "BODY[]");
 			} else {
 				$aResponse = $this->Fetch($nMailId);
@@ -627,7 +496,7 @@ class nglMail extends nglBranch implements iNglClient {
 		$aMail["from"] = $aFrom[0];
 		$aMail["from_name"] = $aFrom[1];
 		$aMail["from_address"] = $aFrom[3];
-		$aMail["to"] = $this->PrepareMails($aMail["headers"]["To"])["list"][0];
+		$aMail["to"] = \array_key_exists("To", $aMail["headers"]) ? $this->PrepareMails($aMail["headers"]["To"])["list"][0] : "";
 		$aMail["cc"] = \array_key_exists("Cc", $aMail["headers"]) ? $this->PrepareMails($aMail["headers"]["Cc"])["list"] : "";
 		$aMail["cco"] = \array_key_exists("Cco", $aMail["headers"]) ? $this->PrepareMails($aMail["headers"]["Cco"])["list"] : "";
 		$aMail["subject"] = $aMail["headers"]["Subject"];
@@ -637,7 +506,7 @@ class nglMail extends nglBranch implements iNglClient {
 		// body
 		\preg_match_all("/boundary=\"?([a-z0-9\'\(\)\+\_\,\-\.\/\:\=\?]+)\"?/is", $sMailContent, $aBoundary);
 
-		$aBoundaries = [];		
+		$aBoundaries = [];
 		foreach($aBoundary[1] as $sBoundary) {
 			$sBoundary = \str_replace(["\"", '"'], "", $sBoundary);
 			$aBoundaries[] = "--".$sBoundary."--";
@@ -649,7 +518,7 @@ class nglMail extends nglBranch implements iNglClient {
 		$sMailContent = \str_replace($aBoundaries, $sHash, $vMailParts[1]);
 		$aMailContent = \explode($sHash, $sMailContent);
 		// print_r($aMailContent); exit();
-		
+
 		foreach($aMailContent as $sFragment) {
 			if(empty($sFragment)) { continue; }
 
@@ -670,7 +539,7 @@ class nglMail extends nglBranch implements iNglClient {
 
 						switch(true) {
 							case ($sContentType && \strpos($sContentType, "text/plain")!==false):
-								if($this->sServerType=="pop3") {
+								if($this->server=="pop3") {
 									$sFragment = \preg_replace(["/\n\.\./s", "/^\.\./s"], ["\n.", "."], $sFragment);
 								}
 								$aMail["text"] = $this->DecodingType($sFragment, $sEncoding);
@@ -756,14 +625,15 @@ class nglMail extends nglBranch implements iNglClient {
 		UNDELETED - match messages that are not deleted
 		UNFLAGGED - match messages that are not flagged
 		UNKEYWORD "string" - match messages that do not have the keyword "string"
-		UNSEEN - match messages which have not been read yet 
+		UNSEEN - match messages which have not been read yet
 	**/
 	public function getall() {
-		if($this->sServerType=="smtp") {
+		if($this->server=="smtp") {
 			return false;
-		} else if($this->sServerType=="imap") {
-			if($this->bLogged) { $this->connect()->login()->mailbox($this->attribute("currret_mailbox")); }
-			list($sSearch,$nLimit,$sGetMode) = $this->getarguments("search,limit,get_mode", \func_get_args());
+		} else if($this->server=="imap") {
+			if(!$this->bLogged) { $this->connect()->login()->mailbox($this->folder); }
+
+			list($sSearch,$nLimit,$sGetMode) = $this->getarguments("search,limit,getmode", \func_get_args());
 			if($sSearch===null) { $sSearch = "ALL"; }
 			$vResponse = $this->request("SEARCH ".$sSearch, $this->Tag());
 			$sResult = \str_replace("* SEARCH ", "", $vResponse["text"]);
@@ -775,7 +645,7 @@ class nglMail extends nglBranch implements iNglClient {
 			$aResult = \explode(" ", $sResult);
 		} else {
 			$aResult = [];
-			$nEnd = $this->attribute("exists")+1;
+			$nEnd = $this->exists+1;
 			for($x=1; $x<$nEnd; $x++) {
 				$aResult[] = $x;
 			}
@@ -805,8 +675,8 @@ class nglMail extends nglBranch implements iNglClient {
 	public function getraw() {
 		list($nMailId) = $this->getarguments("mail", \func_get_args());
 		$nMailId = $this->MailsIds($nMailId, true);
-		if($this->sServerType=="imap") {
-			if($this->bLogged) { $this->connect()->login()->mailbox($this->attribute("currret_mailbox")); }
+		if($this->server=="imap") {
+			if($this->bLogged) { $this->connect()->login()->mailbox($this->folder); }
 			return $this->Fetch($nMailId, "BODY[]");
 		} else {
 			return $this->Fetch($nMailId);
@@ -817,8 +687,8 @@ class nglMail extends nglBranch implements iNglClient {
 	public function getreplyto() {
 		list($nMailId) = $this->getarguments("mail", \func_get_args());
 		$nMailId = $this->MailsIds($nMailId, true);
-		if($this->sServerType=="imap") {
-			if($this->bLogged) { $this->connect()->login()->mailbox($this->attribute("currret_mailbox")); }
+		if($this->server=="imap") {
+			if($this->bLogged) { $this->connect()->login()->mailbox($this->folder); }
 			$aHeaders = $this->headers($nMailId, "MESSAGE-ID REFERENCES");
 			$this->unflag($nMailId, "seen");
 			return $aHeaders;
@@ -829,7 +699,7 @@ class nglMail extends nglBranch implements iNglClient {
 	public function headers() {
 		list($sMailsId, $sFields) = $this->getarguments("mail,fields", \func_get_args());
 		$sMailsId = $this->MailsIds($sMailsId);
-		if($this->sServerType=="imap") {
+		if($this->server=="imap") {
 			if($sFields===null) {
 				$aHeaders = $this->Fetch($sMailsId, "BODY[HEADER]");
 			} else {
@@ -844,7 +714,7 @@ class nglMail extends nglBranch implements iNglClient {
 			$aHeaders[$nMailId] = \iconv_mime_decode_headers(\trim($sHeader), 0, "UTF-8");
 		}
 
-		if($this->sServerType=="pop3" && $sFields!==null) {
+		if($this->server=="pop3" && $sFields!==null) {
 			$sFields = \strtolower($sFields);
 			$aFields = \explode(" ", $sFields);
 			$aFields = self::call()->truelize($aFields);
@@ -857,7 +727,7 @@ class nglMail extends nglBranch implements iNglClient {
 				}
 				$aHeaders[$nId] = $aHeaderFields;
 			}
-			
+
 		}
 
 		return $aHeaders;
@@ -889,7 +759,7 @@ class nglMail extends nglBranch implements iNglClient {
 
 	public function image() {
 		list($sSource, $sCID, $sName) = $this->getarguments("embed,embed_cid,embed_name", \func_get_args());
-		
+
 		if($sCID==null) { $sCID = $sSource; }
 		if($sName==null) { $sName = $sSource; }
 		$this->aAttachments[] = [$sSource, $sName, $sCID];
@@ -898,8 +768,8 @@ class nglMail extends nglBranch implements iNglClient {
 	}
 
 	private function Logger($sLog) {
-		$sHistory = $this->attribute("log");
-		
+		$sHistory = $this->log;
+
 		$sLog = \str_replace("\r\n", "\n", $sLog);
 		$sLog = \str_replace("\r", "\n", $sLog);
 		$sLog = \preg_replace("/\n+/is", $this->sCRLF."   ", $sLog);
@@ -909,25 +779,37 @@ class nglMail extends nglBranch implements iNglClient {
 		$this->attribute("log", $sHistory);
 	}
 
+	private function SASLToken($sUsername, $sAccessToken) {
+		return \base64_encode("user=".$sUsername."\1auth=Bearer ".$sAccessToken."\1\1");
+	}
+
 	public function login() {
 		list($sUsername,$sPassword) = $this->getarguments("user,pass", \func_get_args());
 
-		$sPassword = self::passwd($sPassword, true);
-		if($this->attribute("state")=="CONNECTED") {
-			if($this->sServerType=="smtp") {
+		if($this->authtype=="LOGIN") { $sPassword = self::passwd($sPassword, true); }
+		if($this->state=="CONNECTED") {
+			if($this->server=="smtp") {
 				$this->sSMTPUsername = $sUsername;
 				$this->sSMTPPassword = $sPassword;
 				$this->attribute("state", "READY TO SEND");
 				return $this;
-			} else if($this->sServerType=="imap") {
-				$vResponse = $this->request("LOGIN ".$sUsername." ".$sPassword);
+			} else if($this->server=="imap") {
+				switch($this->authtype) {
+					case "XOAUTH2":
+						$vResponse = $this->request("AUTHENTICATE XOAUTH2 ".$this->SASLToken($sUsername, $sPassword));
+						break;
+
+					case "LOGIN":
+					default:
+						$vResponse = $this->request("LOGIN ".$sUsername." ".$sPassword);
+						break;
+				}
 			} else {
 				$vResponse = $this->request("USER ".$sUsername);
 				if($this->FindMark($vResponse["text"])) {
 					$vResponse = $this->request("PASS ".$sPassword);
 				}
 			}
-
 			if($this->FindMark($vResponse["text"])) {
 				$this->attribute("state", "AUTHENTICATED");
 				$this->bLogged = true;
@@ -941,8 +823,8 @@ class nglMail extends nglBranch implements iNglClient {
 	public function mailbox() {
 		list($sMailBox) = $this->getarguments("folder", \func_get_args());
 
-		if($this->attribute("state")=="AUTHENTICATED") {
-			if($this->sServerType=="imap") {
+		if($this->state=="AUTHENTICATED") {
+			if($this->server=="imap") {
 				$vResponse = $this->request("SELECT ".$sMailBox);
 				if($this->FindMark($vResponse["text"], "* OK")) {
 					\preg_match("/\* ([\d]+) EXISTS/s", $vResponse["text"], $aExists);
@@ -960,8 +842,7 @@ class nglMail extends nglBranch implements iNglClient {
 					$this->attribute("state", "SELECTED");
 				}
 			}
-			
-			$this->attribute("currret_mailbox", $sMailBox);
+
 			return $this;
 		}
 
@@ -972,7 +853,7 @@ class nglMail extends nglBranch implements iNglClient {
 		list($sMailBox,$sWildCard ) = $this->getarguments("mailbox,wild_card", \func_get_args());
 
 		$aMailboxes = [];
-		if($this->attribute("state")=="AUTHENTICATED") {
+		if($this->state=="AUTHENTICATED") {
 			if($sMailBox=="") { $sMailBox = "\"\""; }
 			if($sWildCard=="") { $sWildCard = "*"; }
 
@@ -996,7 +877,7 @@ class nglMail extends nglBranch implements iNglClient {
 	}
 
 	public function maillog() {
-		return $this->attribute("log");
+		return $this->log;
 	}
 
 	protected function MailMessage() {
@@ -1023,17 +904,17 @@ class nglMail extends nglBranch implements iNglClient {
 				if($sLine==".") { $sLine .= " "; }
 				$aMessage[$nLine] = $sLine;
 			}
-			
+
 			$sMessage = \implode($sCRLF, $aMessage);
 			return \trim($sMessage);
 		};
 
 		$fNormalize($sText);
 		$fNormalize($sHTML);
-		
+
 		$this->attribute("mail_text", $sText);
 		$this->attribute("mail_html", $sHTML);
-		
+
 		return $sHTML;
 	}
 
@@ -1064,7 +945,7 @@ class nglMail extends nglBranch implements iNglClient {
 			case 4: $this->attribute("mail_priority", "4 (Low)"); break;
 			case 5: $this->attribute("mail_priority", "5 (Lowest)"); break;
 		}
-		
+
 		return $this;
 	}
 
@@ -1120,15 +1001,15 @@ class nglMail extends nglBranch implements iNglClient {
 
 	public function request() {
 		list($sMessage,$sMark) = $this->getarguments("command,mark", \func_get_args());
-		$sMessage = (($this->sServerType=="imap") ? $this->Tag(true)." " : "").$sMessage.$this->sCRLF;
+		$sMessage = (($this->server=="imap") ? $this->Tag(true)." " : "").$sMessage.$this->sCRLF;
 		@\fputs($this->socket, $sMessage);
-		$this->Logger("<< ".$sMessage); 
+		$this->Logger("<< ".$sMessage);
 		return $this->Response($sMark);
 	}
 
 	private function Response($sMark=null) {
 		$bIMAP = $bSMTP = $bPOP3 = false;
-		switch($this->sServerType) {
+		switch($this->server) {
 			case "smtp": $bSMTP = true; break;
 			case "imap": $bIMAP = true; break;
 			case "pop3": $bPOP3 = true; break;
@@ -1144,20 +1025,22 @@ class nglMail extends nglBranch implements iNglClient {
 				while(true) {
 					$sGet = \fgets($this->socket, 512);
 					$sResponse .= (!empty($sGet)) ? $sGet : "\n";
-					$vMetaData = \stream_get_meta_data($this->socket);
-					if($vMetaData["unread_bytes"]==0) { break; }
-					// if($vMetaData["timed_out"]) { break; }
+					$aMetaData = \stream_get_meta_data($this->socket);
+					if($aMetaData["unread_bytes"]==0) { self::errorMessage($this->object, 1002, null, "die"); }
+					// if($aMetaData["timed_out"]) { break; }
 				}
 			} else {
 				while(true) {
 					$sGet = \fgets($this->socket, 4096);
 					$sResponse .= (!empty($sGet)) ? $sGet : "\n";
-					if(($sMark!==null && \strpos($sGet, $sMark)===0) ||(\strpos($sGet, $this->Tag())===0)) { 
+					$aMetaData = \stream_get_meta_data($this->socket);
+					if($aMetaData["timed_out"]) { self::errorMessage($this->object, 1002, null, "die"); }
+					if(($sMark!==null && \strpos($sGet, $sMark)===0) ||(\strpos($sGet, $this->Tag())===0)) {
 						break;
 					}
 				}
 			}
-			
+
 			$vResponse["text"] = $sResponse;
 			if($bSMTP) { $vResponse["code"] = \substr($sResponse, 0, 3); }
 			if($bPOP3) { $vResponse["code"] = \substr($sResponse, 0, 4); }
@@ -1174,45 +1057,47 @@ class nglMail extends nglBranch implements iNglClient {
 
 	public function send() {
 		list($mTo, $mCC, $mBCC) = $this->getarguments("to,cc,bcc", \func_get_args());
-		if($this->attribute("from")==null) { return self::errorMessage($this->object, 1001); }
-		
+
 		$aSendTo = $this->PrepareMails($mTo);
 		$this->attribute("mail_to", $aSendTo);
 		$this->attribute("mail_cc", $this->PrepareMails($mCC)["list"]);
 		$this->attribute("mail_bcc", $this->PrepareMails($mBCC)["list"]);
-		
+
 		$aSent = [];
 		if(\is_array($aSendTo) && \count($aSendTo)) {
 			$this->BuildMail();
-			$sMessage = $this->attribute("mail_body");
-			$sHeaders = $this->attribute("mail_headers");
+			$sMessage = $this->mail_body;
+			$sHeaders = $this->mail_headers;
 
 			foreach($aSendTo["details"] as $aTo) {
 				$sTo = $aTo[2];
 				$sMsgId = self::call()->imya();
 				$sHeader = \str_replace("{{MAILTO}}", $sTo, $sHeaders);
 				$sHeader = \str_replace("{{MSGID}}", $sMsgId, $sHeader);
-				if($this->sServerType=="smtp") {
+				if($this->server=="smtp") {
 					$aSent[$sMsgId] = $this->SMTPMail($sTo, $sMessage, $sHeader);
-				} else if($this->sServerType=="php") {
+				} else if($this->server=="php") {
 					$aSent[$sMsgId] = \mail($sTo, $this->mail_subject, $sMessage, $sHeader);
 				}
 			}
 		}
-		
+
 		return $aSent;
 	}
-	
+
 	private function SMTPMail($sTo, $sMessage, $sHeaders) {
 		// smtp
 		$sAuthType	= $this->smtp_authtype;
 		$sSecure 	= \strtolower($this->secure);
 		$sLocalhost = "localhost";
 
-		$aCC = $this->attribute("mail_cc");
-		$aBCC = $this->attribute("mail_bcc");
+		$aCC = $this->mail_cc;
+		$aBCC = $this->mail_bcc;
 
-		if($this->attribute("state")!="SENT") {
+		if($this->state!="SENT") {
+			// connect
+			if($this->state=="DISCONNECTED") { $this->connect(); }
+
 			// helo
 			$vResponse = $this->request("EHLO ".$sLocalhost);
 			if($vResponse["code"]!=250) {
@@ -1227,11 +1112,12 @@ class nglMail extends nglBranch implements iNglClient {
 			// tls
 			if(isset($vHELO["STARTTLS"]) && $sSecure=="tls") {
 				$vResponse = $this->request("STARTTLS");
-				@\stream_socket_enable_crypto($this->socket, true, STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT);
+				@\stream_socket_enable_crypto($this->socket, true, $this->crypto);
 				$this->request("EHLO ".$sLocalhost);
 			}
 
 			// login
+			if($this->state!="READY TO SEND") { $this->login(); }
 			if($sAuthType!==null) {
 				$sAuthType = \strtoupper($sAuthType);
 				$vHELO["AUTH"] = [$sAuthType => true];
@@ -1251,7 +1137,7 @@ class nglMail extends nglBranch implements iNglClient {
 			}
 
 			if(!$bLogin) { return $this->Disconnect(); }
-			
+
 			// email maxsize
 			$this->nSMTPMaxSize = (isset($vHELO["SIZE"])) ? $vHELO["SIZE"] : null;
 		}
@@ -1266,7 +1152,8 @@ class nglMail extends nglBranch implements iNglClient {
 		}
 
 		// from
-		$vResponse = $this->request("MAIL FROM: ".$this->attribute("mail_from_mail"));
+		$sMailFrom = $this->mail_from_mail!=null ? $this->mail_from_mail : $this->sSMTPUsername;
+		$vResponse = $this->request("MAIL FROM: ".$sMailFrom);
 
 		// to
 		if($vResponse["code"]==250) {
@@ -1297,13 +1184,6 @@ class nglMail extends nglBranch implements iNglClient {
 		return $this->sTag;
 	}
 
-	// test1@domain.com
-	// <test1@domain.com>
-	// test1 <test1@domain.com>
-	// test1@domain.com;test2@domain.com
-	// test1 <test1@domain.com>;test2@domain.com
-	// test1 <test1@domain.com>,test2 <test2@domain.com>
-	// array("test1@domain2.com", "test1 <test1@domain.com>");
 	private function PrepareMails($mEmails, $bOnce=false) {
 		if(\is_string($mEmails)) {
 			$mEmails = \str_replace(",", ";", $mEmails);

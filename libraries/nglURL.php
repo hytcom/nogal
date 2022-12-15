@@ -1,41 +1,14 @@
 <?php
+/*
+# nogal
+*the most simple PHP Framework* by hytcom.net
+GitHub @hytcom/nogal
+___
 
+# url
+https://hytcom.net/nogal/docs/objects/url.md
+*/
 namespace nogal;
-
-/** CLASS {
-	"name" : "nglURL",
-	"object" : "url",
-	"type" : "instanciable",
-	"revision" : "20150306",
-	"extends" : "nglBranch",
-	"description" : "Parsea URLs en sus diferentes componentes, permite actualizarlos y volver conformar la dirección",
-	"configfile" : "no posee",
-	"variables" : {
-		"$sURL" : ["private", "URL activa"],
-	},
-	"arguments": {
-		"url" : ["string", "URL"],
-		"argument" : ["string", "Argumento que desea modificarse."],
-		"value" : ["mixed", "Nuevo valor para Argument."]
-	},
-	"attributes": {
-		"basename" : ["string", "nombre completo del archivo"],
-		"url" : ["string", "URL completa"],
-		"dirname" : ["string", "directorio del archivo"],
-		"extension" : ["string", "extensión del archivo"],
-		"filename" : ["string", "nombre sin extensión del archivo"],
-		"fragment" : ["string", "Referencia interna en el documento"],
-		"host" : ["string", "Dominio"],
-		"path" : ["string", "Path completo del archivo apuntado"],
-		"params" : ["string", "Request query parseado como array"],
-		"pass" : ["string", "Contraseña (en caso de existir)"],
-		"port" : ["int", "Puerto"],
-		"query" : ["string", "Request query"],
-		"scheme" : ["string", "Protocolo"],
-		"ssl" : ["boolean", "Determina si el protocolo es un protocolo seguro"],
-		"user" : ["string", "Nombre de usuario (en caso de existir)"]
-	}
-} **/
 class nglURL extends nglBranch {
 
 	private $sURL = null;
@@ -68,7 +41,7 @@ class nglURL extends nglBranch {
 
 		return $vAttributes;
 	}
-	
+
 	final protected function __declareVariables__() {
 	}
 
@@ -99,7 +72,7 @@ class nglURL extends nglBranch {
 				$url = "http://example:pass@hytcom.net:80/nogal/help/class.php?q=nglURL::parse#privates";
 				$http = $ngl("url.foo")->parse($url)->parts();
 				print_r($http);
-				
+
 				# resultado
 				Array (
 					[basename] => "class.php"
@@ -129,7 +102,7 @@ class nglURL extends nglBranch {
 		list($sURL) = $this->getarguments("url", \func_get_args());
 		if(!is_string($sURL)) { return false; }
 		$this->sURL = $sURL;
-	
+
 		$vURL = \parse_url($sURL);
 		if(isset($vURL["query"])) {
 			$vURL["params"] = [];
@@ -147,7 +120,7 @@ class nglURL extends nglBranch {
 			$this->attribute("scheme", $vURL["scheme"]);
 			$this->attribute("ssl", (\strtolower($vURL["scheme"])=="https"));
 		}
-		
+
 		if(isset($vURL["user"])) 	{ $this->attribute("user", 		$vURL["user"]); }
 		if(isset($vURL["pass"])) 	{ $this->attribute("pass", 		$vURL["pass"]); }
 		if(isset($vURL["host"])) 	{ $this->attribute("host", 		$vURL["host"]); }
@@ -162,7 +135,7 @@ class nglURL extends nglBranch {
 			if(isset($vPath["basename"])) 	{ $this->attribute("basename",	$vPath["basename"]); }
 			if(isset($vPath["extension"])) 	{ $this->attribute("extension",	$vPath["extension"]); }
 			if(isset($vPath["filename"])) 	{ $this->attribute("filename",	$vPath["filename"]); }
-			
+
 			$vURL = \array_merge($vURL, $vPath);
 		}
 
@@ -223,11 +196,11 @@ class nglURL extends nglBranch {
 
 		// query
 		if(isset($vURL["params"])) {
-			$sQuery = $this->QueryString($vURL["params"]);   
+			$sQuery = $this->QueryString($vURL["params"]);
 		} else {
 			$sQuery = (isset($vURL["query"])) ? $vURL["query"] : null;
 		}
-		
+
 		$sURL  = $sScheme."://";
 		$sURL .= ($sUser!==null && $sUser != "" && $sPass!==null) ? $sUser.":".$sPass."@" : "";
 		$sURL .= \str_replace("//", "/", $sHost."/".$sPath);
@@ -297,7 +270,7 @@ class nglURL extends nglBranch {
 			$aPairs[] = $sKey."=".\urlencode(\stripslashes($sValue));
 		}
 		$sQuery = \implode("&", $aPairs);
-		
+
 		return $sQuery;
 	}
 }

@@ -1,70 +1,38 @@
 <?php
+/*
+# nogal
+*the most simple PHP Framework* by hytcom.net
+GitHub @hytcom/nogal
+___
 
+# pdf
+https://hytcom.net/nogal/docs/objects/pdf.md
+*/
 namespace nogal;
-
-/** CLASS {
-	"name" : "nglGraftPDF",
-	"object" : "pdf",
-	"type" : "instanciable",
-	"revision" : "20150930",
-	"extends" : "nglBranch",
-	"interfaces" : "inglFeeder",
-	"description" : "Implementa https://mpdf.github.io",
-	"arguments": {
-		"after" : ["mixed", "
-			Determina una posible acción luego de ejecutar el método write
-			<ul>
-				<li><b>null</b> solo escribe</li>
-				<li><b>view</b> muestra el documento en el navegador</li>
-				<li><b>download</b> fuerza la descarga del documento</li>
-			</ul>
-		", "null"],
-		"content" : ["string", "Contanido del PDF", "test1234"],
-		"filename" : ["string", "Nombre de archivo de salida", "document.pdf"],
-		"sense" : ["string", "Sentido de la hoja, P (vertical) ó L (horizontal)", "P"],
-		"page" : ["string", "
-			Tamaño de la página
-			<ul>
-				<li>A4</li>
-				<li>A5</li>
-				<li>LETTER</li>
-				<li>widthxheight (100x200)</li>
-			</ul>
-		", "A4"],
-		"language" : ["string", "Lenguaje", "es"],
-		"unicode" : ["boolean", "Determina el uso de Unicode", "true"],
-		"encoding" : ["string", "Juego de caracteres predeterminado", "UTF-8"],
-		"margins" : ["array", "Array o JSON con los margenes de la página (top,right,bottom,left)", "[5,5,5,8]"]
-	}
-}
-
-**/
 class nglGraftPDF extends nglScion {
 
 	public $pdf = null;
-	private $sContent;
 	private $sHeader;
 	private $sFooter;
 	private $sCSS;
 
 	final protected function __declareArguments__() {
 		$vArguments					= [];
-		$vArguments["output"]		= ['$mValue', null];
+		$vArguments["content"]		= ['$mValue', null];
 		$vArguments["css"]			= ['$this->SetCSS($mValue)', null];
-		$vArguments["header"]		= ['$this->SetHeader($mValue)', null];
-		$vArguments["footer"]		= ['$this->SetFooter($mValue)', null];
-		$vArguments["content"]		= ['$this->SetContent($mValue)', null];
+		$vArguments["encoding"]		= ['(string)$mValue', "UTF-8"];
 		$vArguments["filename"]		= ['(string)$mValue', "document.pdf"];
 		$vArguments["font"]			= ['(string)$mValue', "helvetica"];
-		$vArguments["sense"]		= ['(string)$mValue', "P"];
-		$vArguments["page"]			= ['(string)$mValue', "A4"];
-		$vArguments["encoding"]		= ['(string)$mValue', "UTF-8"];
+		$vArguments["footer"]		= ['$this->SetFooter($mValue)', null];
+		$vArguments["header"]		= ['$this->SetHeader($mValue)', null];
 		$vArguments["margin"]		= ['$mValue', [5,5,5,8]];
-		$vArguments["margintop"]	= ['$mValue', "-"];
-		$vArguments["marginright"]	= ['$mValue', "-"];
 		$vArguments["marginbottom"]	= ['$mValue', "-"];
 		$vArguments["marginleft"]	= ['$mValue', "-"];
-		$vArguments["tmpdir"]		= ['$mValue', NGL_PATH_TMP.NGL_DIR_SLASH."mpdf"];
+		$vArguments["marginright"]	= ['$mValue', "-"];
+		$vArguments["margintop"]	= ['$mValue', "-"];
+		$vArguments["output"]		= ['$mValue', null];
+		$vArguments["page"]			= ['(string)$mValue', "A4"];
+		$vArguments["sense"]		= ['(string)$mValue', "P"];
 		return $vArguments;
 	}
 
@@ -78,36 +46,26 @@ class nglGraftPDF extends nglScion {
 
 	final public function __init__() {
 		if(!\class_exists("\Mpdf\Mpdf")) {
-			$this->__errorMode__("die");
-			self::errorMessage($this->object, 1000);
+			$this->installPackage("mpdf/mpdf", "^8.0.11");
 		}
-
 		require_once(__DIR__."/composer/vendor/paragonie/random_compat/lib/random.php");
 		$this->sCSS = "";
 	}
 
-	public function create() {
-		list($sFileName) = $this->getarguments("filename", \func_get_args());
-		if($sFileName===null) { $sFileName = "document.pdf"; }
-		$sFileName = self::call()->sandboxPath($sFileName);
-		$this->args(["filename"=>$sFileName]);
-		return $this->page();
-	}
-
 	public function page() {
 		list($sPageSize, $sSense, $mMargins, $sEncoding, $sFontName) = $this->getarguments("page,sense,margin,encoding,font", \func_get_args());
-		
-		if(\is_string($mMargins)) { $mMargins = \json_decode($mMargins, true); }
-		if($this->argument("margintop")!="-") { $mMargins[0] = $this->argument("margintop"); }
-		if($this->argument("marginright")!="-") { $mMargins[1] = $this->argument("marginright"); }
-		if($this->argument("marginbottom")!="-") { $mMargins[2] = $this->argument("marginbottom"); }
-		if($this->argument("marginleft")!="-") { $mMargins[3] = $this->argument("marginleft"); }
 
-		$sTmpDir = self::call()->sandboxPath($this->argument("tmpdir"));
+		if(\is_string($mMargins)) { $mMargins = \json_decode($mMargins, true); }
+		if($this->margintop!="-") { $mMargins[0] = $this->margintop; }
+		if($this->marginright!="-") { $mMargins[1] = $this->marginright; }
+		if($this->marginbottom!="-") { $mMargins[2] = $this->marginbottom; }
+		if($this->marginleft!="-") { $mMargins[3] = $this->marginleft; }
+
+		$sTmpDir = self::call()->tempDir().NGL_DIR_SLASH."mpdf";
 		if(!\is_dir($sTmpDir)) {
 			if(!\mkdir($sTmpDir, 07777)) {
 				self::errorMode("die");
-				self::errorMessage($this->object, 1001, "Can't create TMPDIR: ".$sTmpDir);
+				self::errorMessage($this->object, 1002, $sTmpDir);
 			}
 		}
 
@@ -116,18 +74,13 @@ class nglGraftPDF extends nglScion {
 			"format" => $sPageSize,
 			"mode" => $sEncoding,
 			"orientation" => $sSense,
-			"margin_top" => $mMargins[0], 
-			"margin_right" =>  $mMargins[1], 
-			"margin_bottom" =>  $mMargins[2], 
-			"margin_left" => $mMargins[3], 
-			"default_font" => $sFontName 
+			"margin_top" => $mMargins[0],
+			"margin_right" =>  $mMargins[1],
+			"margin_bottom" =>  $mMargins[2],
+			"margin_left" => $mMargins[3],
+			"default_font" => $sFontName
 		]);
 
-		return $this;
-	}
-
-	protected function SetContent($sContent) {
-		$this->sContent = $sContent;
 		return $this;
 	}
 
@@ -147,32 +100,47 @@ class nglGraftPDF extends nglScion {
 	}
 
 	public function base64() {
-		list($sFilename) = $this->getarguments("filename", \func_get_args());
-		if($this->pdf===null) { $this->create(); }
-		return \base64_encode($this->WriteContent($this->sContent, "source", false));
+		list($sContent,$sFilename) = $this->getarguments("content,filename", \func_get_args());
+		if($this->pdf===null) { $this->CreatePDF($sFilename); }
+		return \base64_encode($this->WriteContent($sContent, "source", false));
 	}
 
 	public function download() {
-		list($sFilename) = $this->getarguments("filename", \func_get_args());
-		if($this->pdf===null) { $this->create(); }
+		list($sContent,$sFilename) = $this->getarguments("content,filename", \func_get_args());
+		if($this->pdf===null) { $this->CreatePDF($sFilename); }
 		if(\count(self::errorGetLast())) { exit(); }
-		return $this->WriteContent($this->sContent, "download", $sFilename);
+		return $this->WriteContent($sContent, "download", $sFilename);
+	}
+
+	public function load() {
+		list($sFilename) = $this->getarguments("filename", \func_get_args());
+		if($this->pdf===null) { $this->CreatePDF($sFilename); }
+		return $this;
 	}
 
 	public function save() {
-		list($sFilename) = $this->getarguments("filename", \func_get_args());
-		if($this->pdf===null) { $this->create(); }
-		return $this->WriteContent($this->sContent, "save", $sFilename);
+		list($sContent,$sFilename) = $this->getarguments("content,filename", \func_get_args());
+		if($this->pdf===null) { $this->CreatePDF($sFilename); }
+		$this->WriteContent($sContent, "save", $sFilename);
+		return true;
 	}
 
 	public function view() {
-		list($sFilename) = $this->getarguments("filename", \func_get_args());
-		if($this->pdf===null) { $this->create(); }
-		return $this->WriteContent($this->sContent);
+		list($sContent,$sFilename) = $this->getarguments("content,filename", \func_get_args());
+		if($this->pdf===null) { $this->CreatePDF($sFilename); }
+		return $this->WriteContent($sContent);
 	}
 
-	protected function WriteContent($sContent, $sOutputMode=true, $sFilename=null) {
-		if($this->pdf===null) { $this->create()->SetContent(); }
+	private function CreatePDF() {
+		list($sFileName) = $this->getarguments("filename", \func_get_args());
+		if(empty($sFileName)) { $sFileName = "document.pdf"; }
+		$sFileName = self::call()->sandboxPath($sFileName);
+		$this->args(["filename"=>$sFileName]);
+		return $this->page();
+	}
+
+	private function WriteContent($sContent, $sOutputMode=true, $sFilename=null) {
+		if($this->pdf===null) { $this->CreatePDF($sFilename); }
 		if($sFilename===null) { $sFilename = $this->argument("filename"); }
 
 		$sOutput = \Mpdf\Output\Destination::INLINE;
@@ -193,7 +161,7 @@ class nglGraftPDF extends nglScion {
 		$this->pdf->WriteHTML($this->sCSS , \Mpdf\HTMLParserMode::HEADER_CSS);
 		if($this->sHeader!==null) { $this->pdf->SetHTMLHeader($this->sHeader); }
 		if($this->sFooter!==null) { $this->pdf->SetHTMLFooter($this->sFooter); }
-		$this->pdf->WriteHTML($this->sContent, \Mpdf\HTMLParserMode::HTML_BODY);
+		$this->pdf->WriteHTML($sContent, \Mpdf\HTMLParserMode::HTML_BODY);
 
 		return $this->pdf->Output($sFilename, $sOutput);
 	}

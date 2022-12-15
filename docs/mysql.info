@@ -1,9 +1,9 @@
-[checksum]
-md5 = "555426738df3a731b1d7cc71f47fae9b"
-sha1 = "4187d8ec68fd437168cddc7dd3bbfa922d32868f"
-
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/mysql.md"
+[info]
+_help = "### mysql\
+Gestor de conexiones MySQL / MariaDB\
+\
+https://github.com/hytcom/wiki/blob/master/nogal/docs/mysql.md\
+"
 
 [arguments]
 autoconn = "Cuando es TRUE, ejecuta el método connect luego de cargar las configuraciones"
@@ -16,6 +16,7 @@ do = "Cuando es TRUE el método query ejecuta la sentencia pero no retorna resul
 engine = "Motor de tablas predeterminado"
 error_description = "Ante un error mostrará la descripción del mismo"
 error_query = "Ante un error mostrará la consulta que le dió origen"
+field = "Nombre del campo activo"
 file = "Ruta del archivo a exportar ó importar"
 file_eol = "Caracter de fin de línea en los métodos export e import"
 file_separator = "Separador de campos en los métodos export e import"

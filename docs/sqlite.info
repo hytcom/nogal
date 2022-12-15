@@ -1,9 +1,9 @@
-[checksum]
-md5 = "95d89785d3f31f6bb2b9d7a85923f023"
-sha1 = "1937ef1964ab648c30210ba226251016e899f837"
-
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/sqlite.md"
+[info]
+_help = "### sqlite\
+Gestor de conexiones SQLite\
+\
+https://github.com/hytcom/wiki/blob/master/nogal/docs/sqlite.md\
+"
 
 [arguments]
 autoconn = "Cuando es TRUE, ejecuta el método connect luego de cargar las configuraciones"
@@ -13,23 +13,13 @@ debug = "Cuando es TRUE él método retorna la sentencia SQL en lugar de ejecuta
 do = "Cuando es TRUE el método query ejecuta la sentencia pero no retorna resultado"
 error_description = "Ante un error mostrará la descripción del mismo"
 error_query = "Ante un error mostrará la consulta que le dió origen"
+field = "Nombre del campo activo"
 flags = "Banderas opcionales para determinar cómo abrir la base de datos SQLite"
 insert_mode = "Tipo de modo INSERT. Valores admitidos:\
 	INSERT inserta nuevos registros\
 	REPLACE si el nuevo registro duplica un valor PRIMARY KEY o UNIQUE, el antiguo registro es eliminado\
 	IGNORE el comando no aborta incluso si ocurren errores durante la ejecución\
 "
-jsql = "Sentencia SQL en formato JSON o Array, donde los índices son:\
-	columns\
-	tables\
-	where\
-	group\
-	having\
-	order\
-	offset\
-	limit\
-"
-jsql_eol = "Salto de linea luego de cada parte de la sentencia"
 pass = "Clave de encriptación opcional usada cuando se encripta o desencripta una base de datos"
 sql = "Ultima sentencia SQL ejecutada o próxima a ejecutarse"
 table = "Nombre de la tabla activa en los métodos INSERT y UPDATE"

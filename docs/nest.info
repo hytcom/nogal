@@ -1,20 +1,23 @@
-[checksum]
-md5 = "21bf42c69fba19a542c5151f06156285"
-sha1 = "85171e662ea32cc0ca12ade809532461e4ff44c8"
-
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/nest.md"
+[info]
+_help = "### nest\
+Herramienta para crear y mantener la estructura de base de datos del objeto [owl](https://github.com/hytcom/wiki/blob/master/nogal/docs/owl.md)\
+\
+https://github.com/hytcom/wiki/blob/master/nogal/docs/nest.md\
+https://github.com/hytcom/wiki/blob/master/nogal/docs/owluso.md\
+"
 
 [arguments]
 about = "Tabla o Vista sobre la que queremos obtener información"
 after = "Nombre del campo luego del cual se insertará un nuevo campo"
 canvas_height = "NestGUI: Alto del canvas Nest"
 canvas_width = "NestGUI: Ancho del canvas Nest"
-collapsed = "NestGUI: Cierra o abre un objeto"
+comment = "Comentario"
 core = "Determina si deben crearse las tablas CORE"
 db = "Objeto de base de datos"
 der = "Indica si el método describeall debe mostrar el DER o la estructura OWL"
+enclosed = "Caracter delimitador de cadenas"
 entity = "Nombre del objeto activo"
+eol = "Caracter de fin de línea"
 field = "Nombre de campo en el objeto activo"
 fields = "Datos de los campos a crear en el método create"
 filepath = "Ruta del archivo para el método createFromFile"
@@ -25,6 +28,9 @@ nestdata = "Ruta del archivo JSON con campos y objetos predeterminados"
 newname = "Nuevo nombre para el objeto activo"
 normalize_code = "Etiqueta del campo code en los objetos normalizados"
 normalize_name = "Etiqueta del campo name en los objetos normalizados"
+objcfg_val = "Valor de una configuración"
+objcfg_var = "Nombre de una configuración"
+roles = "Determina si el objeto tratado utiliza roles"
 run = "Indica si el método generate debe ejecutar las entencias en la base de datos"
 select = "Nombre del objeto que se quiere seleccionar"
 structure = "Estructura OWL o nombre de la misma en la base de datos"
@@ -32,3 +38,25 @@ title = "Título del objeto activo"
 top = "NestGUI: posición coordenada Y del objeto activo"
 type = "Tipo de dato predeterminado para los nuevos campos"
 using = "Nombre del campo de referencia en el método join"
+
+[errors]
+1001 = "Nombre objeto vacío"
+1002 = "El objeto ya existe"
+1003 = "Acción inválida sobre una VIEW"
+1004 = "El objeto no existe"
+1005 = "Nombre de objeto, campo o campo using"
+1006 = "El campo ya existe"
+1007 = "El objeto with ya existe"
+1008 = "El campo no exite"
+1009 = "Driver de base de datos indefinido"
+
+[errors-en]
+1001 = "Empty object name"
+1002 = "Object alredy exists"
+1003 = "Invalid action on a view"
+1004 = "Object doesn't exists"
+1005 = "Field name, empty object or using name"
+1006 = "Field alredy exists"
+1007 = "With object dosent exists"
+1008 = "Field doesn't exists"
+1009 = "Undefined DB driver"

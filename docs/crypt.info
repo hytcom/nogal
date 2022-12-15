@@ -1,18 +1,36 @@
-[checksum]
-md5 = "93e8bed9519eb55143930e4eb60dd33a"
-sha1 = "b8a2a8dc14ecc91177db2d6f4241e903db38921b"
-
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/crypt.md"
+[info]
+_help = "### crypt\
+Gestor criptográfico\
+\
+https://github.com/hytcom/wiki/blob/master/nogal/docs/crypt.md\
+"
 
 [arguments]
 base64 = "Activa el modo de ingreso/respuesta en base64"
+cipher = "Algorítmo de cifrado"
+digets = "Tipo de digets"
+iv = "Vector IV. Dejar vacío para no activar su uso"
 key = "Clave de encriptación"
-keyslen = "Longuitud de las claves. Minima admitida: 32"
+keyname = "Nombre base para los archivos donde se guardarán las claves generadas"
+keypath = "Ruta donde se guardarán las claves generadas"
+keyslen = "Tamaño de las claves. Mínima admitida: 32"
+padding = "Tipo de padding, según el tipo de encriptación:
+	null=default
+	simetrickeys = [RAW | ZERO]
+	asimetrickeys = [RAW | PKCS1 | SSLV23 | OAEP]
+"
+passphrase = "Contraseña de la clave privada"
+tag = "Tag de autenticación"
 text = "Cadena a encriptar/desencriptar"
-type = "Método de encriptación"
 
 [errors]
-1000 = "No se pudo hallar la librería \phpseclib\Crypt\Base. Ejecutar 'compose update' en la carpeta grafts/composer"
-1001 = Invalid key format
-1002 = Decrypt Faild! Invalid key or String
+1000 = "Tipo de cifrado inválido"
+1001 = "Tamaño de clave inválido. Tamaños soportados: "
+1002 = "Mensaje o clave inválidos"
+1003 = "Tamaño de vector inválido. Tamaño soportado: "
+1004 = "Este modo no requiere IVvc"
+1005 = "Falló la encriptación. Revise las claves"
+1006 = "Falló la desencriptación. Revise las claves"
+1007 = "Tipo de algorítmo inválido"
+1008 = "Archivo o directorio inexistente o protegido contra escritura"
+1009 = "Archivo inexistente o protegido contra lectura"

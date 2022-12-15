@@ -1,10 +1,10 @@
-[checksum]
-md5 = "708bfdab1ead8611503886622931ba76"
-sha1 = "42306376abca5a9fc54e9850f111bbc45e12aa36"
+[info]
+_help = "### jsql\
+Objeto principal de los parsers JSQL\
+	- jsqlmysql = MySQL / MariaDB
+	- jsqlpgsql = PostgreSQL
 
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/jsql.md"
+https://github.com/hytcom/wiki/blob/master/nogal/docs/jsql.md\
+"
 
 [errors]
-1001 = "Estructura JSON inválida"
-1002 = "Falta declarar el tipo de dato"

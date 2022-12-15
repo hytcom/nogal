@@ -1,0 +1,9 @@
+config={@NGL_PATH_GARDEN}/config.php
+env=={@NGL_PATH_GARDEN}/.env
+nut={@NGL_PATH_NUTS}/<NEWNAME>.php
+nut-ctrl={@NGL_PATH_GARDEN}/nut.php
+table={@NGL_PATH_GARDEN}/<NEWNAME>.html
+tutor={@NGL_PATH_TUTORS}/<NEWNAME>.php
+tutor-owl={@NGL_PATH_TUTORS}/<NEWNAME>.php
+tutor-ctrl={@NGL_PATH_GARDEN}/tutor.php
+uproot={@NGL_PATH_GARDEN}/uproot.php

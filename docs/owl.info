@@ -1,15 +1,24 @@
-[checksum]
-md5 = "1c88249830ff565992b7e8083d2d53c2"
-sha1 = "042f9098d3b0824f60865c986614af7cd9ca2d24"
-
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/owl.md"
+[info]
+_help = "### owl\
+Owl es el ORM de NOGAL y permite ejecutar operaciones sobre distintos objetos de base de datos.\
+Entre las funciones del objecto se encuentran:\
+- consulta de listados de registros directos y con referencias cruzadas\
+- consulta de un registro en particular\
+- administración de objetos depentientes, como por ejemplo los datos una empresa y sus empleados\
+- uso de foreignkeys a nivel objeto, sin importar el driver de base de datos
+- validación de datos por medio del objeto https://github.com/hytcom/wiki/blob/master/nogal/docs/validate.md\
+- permite añadir, modificar, suspender y eliminar (eliminado lógico) registros\
+- eliminación de registros en cascada\
+\
+https://github.com/hytcom/wiki/blob/master/nogal/docs/own.md\
+https://github.com/hytcom/wiki/blob/master/nogal/docs/owluso.md\
+"
 
 [arguments]
-alvin = "Activa y desactiva los chequeos ALVIN"
 cascade = "Activa y desactiva el borrado en cascada"
 child = "Nombre del Objeto dependiente activo"
 data = "Objeto o array asociativo con los nombres de las columnas y datos que se usará en los métodos de escritura. Este argumento no es válido para escrituras múltiples"
+db = "Controlador de base de datos"
 debug = "Activa y desactiva el modo DEBUG"
 duplicate_children = "Activa y desactiva la copia de registros dependientes en el método duplicate"
 escape = "Determina si data debe o no ser tratado por el método escape del objeto db"
@@ -50,7 +59,9 @@ view_mode = "Modo de salida de datos en el método view:\
 view_parent = "Activa y desactiva el uso de __parent en las consultas de objetos del tipo children"
 
 [errors]
+1000 = "El objeto de DB no soporta JSQL"
 1001 = "Objeto indefinido"
 1002 = "Parent ID indefinido"
 1003 = "Fallo en la validación de variables"
 1004 = "Child indefinido"
+1005 = "No se pudo autenticar ALVIN"

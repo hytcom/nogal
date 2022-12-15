@@ -1,95 +1,42 @@
 <?php
+/*
+# nogal
+*the most simple PHP Framework* by hytcom.net
+GitHub @hytcom/nogal
+___
 
+# excel
+https://hytcom.net/nogal/docs/objects/excel.md
+*/
 namespace nogal;
-
-/** CLASS {
-	"name" : "nglGraftExcel",
-	"object" : "excel",
-	"type" : "instanciable",
-	"revision" : "20150930",
-	"extends" : "nglBranch",
-	"interfaces" : "inglFeeder",
-	"description" : "Implementa la clase "PhpOffice\PhpSpreadsheet".
-	
-		// lee un excel
-		$excel = $ngl("excel")->load("names.xlsx");
-		print_r($excel->getall());exit();
-
-		// lee un HTML
-		$excel = $ngl("excel")->load("tabla.html");
-		print_r($excel->getall());exit();
-		
-
-		// crear un excel
-		$excel = $ngl("excel")->load("test.xls");
-		$excel->set("A1", array(
-			array("NOMBRE", "APELLIDO", "EDAD", "MESES"),
-			array("ariel", "bottero", "40"),
-			array("homero", "simpson", "35")
-		));
-		$excel->download("test.xls");
-		exit();
-
-
-		// lee un excel, modifica algo y escribe un html
-		$excel = $ngl("excel")->load("names.xlsx");
-		$excel->set("A2", "GROSO");
-		$excel->download("names.html");
-		exit();
-
-		// lee un excel y retorna un arbol en foramto JSON
-		$a = $ngl("excel")->load("impuestos_x_pais.xlsx")->getall(true);
-
-		$a = $ngl()->arrayGroup($a, array(
-			"MAIN" => array("pais", []),
-			"tax" => array("nombre", array("sin", "con"))
-		));
-
-		echo $ngl("shift")->convert($a, "array-json");
-	
-	",
-	"arguments": {
-		"content" : ["string", "Contanido del PDF", "test1234"],
-		"filename" : ["string", "Nombre de archivo de salida", "document.pdf"]
-	}
-}
-
-# error codes
-1001 = content isn't a array of arrays
-
-**/
 class nglGraftExcel extends nglScion {
 
-	public $excel = null;
+	public $excel;
+	private $nRow;
 	private $nMaxRow;
 	private $sMaxCol;
-	private $nRow = 0;
 
 	final protected function __declareArguments__() {
 		$vArguments						= [];
-		$vArguments["content"]			= ['$mValue', null];
-		$vArguments["filename"]			= ['(string)$mValue', null];
-		$vArguments["sheet"]			= ['$this->SetSheet($mValue)', 0];
-		$vArguments["title"]			= ['$this->SetTitle($mValue)', "Hoja1"];
-		$vArguments["index"]			= ['$mValue', "A1"];
-		$vArguments["cellval"]			= ['strtolower($mValue)', "value"]; // value | calculated | formatted
 
+		$vArguments["calculate"]		= ['self::call()->istrue($mValue)', true];
+		$vArguments["cellval"]			= ['\strtolower($mValue)', "value", ["value","calculated","formatted"]];
+		$vArguments["colnames"]			= ['self::call()->istrue($mValue)', true];
+		$vArguments["colref"]			= ['self::call()->istrue($mValue)', true];
+		$vArguments["content"]			= ['$mValue', null];
+		$vArguments["csv_enclosed"]		= ['$mValue', '"'];
+		$vArguments["csv_eol"]			= ['$mValue', "\r\n"];
+		$vArguments["csv_splitter"]		= ['$mValue', ";"];
+		$vArguments["empty"]			= ['$mValue', null];
+		$vArguments["filename"]			= ['(string)$mValue', null];
 		$vArguments["fontfamily"]		= ['$mValue', "Calibri"];
 		$vArguments["fontsize"]			= ['$mValue', 8];
-
-		$vArguments["empty"]			= ['$mValue', null];
-		$vArguments["calculate"]		= ['self::call()->istrue($mValue)', true];
 		$vArguments["format"]			= ['self::call()->istrue($mValue)', true];
-		$vArguments["colnames"]			= ['self::call()->istrue($mValue)', true]; // en get usa la primer fila como nombre de los indices. En set utiliza los indices como titulos de las columnas
-		$vArguments["colref"]			= ['self::call()->istrue($mValue)', true];
-
+		$vArguments["index"]			= ['$mValue', "A1"];
+		$vArguments["sheet"]			= ['$this->SetSheet($mValue)', 0];
 		$vArguments["styles"]			= ['$mValue', null];
-		$vArguments["unmergefill"]		= ['self::call()->istrue($mValue)', false]; 
-
-		$vArguments["csv_enclosed"]		= ['$mValue', '"'];
-		$vArguments["csv_splitter"]		= ['$mValue', ";"];
-		$vArguments["csv_eol"]			= ['$mValue', "\r\n"];
-
+		$vArguments["title"]			= ['$this->SetTitle($mValue)', "Hoja1"];
+		$vArguments["unmergefill"]		= ['self::call()->istrue($mValue)', false];
 		return $vArguments;
 	}
 
@@ -102,12 +49,12 @@ class nglGraftExcel extends nglScion {
 	final protected function __declareVariables__() {
 	}
 
-
 	final public function __init__() {
 		if(!\class_exists("\PhpOffice\PhpSpreadsheet\Spreadsheet")) {
-			$this->__errorMode__("die");
-			self::errorMessage($this->object, 1000);
+			$this->installPackage("phpoffice/phpspreadsheet", "^1.16.0");
 		}
+		$this->nRow = 0;
+		$this->excel = null;
 	}
 
 	public function load() {
@@ -124,14 +71,14 @@ class nglGraftExcel extends nglScion {
 			self::call()->errorClearLast();
 			self::call()->errorReportingRestore();
 
-			$this->nMaxRow = $this->excel->getActiveSheet()->getHighestRow(); 
+			$this->nMaxRow = $this->excel->getActiveSheet()->getHighestRow();
 			$this->sMaxCol = $this->excel->getActiveSheet()->getHighestColumn();
 			$this->attribute("rows", $this->nMaxRow);
 		} else {
 			$this->excel = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
 			$this->excel->getDefaultStyle()->getFont()->setName($sFontFamily);
 			$this->excel->getDefaultStyle()->getFont()->setSize($nFontSize);
-			$this->nMaxRow = "1"; 
+			$this->nMaxRow = "1";
 			$this->sMaxCol = "A";
 		}
 
@@ -151,7 +98,7 @@ class nglGraftExcel extends nglScion {
 		if($this->nRow>$this->nMaxRow) { $this->nRow = 0; return false; }
 		return $this->row($this->nRow);
 	}
-	
+
 	public function getall() {
 		list($bColnames,$sFrom) = $this->getarguments("colnames,index", \func_get_args());
 		$sRange = $sFrom.":".$this->sMaxCol.$this->nMaxRow;
@@ -167,7 +114,7 @@ class nglGraftExcel extends nglScion {
 		$this->nRow = 0;
 		return $this;
 	}
-	
+
 	// retorna el valor de una celda segun el tipo especificado
 	public function cell() {
 		list($sCell, $sFormat) = $this->getarguments("index,cellval", \func_get_args());
@@ -194,14 +141,14 @@ class nglGraftExcel extends nglScion {
 	public function col() {
 		list($sColumn) = $this->getarguments("index", \func_get_args());
 		$sRange = $sColumn."1:".$sColumn.$this->nMaxRow;
-		$aColumns = []; 
+		$aColumns = [];
 		$aGet = $this->GetRange($sRange);
 		foreach($aGet as $nIndex => $aRow) {
 			$aColumns[$nIndex] = \current($aRow);
 		}
 		return $aColumns;
 	}
-	
+
 	/*
 	A1		= celda
 	A1:E9	= rango normal
@@ -238,6 +185,7 @@ class nglGraftExcel extends nglScion {
 		$sCell = \trim($sCell);
 		$sCol = ($sCell[0]=="*") ? "*" : \preg_replace("/[^A-Z]/i", "", $sCell);
 		$nRow = (\substr($sCell, -1)=="*") ? "*" : \preg_replace("/[^0-9]/", "", $sCell);
+		if(\is_numeric($nRow)) { --$nRow; }
 		return [$sCol, $nRow];
 	}
 
@@ -260,23 +208,25 @@ class nglGraftExcel extends nglScion {
 	// si index es un rango, hace merge de las celdas
 	public function set() {
 		list($sCell, $mContent, $bColnames) = $this->getarguments("index,content,colnames", \func_get_args());
+		$sCellName = $sCell;
 		if(!\is_array($mContent)) {
-			$sCellName = $sCell;
 			if(\strpos($sCell, ":")) { $aCell = \explode(":", $sCell); $sCellName = $aCell[0]; }
+			$sCellName = \implode("",$this->CellParts($sCellName));
 			$this->excel->getActiveSheet()->setCellValue($sCellName, $mContent);
 			if(isset($aCell)) { $this->excel->getActiveSheet()->mergeCells($sCell); }
 			return $this;
 		} else {
+			$sCellName = \implode("",$this->CellParts($sCellName));
 			$sEmptyValue = $this->argument("empty");
-			if(!self::call()->isArrayArray($mContent)) {
+			if(!self::call()->isArrayArray($mContent, "edges")) {
 				$this->__errorMode__("die");
-				self::errorMessage($this->object, 1001);
+				self::errorMessage($this->object, 1002);
 			}
 			if($bColnames) { \array_unshift($mContent, \array_keys(\current($mContent))); }
-			$this->excel->getActiveSheet()->fromArray($mContent, $sEmptyValue, $sCell);
+			$this->excel->getActiveSheet()->fromArray($mContent, $sEmptyValue, $sCellName);
 		}
 
-		$this->nMaxRow = $this->excel->getActiveSheet()->getHighestRow(); 
+		$this->nMaxRow = $this->excel->getActiveSheet()->getHighestRow();
 		$this->sMaxCol = $this->excel->getActiveSheet()->getHighestColumn();
 		return $this;
 	}
@@ -318,7 +268,7 @@ class nglGraftExcel extends nglScion {
 		return $this;
 	}
 
-	public function write() {
+	public function save() {
 		list($sFileName) = $this->getarguments("filename", \func_get_args());
 		$sFileName = self::call()->sandboxPath($sFileName);
 		$aFileType = $this->FileType($sFileName);
@@ -337,7 +287,7 @@ class nglGraftExcel extends nglScion {
 		$aFileType = $this->FileType($sFileName);
 
 		if(\count(self::errorGetLast())) { exit(); }
-		
+
 		\header("Content-Type: ".$aFileType[1]);
 		\header("Content-Disposition: attachment;filename=\"".$sFileName."\"");
 		\header("Cache-Control: max-age=0");
@@ -396,7 +346,7 @@ class nglGraftExcel extends nglScion {
 		$bColumnReference	= $this->argument("colref");
 		return $this->excel->getActiveSheet()->rangeToArray($sRange, $sEmptyValue, $bCalculateFormulas, $bApplyFormat, $bColumnReference);
 	}
-	
+
 	protected function SetTitle($sTitle) {
 		$this->excel->getActiveSheet()->setTitle($sTitle);
 		return $sTitle;
@@ -430,13 +380,13 @@ class nglGraftExcel extends nglScion {
 				$this->excel->getActiveSheet()->setTitle($mSheet);
 			}
 		}
-		
-		$this->nMaxRow = $this->excel->getActiveSheet()->getHighestRow(); 
+
+		$this->nMaxRow = $this->excel->getActiveSheet()->getHighestRow();
 		$this->sMaxCol = $this->excel->getActiveSheet()->getHighestColumn();
-		
+
 		return $mSheet;
 	}
-	
+
 	private function FileType($sFileName) {
 		$sType = \strtolower(\pathinfo($sFileName, PATHINFO_EXTENSION));
 		$aTypes = [

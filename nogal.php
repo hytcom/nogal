@@ -7,10 +7,10 @@ namespace nogal;
 #===============================================================================
 if(!\defined("NGL_RUN_ANYWAY") || (\defined("NGL_RUN_ANYWAY") && NGL_RUN_ANYWAY===false)) {
 	// version
-	if(\version_compare(PHP_VERSION, "5.6") < 0) {
+	if(\version_compare(PHP_VERSION, "7.3") < 0) {
 		if(PHP_SAPI!="cli") {
 			die("
-				<b>Nogal Fatal Error:</b> System require PHP <b>5.6</b> or higher.<br />
+				<b>NOGAL FATAL ERROR:</b> System require PHP <b>7.3</b> or higher.<br />
 				Current version is: ".\phpversion()."<br />
 				<br />
 				<small>
@@ -20,7 +20,7 @@ if(!\defined("NGL_RUN_ANYWAY") || (\defined("NGL_RUN_ANYWAY") && NGL_RUN_ANYWAY=
 			");
 		} else {
 			echo "\n";
-			echo "\033[91;91mNogal Fatal Error:\033[0m System require PHP \033[1m5.6\033[0m or higher\n";
+			echo "\033[91;91mNOGAL FATAL ERROR:\033[0m System require PHP \033[1m7.3\033[0m or higher\n";
 			echo "Current version is: \033[1m".phpversion()."\033[0m\n";
 			echo "You can use de \033[1mNGL_RUN_ANYWAY\033[0m constant for ignore this check,\n";
 			echo "but some methods could not work as expected\n\n";
@@ -31,7 +31,7 @@ if(!\defined("NGL_RUN_ANYWAY") || (\defined("NGL_RUN_ANYWAY") && NGL_RUN_ANYWAY=
 	// include path
 	$NGL_INCPATH = \get_include_path();
 	if(\set_include_path($NGL_INCPATH)===false) {
-		die("<b>Nogal Fatal Error:</> System requires <b>set_include_path</b> enabled.");
+		die("<b>NOGAL FATAL ERROR:</> System requires <b>set_include_path</b> enabled.");
 	}
 	unset($NGL_INCPATH);
 }
@@ -41,6 +41,12 @@ if(!\defined("NGL_RUN_ANYWAY") || (\defined("NGL_RUN_ANYWAY") && NGL_RUN_ANYWAY=
 #===============================================================================
 function call($sObjectName=null, $aArguments=[]) {
 	return \nogal\nglRoot::call($sObjectName, $aArguments);
+}
+
+function env($sVarName) {
+	global $ENV;
+	if(!preg_match("/[a-z_][a-z0-9_]+/is", $sVarName)) { return null; }
+	return \array_key_exists($sVarName, $ENV) ? $ENV[$sVarName] : null;
 }
 
 function dump() {

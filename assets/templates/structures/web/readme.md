@@ -1,0 +1,1 @@
+La configuración actual asume que nogal está instalado en: /usr/share/nogal

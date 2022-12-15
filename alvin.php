@@ -1,44 +1,38 @@
 <?php
 
-$NGL_ALVIN_LOGIN		= "/login";
+/*-- DEFAULT CONFIG ----------------------------------------------------------*/
+$NGL_ALVIN_CONFIG = [
+	"login" => "/login",
+	"firewall" => true
+];
 
-$NGL_ALVIN_SAFEPATHS 	= [];
-$NGL_ALVIN_SAFEPATHS[]	= "/gardener";
-$NGL_ALVIN_SAFEPATHS[]	= "/login";
-$NGL_ALVIN_SAFEPATHS[]	= "/logout";
-$NGL_ALVIN_SAFEPATHS[]	= "/index";
-$NGL_ALVIN_SAFEPATHS[]	= "/";
-$NGL_ALVIN_SAFEPATHS[]	= "";
-$NGL_ALVIN_IGNORES = $NGL_ALVIN_SAFEPATHS;
-$NGL_ALVIN_STRICTS = [];
+$NGL_ALVIN_IGNORES = [
+	"/gardener" => 1,
+	"/login" => 1,
+	"/logout" => 1,
+	"/index" => 1,
+	"/" => 1
+];
 
-
-/** $NGL_ALVIN_IGNORES / $NGL_ALVIN_STRICTS ----------------------------------*/
-// alvin.conf
+/*-- CONFIG ------------------------------------------------------------------*/
 $ALVINCFG = NGL_PATH_CONF.NGL_DIR_SLASH."alvin.conf";
 if(\file_exists($ALVINCFG)) {
 	$ALVINCFG = $ngl()->parseConfigString(\file_get_contents($ALVINCFG), true);
 
-	if(isset($ALVINCFG["config"]) && \count($ALVINCFG["config"])) {
-		$NGL_ALVIN_LOGIN = $ALVINCFG["config"]["login"];
+	if(isset($ALVINCFG["config"])) {
+		$NGL_ALVIN_CONFIG = \array_merge($NGL_ALVIN_CONFIG, $ALVINCFG["config"]);
 	}
 
-	if(isset($ALVINCFG["firewall-ignore"]) && \count($ALVINCFG["firewall-ignore"])) {
-		$NGL_ALVIN_IGNORES = \array_merge($NGL_ALVIN_IGNORES, \array_keys($ALVINCFG["firewall-ignore"]));
-	}
-
-	if(isset($ALVINCFG["firewall-strict"]) && \count($ALVINCFG["firewall-strict"])) {
-		$NGL_ALVIN_STRICTS = $ALVINCFG["firewall-strict"];
+	if(isset($ALVINCFG["ignore"]) && \count($ALVINCFG["ignore"])) {
+		$NGL_ALVIN_IGNORES = \array_merge($NGL_ALVIN_IGNORES, \array_fill_keys(\array_keys($ALVINCFG["ignore"]), true));
 	}
 }
-unset($ALVINCFG);
 
-
-/** REDIRECCION DESPUES DEL LOGIN --------------------------------------------*/
+/*-- REDIRECCION DESPUES DEL LOGIN -------------------------------------------*/
 if(isset($_SESSION, $_SESSION[NGL_SESSION_INDEX])) {
 	if(!isset($_SESSION[NGL_SESSION_INDEX]["ALVIN"])) {
 		if(!isset($_SESSION[NGL_SESSION_INDEX]["GOAFTERLOGIN"])) {
-			if(!\in_array(NGL_PATH_CURRENT, $NGL_ALVIN_SAFEPATHS)) {
+			if(empty($NGL_ALVIN_IGNORES[NGL_PATH_CURRENT])) {
 				$_SESSION[NGL_SESSION_INDEX]["GOAFTERLOGIN"] = NGL_URL.NGL_PATH_CURRENT;
 				if(\defined("NGL_PATH_CURRENT_QUERY") && NGL_PATH_CURRENT_QUERY!="") { $_SESSION[NGL_SESSION_INDEX]["GOAFTERLOGIN"] .= "?".NGL_PATH_CURRENT_QUERY; }
 			} else {
@@ -55,49 +49,35 @@ if(isset($_SESSION, $_SESSION[NGL_SESSION_INDEX])) {
 	}
 }
 
-/** CHEQUEOS -----------------------------------------------------------------*/
-if(NGL_AUTHORIZED_IPS!==null && \is_array(NGL_AUTHORIZED_IPS) && !\in_array(NGL_PATH_CURRENT, $NGL_ALVIN_SAFEPATHS)) {
+/*-- CHEQUEOS ----------------------------------------------------------------*/
+if(NGL_AUTHORIZED_IPS!==null && \is_array(NGL_AUTHORIZED_IPS) && empty($NGL_ALVIN_IGNORES[NGL_PATH_CURRENT])) {
 	if(\array_key_exists("REMOTE_ADDR", $_SERVER) && !\in_array($_SERVER["REMOTE_ADDR"], NGL_AUTHORIZED_IPS)) {
-		$ngl()->errorPages(403);
+		$ngl()->errorHTTP(403);
 	}
 }
 
-if(NGL_ALVIN!==null) {
-	// si no de definen exepciones, todo esta bloquedo salvo index y login
-	if(!isset($_SESSION, $_SESSION[NGL_SESSION_INDEX], $_SESSION[NGL_SESSION_INDEX]["ALVIN"]) && !NGL_TERMINAL) {
-		if(NGL_PATH_CURRENT!="/" && !\in_array(NGL_PATH_CURRENT, $NGL_ALVIN_IGNORES)) {
-			if($ngl()->inCurrentPath($NGL_ALVIN_IGNORES)===false) {
-				\header("location:".$NGL_ALVIN_LOGIN);
-				exit();
-			}
-		}
-	}
+if(NGL_ALVIN!==null && !NGL_TERMINAL) {
+	if($NGL_ALVIN_CONFIG["firewall"]) {
+		$NGL_ALVIN_IGNORE = $ngl()->inCurrentPath(\array_keys($NGL_ALVIN_IGNORES));
 
-	$NGL_ALVIN_STRICT = $ngl()->inCurrentPath(\array_keys($NGL_ALVIN_STRICTS));
-	if($NGL_ALVIN_STRICT!==false) {
-		if($NGL_ALVIN_STRICTS[$NGL_ALVIN_STRICT]===true && !isset($_SESSION[NGL_SESSION_INDEX]["ALVIN"])) {
-			\header("location:".$NGL_ALVIN_LOGIN);
-			exit();
-		}
-
-		if(\array_key_exists("alvin", $_SESSION[NGL_SESSION_INDEX]["ALVIN"])) {
-			$sToken		= isset($_SESSION[NGL_SESSION_INDEX]["ALVIN"]["alvin"]) ? $_SESSION[NGL_SESSION_INDEX]["ALVIN"]["alvin"] : null;
-			$sUsername	= isset($_SESSION[NGL_SESSION_INDEX]["ALVIN"]["username"]) ? $_SESSION[NGL_SESSION_INDEX]["ALVIN"]["username"] : null;
-			$sProfile	= isset($_SESSION[NGL_SESSION_INDEX]["ALVIN"]["profile"]) ? $_SESSION[NGL_SESSION_INDEX]["ALVIN"]["profile"] : null;
-
-			if($NGL_ALVIN = $ngl("alvin")->load($sToken, $sUsername, $sProfile)) {
-				if(!$NGL_ALVIN->check($NGL_ALVIN_STRICTS[$NGL_ALVIN_STRICT])) {
-					\header("location:".$NGL_ALVIN_LOGIN);
+		if($NGL_ALVIN_IGNORE===false) {
+			// si no de definen exepciones, todo esta bloquedo salvo index y login
+			if(isset($_SESSION[NGL_SESSION_INDEX]["ALVIN"]["token"])!==true) {
+				if(NGL_PATH_CURRENT!="/" && !\in_array(NGL_PATH_CURRENT, $NGL_ALVIN_IGNORES)) {
+					\header("location:".$NGL_ALVIN_CONFIG["login"]);
 					exit();
 				}
-			} else {
-				\header("location:".$NGL_ALVIN_LOGIN);
+			}
+
+			$NGL_ALVIN = $ngl("alvin")->setkey(false, (NGL_ALVIN===true ? null : NGL_ALVIN))->autoload();
+			if(!$NGL_ALVIN || !$NGL_ALVIN->firewall(NGL_PATH_CURRENT)) {
+				\header("location:".$NGL_ALVIN_CONFIG["login"]);
 				exit();
 			}
 		}
 	}
 }
 
-unset($NGL_ALVIN, $NGL_ALVIN_SAFEPATHS, $NGL_ALVIN_IGNORES, $NGL_ALVIN_STRICT, $NGL_ALVIN_STRICTS);
+unset($ALVINCFG, $NGL_ALVIN, $NGL_ALVIN_IGNORE, $NGL_ALVIN_IGNORES);
 
 ?>

@@ -1,17 +1,30 @@
-[checksum]
-md5 = "fcc6557f7a6720e31d17a85adb4f7a7e"
-sha1 = "c6a27f801296d4e9c60d3e164d4e2d2a4cfcd2d3"
-
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/tree.md"
+[info]
+_help = "### tree\
+Operaciones con árboles de datos
+\
+https://github.com/hytcom/wiki/blob/master/nogal/docs/tree.md\
+"
 
 [arguments]
 children = "Nombre de la clave en la que se anidarán las dependencias"
 colid = "Nombre de la clave con el ID principal"
-column = "Columna seleccionada"
 colparent = "Nombre de la clave con el ID del padre"
+column = "Columna seleccionada"
 id = "ID del nodo actual"
 nodedata = "Array con los datos del nodo que se quiere agregar ó modificar"
 separator = "Separador utilizado en el método path"
-source = "Array de origen de datos"
-
+source = "Origen de datos"
+source_type = "Tipo de origien de datos se esperan los valore:\
+	- ARRAY\
+	- JSON\
+	- OBJECT\
+	- JSON-FILE\
+	- YAML\
+	- YAML-FILE\
+	- B-ARRAY\
+	- B-JSON\
+	- B-OBJECT\
+	- B-JSON-FILE\
+	- B-YAML\
+	- B-YAML-FILE\
+"

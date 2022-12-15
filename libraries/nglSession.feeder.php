@@ -1,48 +1,14 @@
 <?php
+/*
+# nogal
+*the most simple PHP Framework* by hytcom.net
+GitHub @hytcom/nogal
+___
 
+# session
+https://hytcom.net/nogal/docs/objects/session.md
+*/
 namespace nogal;
-
-/** CLASS {
-	"name" : "nglSession",
-	"object" : "sess",
-	"type" : "main",
-	"revision" : "20140621",
-	"extends" : "nglTrunk",
-	"description" : "
-		Gesiona el almacenamiento y recuperación de información asociada con una sesión o varias sesiones.
-		Esta clase permite gestionar las sesiones en base de datos o de manera nativa.
-
-		nglSession construye el objeto $session dentro de NOGAL, el cual es accedido a través de: <b>$ngl("sess")->NOMBRE_DEL_METODO()</b>
-
-		Para sessiones en bases de datos
-		DROP TABLE IF EXISTS `__ngl_sessions__`;
-		CREATE TABLE `__ngl_sessions__` (
-			`id` VARCHAR(32) NOT NULL DEFAULT '',
-			`expire` INT(11) NOT NULL DEFAULT '0',
-			`persistent` ENUM('0', '1') NOT NULL DEFAULT '0',
-			`data` BLOB NOT NULL,
-			PRIMARY KEY (`id`) 
-		);
-		CREATE INDEX `expire_idx` ON `__ngl_sessions__` (`expire` DESC);
-		CREATE INDEX `persistent_idx` ON `__ngl_sessions__` (`persistent`);
-
-
-	",
-	"variables" : {
-		"$sMode" : ["private", "
-			Modo en el que trabajará el objeto:
-			
-			<ul>
-				<li><b>db:</b> configura las sesiones en base de datos</li>
-				<li><b>fs:</b> modo filesystem, los archivos de sesión se almacenarán en <b>NGL_PATH_SESSIONS</b></li>
-				<li><b>php:</b> modo nativo de PHP</li>
-			</ul>
-		"],
-		"$db" : ["private", "Controlador de base de datos"],
-		"$sPath" : ["private", "Ruta en la que se guardarán las sesiones cuando el modo sea <b>fs</b>. Por deeccto "],
-		"$nLifeTime" : ["int", "Tiempo máximo de vida de una sesión", "session.gc_maxlifetime"]
-	}
-} **/
 class nglSession extends nglTrunk {
 
 	protected $class	= "nglSession";
@@ -60,7 +26,7 @@ class nglSession extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "gc", 
+		"name" : "gc",
 		"type" : "public",
 		"description" : "Elimina las sesiones, no persistentes, cuyo tiempo de vida supere el establecido por la variable PHP <b>session.gc_maxlifetime</b>",
 		"return" : "boolean"
@@ -68,7 +34,7 @@ class nglSession extends nglTrunk {
 	public function gc($nMaxLifeTime) {
 		$nTime = \time();
 		if($this->db!==null) {
-			$this->db->exec("DELETE FROM `__ngl_sessions__` WHERE `expire` < '".$nTime."' AND `persistent` = '0'");
+			$this->db->exec("DELETE FROM __ngl_sessions__ WHERE expire < '".$nTime."' AND persistent = '0'");
 		} else {
 			$aSessions = \glob($this->sPath."sess_*");
 			foreach($aSessions as $sSession) {
@@ -77,12 +43,12 @@ class nglSession extends nglTrunk {
 				}
 			}
 		}
-		
+
 		return true;
 	}
 
 	/** FUNCTION {
-		"name" : "close", 
+		"name" : "close",
 		"type" : "public",
 		"description" : "
 			Controlador requerido por PHP para el cierre de las sesiones.
@@ -92,22 +58,22 @@ class nglSession extends nglTrunk {
 	} **/
 	public function close() {
 		return true;
-	}	
+	}
 
 	/** FUNCTION {
-		"name" : "count", 
+		"name" : "count",
 		"type" : "public",
 		"description" : "Retorna el número de sesiones activas. Disponible cuando el modo de almacenamiento no sea <b>php</b>",
 		"return" : "int"
 	} **/
 	public function count() {
 		if($this->sMode=="db") {
-			$sessions = $this->db->query("SELECT * FROM `__ngl_sessions__`");
+			$sessions = $this->db->query("SELECT * FROM __ngl_sessions__");
 			return $sessions->rows();
 		} else if($this->sMode=="fs") {
 			$aSessions = \glob($this->sPath."sess_*");
 			$aPersistents = \glob($this->sPath."psess_*");
-			
+
 			return (\count($aSessions)+\count($aPersistents));
 		}
 
@@ -115,7 +81,7 @@ class nglSession extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "destroy", 
+		"name" : "destroy",
 		"type" : "public",
 		"description" : "Llamada de retorno ejecutada cuando una sesión es destruida",
 		"parameters" : { "$SID" : ["string", "ID de sesion a destruir", "sesion activa"] },
@@ -125,7 +91,7 @@ class nglSession extends nglTrunk {
 		if($SID==null) { $SID = session_id(); }
 		if($this->sMode=="db") {
 			$SID = $this->db->escape($SID);
-			$this->db->exec("DELETE FROM `__ngl_sessions__` WHERE `id` = '".$SID."'");
+			$this->db->exec("DELETE FROM __ngl_sessions__ WHERE id = '".$SID."'");
 		} else if($this->sMode=="fs") {
 			$sFileName = $this->sPath."sess_".$SID;
 			if(\file_exists($sFileName)) { \unlink($sFileName); }
@@ -133,19 +99,19 @@ class nglSession extends nglTrunk {
 			$sFileName = $this->sPath."psess_".$SID;
 			if(\file_exists($sFileName)) { \unlink($sFileName); }
 		}
-		
+
 		return true;
 	}
 
 	/** FUNCTION {
-		"name" : "destroyAll", 
+		"name" : "destroyAll",
 		"type" : "public",
 		"description" : "Destruye todas las sesiones, persistentes o no. Disponible cuando el modo de almacenamiento no sea <b>php</b>",
 		"return" : "void"
 	} **/
 	public function destroyAll() {
 		if($this->sMode==="db") {
-			$this->db->exec("DELETE FROM `__ngl_sessions__`");
+			$this->db->exec("DELETE FROM __ngl_sessions__");
 			\session_destroy();
 		} else if($this->sMode==="fs") {
 			$aSessions = \glob($this->sPath."*sess_*");
@@ -158,7 +124,7 @@ class nglSession extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "GetPersistent", 
+		"name" : "GetPersistent",
 		"type" : "private",
 		"description" : "Chequea si la sesion <b>$SID</b> es o no una sesion persistente",
 		"parameters" : { "$SID" : ["string", "ID de sesion a chequear"] },
@@ -167,11 +133,11 @@ class nglSession extends nglTrunk {
 	private function GetPersistent($SID) {
 		if($this->sMode==="db") {
 			$session = $this->db->query("
-				SELECT 
-					`persistent` 
-				FROM `__ngl_sessions__` 
-				WHERE `id` = '".$SID."'
-			");		
+				SELECT
+					persistent
+				FROM __ngl_sessions__
+				WHERE id = '".$SID."'
+			");
 
 			if($session->rows()) {
 				return self::call()->isTrue($session->get("persistent"));
@@ -184,7 +150,7 @@ class nglSession extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "id", 
+		"name" : "id",
 		"type" : "public",
 		"description" : "Retorna el ID de la sesion activa",
 		"return" : "string"
@@ -194,7 +160,7 @@ class nglSession extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "open", 
+		"name" : "open",
 		"type" : "public",
 		"description" : "
 			Llamada de retorno que se ejecutada cuando la sesión está siendo abierta.
@@ -207,7 +173,7 @@ class nglSession extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "persistent", 
+		"name" : "persistent",
 		"type" : "public",
 		"description" : "Chequea si la sesion <b>$SID</b> es o no una sesion persistente",
 		"parameters" : {
@@ -223,14 +189,14 @@ class nglSession extends nglTrunk {
 
 		if($this->sMode==="db") {
 			$SID = $this->db->escape($SID);
-			return $this->db->exec("UPDATE `__ngl_sessions__` SET `persistent` = '".$nPersistent."' WHERE `id` = '".$SID."'");
+			return $this->db->exec("UPDATE __ngl_sessions__ SET persistent = '".$nPersistent."' WHERE id = '".$SID."'");
 		} else if($this->sMode==="fs") {
 			if($nPersistent==="1" && \file_exists($this->sPath."sess_".$SID)) {
 				return \rename($this->sPath."sess_".$SID, $this->sPath."psess_".$SID);
 			} else if($nPersistent==="0" && \file_exists($this->sPath."psess_".$SID)) {
 				return \rename($this->sPath."psess_".$SID, $this->sPath."sess_".$SID);
 			}
-			
+
 			return true;
 		}
 
@@ -238,7 +204,7 @@ class nglSession extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "read", 
+		"name" : "read",
 		"type" : "public",
 		"description" : "Retorna el contenidos de la sesion en forma de cadena serializada",
 		"parameters" : { "$SID" : ["string", "ID de sesion a leer", "sesion activa"] },
@@ -247,20 +213,20 @@ class nglSession extends nglTrunk {
 	public function read($SID) {
 		if($SID==null) { $SID = \session_id(); }
 		$nTime	= \time();
-		
+
 		if($this->sMode==="db") {
 			$session = $this->db->query("
-				SELECT 
-					`data` 
-				FROM `__ngl_sessions__` 
-				WHERE 
-					`id` = '".$SID."' AND 
-					`expire` > '".$nTime."'
+				SELECT
+					data
+				FROM __ngl_sessions__
+				WHERE
+					id = '".$SID."' AND
+					expire > '".$nTime."'
 			");
 
 			if($session->rows()) {
 				return $session->get("data");
-			} 
+			}
 		} else if($this->sMode==="fs") {
 			if(\file_exists($this->sPath."psess_".$SID)) {
 				return \file_get_contents($this->sPath."psess_".$SID);
@@ -273,17 +239,17 @@ class nglSession extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "showSessions", 
+		"name" : "showSessions",
 		"type" : "public",
 		"description" : "
-			Retorna listado completo de las sesiones activas. 
+			Retorna listado completo de las sesiones activas.
 			Cuando el objeto este configurado en modo <b>fs</b> retornara el listado de archivos de sesion.
 		",
 		"return" : "array"
 	} **/
 	public function showSessions() {
 		if($this->sMode==="db") {
-			$query = $this->db->query("SELECT * FROM `__ngl_sessions__`");
+			$query = $this->db->query("SELECT * FROM __ngl_sessions__");
 			return $query->toArray();
 		} else if($this->sMode==="fs") {
 			return \glob($this->sPath."*sess_*");
@@ -293,7 +259,7 @@ class nglSession extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "start", 
+		"name" : "start",
 		"type" : "public",
 		"description" : "Da inicio al objeto. Configura el modo de sesión y el tiempo máximo de vida de las mismas",
 		"parameters" : {
@@ -312,7 +278,7 @@ class nglSession extends nglTrunk {
 	public function start($handler=null, $nLifeTime=null) {
 		if(!$nLifeTime) { $nLifeTime = \get_cfg_var("session.gc_maxlifetime"); }
 		$this->lifeTime = $nLifeTime;
-		
+
 		if($handler!==null) {
 			if(\is_object($handler)) {
 				$this->sMode = "db";
@@ -337,17 +303,17 @@ class nglSession extends nglTrunk {
 			);
 
 			\register_shutdown_function("session_write_close");
-			
+
 			// recolector de residuos
 			$this->gc($nLifeTime);
 		}
-		
+
 		// inicio de sesion
 		\session_start();
 	}
 
 	/** FUNCTION {
-		"name" : "write", 
+		"name" : "write",
 		"type" : "public",
 		"description" : "Guarda los datos de la variable superglobal <b>$_SESSION</b> como contenido de la sesión <b>$SID</b>",
 		"parameters" : {
@@ -381,28 +347,28 @@ class nglSession extends nglTrunk {
 				return \file_put_contents($this->sPath."sess_".$SID, $sData);
 			}
 		}
-		
+
 		return true;
 	}
 
 	/** FUNCTION {
-		"name" : "sqlcreate", 
+		"name" : "sqlcreate",
 		"type" : "public",
 		"description" : "Retorna la sentencia SQL para crear la tabla de sessiones",
 		"return" : "string"
 	} **/
 	public function sqlcreate() {
 		return <<<SQL
-DROP TABLE IF EXISTS `__ngl_sessions__`;
-CREATE TABLE `__ngl_sessions__` (
-	`id` VARCHAR(32) NOT NULL DEFAULT '',
-	`expire` INT(11) NOT NULL DEFAULT '0',
-	`persistent` ENUM('0', '1') NOT NULL DEFAULT '0',
-	`data` BLOB NOT NULL,
-	PRIMARY KEY (`id`) 
+DROP TABLE IF EXISTS __ngl_sessions__;
+CREATE TABLE __ngl_sessions__ (
+	id VARCHAR(32) NOT NULL DEFAULT '',
+	expire INT(11) NOT NULL DEFAULT '0',
+	persistent ENUM('0', '1') NOT NULL DEFAULT '0',
+	data BLOB NOT NULL,
+	PRIMARY KEY (id)
 );
-CREATE INDEX `expire_idx` ON `__ngl_sessions__` (`expire` DESC);
-CREATE INDEX `persistent_idx` ON `__ngl_sessions__` (`persistent`);
+CREATE INDEX expire_idx ON __ngl_sessions__ (expire DESC);
+CREATE INDEX persistent_idx ON __ngl_sessions__ (persistent);
 SQL;
 	}
 }

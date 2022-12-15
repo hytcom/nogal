@@ -1,9 +1,9 @@
-[checksum]
-md5 = "72730b444eb4a24296f5fd62b2007c7a"
-sha1 = "52f7975a01b712a155a6a41200c91735e42d2760"
-
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/dbase.md"
+[info]
+_help = "### dbase\
+Gestor de conexiones dBase\
+\
+https://github.com/hytcom/wiki/blob/master/nogal/docs/dbase.md\
+"
 
 [arguments]
 autoconn = "Establece la autoconexión"
@@ -26,3 +26,5 @@ mode = "Modo de lectura de la db:\
 sql = "Sentencia SQL por defecto"
 table = "Nombre de la tabla"
 utf8 = "Activa la conversión UTF-8 en la lectura de datos"
+
+[errors]

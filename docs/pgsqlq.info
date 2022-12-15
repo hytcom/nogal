@@ -1,7 +1,24 @@
-[checksum]
-md5 = "51b7666a5235f29a259a0887ef572183"
-sha1 = "6ec50ad620276012a89569a9382c86ecbbf6ea20"
+[info]
+_help = "### pgsqlq\
+Controlador de resultados generados por consultas a la bases de datos PostgreSQL\
+\
+https://github.com/hytcom/wiki/blob/master/nogal/docs/pgsqlq.md\
+"
 
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/pgsqlq.md"
-
+[arguments]
+column = "Nombre de una columna del grupo de resultados.\
+	En el método getAll, cuando el nombre este presedido de un #, el valor de la columna será utilizado como indice asociativo.\
+	Cuando el nombre este presedido de un @, el resultado será tratado con nglfn::arrayGroup y el valor de la columna será utilizado como indice asociativo.\
+"
+get_mode = "Formato de salida de los datos, los valores posibles son:\
+	both = los valores serán retornados con indices númericos y asociativos\
+	num = valores retornados con índices numéricos comenzando por el 0\
+	assoc = valores retornados con índices asociativos\
+	3 = igual a both\
+	2 = igual a num\
+	1 = igual a assoc\
+"
+link = "Puntero del driver de base de datos"
+query = "Resultado de la última consulta ejecutada"
+query_time = "Tiempo que tomó la última consulta ejecutada"
+sentence = "Última consulta ejecutada"

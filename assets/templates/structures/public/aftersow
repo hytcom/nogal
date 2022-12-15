@@ -2,20 +2,26 @@
 
 $sNogalDirs = self::call()->imya();
 
-$sBuffer = \file_get_contents($sDestine."/html/config.php");
+$sBuffer = \file_get_contents($sDestine."/html/dir/config.php");
 $sBuffer = \str_replace(["<{=ROOTDIR=}>", "<{=NOGALDIRS=}>"], [$sDestine, $sNogalDirs], $sBuffer);
-\file_put_contents($sDestine."/html/config.php", $sBuffer);
+\file_put_contents($sDestine."/html/dir/config.php", $sBuffer);
 
-$nMask = \umask(0); 
-\mkdir($sDestine."/html/".$sNogalDirs, 0775);
-\mkdir($sDestine."/html/".$sNogalDirs."/cache", 0777);
-\mkdir($sDestine."/html/".$sNogalDirs."/conf", 0775);
-\mkdir($sDestine."/html/".$sNogalDirs."/data", 0775);
-\mkdir($sDestine."/html/".$sNogalDirs."/nuts", 0775);
-\mkdir($sDestine."/html/".$sNogalDirs."/logs", 0777);
-\mkdir($sDestine."/html/".$sNogalDirs."/tmp", 0777);
-\mkdir($sDestine."/html/".$sNogalDirs."/tutors", 0775);
-\umask($nMask);
+$sBuffer = \file_get_contents($sDestine."/html/index.php");
+$sBuffer = \str_replace(["<{=ROOTDIR=}>", "<{=NOGALDIRS=}>"], [$sDestine, $sNogalDirs], $sBuffer);
+\file_put_contents($sDestine."/html/index.php", $sBuffer);
+
+$sBuffer = \file_get_contents($sDestine."/html/gardener.php");
+$sBuffer = \str_replace(["<{=ROOTDIR=}>", "<{=NOGALDIRS=}>"], [$sDestine, $sNogalDirs], $sBuffer);
+\file_put_contents($sDestine."/html/gardener.php", $sBuffer);
+
+$sBuffer = \file_get_contents($sDestine."/html/gardener_journal.php");
+$sBuffer = \str_replace(["<{=ROOTDIR=}>", "<{=NOGALDIRS=}>"], [$sDestine, $sNogalDirs], $sBuffer);
+\file_put_contents($sDestine."/html/gardener_journal.php", $sBuffer);
+
+\chmod($sDestine."/html/dir/ground/cache", 0777);
+\chmod($sDestine."/html/dir/ground/logs", 0777);
+\chmod($sDestine."/html/dir/ground/tmp", 0777);
+\rename($sDestine."/html/dir", $sDestine."/html/".$sNogalDirs);
 \unlink(__FILE__);
 
 ?>

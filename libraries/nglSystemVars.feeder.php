@@ -1,38 +1,14 @@
 <?php
+/*
+# Nogal
+*the most simple PHP Framework* by hytcom.net
+GitHub @hytcom
+___
 
+# system
+https://hytcom.net/nogal/docs/objects/system.md
+*/
 namespace nogal;
-
-/** CLASS {
-	"name" : "nglSystemVars",
-	"object" : "sysvar",
-	"type" : "main",
-	"revision" : "20140202",
-	"extends" : "nglTrunk",
-	"description" : "
-		Establece y almacena las variables por sistema de NOGAL.
-		<ul>
-			<li><b>NULL:</b> valor NULL</li>
-			<li><b>REGEX:</b> expresiones regulares frecuentes</li>
-			<li><b>SELF:</b> datos del path del archivo actual</li>
-			<li><b>UID:</b> valor de la variable $_SESSION[NGL_SESSION_INDEX]["ALVIN"]["UID"] o NULL</li>
-			<li><b>VERSION:</b> datos de la versión</li>
-		</ul>
-
-
-		Tambien son capturadas variables $_REQUEST de uso frecuente previas a la validación por Validate
-		<ul>
-			<li><b>ID:</b> entero o cadena imya ( $_REQUEST["id"] )</li>
-			<li><b>Q:</b> usualmente utilizada en búsquedas ( $_REQUEST["q"] )</li>
-		</ul>
-
-
-		nglSystemVars construye el objeto $var dentro de NOGAL el cual es accedido a través de: <b>$ngl("sysvar")->NOMBRE_DE_VARIABLE</b>
-	",
-	"variables" : {
-		"$VARS" : ["private", "Contenedor de variables"],
-		"$SETTINGS" : ["private", "Valores por default de variables"]
-	}
-} **/
 class nglSystemVars extends nglTrunk {
 
 	protected $class		= "nglSystemVars";
@@ -46,11 +22,13 @@ class nglSystemVars extends nglTrunk {
 
 		// para que una variable sea privada no debe admitir el argumento $mValue
 		// por eso se asignan mediate la ejecucion de un metodo privado
-		
-		// PRIVADAS (escritura privada, lectura publica)
-		// nombres de meses y dias
+
+		// caracteres con acento
 		$SETTINGS["ACCENTED"]		= ['$this->AccentedChars()'];
-		
+
+		// HTTP CODES
+		$SETTINGS["HTTP_CODES"]		= ['$this->SetHTTPCodes()'];
+
 		// IP del cliente
 		$SETTINGS["IP"]				= ['$this->SetIP()'];
 
@@ -62,16 +40,16 @@ class nglSystemVars extends nglTrunk {
 
 		// PHP_SELF
 		$SETTINGS["SELF"]			= ['$this->SetSelf()'];
-		
+
 		// id del usuario (en caso de existir un login)
 		$SETTINGS["UID"]			= ['$this->SetUID()'];
-		
+
 		// version
 		$SETTINGS["VERSION"]		= ['$this->SetVersion()'];
 
 		// SETTINGS
 		$this->SETTINGS = $SETTINGS;
-		
+
 		// VARIABLES
 		$VARS = [];
 		foreach($SETTINGS as $sVarname => $mValue) {
@@ -84,20 +62,6 @@ class nglSystemVars extends nglTrunk {
 	public function get($sVarname) { return $this->__get($sVarname); }
 	public function getall() { return $this->__get("ALL"); }
 
-	/** FUNCTION {
-		"name" : "__get", 
-		"type" : "public",
-		"description" : "
-			Método mágico encargado de retornar los valores de la variable $VARS cuando es invocada por medio de <b>$ngl("sysvar")</b>
-			si no se especifica un nombre de variable se retornarán todas las variables de sistema.
-		",
-		"parameters" : { "$sVarname" : ["string", "Nombre de variable", "null"] },
-		"examples" : {
-			"llamada de variable" : "echo $ngl("sysvar")->foo;",
-			"llamada global" : "print_r($ngl("sysvar"));"
-		},
-		"return" : "mixed"
-	} **/
 	public function __get($sVarname="ALL") {
 		if($sVarname!=="ALL") {
 			if(isset($this->VARS[$sVarname])) {
@@ -108,15 +72,6 @@ class nglSystemVars extends nglTrunk {
 		}
 	}
 
-	/** FUNCTION {
-		"name" : "AccentedChars", 
-		"type" : "private",
-		"description" : "
-			Retorna un array asociativo con los caracteres acentuados y su equivalente sin acento, 
-			donde la clave es el caracter acentuado y el valor el caracter sin acentuar
-		",
-		"return" : "array"
-	} **/
 	private function AccentedChars() {
 		$vChars = [
 			"À"=>"A", "Á"=>"A", "Â"=>"A", "Ã"=>"A", "Ä"=>"A", "Å"=>"A", "Æ"=>"A",
@@ -132,80 +87,96 @@ class nglSystemVars extends nglTrunk {
 			"Š"=>"S", "š"=>"s", "Ž"=>"Z", "ž"=>"z", "Ç"=>"C", "Ñ"=>"N", "Ý"=>"Y", "Þ"=>"B",
 			"ß"=>"Ss", "ç"=>"c", "ñ"=>"n", "ý"=>"y", "ý"=>"y", "þ"=>"b", "ÿ"=>"y"
 		];
-		
+
 		return $vChars;
 	}
 
-	/** FUNCTION {
-		"name" : "SetIP", 
-		"type" : "private",
-		"description" : "
-			En caso de existir setea el valor de la variable $_SERVER["REMOTE_ADDR"] en la variable <b>IP</b>
-			de lo contrario la setea como localhost
-		",
-		"return" : "string o null"
-	} **/
 	private function SetIP() {
 		return (isset($_SERVER["REMOTE_ADDR"])) ? $_SERVER["REMOTE_ADDR"] : "127.0.0.1";
 	}
-	
-	/** FUNCTION {
-		"name" : "SetSelf", 
-		"type" : "private",
-		"description" : "almacena los datos de la ruta del archivo actual en la variable <b>SELF</b>",
-		"examples" : {
-			"/www/htdocs/foo/bar.php" : "
-				[b]basename:[/b] bar.php
-				[b]dirname:[/b] foo
-				[b]extension:[/b] php
-				[b]filename:[/b] bar
-				[b]fullpath:[/b] /www/htdocs/foo/bar.php
-				[b]path:[/b] /www/htdocs/foo
-				
-			",
-			"http://localhost/foo/bar.php?val=demo" : "
-				[b]basename:[/b] bar.php
-				[b]dirname:[/b] foo
-				[b]extension:[/b] php
-				[b]filename:[/b] bar
-				[b]fullpath:[/b] /www/htdocs/foo/bar.php
-				[b]path:[/b] /www/htdocs/foo
-				[b]query_string:[/b] val=demo
-				[b]url:[/b] foo/bar.php?val=demo
-				[b]fullurl:[/b] http://localhost/foo/bar.php?val=demo
-				[b]urlpath:[/b] foo/bar.php
-				[b]fullurlpath:[/b] http://localhost/foo/bar.php
-			"
-		},
-		"return" : "array"
-	} **/
+
+	private function SetHTTPCodes() {
+		return [
+			100 => "Continue",
+			101 => "Switching Protocols",
+			102 => "Processing",
+			200 => "OK",
+			201 => "Created",
+			202 => "Accepted",
+			203 => "Non-Authoritative Information",
+			204 => "No Content",
+			205 => "Reset Content",
+			206 => "Partial Content",
+			207 => "Multi-Status",
+			300 => "Multiple Choices",
+			301 => "Moved Permanently",
+			302 => "Found",
+			303 => "See Other",
+			304 => "Not Modified",
+			305 => "Use Proxy",
+			306 => "(Unused)",
+			307 => "Temporary Redirect",
+			308 => "Permanent Redirect",
+			400 => "Bad Request",
+			401 => "Unauthorized",
+			402 => "Payment Required",
+			403 => "Forbidden",
+			404 => "Not Found",
+			405 => "Method Not Allowed",
+			406 => "Not Acceptable",
+			407 => "Proxy Authentication Required",
+			408 => "Request Timeout",
+			409 => "Conflict",
+			410 => "Gone",
+			411 => "Length Required",
+			412 => "Precondition Failed",
+			413 => "Request Entity Too Large",
+			414 => "Request-URI Too Long",
+			415 => "Unsupported Media Type",
+			416 => "Requested Range Not Satisfiable",
+			417 => "Expectation Failed",
+			418 => "I'm a teapot",
+			419 => "Authentication Timeout",
+			420 => "Enhance Your Calm",
+			422 => "Unprocessable Entity",
+			423 => "Locked",
+			424 => "Failed Dependency",
+			424 => "Method Failure",
+			425 => "Unordered Collection",
+			426 => "Upgrade Required",
+			428 => "Precondition Required",
+			429 => "Too Many Requests",
+			431 => "Request Header Fields Too Large",
+			444 => "No Response",
+			449 => "Retry With",
+			450 => "Blocked by Windows Parental Controls",
+			451 => "Unavailable For Legal Reasons",
+			494 => "Request Header Too Large",
+			495 => "Cert Error",
+			496 => "No Cert",
+			497 => "HTTP to HTTPS",
+			499 => "Client Closed Request",
+			500 => "Internal Server Error",
+			501 => "Not Implemented",
+			502 => "Bad Gateway",
+			503 => "Service Unavailable",
+			504 => "Gateway Timeout",
+			505 => "HTTP Version Not Supported",
+			506 => "Variant Also Negotiates",
+			507 => "Insufficient Storage",
+			508 => "Loop Detected",
+			509 => "Bandwidth Limit Exceeded",
+			510 => "Not Extended",
+			511 => "Network Authentication Required",
+			598 => "Network read timeout error",
+			599 => "Network connect timeout error"
+		];
+	}
+
 	private function SetSelf() {
 		return self::currentPath();
 	}
 
-	/** FUNCTION {
-		"name" : "SetRegexs", 
-		"type" : "private",
-		"description" : "Almacena expresiones regulares de uso frecuente en la variable <b>REGEX</b>",
-		"examples" : {
-			"Expresiones" : "
-				[b]base64:[/b] caracteres permitidos en una cadena base64
-				[b]color:[/b] color en formato hexadecimal #RGB, #RRGGBB ó #RRGGBBAA
-				[b]date:[/b] fecha en formato yyyy-mm-dd
-				[b]datetime:[/b] fecha y hora en formato yyyy-mm-dd hh-ii-ss
-				[b]email:[/b] dirección de correo
-				[b]filename:[/b] formato windows y Linux
-				[b]fulltag:[/b] etiqueta HTML completa: <div id="foo"...>Lorem ipsum dolor sit amet...</div>
-				[b]imya:[/b] cadena imya
-				[b]ip:[/b] dirección IPv4
-				[b]phpvar:[/b] nombre de variable PHP
-				[b]tag:[/b] etiqueta HTML, sólo apertura: <div id="foo"...>
-				[b]time:[/b] hora en formato hh:ii o hh:ii:ss
-				[b]url:[/b] dirección URL/FTP
-			"
-		},
-		"return" : "array"
-	} **/
 	private function SetRegexs() {
 		$vRegexs = [];
 		$vRegexs["base64"] 		= "[a-zA-Z0-9\+\/\=]*";
@@ -226,15 +197,6 @@ class nglSystemVars extends nglTrunk {
 		return $vRegexs;
 	}
 
-	/** FUNCTION {
-		"name" : "SetUID", 
-		"type" : "private",
-		"description" : "
-			En caso de existir setea el valor de la variable $_SESSION[NGL_SESSION_INDEX]["ALVIN"]["id"] en la variable <b>UID</b>
-			de lo contrario la setea como NULL
-		",
-		"return" : "int o null"
-	} **/
 	private function SetUID() {
 		if(isset($_SESSION[NGL_SESSION_INDEX]["ALVIN"], $_SESSION[NGL_SESSION_INDEX]["ALVIN"]["id"])) {
 			return $_SESSION[NGL_SESSION_INDEX]["ALVIN"]["id"];
@@ -242,13 +204,7 @@ class nglSystemVars extends nglTrunk {
 			return null;
 		}
 	}
-	
-	/** FUNCTION {
-		"name" : "SetVersion", 
-		"type" : "private",
-		"description" : "Almacena los datos de la versión de NOGAL en la variable <b>VERSION</b>",
-		"return" : "array"
-	} **/
+
 	private function SetVersion() {
 		$vVersion					= [];
 		$vVersion["name"]			= "nogal";
@@ -256,13 +212,13 @@ class nglSystemVars extends nglTrunk {
 		$vVersion["version"]		= \file_get_contents(NGL_PATH_FRAMEWORK.NGL_DIR_SLASH."version");
 		$vVersion["author"]			= "hytcom";
 		$vVersion["site"]			= "https://hytcom.net";
-		$vVersion["documentation"]	= "https://github.com/hytcom/wiki/tree/master/nogal";
+		$vVersion["documentation"]	= "https://hytcom.net/nogal/docs";
 		$vVersion["github"]			= "https://github.com/hytcom/nogal";
 		$vVersion["docker"]			= "docker pull hytcom/nogal:latest";
 
 		return $vVersion;
 	}
-	
+
 	public function sessionVars() {
 		$this->VARS["UID"] = $this->SetUID();
 	}

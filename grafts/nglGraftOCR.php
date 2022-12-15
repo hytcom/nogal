@@ -1,13 +1,14 @@
 <?php
-
-namespace nogal;
 /*
+# nogal
+*the most simple PHP Framework* by hytcom.net
+GitHub @hytcom/nogal
+___
 
-https://github.com/thiagoalessio/tesseract-ocr-for-php
-
-echo $ngl("ocr")->load("/tmp/text.png")->get();
-
+# ocr
+https://hytcom.net/nogal/docs/objects/ocr.md
 */
+namespace nogal;
 class nglGraftOCR extends nglScion {
 
 	public $ocr;
@@ -30,15 +31,14 @@ class nglGraftOCR extends nglScion {
 	}
 
 	final protected function __declareVariables__() {
-		$this->ocr = new \thiagoalessio\TesseractOCR\TesseractOCR();
-		$this->ocr->tempDir(NGL_PATH_TMP);
 	}
 
 	final public function __init__() {
-		if(!\class_exists("\thiagoalessio\TesseractOCR")) {
-			$this->__errorMode__("die");
-			self::errorMessage($this->object, 1000);
+		if(!\class_exists('\thiagoalessio\TesseractOCR\TesseractOCR')) {
+			$this->installPackage("thiagoalessio/tesseract_ocr", "^2.9");
 		}
+		$this->ocr = new \thiagoalessio\TesseractOCR\TesseractOCR();
+		$this->ocr->tempDir(self::call()->tempDir());
 	}
 
 	public function load() {
@@ -94,7 +94,7 @@ class nglGraftOCR extends nglScion {
 	}
 
 	protected function SetWhiteList($aLists) {
-		if(!self::call()->isArrayArray($aLists)) { $aLists = [$aLists]; }
+		if(!self::call()->isArrayArray($aLists, "edges")) { $aLists = [$aLists]; }
 		$this->ocr->whitelist(...$aLists);
 		return $aLists;
 	}

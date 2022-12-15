@@ -1,23 +1,23 @@
-[checksum]
-md5 = "31487743914fb11b5c24d78091669960"
-sha1 = "55126eed0989ac5bf8e20e099e81a4ca1bd83ef2"
-
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/mail.md"
+[info]
+_help = "### mail\
+Gestor de correo electrónico. Envía y recibe correos utilizando los protocolos SMTP, POP3 e IMAP
+https://github.com/hytcom/wiki/blob/master/nogal/docs/mail.md\
+"
 
 [arguments]
 attach = "Ruta de un archivo adjunto relativa a NGL_SANDBOX"
 attach_content = "Contenido que puede ser enviado como archivo adjunto"
-attachs_ignore = "Ignora los adjuntos al leer los emails con el método MailParser, pero aún asi informa si hay adjuntos mediante el valor hasattachments"
 attach_name = "Nombre que llevará el archivo adjunto attach"
+attachs_ignore = "Ignora los adjuntos al leer los emails con el método MailParser, pero aún asi informa si hay adjuntos mediante el valor hasattachments"
 bcc = "Direcciones en copia oculta, separados cualquier caracter NO válido en una dirección de correo (espacio, coma, punto y coma, etc)"
 cc = "Direcciones en copia, separados cualquier caracter NO válido en una dirección de correo (espacio, coma, punto y coma, etc)"
 charset = "Codificación de caracteres del correo a enviar"
+crypto = "Método de encriptación"
 fields = "Nombres, separados por espacios, de los campos del correo activo"
 flags = "Banderas para marcar/desmarcar el mail, separadas por espacios y sin la barra invertida"
 folder = "Nombre de la carpeta por defecto al consultar correos"
 from = "Dirección de correo saliente"
-get_mode = "Datos que se quieren obtener en el método get: ALL | KEYS"
+getmode = "Datos que se quieren obtener en el método get: [HEADERS* | ALL | KEYS]"
 headers = "Header por defecto: DATE FROM SUBJECT"
 host = "Dominio o IP del servidor de correo"
 inreplyto = "Message-ID del mail que se quiere responder"
@@ -26,7 +26,7 @@ localhost = "Nombre del servidor local"
 mail = "Id del correo activo"
 message = "Cuerpo del correo"
 notify = "Dirección del acuse de recibo"
-pass = "Contraseña del servidor de correo"
+pass = "Contraseña del servidor de correo, o token cuando se utiliza xaouth2"
 peek = "Vuelve a marcar los correos como no leídos luego de utilizar los métodos get"
 port = "Puerto del servidor de correo"
 priority = "Prioridad del correo a enviar, de 1 a 5"
@@ -39,5 +39,17 @@ smtp_authtype = "Método de autenticación: CRAM-MD5 | LOGIN | PLAIN"
 subject = "Asunto del correo a enviar"
 timediff = "Diferencia horaria entre el cliente y el servidor SMTP"
 timeout = "Tiempo de espera del servidor"
-to = "Correos de destino, separados cualquier caracter NO válido en una dirección de correo (espacio, coma, punto y coma, etc)"
+to = "Array de correos de destino, o cadena de los mismos separados coma o punto y coma. Los formatos esperados son:\
+	test1@domain.com
+	<test1@domain.com>
+	test1 <test1@domain.com>
+	test1@domain.com;test2@domain.com
+	test1 <test1@domain.com>;test2@domain.com
+	test1 <test1@domain.com>,test2 <test2@domain.com>
+	array("test1@domain2.com", "test1 <test1@domain.com>");
+"
 user = "Nombre de usuario en el servidor de correo"
+
+[errors]
+1001 = "Falta especificar el argumento FROM"
+1002 = "Timeout"

@@ -1,0 +1,27 @@
+[info]
+_help = "### jwt\
+Gestor de tokens JWT\
+\
+https://github.com/hytcom/wiki/blob/master/nogal/docs/jwt.md\
+"
+
+[arguments]
+algorithm = "Algorítmo de encriptación\
+	HS256\
+	HS384\
+	HS512\
+	RS256\
+	RS384\
+	RS512\
+"
+expire = "Fecha en la que expira el token. Puede ser un timestamp o una cadena de texto válida para strtotime. basetime GMT 0"
+header = "Array o JSON con el header del token"
+key = "Clave para la firma del token"
+payload = "Array con el contenido del payload del token"
+token = "Token JWT"
+
+[errors]
+1001 = Algoritmo inválido
+1002 = No se pudo hallar el objeto nogal::crypt
+1003 = Token vacio
+1003 = Formato de token incorrecto

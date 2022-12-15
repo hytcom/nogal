@@ -1,9 +1,13 @@
-[checksum]
-md5 = "d4ea5fbf3d69efad967e4c16b2aa1310"
-sha1 = "365d3c43b3894dc06adc5ab4456c74f9c22f4b8c"
-
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/ftp.md"
+[info]
+_help = "### ftp\
+Gestor de conexiones FTP.\
+Características Principales:\
+	- listar, crear, renombrar y eliminar archivos y directorios\
+	- descargar archivos y directorios completos al servidor local\
+	- subir archivos y directorios al servidor remoto\
+\
+https://github.com/hytcom/wiki/blob/master/nogal/docs/ftp.md\
+"
 
 [arguments]
 filepath = "Nombre del archivo o directorio activo en el servidor remoto"

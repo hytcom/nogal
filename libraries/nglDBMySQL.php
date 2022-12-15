@@ -1,19 +1,14 @@
 <?php
 /*
-# Nogal
+# nogal
 *the most simple PHP Framework* by hytcom.net
-GitHub @hytcom
+GitHub @hytcom/nogal
 ___
-  
+
 # mysql
-## nglDBMySQL *extends* nglBranch *implements* iNglDataBase [2018-08-21]
-Gestor de conexciones con bases de datos MySQL
-
-https://github.com/hytcom/wiki/blob/master/nogal/docs/mysql.md
-
+https://hytcom.net/nogal/docs/objects/mysql.md
 */
 namespace nogal;
-
 class nglDBMySQL extends nglBranch implements iNglDataBase {
 
 	private $link;
@@ -34,18 +29,18 @@ class nglDBMySQL extends nglBranch implements iNglDataBase {
 		$vArguments["error_query"]			= ['self::call()->istrue($mValue)', false];
 		$vArguments["field"]				= ['$mValue', null];
 		$vArguments["file"]					= ['$mValue', null];
-		$vArguments["file_eol"]				= ['$mValue', "\\r\\n"];
+		$vArguments["file_eol"]				= ['$mValue', "\\n"];
 		$vArguments["file_local"]			= ['self::call()->istrue($mValue)', true];
 		$vArguments["file_separator"]		= ['$mValue', "\\t"];
 		$vArguments["file_enclosed"]		= ['$mValue', '"'];
 		$vArguments["host"]					= ['$mValue', "localhost"];
-		$vArguments["insert_mode"]			= ['$mValue', "INSERT"];
+		$vArguments["insert_mode"]			= ['\strtoupper($mValue)', "INSERT", ["INSERT","REPLACE","IGNORE"]];
 		$vArguments["pass"]					= ['$mValue', "root"];
 		$vArguments["port"]					= ['(int)$mValue', null];
 		$vArguments["socket"]				= ['$mValue', null];
 		$vArguments["sql"]					= ['$mValue', null];
 		$vArguments["table"]				= ['(string)$mValue', null];
-		$vArguments["update_mode"]			= ['strtoupper($mValue)', "UPDATE"];
+		$vArguments["update_mode"]			= ['\strtoupper($mValue)', "UPDATE", ["UPDATE","REPLACE","IGNORE"]];
 		$vArguments["user"]					= ['$mValue', "root"];
 		$vArguments["values"]				= ['$mValue', null];
 		$vArguments["where"]				= ['$mValue', null];
@@ -91,7 +86,7 @@ class nglDBMySQL extends nglBranch implements iNglDataBase {
 			$this->Error();
 			return false;
 		}
-		
+
 		return $this;
 	}
 
@@ -106,29 +101,29 @@ class nglDBMySQL extends nglBranch implements iNglDataBase {
 		$bDebug = $this->debug;
 		$this->debug = false;
 		$describe = $this->query("
-			SELECT 
-				`name`, `type`, `length`, `attributes`, `default`, `nullable`, `index`, `extra`, `comment` 
+			SELECT
+				`name`, `type`, `length`, `attributes`, `default`, `nullable`, `index`, `extra`, `comment`
 				FROM (
-					SELECT 
+					SELECT
 						@type := REPLACE(REPLACE(`COLUMN_TYPE`, '(', '".$sSplitter."'), ')', '".$sSplitter."'),
 						@len := ROUND((LENGTH(@type) - LENGTH(REPLACE(@type, '".$sSplitter."', '') )) / 6),
-						`COLUMN_NAME` AS 'name', 
+						`COLUMN_NAME` AS 'name',
 						TRIM(SUBSTRING_INDEX(@type, '".$sSplitter."', 1)) AS 'type',
 						IF(@len>=2, TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(@type, '".$sSplitter."', 2), '".$sSplitter."', -1)), '') AS 'length',
 						IF(@len>=2, TRIM(SUBSTRING_INDEX(@type, '".$sSplitter."', -1)), '') AS 'attributes',
-						`COLUMN_DEFAULT` AS 'default', 
-						`IS_NULLABLE` AS 'nullable', 
-						CASE 
-							WHEN `COLUMN_KEY`='PRI' THEN 'PRIMARY KEY' 
-							WHEN `COLUMN_KEY`='UNI' THEN 'UNIQUE' 
-							WHEN `COLUMN_KEY`='MUL' THEN 'INDEX' 
-							ELSE '' 
-						END AS 'index', 
-						`EXTRA` AS 'extra', 
+						`COLUMN_DEFAULT` AS 'default',
+						`IS_NULLABLE` AS 'nullable',
+						CASE
+							WHEN `COLUMN_KEY`='PRI' THEN 'PRIMARY KEY'
+							WHEN `COLUMN_KEY`='UNI' THEN 'UNIQUE'
+							WHEN `COLUMN_KEY`='MUL' THEN 'INDEX'
+							ELSE ''
+						END AS 'index',
+						`EXTRA` AS 'extra',
 						`COLUMN_COMMENT` AS 'comment'
-					FROM `information_schema`.`COLUMNS` 
-					WHERE 
-						`TABLE_SCHEMA` = '".$this->base."' AND 
+					FROM `information_schema`.`COLUMNS`
+					WHERE
+						`TABLE_SCHEMA` = '".$this->base."' AND
 						`TABLE_NAME` = '".$sTable."'
 				) info
 		");
@@ -165,8 +160,8 @@ class nglDBMySQL extends nglBranch implements iNglDataBase {
 		}
 		$this->link->close();
 		return parent::__destroy__();
-	}	
-	
+	}
+
 	public function escape() {
 		list($mValues) = $this->getarguments("values", \func_get_args());
 
@@ -213,14 +208,14 @@ class nglDBMySQL extends nglBranch implements iNglDataBase {
 
 		if($sFilePath===null) { $sFilePath = NGL_PATH_TMP."/export_".\date("YmdHis").".csv"; }
 		$sFilePath = self::call()->sandboxPath($sFilePath);
-		
+
 		$sEnclosed	= \addslashes($this->file_enclosed);
-		$sOutput = " 
-			INTO OUTFILE '".$sFilePath."' 
-			CHARACTER SET ".$this->charset." 
+		$sOutput = "
+			INTO OUTFILE '".$sFilePath."'
+			CHARACTER SET ".$this->charset."
 			FIELDS TERMINATED BY '".$this->file_separator."' OPTIONALLY ENCLOSED BY '".$sEnclosed."' ESCAPED BY '\\\\\\'
-			LINES TERMINATED BY '".$this->file_eol."' 
-			FROM 
+			LINES TERMINATED BY '".$this->file_eol."'
+			FROM
 		";
 
 		$sQuery = \preg_replace("/FROM/i", $sOutput, $sQuery, 1);
@@ -271,18 +266,18 @@ class nglDBMySQL extends nglBranch implements iNglDataBase {
 					if(isset($aColsChecker[$sColumn]) || empty($sColumn)) { $sColumn .= "_".self::call()->unique(); }
 					$aColsChecker[$sColumn] = true;
 				}
-				$sCreate = "CREATE TABLE `".$sTable."` (`".implode("` TEXT NULL, `", $aColumns)."` TEXT NULL) ENGINE=".$this->engine." DEFAULT CHARSET=".$sCharset.";";
+				$sCreate = "CREATE TABLE `".$sTable."` (`".implode("` TEXT NULL, `", $aColumns)."` TEXT NULL) ENGINE=".$this->engine." DEFAULT CHARSET=".$this->charset.";";
 
 				if($this->query($sCreate)===null) { return false; }
 			}
 		}
 
-		$sInput = " 
-			LOAD DATA ".$sLocal." INFILE '".$sFilePath."' 
-			INTO TABLE `".$sTable."`  
-			CHARACTER SET ".$this->charset." 
-			FIELDS TERMINATED BY '".$sSeparator."' OPTIONALLY ENCLOSED BY '".$sEnclosed."' ESCAPED BY '\\\\' 
-			LINES TERMINATED BY '".$this->file_eol."' 
+		$sInput = "
+			LOAD DATA ".$sLocal." INFILE '".$sFilePath."'
+			INTO TABLE `".$sTable."`
+			CHARACTER SET ".$this->charset."
+			FIELDS TERMINATED BY '".$sSeparator."' OPTIONALLY ENCLOSED BY '".$sEnclosed."' ESCAPED BY '\\\\'
+			LINES TERMINATED BY '".$this->file_eol."'
 		";
 
 		$bLoad = ($this->query($sInput)===null) ? false : true;
@@ -304,7 +299,7 @@ class nglDBMySQL extends nglBranch implements iNglDataBase {
 				return $this->query($sSQL, $bDO);
 			}
 		}
-		
+
 		return null;
 	}
 
@@ -319,7 +314,7 @@ class nglDBMySQL extends nglBranch implements iNglDataBase {
 				return $this->query($sSQL, $bDO);
 			}
 		}
-		
+
 		return null;
 	}
 
@@ -329,7 +324,7 @@ class nglDBMySQL extends nglBranch implements iNglDataBase {
 		if(empty($sQuery)) { return []; }
 		$aQueries = self::call()->strToArray($sQuery, ";");
 		if($this->debug) { return $aQueries; }
-		
+
 		$aResults = [];
 		if(\count($aQueries)) {
 			foreach($aQueries as $sQuery) {
@@ -343,7 +338,7 @@ class nglDBMySQL extends nglBranch implements iNglDataBase {
 				}
 			}
 		}
-		
+
 		return $aResults;
 	}
 
@@ -353,7 +348,7 @@ class nglDBMySQL extends nglBranch implements iNglDataBase {
 		if(empty($sQuery)) { return []; }
 		$aQueries = self::call()->strToArray($sQuery, ";");
 		if($this->debug) { return \implode(PHP_EOL, $aQueries); }
-		
+
 		$aErrors = [];
 		if(\count($aQueries)) {
 			foreach($aQueries as $sQuery) {
@@ -371,18 +366,18 @@ class nglDBMySQL extends nglBranch implements iNglDataBase {
 		$bDebug = $this->debug;
 		$this->debug = false;
 		$pk = $this->query("
-			SELECT 
-				k.column_name 
-			FROM 
+			SELECT
+				k.column_name
+			FROM
 				INFORMATION_SCHEMA.table_constraints t
 				JOIN INFORMATION_SCHEMA.key_column_usage k ON (
-					k.constraint_name = t.constraint_name AND 
-					k.constraint_schema = t.constraint_schema AND 
+					k.constraint_name = t.constraint_name AND
+					k.constraint_schema = t.constraint_schema AND
 					k.table_name = t.table_name
 				)
-			WHERE 
-				t.constraint_schema = '".$this->base."' AND 
-				k.table_name = '".$sTable."' AND 
+			WHERE
+				t.constraint_schema = '".$this->base."' AND
+				k.table_name = '".$sTable."' AND
 				t.constraint_type = 'PRIMARY KEY'
 		");
 		$this->debug = $bDebug;
@@ -427,9 +422,9 @@ class nglDBMySQL extends nglBranch implements iNglDataBase {
 		$bDebug = $this->debug;
 		$this->debug = false;
 		$tables = $this->query("
-			SELECT TABLE_NAME \"name\" 
-			FROM INFORMATION_SCHEMA.TABLES 
-			WHERE 
+			SELECT TABLE_NAME \"name\"
+			FROM INFORMATION_SCHEMA.TABLES
+			WHERE
 				TABLE_SCHEMA = '".$this->base."' AND
 				TABLE_NAME LIKE '%".$sTable."%'
 			ORDER BY 1
@@ -451,7 +446,7 @@ class nglDBMySQL extends nglBranch implements iNglDataBase {
 				return $this->query($sSQL, $bDO);
 			}
 		}
-		
+
 		return null;
 	}
 
@@ -513,7 +508,7 @@ class nglDBMySQL extends nglBranch implements iNglDataBase {
 				}
 			}
 		}
-		
+
 		return $aNewValues;
 	}
 }

@@ -1,5 +1,13 @@
 <?php
+/*
+# nogal
+*the most simple PHP Framework* by hytcom.net
+GitHub @hytcom/nogal
+___
 
+# jsql
+https://hytcom.net/nogal/docs/objects/jsql.md
+*/
 namespace nogal;
 
 class nglJSQL extends nglFeeder implements inglFeeder {
@@ -9,7 +17,7 @@ class nglJSQL extends nglFeeder implements inglFeeder {
 
 	final public function __init__($mArguments=null) {
 		if($mArguments!==null) { $this->db($this->parser($mArguments[0])); }
-		
+
 		$aTypes = [
 			"TINYINT",
 			"SMALLINT",
@@ -67,7 +75,7 @@ class nglJSQL extends nglFeeder implements inglFeeder {
 			case "drop": $sSQL = $this->drop($aJSQL); break;
 			case "index": $sSQL = $this->index($aJSQL); break;
 			case "indexdrop": $sSQL = $this->indexDrop($aJSQL); break;
-			
+
 			case "delete":
 			case "select":
 				$sSQL = ($sQuery=="select") ? $this->select($aJSQL) : $this->delete($aJSQL); break;
@@ -75,10 +83,10 @@ class nglJSQL extends nglFeeder implements inglFeeder {
 			case "insert":
 			case "update":
 				$sSQL = ($sQuery=="insert") ? $this->insert($aJSQL) : $this->update($aJSQL); break;
-			
+
 			case "where":
 				$sSQL = $this->where($aJSQL["where"]); break;
-			
+
 			case "rename": $sSQL = $this->rename($aJSQL); break;
 		}
 
@@ -91,7 +99,7 @@ class nglJSQL extends nglFeeder implements inglFeeder {
 		foreach($aConditions as $mCondition) {
 			if(\is_string($mCondition)) {
 				$aWhere[] = $this->operator($mCondition);
-			} else if(self::call()->isArrayArray($mCondition)) {
+			} else if(self::call()->isArrayArray($mCondition, "edges")) {
 				$aWhere[] = !$bArrayMode ? "(".$this->where($mCondition).")" : [$this->where($mCondition)];
 			} else {
 				$aWhere[] = $this->condition($mCondition);
@@ -141,7 +149,7 @@ class nglJSQL extends nglFeeder implements inglFeeder {
 	public function condition($aCondition) {
 		$sOperator = $this->operator($aCondition[1]);
 		$sCondition  = $aCondition[0][0]=="[" ? $this->column(\substr($aCondition[0],1,-1)) : (is_int($aCondition[0]) ? $aCondition[0] : $this->value($aCondition[0]));
-		
+
 		if($sOperator=="IN" || $sOperator=="NOT IN") {
 			$sCondition .= " ".$this->operator($aCondition[1])." (";
 			$aSet = self::call()->explodeTrim(",", $aCondition[2]);

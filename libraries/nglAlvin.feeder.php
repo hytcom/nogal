@@ -1,150 +1,117 @@
 <?php
 /*
-# Nogal
+# nogal
 *the most simple PHP Framework* by hytcom.net
-GitHub @hytcom
+GitHub @hytcom/nogal
 ___
-  
+
 # alvin
-## nglAlvin *extends* nglFeeder [2018-10-28]
-Alvin es el sistema de seguridad de **nogal**, encargado de gestionar permisos, grupos y perfiles de usuario.  
-Mas que un objeto es un concepto que atraviesa transversalmente todo el framework. 
-
-https://github.com/hytcom/wiki/blob/master/nogal/docs/alvin.md
-https://github.com/hytcom/wiki/blob/master/nogal/docs/alvinuso.md
-
-#errors
-1001 = Clave de encriptación indefinida
-1002 = Token inválido o vacío
-1003 = Clave grants duplicada
-1004 = Clave grants indefinida
-1005 = No se pudieron salvar las claves. Permiso denegado
-1006 = Error en la ruta
-1007 = Clave pública indefinida
-1008 = Clave privada indefinida
-1009 = Nombre de usuario incorrecto para el TOKEN
-1010 = Passphrase indefinida
-1011 = Nombre de permiso inválido
-1012 = No se pudieron cargar los permisos
-1013 = No se pudieron salvar las claves porque ya existen
-
+https://hytcom.net/nogal/docs/objects/alvin.md
+https://hytcom.net/nogal/docs/objects/alvinuso.md
 */
 namespace nogal;
-
 class nglAlvin extends nglFeeder implements inglFeeder {
 
-	private $aToken;
-	private $aGeneratedKeys;
-	private $sAlvinPath;
+	private $sKeyStore;
 	private $sCryptKey;
 	private $sPrivateKey;
 	private $sPassphrase;
-	private $sGrantsFile;
+	private $aToken;
 	private $aGrants;
-	private $aRAW;
-	private $sDefaultGrants;
+	private $aGrantsEmpty;
+	private $aGrantsStructures;
+	private $aPoliciesTypes;
 	private $crypt;
-	private $roles;
+	private $aes;
+	private $sAlvinClaim;
+	private $sExpireTime;
 
 	final public function __init__($mArguments=null) {
-		$this->aToken = null;
+		$this->__errorMode__("die");
+		if(NGL_ALVIN===null) {
+			self::errorShowSource(false);
+			self::errorMessage($this->object, 1000);
+		}
+
 		$this->aGeneratedKeys = [];
 		$this->sPrivateKey = null;
 		$this->sPassphrase = null;
-		$this->aGrants = [];
-		$this->aRAW = [];
-		$this->sGrantsFile = null;
-		$this->sDefaultGrants = '{"GRANTS":{"profiles":{"ADMIN":[]}},"ROLES":[],"RAW":[]}';
-		$this->crypt = (self::call()->exists("crypt")) ? self::call("crypt") : null;
-		$this->sAlvinPath = NGL_PATH_DATA.NGL_DIR_SLASH."alvin";
-		$this->roles = self::call("tree")->loadtree([]);
-		if($this->crypt!==null) { $this->crypt->type("rsa")->base64(true); }
-		$this->__errorMode__("die");
-		$this->setkey();
-	}
+		$this->crypt = self::call("crypt")->cipher("rsa");
+		$this->aes = self::call("crypt")->cipher("aes-128-cbc");
+		$this->aToken = null;
+		$this->aGrants = $this->aGrantsEmpty = [
+			"roles" => [],
+			"resources" => [],
+			"scopes" => [],
+			"policies" => [],
+			"permissions" => []
+		];
 
-	// DB --------------------------------------------------------------------
-	public function dbStructure() {
-		return <<<SQL
--- MySQL / MariaDB -------------------------------------------------------------
--- users
-CREATE TABLE IF NOT EXISTS `users` (
-	`id` INT UNSIGNED AUTO_INCREMENT NOT NULL,
-	`imya` CHAR(32) NOT NULL DEFAULT '',
-	`state` ENUM('0','1') DEFAULT '1' COMMENT 'NULL=eliminado, 0=inactivo, 1=activo',
-	`wrong` INT UNSIGNED NOT NULL COMMENT 'cantidad de fallos en intentos de login',
-	`fullname` VARCHAR(128) DEFAULT NULL,
-	`username` VARCHAR(128) DEFAULT NULL,
-	`password` VARCHAR(255) DEFAULT NULL,
-	`email` CHAR(96) DEFAULT NULL,
-	`profile` CHAR(32) DEFAULT NULL,
-	`roles` CHAR(255) DEFAULT NULL,
-	`alvin` MEDIUMEXT DEFAULT NULL COMMENT 'alvin token',
-	PRIMARY KEY (`id`)
-) ENGINE=MyISAM, DEFAULT CHARSET=utf8mb4, COLLATE=utf8mb4_unicode_ci COMMENT='Tabla de usuarios del sistema';
-CREATE UNIQUE INDEX `imya` ON `users` (`imya`);
-CREATE UNIQUE INDEX `username` ON `users` (`username`);
-CREATE INDEX `state` ON `users` (`state`);
+		$this->aGrantsStructures = [
+			"roles" => ["label","attribs"],
+			"resources" => ["label","path"],
+			"scopes" => ["label","path"],
+			"policies" => ["label","type","value","positive"],
+			"permissions" => ["label","resource","paths","scopes","policies"]
+		];
 
-DROP TABLE IF EXISTS `users_entities`;
-CREATE TABLE `users_entities` (
-	`id` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT NOT NULL,
-	`imya` CHAR(32) NOT NULL DEFAULT '',
-	`state` ENUM('0', '1') NULL DEFAULT '1',
-	`pid` INT UNSIGNED NOT NULL COMMENT 'id del usuario',
-	`entity` CHAR(32)  NOT NULL COMMENT 'imya del registro en la entidad asociada'
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Identifica a los usuarios del sistema con los registros de otras entidades. Por ejemplo, cual es el usuario del vendedor JUAN';
-CREATE UNIQUE INDEX `imya` ON `users_entities` (`imya`);
-CREATE INDEX `state` ON `users_entities` (`state`);
-CREATE INDEX `pid` ON `users_entities` (`pid`);
-SQL;
+		$this->aPoliciesTypes = ["regex","role","session","time","user"];
+
+		$this->setKeyStore(NGL_PATH_DATA.NGL_DIR_SLASH."alvin");
+		if(\file_exists($this->sKeyStore."alvin_pub.pem") || NGL_ALVIN!==null) {
+			$this->setkey();
+		}
+
+		$this->sAlvinClaim = "alvin";
+		$this->sExpireTime = "15 minutes";
 	}
 
 	// KEYS --------------------------------------------------------------------
-	public function keys($bSet=false, $bReturnKeys=false) {
-		if(!$this->crypt) { self::errorMessage($this->object, 1001); }
-		$this->aGeneratedKeys = self::call("crypt")->type("rsa")->keys();
-		if($bSet) {
-			$this->setkey(true, $this->aGeneratedKeys["private"]);
-			$this->setkey(false, $this->aGeneratedKeys["public"]);
+	// path del keystore
+	public function setKeyStore($sPath) {
+		$sPath = self::call()->sandboxPath($sPath);
+		$sPath = self::call()->clearPath($sPath, true);
+		if(!\is_writable($sPath)) {
+			self::errorMessage($this->object, 1001, $sPath);
+		}
+		$this->sKeyStore = $sPath;
+	}
+
+	// genera un par de claves RSA de 2048 bits
+	public function keys($bSave=false, $bReturnKeys=true) {
+		$this->aGeneratedKeys = $this->crypt->keygen();
+		$this->setkey(true, $this->aGeneratedKeys["private"]);
+		$this->setkey(false, $this->aGeneratedKeys["public"]);
+
+		if($bSave) {
+			if(!\is_dir($this->sKeyStore)) {
+				if(!@\mkdir($this->sKeyStore, 0777, true)) { self::errorMessage($this->object, 1002, $this->sKeyStore); }
+			}
+			$this->crypt->keypath($this->sKeyStore)->keyname("alvin")->savekeys();
 		}
 		return ($bReturnKeys) ? $this->aGeneratedKeys : $this;
 	}
 
-	public function saveKeys() {
-		if(!$this->crypt) { self::errorMessage($this->object, 1001); }
-		if(!\is_dir($this->sAlvinPath)) {
-			if(!@\mkdir($this->sAlvinPath, 0777, true)) {
-				self::errorMessage($this->object, 1005, $this->sAlvinPath);
-			}
-		}
-		if(!\file_exists($this->sAlvinPath.NGL_DIR_SLASH."private.key") && !\file_exists($this->sAlvinPath.NGL_DIR_SLASH."public.key")) {
-			@\file_put_contents($this->sAlvinPath.NGL_DIR_SLASH."private.key", $this->aGeneratedKeys["private"]);
-			@\file_put_contents($this->sAlvinPath.NGL_DIR_SLASH."public.key", $this->aGeneratedKeys["public"]);
-		} else {
-			self::errorMessage($this->object, 1013, $this->sAlvinPath);
-		}
-
-		return $this;
-	}
-
+	// setea las claves publicas y privadas
 	public function setkey($bPrivate=false, $sKey=null) {
-		if(!$this->crypt) { self::errorMessage($this->object, 1001); }
 		if($bPrivate) {
 			if($sKey===null) {
-				if(\file_exists($this->sAlvinPath.NGL_DIR_SLASH."private.key") && NGL_ALVIN!==null) {
-					$sKey = \file_get_contents($this->sAlvinPath.NGL_DIR_SLASH."private.key");
+				// TODO: agregar caso de Passphrase
+				if(\file_exists($this->sKeyStore."alvin.pem") && NGL_ALVIN!==null) {
+					$sKey = \file_get_contents($this->sKeyStore."alvin.pem");
 				} else if(NGL_ALVIN===null) {
-					return self::errorMessage($this->object, 1008);
+					self::errorShowSource(false);
+					self::errorMessage($this->object, 1003);
 				}
 			}
 			$this->sPrivateKey = $this->PrepareKey($sKey);
 		} else {
 			if($sKey===null) {
-				if(\file_exists($this->sAlvinPath.NGL_DIR_SLASH."public.key") && NGL_ALVIN!==null) {
-					$sKey = \file_get_contents($this->sAlvinPath.NGL_DIR_SLASH."public.key");
+				if(\file_exists($this->sKeyStore."alvin_pub.pem") && NGL_ALVIN===true) {
+					$sKey = \file_get_contents($this->sKeyStore."alvin_pub.pem");
 				} else if(NGL_ALVIN===null) {
-					return self::errorMessage($this->object, 1007);
+					self::errorShowSource(false);
+					self::errorMessage($this->object, 1004);
 				}
 			}
 			$this->sCryptKey = $this->PrepareKey($sKey);
@@ -152,483 +119,454 @@ SQL;
 		return $this;
 	}
 
-    private function PrepareKey($sKey) {
-        return \preg_replace([
-            "/-----BEGIN PUBLIC KEY-----/is",
-            "/-----END PUBLIC KEY-----/is",
-            "/-----BEGIN RSA PRIVATE KEY-----/is",
-            "/-----END RSA PRIVATE KEY-----/is",
-            "/[\s]*/is"
-        ], [""], $sKey);
-    }
-
-	// ADMIN GRANTS ------------------------------------------------------------
-	// carga o crea los permisos
-	public function loadGrants($sPassphrase=null) {
-		if(!$this->crypt) { self::errorMessage($this->object, 1001); }
-		if($sPassphrase===null) { return self::errorMessage($this->object, 1010); }
-		$grants = self::call("file")->load($this->sAlvinPath.NGL_DIR_SLASH."grants");
-		if($grants->size) {
-			$sGrants = $grants->read();
-			$sGrants = \preg_replace("/(\n|\r)/is", "", $sGrants);
-			$grants->close();
-			$sGrants = $sGrants = self::call("crypt")->type("aes")->key($sPassphrase)->base64(true)->decrypt($sGrants);
-		} else {
-			$sGrants = $this->sDefaultGrants;
-		}
-
-		return $this->jsonGrants($sGrants);
+	private function PrepareKey($sKey) {
+		return \trim($sKey);
 	}
 
-	// escribe el archivo con los permisos
-	public function save($sPassphrase=null) {
-		if(!$this->crypt) { self::errorMessage($this->object, 1001); }
-		if($sPassphrase===null) { return self::errorMessage($this->object, 1010); }
 
-		$this->AdminGrants();
-		$aRoles = $this->roles();
-		self::call()->msort($this->aGrants, "ksort");
-		$sGrants = \json_encode(["GRANTS"=>$this->aGrants, "ROLES"=>$aRoles, "RAW"=>$this->aRAW]);
-		$sGrants = self::call("shift")->jsonformat($sGrants, true);
-		$sGrants = self::call("crypt")->type("aes")->key($sPassphrase)->base64(true)->encrypt($sGrants);
-
-		$this->BackupGrants();
-		$save = self::call("file")->load($this->sAlvinPath.NGL_DIR_SLASH."grants");
-		if($save->write(\chunk_split($sGrants, 80))!==false) {
-			$save->close();
-
-			if($this->crypt) {
-				$sJsonRoles = self::call("shift")->jsonformat(\json_encode($aRoles), true);
-				if(!$this->sPrivateKey) { return self::errorMessage($this->object, 1008); }
-				$sJsonRoles = $this->crypt->type("rsa")->key($this->sPrivateKey)->encrypt($sJsonRoles);
-				$saveroles = self::call("file")->load($this->sAlvinPath.NGL_DIR_SLASH."roles");
-				if($saveroles->write(\chunk_split($sJsonRoles, 80))!==false) {
-					$saveroles->close();
-				}
-			}
-
-			return true;
-		}
-
-		return false;
-	}
-
-	private function BackupGrants() {
-		$aBackups = self::call("files")->ls($this->sAlvinPath.NGL_DIR_SLASH, "*.bak", "info");
-		$aBackups = self::call()->arrayMultiSort($aBackups, [["field"=>"timestamp", "order"=>"desc", "type"=>2]]);
-		$aBackups = \array_slice($aBackups, 6);
-		if(\count($aBackups)) {
-			foreach($aBackups as $aBack) {
-				\unlink($aBack["path"]);
-			}
-		}
-		@\copy($this->sAlvinPath.NGL_DIR_SLASH."grants", $this->sAlvinPath.NGL_DIR_SLASH."grants_".\date("YmdHis").".bak");
-	}
-
-	// importa los permisos desde una cadena plana o un json
-	public function import($sGrants) {
-		if(!empty($sGrants) && $sGrants[0]=="{") {
-			return $this->jsonGrants($sGrants);
-		} else {
-			$aGrants = self::call()->strToArray($sGrants);
-			$this->jsonGrants($this->sDefaultGrants);
-			foreach($aGrants as $sRow) {
-				$aRow = \preg_split("/(\t|;|,)/is", $sRow);
-				$sGroup = \trim(\array_shift($aRow));
-				$this->setGrant("groups", $sGroup, []);
-				foreach($aRow as $sGrant) {
-					$sGrant = trim($sGrant);
-					if(empty($sGrant)) { break; }
-					$this->setGrant("grants", $sGrant, $sGrant);
-					$this->setGrant("groups", $sGroup, [$sGrant=>$sGrant], 1);
-				}
-			}
-		}
-
-		return $this;
-	}
-
-	public function export($bPretty=false) {
-		$sGrants = \json_encode(["GRANTS"=>$this->aGrants, "ROLES"=>$this->roles(), "RAW"=>$this->aRAW]);
-		return ($bPretty) ? self::call("shift")->jsonFormat($sGrants) : $sGrants;
-	}
-
-	// retorna todos los permisos del tipo raw
-	public function getraw($sProfile=null) {
-		if($sProfile!==null) {
-			if(isset($this->aRAW[$sProfile])) {
-				return $this->aRAW[$sProfile];
-			} else {
-				return false;
-			}
-		}
-
-		return $this->aRAW;
-	}
-
-	// agrega o sobreescribe los permisos raw de un perfil
-	public function setraw($sProfile, $aValue, $bAppend=false) {
-		if($bAppend) { $aValue = self::call()->arrayMerge($this->aRAW[$sProfile], $aValue); }
-		$this->aRAW[$sProfile] = $aValue;
-		return $this;
-	}
-
-	// elimina un perfil de los permisos raw
-	public function unsetraw($sProfile) {
-		unset($this->aRAW[$sProfile]);
-		return $this;
-	}
-
-	// ROLES -------------------------------------------------------------------
-	// valida un nombre de rol o una cadena de ellos separados por ,
-	// si el nombre es nulo y hay un token cargado, intenta retornar el role del mismo
-	public function role($sRoles=null) {
-		if($sRoles===null && isset($_SESSION[NGL_SESSION_INDEX]["ALVIN"]["role"])) { return $_SESSION[NGL_SESSION_INDEX]["ALVIN"]["role"]; }
-		$aRoles = \explode(",", $sRoles);
-		foreach($aRoles as $x => $sRole) {
-			$aRoles[$x] = $this->GrantName($sRole, false);
-		}
-		return \implode(",", $aRoles);
-	}
-
-	public function rolechain($sRoles=null) {
-		if($sRoles===null && isset($_SESSION[NGL_SESSION_INDEX]["ALVIN"]["roleschain"])) { return $_SESSION[NGL_SESSION_INDEX]["ALVIN"]["roleschain"]; }
-		if(!empty($sRoles) && \file_exists($this->sAlvinPath.NGL_DIR_SLASH."roles")) {
-			$sRolesTree = \file_get_contents($this->sAlvinPath.NGL_DIR_SLASH."roles");
-			if($sRolesTree = @self::call("crypt")->type("rsa")->base64(true)->key(NGL_ALVIN)->decrypt($sRolesTree)) {
-				$aRoles = \json_decode($sRolesTree, true);
-				if(\is_array($aRoles)) {
-					$tree = self::call("tree")->loadtree($aRoles);
-					$aUserRoles = \explode(",", $sRoles);
-					$aChain = [$aUserRoles[0]];
-					foreach($aUserRoles as $sRole) {
-						$aChain[] = $sRole;
-						$aChain = \array_merge($aChain, $tree->childrenChain($sRole, null));
-					}
-					return \implode(",", \array_unique($aChain));
-				}
-			}
-		}
-		return "";
-	}
-
-	public function roles() {
-		return $this->roles->tree();
-	}
-
-	// resetea los roles
-	public function resetRoles() {
-		$this->roles = self::call("tree")->loadtree([]);
-	}
-
-	// agrega un role
-	public function setRole($sRole, $sParent=null) {
-		$aRole = ["id"=>$this->GrantName($sRole, false)];
-		if($sParent!=null) { $aRole["parent"] = $this->GrantName($sParent, false); }
-		$this->roles->node($aRole);
-		return $this;
-	}
-
-	// obtiene la ruta de un role en formato cadena
-	public function rolePath($sRole) {
-		$sRole = $this->GrantName($sRole, false);
-		return $this->roles->parentsChain($sRole, "id", ",");
-	}
-
-	// obtiene los hijos de un role
-	public function roleChildren($sRole) {
-		$sRole = $this->GrantName($sRole, false);
-		return $this->roles->children($sRole);
-	}
-
-	// GRANTS ------------------------------------------------------------------
-	// retorna todos los permisos del tipo grant
-	public function getall() {
+	// -- GRANTS ADMIN ---------------------------------------------------------
+	// grants structure
+	public function grants($bJson=false, $bPretty=false) {
+		if($bJson) { return $bPretty ? \json_encode($this->aGrants, JSON_PRETTY_PRINT |  JSON_UNESCAPED_SLASHES) : \json_encode($this->aGrants,  JSON_UNESCAPED_SLASHES); }
 		return $this->aGrants;
 	}
 
-	// listado de permisos segun el tipo (grants|groups|profiles)
-	public function get($sType=null) {
-		if($sType!==null && isset($this->aGrants[$sType])) { return $this->aGrants[$sType]; }
-		return [];
-	}
-
-	// retorna un permiso con su composicion
-	public function grant($sName=null, $sType="grants") {
-		$this->chkType($sType);
-		$sName = $this->GrantName($sName);
-		$sType = \strtolower($sType);
-		if($sType!==false && $sName!==null && isset($this->aGrants[$sType][$sName])) {
-			if($sType=="profiles" && $sName=="ADMIN") {
-				return ["ADMIN"=>[]];
-			} else {
-				return $this->aGrants[$sType][$sName];
-			}
-		}
-		return false;
-	}
-
-	// agrega un permiso a la estructura
-	public function setGrant($sType, $sName, $mGrant=null) {
-		$this->chkType($sType);
-		$sName = $this->GrantName($sName);
-		if($sName===false) { self::errorMessage($this->object, 1011, null, "die"); }
-		if($sType=="grants" && $mGrant===null) { $mGrant = $sName; }
-		
-		$sIndex = $this->FindGrant($sName, false, $sType);
-		
-		// valor a array
-		if(\is_array($mGrant)) {
-			$mGrant = \array_unique($mGrant);
+	// carga el arbol de grants, desde una cadena o desde la ubicación predeterminada
+	public function grantsLoad($sGrants=null) {
+		if($sGrants===null) {
+			$aGrants = self::call()->fileLoad(NGL_PATH_DATA.NGL_DIR_SLASH."alvin".NGL_DIR_SLASH."grants.json", "json");
 		} else {
-			if($sType!="grants") { $mGrant = [$mGrant]; }
+			$aGrants = \json_decode($sGrants, true);
 		}
 
-		// nuevo registro
-		if($sIndex===false) {
-			if($sType=="grants") {
-				$this->aGrants["grants"][$sName] = [];
-			} else if($sType=="groups") {
-				$this->MakeGroup($sName, $mGrant, true);
-				\ksort($this->aGrants["groups"][$sName]);
-			} else {
-				if($sName=="ADMIN") { return $this; }
-				$this->MakeProfile($sName, $mGrant, true);
-			}
-		} else { // edicion
-			if($sType=="groups") {
-				$this->MakeGroup($sIndex, $mGrant);
-				\ksort($this->aGrants["groups"][$sIndex]);
-			} else if($sType=="profiles") {
-				if($sIndex=="ADMIN") { return $this; }
-				$this->MakeProfile($sIndex, $mGrant);
+		if(!empty($aGrants)) { $this->aGrants = $aGrants; }
+		return $this;
+	}
+
+	// guarda el arbol de grants en la ubicación predeterminada
+	public function grantsSave() {
+		self::call()->fileSave(NGL_PATH_DATA.NGL_DIR_SLASH."alvin".NGL_DIR_SLASH."grants.json", $this->aGrants, "json");
+		return $this;
+	}
+
+	public function grantsFlush() {
+		$this->aGrants = $this->aGrantsEmpty;
+		return $this;
+	}
+
+	// roles -------------------------------------------------------------------
+	public function roles() {
+		return !empty($this->aGrants["roles"]) ? $this->aGrants["roles"] : [];
+	}
+
+	public function rolesCreate($sName, $aProperties=[]) {
+		$sClaim = $this->ClaimExists("roles", $sName, true);
+		if(empty($aProperties["label"])) { $aProperties["label"] = $sName; }
+		$aProperties["attribs"] = (empty($aProperties["attribs"]) || !\is_array($aProperties["attribs"])) ? [] : $aProperties["attribs"];
+		$this->GrantClaimCreate("roles", $sClaim, $aProperties);
+		return $this;
+	}
+
+	public function rolesUpdate($sName, $aProperties=[]) {
+		$sClaim = $this->ClaimExists("roles", $sName);
+		$this->GrantClaimUpdate($this->aGrants["roles"][$sClaim], $aProperties);
+		return $this;
+	}
+
+	public function rolesDelete($sName) {
+		$sClaim = $this->ClaimExists("roles", $sName);
+		$this->ChkRoleInPolicies($sClaim);
+		$this->GrantClaimDelete("roles", $sClaim);
+		return $this;
+	}
+
+	// resources ---------------------------------------------------------------
+	public function resources() {
+		return !empty($this->aGrants["resources"]) ? $this->aGrants["resources"] : [];
+	}
+
+	public function resourcesCreate($sName, $aProperties=[]) {
+		$sClaim = $this->ClaimExists("resources", $sName, true);
+		if(empty($aProperties["label"])) { $aProperties["label"] = $sName; }
+		$aProperties["path"] = !empty($aProperties["path"]) ? $this->PathToClaim($aProperties["path"]) : null;
+		$this->GrantClaimCreate("resources", $sClaim, $aProperties);
+		return $this;
+	}
+
+	public function resourcesUpdate($sName, $aProperties=[]) {
+		$sClaim = $this->ClaimExists("resources", $sName);
+		if(\array_key_exists("path", $aProperties)) { $aProperties["path"] = $this->PathToClaim($aProperties["path"]); }
+		$this->GrantClaimUpdate($this->aGrants["resources"][$sClaim], $aProperties);
+		return $this;
+	}
+
+	public function resourcesDelete($sName) {
+		$sClaim = $this->ClaimExists("resources", $sName);
+		$this->ChkResourceInPermissions($sClaim);
+		$this->GrantClaimDelete("resources", $sClaim);
+		return $this;
+	}
+
+
+	// scopes ------------------------------------------------------------------
+	public function scopes() {
+		return !empty($this->aGrants["scopes"]) ? $this->aGrants["scopes"] : [];
+	}
+
+	public function scopesCreate($sName, $aProperties=[]) {
+		$sClaim = $this->ClaimExists("scopes", $sName, true);
+		if(empty($aProperties["label"])) { $aProperties["label"] = $sName; }
+		$aProperties["path"] = !empty($aProperties["path"]) ? $this->PathToClaim($aProperties["path"]) : null;
+		$this->GrantClaimCreate("scopes", $sClaim, $aProperties);
+		return $this;
+	}
+
+	public function scopesUpdate($sName, $aProperties=[]) {
+		$sClaim = $this->ClaimExists("scopes", $sName);
+		if(\array_key_exists("path", $aProperties)) { $aProperties["path"] = $this->PathToClaim($aProperties["path"]); }
+		$this->GrantClaimUpdate($this->aGrants["scopes"][$sClaim], $aProperties);
+		return $this;
+	}
+
+	public function scopesDelete($sName) {
+		$sClaim = $this->ClaimExists("scopes", $sName);
+		$this->ChkScopeInPermissions($sClaim);
+		$this->GrantClaimDelete("scopes", $sClaim);
+		return $this;
+	}
+
+
+	// policies ----------------------------------------------------------------
+	public function policies() {
+		return !empty($this->aGrants["policies"]) ? $this->aGrants["policies"] : [];
+	}
+
+	public function policiesCreate($sName, $aProperties=[]) {
+		$sClaim = $this->ClaimExists("policies", $sName, true);
+		if(empty($aProperties["label"])) { $aProperties["label"] = $sName; }
+		if(!\array_key_exists("positive", $aProperties)) { $aProperties["positive"] = true; }
+		if(!empty($aProperties["type"])) {
+			$aProperties["type"] = \strtolower($aProperties["type"]);
+			if(!\in_array($aProperties["type"], $this->aPoliciesTypes)) { self::errorMessage($this->object, 1008, $aProperties["type"]); }
+		}
+		if(empty($aProperties["type"])) { self::errorMessage($this->object, 1008); }
+		if(empty($aProperties["value"])) { self::errorMessage($this->object, 1009); }
+
+		// chequeo de roles
+		if($aProperties["type"]=="role") {
+			$this->ChkPoliciesRoles($aProperties["value"]);
+		}
+
+		$this->GrantClaimCreate("policies", $sClaim, $aProperties);
+		return $this;
+	}
+
+	public function policiesUpdate($sName, $aProperties=[]) {
+		$sClaim = $this->ClaimExists("policies", $sName);
+		if(!\array_key_exists("positive", $aProperties)) { $aProperties["positive"] = true; }
+		if(!empty($aProperties["type"])) { self::errorMessage($this->object, 1012, "policiesUpdate => type"); }
+		if(empty($aProperties["value"])) { self::errorMessage($this->object, 1009); }
+
+		// chequeo de roles
+		if($this->aGrants["policies"][$sClaim]["type"]=="role") {
+			$this->ChkPoliciesRoles($aProperties["value"]);
+		}
+
+		$this->GrantClaimUpdate($this->aGrants["policies"][$sClaim], $aProperties);
+		return $this;
+	}
+
+	public function policiesDelete($sName) {
+		$sClaim = $this->ClaimExists("policies", $sName);
+		$this->ChkPolicyInPermissions($sClaim);
+		$this->GrantClaimDelete("policies", $sClaim);
+		return $this;
+	}
+
+
+	// permissions -------------------------------------------------------------
+	public function permissions() {
+		return !empty($this->aGrants["permissions"]) ? $this->aGrants["permissions"] : [];
+	}
+
+	public function permissionsCreate($sName, $aProperties=[]) {
+		$sClaim = $this->ClaimExists("permissions", $sName, true);
+		if(empty($aProperties["label"])) { $aProperties["label"] = $sName; }
+
+		// resource
+		if(empty($aProperties["resource"])) { self::errorMessage($this->object, 1010); }
+		$sResource = $this->ClaimExists("resources", $aProperties["resource"]);
+
+		// scopes
+		if(!empty($aProperties["scopes"])) {
+			if(!\is_array($aProperties["scopes"])) { self::errorMessage($this->object, 1011); }
+			foreach($aProperties["scopes"] as $k => $sScope) {
+				$this->ClaimExists("scopes", $sScope);
 			}
 		}
+
+		// paths
+		if(!empty($aProperties["paths"]) && \is_array($aProperties["paths"])) {
+			foreach($aProperties["paths"] as $k => $sPath) {
+				$aProperties["paths"][$k] = $this->PathToClaim($sPath);
+			}
+		}
+
+		// policies
+		if(!empty($aProperties["policies"]) && \is_array($aProperties["policies"])) {
+			foreach($aProperties["policies"] as $k => $sPolicy) {
+				$this->ClaimExists("policies", $sPolicy);
+			}
+		}
+
+		$this->GrantClaimCreate("permissions", $sClaim, $aProperties);
+		return $this;
+	}
+
+	public function permissionsUpdate($sName, $aProperties=[]) {
+		$sClaim = $this->ClaimExists("permissions", $sName);
+
+		// resource
+		if(!empty($aProperties["resource"])) {
+			$sResource = $this->ClaimExists("resources", $aProperties["resource"]);
+		}
+
+		// scopes
+		if(!empty($aProperties["scopes"])) {
+			if(!\is_array($aProperties["scopes"])) { self::errorMessage($this->object, 1011); }
+			foreach($aProperties["scopes"] as $k => $sScope) {
+				$this->ClaimExists("scopes", $sScope);
+			}
+		}
+
+		// paths
+		if(!empty($aProperties["paths"]) && \is_array($aProperties["paths"])) {
+			foreach($aProperties["paths"] as $k => $sPath) {
+				$aProperties["paths"][$k] = $this->PathToClaim($sPath);
+			}
+		}
+
+		// policies
+		if(!empty($aProperties["policies"]) && \is_array($aProperties["policies"])) {
+			foreach($aProperties["policies"] as $k => $sPolicy) {
+				$this->ClaimExists("policies", $sPolicy);
+			}
+		}
+
+		$this->GrantClaimUpdate($this->aGrants["permissions"][$sClaim], $aProperties);
 
 		return $this;
 	}
 
-	private function MakeGroup($sName, $aGrants, $bNew=false) {
-		if($bNew) { $this->aGrants["groups"][$sName] = []; }
-		foreach($aGrants as $sGrant) {
-			$sGrant = $this->GrantName($sGrant);
-			if(\array_key_exists($sGrant, $this->aGrants["grants"])) {
-				$this->aGrants["groups"][$sName][$sGrant] = [];
-				$this->aGrants["grants"][$sGrant][$sName] = true;
-			}
-		}
-		
-		ksort($this->aGrants["groups"]);
-		ksort($this->aGrants["groups"][$sName]);
+	public function permissionsDelete($sName) {
+		$sClaim = $this->ClaimExists("permissions", $sName);
+		$this->GrantClaimDelete("permissions", $sClaim);
+		return $this;
 	}
 
-	private function MakeProfile($sName, $aGrants, $bNew=false) {
-		if($bNew) { $this->aGrants["profiles"][$sName] = []; }
-		foreach($aGrants as $sGrant) {
-			if(!empty($sGrant) && $sGrant[0]=="-") { $sGrant = \substr($sGrant, 1); $bRemove = true; }
-			$sGrant = $this->GrantName($sGrant, true);
-			$aGrant = \explode(".", $sGrant);
-			if(isset($this->aGrants["groups"][$aGrant[0]])) {
-				if(isset($aGrant[1])) {
-					if(!isset($this->aGrants["groups"][$aGrant[0]][$aGrant[1]])) { continue; }
-					if(isset($bRemove)) {
-						unset($this->aGrants["groups"][$aGrant[0]][$aGrant[1]][$sName]);
-						unset($this->aGrants["profiles"][$sName][$aGrant[0]][$aGrant[1]]);
-					} else {
-						$this->aGrants["groups"][$aGrant[0]][$aGrant[1]][$sName] = true;
-						$this->aGrants["profiles"][$sName][$aGrant[0]][$aGrant[1]] = true;
+	// -- TOKEN ----------------------------------------------------------------
+	// duracion del token
+	public function tokenExpireTime($sExpireTime=false) {
+		if($sExpireTime===false) { return $this->sExpireTime; }
+		$this->sExpireTime = $sExpireTime;
+		return $this;
+	}
+
+	// genera un token
+	public function tokenCreate($sUsername, $aRoles=[], $aToken=[]) {
+		$aAlvin = ["roles"=>$aRoles, "resources"=>[], "paths"=>[], "policies"=>[]];
+		$aPermissions = $this->evaluate($sUsername, $aRoles, $aToken);
+		$this->AddToToken($aAlvin, $aPermissions["approve"]);
+		$aToken["username"] = $sUsername;
+		$aToken["alvin"] = $aAlvin;
+
+		// se genera el token
+		if(!$this->sPrivateKey) { self::errorMessage($this->object, 1003); }
+		$jwt = self::call("jwt")->algorithm("rs512")->key($this->sPrivateKey);
+		if(!empty($this->sExpireTime)) { $jwt->expire($this->sExpireTime); }
+		return ($sToken = $jwt->create($aToken)) ? $jwt->encoded : "";
+	}
+
+	// evalua un token
+	public function evaluate($sUsername, $aRoles=[], $aToken=[]) {
+		$sUsername = $this->username($sUsername);
+		// status
+		// 0 - fail
+		// 1 - approve
+		// 2 - eval later
+		foreach($this->aGrants["permissions"] as $sPermission => $aPermission) {
+			// permisos sin policies
+			if($aPermission["policies"]===null) {
+				$aEvaluated["approve"][$sPermission] = [];
+			} else { // permisos por usuario y rol
+				$aRoleUserPass = [];
+				foreach($aPermission["policies"] as $sPolicy) {
+					$aPolicy = $this->aGrants["policies"][$sPolicy];
+					if($aPolicy["type"]=="role") {
+						$aRoleUserPass[$sPolicy] = 0;
+						if(count(\array_intersect($aRoles, $aPolicy["value"]))) {
+							if($aPolicy["positive"]) { $aRoleUserPass[$sPolicy] = 1; }
+						} else {
+							if(!$aPolicy["positive"]) { $aRoleUserPass[$sPolicy] = 1; }
+						}
+					} else if($aPolicy["type"]=="user") {
+						$aRoleUserPass[$sPolicy] = 0;
+						if(in_array($sUsername, $aPolicy["value"])) {
+							if($aPolicy["positive"]) { $aRoleUserPass[$sPolicy] = 1; }
+						} else {
+							if(!$aPolicy["positive"]) { $aRoleUserPass[$sPolicy] = 1; }
+						}
 					}
+				}
+
+				if(!\count($aRoleUserPass) || count($aRoleUserPass)==\array_sum($aRoleUserPass)) {
+					$aPolicies = $aPoliciesStatus = [];
+					foreach($aPermission["policies"] as $sPolicy) {
+						$aPolicies[$sPolicy] = 0;
+						$aPoliciesStatus[$sPolicy] = 0;
+						$aPolicy = $this->aGrants["policies"][$sPolicy];
+
+						if($aPolicy["type"]=="role" || $aPolicy["type"]=="user") {
+							$aPolicies[$sPolicy] = 1;
+							$aPoliciesStatus[$sPolicy] = 1;
+						} else if($aPolicy["type"]=="time" || $aPolicy["type"]=="session") {
+							$aPolicies[$sPolicy] = 1;
+							$aPoliciesStatus[$sPolicy] = 2;
+						} else if($aPolicy["type"]=="regex") {
+							$mClaim = self::call()->strToVars($aPolicy["value"][0], $aToken);
+							if($aPolicy["value"][0]!=$mClaim) {
+								if($aPolicy["value"][1]==="") { $aPolicy["value"][1] = '^$'; }
+								if(preg_match("/".$aPolicy["value"][1]."/", $mClaim)) {
+									if($aPolicy["positive"]) {
+										$aPolicies[$sPolicy] = 1;
+										$aPoliciesStatus[$sPolicy] = 1;
+									}
+								} else {
+									if(!$aPolicy["positive"]) {
+										$aPolicies[$sPolicy] = 1;
+										$aPoliciesStatus[$sPolicy] = 1;
+									}
+								}
+							}
+						}
+					}
+					if(count($aPolicies)==\array_sum($aPolicies)) {
+						$aEvaluated["approve"][$sPermission] = $aPoliciesStatus;
+					} else {
+						$aEvaluated["fail"][$sPermission] = $aPoliciesStatus;
+					}
+
 				} else {
-					if(!isset($bRemove)) {
-						foreach($this->aGrants["groups"][$aGrant[0]] as $sGrant => $sTrue) {
-							$this->aGrants["groups"][$aGrant[0]][$sGrant][$sName] = true;
-						}
-						$this->aGrants["profiles"][$sName][$aGrant[0]] = self::call()->truelize(\array_keys($this->aGrants["groups"][$aGrant[0]]));
+					$aEvaluated["fail"][$sPermission] = $aRoleUserPass;
+				}
+			}
+		}
+
+		return $aEvaluated;
+	}
+
+	private function AddToToken(&$aAlvin, $aPermissions) {
+		foreach($aPermissions as $sPermission => $aPolicies) {
+			$aPermission	= $this->aGrants["permissions"][$sPermission];
+			$sResource		= $aPermission["resource"];
+			$sResourcePath	= !empty($this->aGrants["resources"][$sResource]["path"]) ? $this->aGrants["resources"][$sResource]["path"] : false;
+			$aScopePaths	= [];
+
+			$aPoliciesNames = [];
+			foreach($aPolicies as $sPolicy => $nStatus) {
+				if($nStatus===2) { $aPoliciesNames[] = $sPolicy; }
+			}
+			if(!\count($aPoliciesNames)) { $aPoliciesNames = true; }
+
+			$aAlvin["resources"][$sResource] = $aPoliciesNames;
+			if(!empty($aPermission["scopes"]) && \is_array($aPermission["scopes"])) {
+				foreach($aPermission["scopes"] as $sScope) {
+					$aAlvin["resources"][$sResource.".".$sScope] = $aPoliciesNames;
+					if(!empty($this->aGrants["scopes"][$sScope]["path"])) {
+						$aScopePaths[] = $this->aGrants["scopes"][$sScope]["path"];
+					}
+				}
+			}
+
+			if($sResourcePath!=false) {
+				$aAlvin["paths"][$sResourcePath.NGL_DIR_SLASH] = $aPoliciesNames;
+				$aAlvin["paths"][$sResourcePath.NGL_DIR_SLASH."index"] = $aPoliciesNames;
+				if(count($aScopePaths)) {
+					foreach($aScopePaths as $sPath) {
+						$aAlvin["paths"][$sResourcePath.NGL_DIR_SLASH.$sPath] = $aPoliciesNames;
+					}
+				}
+			}
+
+			if($aPermission["paths"]) {
+				$aAlvin["paths"] = \array_merge($aAlvin["paths"], \array_fill_keys($aPermission["paths"], $aPoliciesNames));
+			}
+
+			if($aPoliciesNames!==true) {
+				foreach($aPoliciesNames as $sPolicy) {
+					$aAlvin["policies"][$sPolicy] = $this->aGrants["policies"][$sPolicy];
+				}
+			}
+		}
+	}
+
+	private function RealTimePolicies($aPoliciesList) {
+		$aPolicies = $aPoliciesStatus = [];
+		foreach($aPoliciesList as $sPolicy) {
+			$aPolicies[$sPolicy] = 0;
+			$aPolicy = $this->aToken[$this->sAlvinClaim]["policies"][$sPolicy];
+
+			if($aPolicy["type"]=="time") {
+				$bDate = true;
+				if($aPolicy["value"][2]) {
+					if(!\in_array(\date("w"), $aPolicy["value"][2])) { $bDate = false; }
+				}
+
+				if($bDate) {
+					$nFrom = !empty($aPolicy["value"][0]) ? \strtotime($aPolicy["value"][0]) : 0;
+					$nTo = !empty($aPolicy["value"][0]) ? \strtotime($aPolicy["value"][1]) : \strtotime("2050-08-15");
+					$nNow = \time();
+					if($nNow<=$nFrom || $nNow>=$nTo) {
+						$bDate = false;
+					}
+				}
+
+				if($bDate) {
+					if(self::call()->isTrue($aPolicy["positive"])) { $aPolicies[$sPolicy] = 1; }
+				} else {
+					if(!self::call()->isTrue($aPolicy["positive"])) { $aPolicies[$sPolicy] = 1; }
+				}
+			} else if($aPolicy["type"]=="session") {
+				if(empty($_SESSION[NGL_SESSION_INDEX]["ALVIN"])) {
+					$this->__errorMode__("log");
+					return self::errorMessage($this->object, 1016);
+				}
+
+				$mClaim = self::call()->strToVars($aPolicy["value"][0], $_SESSION[NGL_SESSION_INDEX]["ALVIN"]);
+				if($aPolicy["value"][0]!=$mClaim) {
+					if($aPolicy["value"][1]==="") { $aPolicy["value"][1] = '^$'; }
+					if(preg_match("/".$aPolicy["value"][1]."/", $mClaim)) {
+						if(self::call()->isTrue($aPolicy["positive"])) { $aPolicies[$sPolicy] = 1; }
 					} else {
-						foreach($this->aGrants["profiles"][$sName][$aGrant[0]] as $sGrant => $sTrue) {
-							unset($this->aGrants["groups"][$aGrant[0]][$sGrant][$sName]);
-							unset($this->aGrants["profiles"][$sName][$aGrant[0]][$sGrant]);
-						}
-						unset($this->aGrants["profiles"][$sName][$aGrant[0]]);
+						if(!self::call()->isTrue($aPolicy["positive"])) { $aPolicies[$sPolicy] = 1; }
 					}
 				}
 			}
 		}
 
-		ksort($this->aGrants["profiles"]);
-		ksort($this->aGrants["profiles"][$sName]);
+		return (count($aPolicies)==\array_sum($aPolicies)) ? true : false;
 	}
 
-	// elimina un permiso, grupo o perfil
-	public function unsetGrant($sType, $sName) {
-		$this->chkType($sType);
-		$sName = $this->GrantName($sName);
-
-		if($sName!==false) { 
-			if($sType=="grants") {
-				foreach($this->aGrants["grants"][$sName] as $sGroup => $bVal) {
-					foreach($this->aGrants["groups"][$sGroup][$sName] as $sProfile => $bVal) {
-						unset($this->aGrants["profiles"][$sProfile][$sGroup][$sName]);
-					}					
-					unset($this->aGrants["groups"][$sGroup][$sName]);
-				}
-			} else if($sType=="groups") {
-				foreach($this->aGrants["groups"][$sName] as $sGrant => $aProfiles) {
-					if(is_array($aProfiles) && count($aProfiles)) {
-						foreach($aProfiles as $sProfile => $bVal) {
-							unset($this->aGrants["profiles"][$sProfile][$sName]);
-						}
-					}
-				}
-			} else {
-				if($sName=="ADMIN") { return $this; }
-				foreach($this->aGrants["profiles"][$sName] as $sGroup => $aGrants) {
-					if(\is_array($aGrants) && count($aGrants)) {
-						foreach($aGrants as $sGrant => $bVal) {
-							unset($this->aGrants["groups"][$sGroup][$sGrant][$sName]);
-						}
-					}
-				}
-			}
-
-			unset($this->aGrants[$sType][$sName]);
-			\ksort($this->aGrants[$sType]);
-		}
-		return $this;
-	}
-
-	// genera el token del usuario
-	public function token($sProfileName, $sRoleName=null, $aGrants=[], $aRaw=[], $sUsername=null) {
-		if($sUsername!==null) { $sUsername = $this->username($sUsername); }
-		if(!$this->crypt) { return self::errorMessage($this->object, 1001); }
-
-		$sProfileName = $this->profile($sProfileName);
-		$sRoleName = $this->role($sRoleName);
-		$aToken = ["profile"=>$sProfileName, "role"=>$sRoleName, "grants"=>null, "raw"=>null, "username"=>$sUsername];
-
-		// permisos
-		if(\is_array($aGrants) && \count($aGrants)) {
-			$aToken["grants"] = $this->PrepareGrants($aGrants); 
-		}
-
-		// permisos crudos
-		if(\is_array($aRaw) && \count($aRaw)) { $aToken["raw"] = $aRaw; }
-
-		$sTokenContent = \serialize($aToken);
-		if($this->crypt) {
-			if(!$this->sPrivateKey) { return self::errorMessage($this->object, 1008); }
-			$sTokenContent = $this->crypt->type("rsa")->key($this->sPrivateKey)->encrypt($sTokenContent);
-		}
-		$sTokenContent = \base64_encode($sTokenContent);
-		$sTokenContent = \base64_encode($this->password($sUsername))."@".$sTokenContent;
-
-		$sToken	 = "/-- NGL ALVIN TOKEN -------------------------------------------------------/\n";
-		$sToken	.= \chunk_split($sTokenContent);
-		$sToken	.= "/------------------------------------------------------- NGL ALVIN TOKEN --/";
-
-		return $sToken;
-	}
-
-	//
-	private function GrantName($sGrant, $bDot=false) {
-		$sGrant = self::call()->unaccented($sGrant);
-		$sRegex = (!$bDot) ? "/[^a-zA-Z0-9]+/" : "/[^a-zA-Z0-9\-\_\.]+/";
-		return \strtoupper(\preg_replace($sRegex, "", $sGrant));
-	}
-
-	private function PrepareGrants($aProfile) {
-		if(\array_key_exists("ADMIN", $aProfile)) { $aProfile = $this->aGrants["groups"]; }
-		$aToken = [];
-		foreach($aProfile as $sGroup => $aGrants) {
-			$aToken[$sGroup] = true;
-			if(!\is_array($aGrants) || !\count($aGrants)) { continue; }
-			foreach($aGrants as $sGrant => $bVal) {
-				$aToken[$sGroup.".".$sGrant] = true;
-			}
-		}
-		return $aToken;
-	}
-	
-	// decodifica los permisos json
-	private function jsonGrants($sGrants) {
-		$aGrants = json_decode($sGrants, true);
-		if($aGrants!==null) {
-			if(\array_key_exists("GRANTS", $aGrants)) { $this->aGrants = $aGrants["GRANTS"]; }
-			if(\array_key_exists("ROLES", $aGrants)) { $this->roles = self::call("tree")->loadtree($aGrants["ROLES"]); }
-			if(\array_key_exists("RAW", $aGrants)) { $this->aRAW = $aGrants["RAW"]; }
-			if(!\array_key_exists("GRANTS", $aGrants) && !\array_key_exists("ROLES", $aGrants) && !\array_key_exists("RAW", $aGrants)) { $this->aGrants = $aGrants; }
-		} else {
-			return self::errorMessage($this->object, 1012);
-		}
-
-		// perfil y rol admin
-		$this->AdminGrants();
-
-		return $this;
-	}
-
-	// busca permisos
-	private function FindGrant($sName, $bRecursive=false, $sType="grants") {
-		$sType = \strtolower($sType);
-		if(isset($this->aGrants[$sType], $this->aGrants[$sType][$sName])) { return $sName; }
-		return false;
-	}
-
-	private function chkType(&$sType) {
-		$sType = \strtolower($sType);
-		return (\in_array($sType, ["grants", "groups", "profiles"])) ? $sType : false;
-	}
-
-	// USE GRANTS --------------------------------------------------------------
+	// IMPLEMENTACION ----------------------------------------------------------
 	// carga un token
-	// tipo de carga de ALVIN-TOKEN (TOKEN|TOKENUSER|PROFILE)
-	public function load($sToken=null, $sUsername=null, $sProfile=null) {
-		if(!$this->crypt) { self::errorMessage($this->object, 1001); }
-
-		// datos insuficientes
-		if($sToken===null && $sProfile===null) { return false; }
-
-		// modo de carga
-		$sMode = \strtoupper(NGL_ALVIN_MODE);
-
-		if($sToken!==null && $sMode!=="PROFILE") {
-			$sToken = \preg_replace("/\s/is", "", $sToken);
-			$sToken = \str_replace(["NGLALVINTOKEN","/---------------------------------------------------------/"], "", $sToken);
-
-			$aToken = \explode("@", $sToken);
-			if(isset($aToken[1])) {
-				if($sUsername!==null) {
-					$sUsername = $this->username($sUsername);
-					if(\base64_decode($aToken[0])!==$this->password($sUsername)) {
-						self::errorMessage($this->object, 1009);
-						return false;				
-					}
-				}
-				$sToken = $aToken[1];
-			} else {
-				if($sMode==="TOKENUSER") { return false; }
-				$sToken = $aToken[0];
-			}
-		
-			if($this->crypt) {
-				$sDecrypt = $this->crypt->type("rsa")->key($this->sCryptKey)->decrypt(\base64_decode($sToken));
-			} else {
-				$sDecrypt = \base64_decode($sToken);
-			}
-
-			$this->aToken = \unserialize($sDecrypt);
-		} else if($sProfile!==null) {
-			$sProfileName = \trim($sProfile);
-			$sProfileName = \strtoupper($sProfileName);
-			$this->aToken = ["profile"=>$sProfileName];
+	public function load($sToken) {
+		if(!$this->sCryptKey) { self::errorMessage($this->object, 1004); }
+		$jwt = self::call("jwt");
+		if(!$bCheck = $jwt->verify($sToken, $this->sCryptKey)) {
+			$this->__errorMode__("boolean");
+			return self::errorMessage($this->object, 1015);
 		}
-
-		// \nogal\dump($this->aToken);
-		if(!\is_array($this->aToken)) {
-			self::errorMessage($this->object, 1002);
-			return false;
-		}
-		
+		$this->aToken = \json_decode($jwt->jwt["payload"], true);
 		return $this;
 	}
 
@@ -637,151 +575,95 @@ SQL;
 		return ($this->aToken!==null);
 	}
 
+	// intenta cargar el token desde la session
 	public function autoload() {
-		if(empty($_SESSION[NGL_SESSION_INDEX]["ALVIN"])) { return false; }
-		$sUsername	= isset($_SESSION[NGL_SESSION_INDEX]["ALVIN"]["username"]) ? $_SESSION[NGL_SESSION_INDEX]["ALVIN"]["username"] : null;
-		$sToken		= isset($_SESSION[NGL_SESSION_INDEX]["ALVIN"]["alvin"]) ? $_SESSION[NGL_SESSION_INDEX]["ALVIN"]["alvin"] : null;
-		$sProfile	= isset($_SESSION[NGL_SESSION_INDEX]["ALVIN"]["profile"]) ? $_SESSION[NGL_SESSION_INDEX]["ALVIN"]["profile"] : null;
-		if(!$this->load($sToken, $sUsername, $sProfile)) { return false; }
+		if(empty($_SESSION[NGL_SESSION_INDEX]["ALVIN"])) {
+			$this->__errorMode__("log");
+			return self::errorMessage($this->object, 1016);
+		}
+		if(!empty($_SESSION[NGL_SESSION_INDEX]["ALVIN"]["token"])) {
+			$this->load($_SESSION[NGL_SESSION_INDEX]["ALVIN"]["token"]);
+		}
 		return $this;
 	}
 
-	// valida un nombre de perfil
-	// si el nombre es nulo y hay un token cargado, intenta retornar el perfil del mismo
-	public function profile($sProfile=null) {
-		if($sProfile===null && $this->aToken!==null) { return $this->aToken["profile"]; }
-		return $this->GrantName($sProfile, false);
+	public function token() {
+		return $this->aToken;
 	}
 
-	// valida un nombre de usuario
-	// si el nombre es nulo y hay un token cargado, intenta retornar el nombre del mismo
-	public function username($sUsername=null) {
-		if($sUsername===null && $this->aToken!==null) { return $this->aToken["username"]; }
-		$sUsername = self::call()->unaccented($sUsername);
-		return \preg_replace("/[^a-zA-Z0-9\_\-\.\@]+/", "", $sUsername);
-	}
-
-	// encripta un password
-	public function password($sPassword) {
-		$sCryptPassword = \crypt($sPassword, '$6$rounds=5000$'.\md5($this->sCryptKey).'$');
-		$aCryptPassword = \explode('$', $sCryptPassword, 5);
-		return $aCryptPassword[4];
-	}
-
-	// ver token
-	public function viewtoken() {
-		return ($this->aToken!==null) ? $this->aToken : false;
-	}
-
-	public function analize($sGrant, $sToken=null) {
+	public function check($sGrant) {
+		if(!$this->loaded()) { $this->expiredToken(); }
 		$sGrant = \trim($sGrant);
-		if(empty($sGrant)) { return false; }
-		if($sGrant[0].$sGrant[1]=="?|") {
-			$sGrant = \substr($sGrant, 2);
-		}
-		return $this->CheckGrant($sGrant, $sToken, "analize");
-	}
-
-	/// chequear si es parte de otro proesupestos.add tiene que matchear con presupuestos(algo)
-	public function check($sGrant, $sToken=null) {
-		$sGrant = \trim($sGrant);
-		$sGrant = \strtoupper($sGrant);
+		$sGrant = \strtolower($sGrant);
 		if(empty($sGrant)) { return false; }
 		if($sGrant[0].$sGrant[1]=="!|") {
 			$sGrant = \substr($sGrant, 2);
-			return $this->CheckGrant($sGrant, $sToken, "none");
+			return $this->CheckPermissions($sGrant, "none");
 		} else if($sGrant[0].$sGrant[1]=="?|") {
 			$sGrant = \substr($sGrant, 2);
-			return $this->CheckGrant($sGrant, $sToken, "any");
+			return $this->CheckPermissions($sGrant, "any");
 		} else {
-			return $this->CheckGrant($sGrant, $sToken, "all");
+			return $this->CheckPermissions($sGrant, "all");
 		}
 	}
 
-	public function raw($sIndex=null, $aKeyVals=false) {
-		$mRaw = null;
-		if(!\is_array($this->aToken)) { self::errorMessage($this->object, 1002); return false; }
-		if(\array_key_exists("raw", $this->aToken)) {
-			$mRaw = self::call()->arrayFlatIndex($this->aToken["raw"], $sIndex, true);
-		}
-
-		if(\is_array($aKeyVals)) {
-			$mRaw = $this->RawKeywords($mRaw, $aKeyVals);
-		}
-
-		return $mRaw;
+	public function firewall($sPath) {
+		if(!$this->loaded()) { $this->expiredToken(); }
+		if(!isset($this->aToken[$this->sAlvinClaim]["paths"][$sPath])) { return false; }
+		if($this->aToken[$this->sAlvinClaim]["paths"][$sPath]===true) { return true; }
+		return $this->RealTimePolicies($this->aToken[$this->sAlvinClaim]["paths"][$sPath]);
 	}
 
-	private function RawKeywords($mRaw, $aKeyVals) {
-		if(\is_array($mRaw)) {
-			foreach($mRaw as $mKey => $mValue) {
-				$mRaw[$mKey] = $this->RawKeywords($mValue, $aKeyVals);
-			}
-		} else {
-			\preg_match_all("/\{:([a-z0-9_\.]+):\}/is", $mRaw, $aMatchs);
-			if(\is_array($aMatchs[0]) && \count($aMatchs[0])) {
-				foreach($aMatchs[0] as $x => $sFind) {
-					$sReplace = self::call()->arrayFlatIndex($aKeyVals, $aMatchs[1][$x], true);
-					$mRaw = \str_replace($sFind, $sReplace, $mRaw);
-				}
+	public function expiredToken() {
+		$this->__errorMode__("die");
+		self::errorShowSource(false);
+		self::errorMessage($this->object, 1015);
+	}
+
+	private function CheckPermissions($sResource, $sMode="analize") {
+		if(!$this->loaded()) {
+			$this->autoload();
+			if($this->aToken===null) {
+				$this->__errorMode__("log");
+				self::errorMessage($this->object, 1014);
+				return null;
 			}
 		}
 
-		return $mRaw;
-	}
-
-	private function FlatGrants($sName, $aGrants) {
-		$aFlat = [$sName=>$sName];
-		foreach($aGrants as $sName => $aGrant) {
-			if(isset($aGrant["type"]) && $aGrant["type"]=="grant") {
-				$aFlat[$sName] = $aGrant["grant"];
-			} else {
-				$aFlat = \array_merge($aFlat, $this->FlatGrants($sName, $aGrant["grant"]));
-			}
-		}
-		return $aFlat;
-	}
-
-	public function unload($aUser) {
-		$this->aToken = null;
-		return $this;
-	}
-
-	private function AdminGrants() {
-		if(!\array_key_exists("ADMIN", $this->aGrants["profiles"])) { $this->aGrants["profiles"]["ADMIN"] = []; }
-		$aRoles = $this->roles();
-		if(empty($aRoles) || !\array_key_exists("ADMIN", $aRoles)) { $this->setRole("ADMIN"); }
-	}
-
-	// primero intenta matchear el nombre del perfil
-	// luego busca pertenencias de grupos xxx.
-	// finalmente, permisos
-	private function CheckGrant($sGrant, $sToken=null, $sMode="analize") {
-		if($sToken!=null) { $this->load($sToken); }
-		$aToCheck = (\strpos($sGrant, ",")===false) ? [$sGrant] : self::call()->explodeTrim(",", $sGrant);
-
-		// nombre del perfil
-		if(!empty($this->aToken["profile"]) && \in_array($this->aToken["profile"], $aToCheck)) { return ($sMode=="none") ? false : true; }
+		$aToCheck = (\strpos($sResource, ",")===false) ? [$sResource] : self::call()->explodeTrim(",", $sResource);
 
 		if(\is_array($aToCheck) && \count($aToCheck)==1) {
-			$sGrant = $aToCheck[0];
-			if(isset($this->aToken["grants"][$sGrant])) {
-				return ($sMode=="none") ? false : true;
+			$sResource = $aToCheck[0];
+			if(isset($this->aToken[$this->sAlvinClaim]["resources"][$sResource])) {
+				if($this->aToken[$this->sAlvinClaim]["resources"][$sResource]===true) {
+					return ($sMode=="none") ? false : true;
+				} else {
+					if($this->RealTimePolicies($this->aToken[$this->sAlvinClaim]["resources"][$sResource])) {
+						return ($sMode=="none") ? false : true;
+					}
+				}
 			}
 			return ($sMode=="none") ? true : false;
 		} else {
-			
 			$aReturn = [];
 			$bNone = true;
-			foreach($aToCheck as $sGrant) {
-				if(isset($this->aToken["grants"][$sGrant])) {
+			foreach($aToCheck as $sResource) {
+				$bPass = false;
+				if(isset($this->aToken[$this->sAlvinClaim]["resources"][$sResource])) {
+					$bPass = true;
+					if(\is_array($this->aToken[$this->sAlvinClaim]["resources"][$sResource])) {
+						$bPass = $this->RealTimePolicies($this->aToken[$this->sAlvinClaim]["resources"][$sResource]);
+					}
+				}
+
+				if($bPass) {
 					if($sMode=="any") { return true; }
 					if($sMode=="none") { return false; }
-					$aReturn[$sGrant] = true;
+					$aReturn[$sResource] = true;
 					$bNone = false;
 				} else {
 					if($sMode=="all") { return false; }
-					$aReturn[$sGrant] = false;
+					$aReturn[$sResource] = false;
 				}
 
 			}
@@ -791,6 +673,109 @@ SQL;
 			if($sMode=="any") { return false; }
 
 			return $aReturn;
+		}
+	}
+
+	// -- VALIDACIONES----------------------------------------------------------
+	// sanitiza un nombre de usuario
+	// si el nombre es nulo y hay un token cargado, intenta retornar el nombre del mismo
+	public function username($sUsername=null) {
+		if($sUsername===null && $this->aToken!==null) { return $this->aToken["username"]; }
+		$sUsername = self::call()->unaccented($sUsername);
+		return \preg_replace("/[^a-zA-Z0-9\_\-\.\@]+/", "", $sUsername);
+	}
+
+	// calcula un password
+	public function password($sPassword) {
+		$sCryptPassword = \crypt($sPassword, '$6$rounds=5000$'.\md5($this->sCryptKey).'$');
+		$aCryptPassword = \explode('$', $sCryptPassword, 5);
+		return $aCryptPassword[4];
+	}
+
+	private function ClaimExists($sGrant, $sClaim, $bPositive=false, $bThrowError=true) {
+		$sClaim = $this->ClaimName($sClaim);
+		$bExists = \array_key_exists($sClaim, $this->aGrants[$sGrant]);
+
+		if($bExists && $bPositive) {
+			if($bThrowError) { self::errorMessage($this->object, 1006, $sGrant."[".$sClaim."]"); }
+			return true;
+		} else if(!$bExists && !$bPositive) {
+			if($bThrowError) { self::errorMessage($this->object, 1007, $sGrant."[".$sClaim."]"); }
+			return true;
+		}
+
+		return $bThrowError ? $sClaim : false;
+	}
+
+	private function ClaimName($sClaimSrc) {
+		$sClaim = self::call()->unaccented($sClaimSrc);
+		$sClaim = \strtolower(\preg_replace("/[^a-zA-Z0-9\_]+/", "", $sClaim));
+		if(empty($sClaim) || preg_match("/[a-z\_]/", $sClaim[0])===0) { self::errorMessage($this->object, 1005, $sClaimSrc." => ".$sClaim); }
+		return $sClaim;
+	}
+
+	private function PathToClaim($sPath) {
+		return ($sPath==NGL_DIR_SLASH || $sPath==".") ? $sPath : self::call()->clearPath($sPath);
+	}
+
+	private function GrantClaimCreate($sGrant, $sClaim, $aCreate) {
+		$aClaim = \array_fill_keys($this->aGrantsStructures[$sGrant], null);
+		foreach($this->aGrantsStructures[$sGrant] as $sKey) {
+			if(\array_key_exists($sKey, $aCreate)) {
+				$aClaim[$sKey] = $aCreate[$sKey];
+			}
+		}
+		$this->aGrants[$sGrant][$sClaim] = $aClaim;
+	}
+
+	private function GrantClaimUpdate(&$aClaim, $aUpdate) {
+		foreach($aClaim as $sKey => $mValue) {
+			if(\array_key_exists($sKey, $aUpdate)) {
+				$aClaim[$sKey] = $aUpdate[$sKey];
+			}
+		}
+	}
+
+	private function GrantClaimDelete($sGrant, $sClaim) {
+		unset($this->aGrants[$sGrant][$sClaim]);
+	}
+
+	private function ChkPoliciesRoles($aRoles) {
+		$aCheck = \array_diff($aRoles, \array_keys($this->aGrants["roles"]));
+		if(count($aCheck)) { self::errorMessage($this->object, 1007, "roles[".\implode(", ", $aCheck)."]"); }
+	}
+
+	private function ChkRoleInPolicies($sRole) {
+		foreach($this->aGrants["policies"] as $sPolicy => $aPolicy) {
+			if($aPolicy["type"]=="role") {
+				if(\in_array($sRole, $aPolicy["value"])) {
+					self::errorMessage($this->object, 1013, "policy[".$sPolicy."] => role[".$sRole."]");
+				}
+			}
+		}
+	}
+
+	private function ChkResourceInPermissions($sResource) {
+		foreach($this->aGrants["permissions"] as $sPermission => $aPermission) {
+			if($aPermission["resource"]==$sResource) {
+				self::errorMessage($this->object, 1013, "permission[".$sPermission."] => resource[".$sResource."]");
+			}
+		}
+	}
+
+	private function ChkScopeInPermissions($sScope) {
+		foreach($this->aGrants["permissions"] as $sPermission => $aPermission) {
+			if(\in_array($sScope, $aPermission["scopes"])) {
+				self::errorMessage($this->object, 1013, "permission[".$sPermission."] => scope[".$sScope."]");
+			}
+		}
+	}
+
+	private function ChkPolicyInPermissions($sPolicy) {
+		foreach($this->aGrants["permissions"] as $sPermission => $aPermission) {
+			if(\in_array($sPolicy, $aPermission["policies"])) {
+				self::errorMessage($this->object, 1013, "permission[".$sPermission."] => policy[".$sPolicy."]");
+			}
 		}
 	}
 }

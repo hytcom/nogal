@@ -1,9 +1,9 @@
-[checksum]
-md5 = "d9623c7d8f8d7e7e15f627203678661c"
-sha1 = "2611a6cb370c558d7a34192eb0d7e45a1852ef99"
-
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/dom.md"
+[info]
+_help = "### dom\
+Implementa http://simplehtmldom.sourceforge.net\
+\
+https://github.com/hytcom/wiki/blob/master/nogal/docs/dom.md\
+"
 
 [arguments]
 brtext = "Texto utilizado para reemplazar las etiquetas <br> al retornar texto"

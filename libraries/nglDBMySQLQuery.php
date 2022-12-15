@@ -1,33 +1,27 @@
 <?php
 /*
-# Nogal
+# nogal
 *the most simple PHP Framework* by hytcom.net
-GitHub @hytcom
+GitHub @hytcom/nogal
 ___
-  
-# mysql
-## nglDBMySQLQuery *extends* nglBranch *implements* iNglDBQuery [2018-08-21]
-Controla los resultados generados por consultas a la bases de datos MySQL
 
-https://github.com/hytcom/wiki/blob/master/nogal/docs/mysqlq.md
-
+# mysqlq
+https://hytcom.net/nogal/docs/objects/mysqlq.md
 */
 namespace nogal;
-
 class nglDBMySQLQuery extends nglBranch implements iNglDBQuery {
 
 	private $db		= null;
 	private $cursor = null;
-	
+
 	final protected function __declareArguments__() {
 		$vArguments							= [];
-
 		$vArguments["column"]				= ['$mValue', null];
 		$vArguments["get_mode"]				= ['$this->GetMode($mValue)', \MYSQLI_ASSOC];
 		$vArguments["link"]					= ['$mValue', null];
+		$vArguments["query_time"]			= ['$mValue', null];
 		$vArguments["query"]				= ['$mValue', null];
 		$vArguments["sentence"]				= ['(string)$mValue', null];
-		$vArguments["query_time"]			= ['$mValue', null];
 
 		return $vArguments;
 	}
@@ -40,7 +34,7 @@ class nglDBMySQLQuery extends nglBranch implements iNglDBQuery {
 		$vAttributes["_allrows"]			= null;
 		$vAttributes["_columns"]			= null;
 		$vAttributes["_rows"]				= null;
-		
+
 		return $vAttributes;
 	}
 
@@ -65,13 +59,13 @@ class nglDBMySQLQuery extends nglBranch implements iNglDBQuery {
 				$sSQL = \preg_replace("/LIMIT *[0-9]+ *,? *[0-9]*$/i", "", $sSQL);
 				$sSQL = \preg_replace("/SELECT/i", "SELECT SQL_CALC_FOUND_ROWS", $sSQL, 1);
 				$foundrows = $this->db->query($sSQL);
-			
+
 				$sRowsAlias = self::call()->unique();
 				$sSQL = "
 					SELECT FOUND_ROWS() AS '".$sRowsAlias."'
 				";
 				$getrows = $this->db->query($sSQL);
-				
+
 				$aRows = $getrows->fetch_array(MYSQLI_ASSOC);
 				$nRows = (int)$aRows[$sRowsAlias];
 
@@ -85,7 +79,7 @@ class nglDBMySQLQuery extends nglBranch implements iNglDBQuery {
 		$this->attribute("_allrows", $nRows);
 		return $nRows;
 	}
-	
+
 	public function columns() {
 		if($this->attribute("_columns")!==null) { return $this->attribute("_columns"); }
 
@@ -94,7 +88,7 @@ class nglDBMySQLQuery extends nglBranch implements iNglDBQuery {
 		foreach($aCols as $column) {
 			$aGetColumns[] = $column->name;
 		}
-		
+
 		$this->attribute("_columns", $aGetColumns);
 		return $aGetColumns;
 	}
@@ -106,7 +100,7 @@ class nglDBMySQLQuery extends nglBranch implements iNglDBQuery {
 		} else {
 			$nRows = $this->cursor->num_rows;
 		}
-		
+
 		$this->attribute("_rows", $nRows);
 		return $nRows;
 	}
@@ -149,7 +143,7 @@ class nglDBMySQLQuery extends nglBranch implements iNglDBQuery {
 				$sColumn = $aColumn[0];
 				$sValue = (\count($aColumn)>1) ? $aColumn[1] : $aColumn[0];
 				$bKeyValue = true;
-			}			
+			}
 		}
 
 		$this->reset();
@@ -176,11 +170,11 @@ class nglDBMySQLQuery extends nglBranch implements iNglDBQuery {
 			} else if($bKeyValue) {
 				while($aRow = $this->cursor->fetch_array($nMode)) {
 					$aGetAll[$aRow[$sColumn]] = $aRow[$sValue];
-				}			
+				}
 			} else {
 				while($aRow = $this->cursor->fetch_array($nMode)) {
 					$aGetAll[] = $aRow[$sColumn];
-				}			
+				}
 			}
 		} else {
 			while($aRow = $this->cursor->fetch_array($nMode)) {
@@ -210,7 +204,7 @@ class nglDBMySQLQuery extends nglBranch implements iNglDBQuery {
 
 	public function load() {
 		list($link, $query, $sQuery, $nQueryTime) = $this->getarguments("link,query,sentence,query_time", \func_get_args());
-		
+
 		$this->db = $link;
 		$this->cursor = $query;
 		$this->attribute("sql", $sQuery);
@@ -220,13 +214,13 @@ class nglDBMySQLQuery extends nglBranch implements iNglDBQuery {
 		$sSQL = \preg_replace("/^[^A-Z]*/i", "", $sSQL);
 		$sSQLCommand = \strtok($sSQL, " ");
 		$sSQLCommand = \strtoupper($sSQLCommand);
-		
+
 		if(\in_array($sSQLCommand, ["SELECT", "INSERT", "UPDATE", "REPLACE", "DELETE"])) {
 			$this->attribute("crud", $sSQLCommand);
 		} else {
 			$this->attribute("crud", false);
 		}
-		
+
 		return $this;
 	}
 

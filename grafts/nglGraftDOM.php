@@ -1,33 +1,28 @@
 <?php
+/*
+# nogal
+*the most simple PHP Framework* by hytcom.net
+GitHub @hytcom/nogal
+___
 
+# dom
+https://hytcom.net/nogal/docs/objects/dom.md
+*/
 namespace nogal;
-
-/** CLASS {
-	"name" : "nglGraftDOM",
-	"object" : "dom",
-	"type" : "instanciable",
-	"revision" : "20171124",
-	"extends" : "nglBranch",
-	"interfaces" : "inglFeeder",
-	"description" : "Implementa http://simplehtmldom.sourceforge.net/",
-
-} **/
-
-
 class nglGraftDOM extends nglScion {
 
 	public $dom = null;
 
 	final protected function __declareArguments__() {
 		$vArguments							= [];
+		$vArguments["brtext"]				= ['(string)$mValue', "\r\n"];
+		$vArguments["charset"]				= ['(string)$mValue', "UTF-8"];
 		$vArguments["content"]				= ['(string)$mValue', "test1234"];
-		$vArguments["selector"]				= ['(string)$mValue', ""];
 		$vArguments["index"]				= ['(int)$mValue', 0];
 		$vArguments["lowercase"]			= ['(boolean)$mValue', true];
-		$vArguments["tagsclosed"]			= ['(boolean)$mValue', true];
-		$vArguments["charset"]				= ['(string)$mValue', "UTF-8"];
-		$vArguments["brtext"]				= ['(string)$mValue', "\r\n"];
+		$vArguments["selector"]				= ['(string)$mValue', ""];
 		$vArguments["spantext"]				= ['(string)$mValue', " "];
+		$vArguments["tagsclosed"]			= ['(boolean)$mValue', true];
 		return $vArguments;
 	}
 

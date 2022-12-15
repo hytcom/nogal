@@ -1,36 +1,20 @@
 <?php
+/*
+# nogal
+*the most simple PHP Framework* by hytcom.net
+GitHub @hytcom/nogal
+___
 
+# shift
+https://hytcom.net/nogal/docs/objects/shift.md
+*/
 namespace nogal;
-
-/** CLASS {
-	"name" : "nglShift",
-	"object" : "shift",
-	"type" : "main",
-	"revision" : "20150225",
-	"extends" : "nglTrunk",
-	"description" : "
-		Este objeto nuclea métodos de conversión de datos entre las siguientes escructuras:
-		<ul>
-			<li><b>array:</b> Array de datos</li>
-			<li><b>csv:</b> Texto inline o multilinea de valores separados por comas</li>
-			<li><b>fixed:</b> Texto inline o multilinea de valores separados ancho fijo</li>
-			<li><b>html:</b> Tablas html, soporta tablas anidadas. Si se especifican thead se utilizarán como claves</li>
-			<li><b>json:</b> JSON</li>
-			<li><b>object:</b> Objecto de datos o un objeto del tipo iNglDataObjet</li>
-			<li><b>serialize:</b> valor serializado</li>
-			<li><b>xml:</b> XML</li>
-		</ul>
-	",
-	"variables" : {
-		"$vCSV" : ["private", "Configuraciones para la lectura de cadenas CSV"]
-	}
-} **/
 class nglShift extends nglTrunk {
 
-	protected $class	= "nglShift";
-	protected $me		= "shift";
-	protected $object	= "shift"; 
-	private $xpath		= null; 
+	protected $class			= "nglShift";
+	protected $me				= "shift";
+	protected $object			= "shift";
+	private $xpath				= null;
 	private $vCSV;
 
 	function __builder__() {
@@ -49,51 +33,9 @@ class nglShift extends nglTrunk {
 		$this->vCSV["pointer"]		= null;
 	}
 
-	/** FUNCTION {
-		"name" : "cast",
-		"type" : "public",
-		"description" : "
-			Formatea el valor <b>$mValue</b> según <b>$sCastType</b>, siempre que se encuentre dentro de los tipos:
-			<ul>
-				<li>array</li>
-				<li>boolean</li>
-				<li>double</li>
-				<li>integer</li>
-				<li>NULL</li>
-				<li>object</li>
-				<li>string</li>
-			</ul>
-		",
-		"parameters" : {
-			"$mValue" : ["mixed", "Variable a formatear"],
-			"$sCastType" : ["string", "
-				tipo de formato:<br />
-				<ul>
-					<li><b>text:</b> texto plano (valor predeterminado)</li>
-					<li><b>html:</b> se aplica htmlspecialchars</li>
-					<li><b>htmlall:</b> se aplica htmlentities</li>
-				</ul>
-			", "text"]
-		},
-		"examples" : {
-			"example" : "
-				$text = <<<TXT <b>El 'río' de las "pirañas"</b> TXT;
-				
-				echo $ngl("shift")->cast($text);
-				# Retorna: <b>El 'río' de las "pirañas"</b>
-				
-				echo $ngl("shift")->cast($text, "html");
-				# Retorna: &lt;b&gt;El &#039;río&#039; de las &quot;pirañas&quot;&lt;/b&gt;
-				
-				echo $ngl("shift")->cast($text, "htmlall");
-				# Retorna: &lt;b&gt;El &#039;r&iacute;o&#039; de las &quot;pira&ntilde;as&quot;&lt;/b&gt;
-			"
-		},
-		"return" : "mixed"
-	} **/
 	public function cast($mValue, $sCastType="text") {
 		$sType = \gettype($mValue);
-		
+
 		if(!\in_array($sType, ["array","boolean","double","integer","NULL","object","string"])) { return true; }
 		if(\is_object($mValue)) { $mValue = $this->objToArray($mValue); }
 
@@ -109,24 +51,6 @@ class nglShift extends nglTrunk {
 		}
 	}
 
-	/** FUNCTION {
-		"name" : "CastValue",
-		"type" : "private",
-		"description" : "Auxiliar del método <b>nglShift::cast</b>",
-		"parameters" : {
-			"$mValue" : ["mixed", "Variable a formatear"],
-			"$sCastType" : ["string", "
-				tipo de formato:<br />
-				<ul>
-					<li><b>text:</b> texto plano (valor predeterminado)</li>
-					<li><b>html:</b> se aplica htmlspecialchars</li>
-					<li><b>htmlall:</b> se aplica htmlentities</li>
-				</ul>
-			"]
-		},
-		"seealso" : ["nglShift::cast"],
-		"return" : "mixed"
-	} **/
 	private function CastValue($mValue, $sCastType) {
 		switch($sCastType) {
 			case "html":
@@ -143,125 +67,6 @@ class nglShift extends nglTrunk {
 		}
 	}
 
-	/** FUNCTION {
-		"name" : "convert",
-		"type" : "public",
-		"description" : "Convierte una estructura de datos en otra",
-		"parameters" : {
-			"$mData" : ["mixed", "Estructura de datos original"],
-			"$sMethod" : ["string", "
-				Método de conversión, que se indica separando los tipos de estruturas de origen y destino con un - (guión medio)
-				
-				Estructuras soportadas:
-				<ul>
-					<li>array</li>
-					<li>csv</li>
-					<li>fixed / text</li>
-					<li>html</li>
-					<li>json</li>
-					<li>object</li>
-					<li>serialize</li>
-					<li>texttable / ttable</li>
-					<li>yml/yaml</li>
-					<li>xml</li>
-				</ul>
-				
-				Ejemplos:
-					<ul>
-						<li>array-csv</li>
-						<li>json-array</li>
-						<li>fixed-csv</li>
-						<li>html-json</li>
-					</ul>
-			","object-array"],
-			"$vOptions" : ["array", "
-				Array con las parametrizaciones de los métodos que intervienen en la conversión
-
-				<ul>
-					<li><b>class:</b> nombre de la clase CSS aplicado en la salida como tabla HTML</li>
-					<li><b>colnames:</b> array con los nombres de las columnas (null)</li>
-					<li><b>convert_spaces:</b> Determina si deben convertirse los caracteres de espacio</li>
-					<li><b>convert_unicode:</b> Determina si los caracteres UTF-8 deberán ser convertidos a formato UNICODE (\\uXXXX)</li>					
-					<li><b>joiner:</b> caracter por el que se unirán los campos (,)</li>
-					<li><b>enclose:</b> caracter que se utilizará para encerrar los valores de los campos (&quot;)</li>
-					<li><b>enclosed:</b> caracter utilizado para encerrar los valores de los campos (&quot;)</li>
-					<li><b>eol:</b> fin de línea (\\r\\n)</li>
-					<li><b>escape:</b> caracter de escape para caracteres especiales (\) Salida de datos</li>
-					<li><b>escaped:</b> caracter para escapar los caracteres especiales (\) Entrada de datos</li>
-					<li><b>format:</b> formato de salida para el modo HTML (table|div|list)</li>
-					<li><b>level:</b> actual nivel de anidamiento (-1)</li>
-					<li><b>multiline:</b> indica que los valores de origen deben considerar multiples lineas en textTableToArray</li>
-					<li><b>positions:</b> array de anchos fijos para los metodos fixed</li>
-					<li><b>splitter:</b> caracter separador de campos (,)</li>
-					<li><b>tag:</b> nombre del siguiente tag XML (vacio)</li>
-					<li><b>tthalign:</b> alineación de los encabezados en texttable</li>
-					<li><b>ttdalign:</b> alineación de los contenidos en texttable</li>
-					<li><b>use_colnames:</b> en combinación con <strong>colnames</strong>, establece los índices del array. 
-						Con valor true y colnames = null, se utilizarán como índices los valores de la primera fila.
-						(false)
-					</li>
-					<li><b>xml_attributes:</b> determina si se deben procesar o no los atributos de las etiquetas XML (falso)</li>					
-				</ul>
-			", null]
-		},
-		"examples" : {
-			"xml-csv" : "
-				$data = "
-					<months>
-						<month><name>enero</name><number>01</number></month>
-						<month><name>febrero</name><number>02</number></month>
-						<month><name>marzo</name><number>03</number></month>
-						<month><name>abril</name><number>04</number></month>
-						<month><name>mayo</name><number>05</number></month>
-						<month><name>junio</name><number>06</number></month>
-						<month><name>julio</name><number>07</number></month>
-						<month><name>agosto</name><number>08</number></month>
-						<month><name>septiembre</name><number>09</number></month>
-						<month><name>octubre</name><number>10</number></month>
-						<month><name>noviembre</name><number>11</number></month>
-						<month><name>diciembre</name><number>12</number></month>
-					</months>
-				";
-				
-				echo $ngl("shift")->convert($data, "xml-csv");
-				
-				# salida
-				"enero","01"
-				"febrero","02"
-				"marzo","03"
-				"abril","04"
-				"mayo","05"
-				"junio","06"
-				"julio","07"
-				"agosto","08"
-				"septiembre","09"
-				"octubre","10"
-				"noviembre","11"
-				"diciembre","12"
-			", 
-			
-			"array-json" : "
-				$data = array(
-					array("firstName" => "John" , "lastName" => "Doe", "age"=>36),
-					array("firstName" => "Anna" , "lastName" => "Smith", "age"=>15),
-					array("firstName" => "Peter" , "lastName" => "Jones", "age"=>42)
-				);
-				
-				echo $ngl("shift")->convert($data, "array-json");
-				
-				# salida
-				[
-					{"firstName":"John","lastName":"Doe","age":36},
-					{"firstName":"Anna","lastName":"Smith","age":15},
-					{"firstName":"Peter","lastName":"Jones","age":42}
-				]
-			"
-		},
-		"seealso" : [
-			"nglShift::cast"
-		],
-		"return" : "mixed"
-	} **/
 	public function convert($mData, $sMethod=null, $vOptions=null) {
 		if(empty($sMethod)) { $sMethod = "object-array"; }
 		$sMethod = \strtolower($sMethod);
@@ -326,16 +131,14 @@ class nglShift extends nglTrunk {
 
 			case "vector":
 				$aData = [];
-				foreach($mData as $mItem) {
-					$aData[] = [$mItem];
-				}
+				$aData = $this->vectorToArray($mData);
 				break;
 
 			case "array":
 			default:
 				$aData = $mData;
 		}
-		
+
 		if(!\is_array($aData)) { $aData = [$aData]; }
 
 		// destine
@@ -343,9 +146,6 @@ class nglShift extends nglTrunk {
 			case "csv":
 				return $this->csvEncode($aData, $vOptions);
 
-			case "gchart":
-				return $this->GoogleCharts($aData);
-			
 			case "text":
 			case "fixed":
 				return $this->fixedImplode($aData, $vOptions);
@@ -356,6 +156,9 @@ class nglShift extends nglTrunk {
 
 			case "html":
 				return $this->html($aData, $vOptions);
+
+			case "sql":
+				return $this->sql($vOptions["table"], $aData, $vOptions);
 
 			case "json":
 				return $this->jsonEncode($aData, $vOptions);
@@ -368,7 +171,7 @@ class nglShift extends nglTrunk {
 
 			case "xml":
 				return $this->xmlEncode($aData, $vOptions);
-			
+
 			case "yml":
 			case "yaml":
 				if(!\function_exists("yaml_emit")) { $this->__errorMode__("die"); self::errorMessage($this->object, 1001); }
@@ -378,40 +181,29 @@ class nglShift extends nglTrunk {
 			default:
 				return $aData;
 		}
-		
+
 	}
-	
-	/** FUNCTION {
-		"name" : "csvEncode",
-		"type" : "public",
-		"description" : "Genera una cadena formateada como CSV partiendo de un Array",
-		"parameters" : {
-			"$aData" : ["array", "Array de datos"],
-			"$vOptions" : ["array", "
-				Array de opciones del método:<br />
-				<ul>
-					<li><b>colnames:</b> array con los nombres de las columnas (null)</li>
-					<li><b>joiner:</b> caracter por el que se unirán los campos (,)</li>
-					<li><b>enclose:</b> caracter que se utilizará para encerrar los valores de los campos (&quot;)</li>
-					<li><b>escape:</b> caracter de escape para caracteres especiales (\)</li>
-					<li><b>eol:</b> fin de línea (\\r\\n)</li>
-				</ul>
-			", null]
-		},
-		"seealso" : ["nglShift::convert","nglShift::csvToArray"],
-		"return" : "string"
-	} **/
+
+	public function vectorToArray($aVector) {
+		$aArray = [];
+		foreach($aVector as $sKey => $mItem) {
+			if(\is_array($mItem) && !self::call()->isarrayarray($mItem, "any")) { $mItem = $this->vectorToArray($mItem); }
+			$aArray[] = ["key"=>$sKey, "value"=>$mItem];
+		}
+		return $aArray;
+	}
+
 	public function csvEncode($aData, $vOptions) {
 		$aColnames	 	= (isset($vOptions["colnames"])) ? $vOptions["colnames"] : null;
 		$sJoiner 		= (isset($vOptions["joiner"])) ? $vOptions["joiner"] : ",";
 		$sEnclosed	 	= (isset($vOptions["enclose"])) ? $vOptions["enclose"] : '"';
 		$sEscaped	 	= (isset($vOptions["escape"])) ? $vOptions["escape"] : "\\";
 		$sEOL			= (isset($vOptions["eol"])) ? $vOptions["eol"] : "\r\n";
-		$bArrayArray	= (isset($vOptions["arrayarray"])) ? $vOptions["arrayarray"] : null;
-	
+		$sArrayArray	= (isset($vOptions["arrayarray"])) ? $vOptions["arrayarray"] : "any";
+
 		$sCSV = "";
 		if(!\is_array($aData)) { return ""; }
-		
+
 		if($aColnames) {
 			if(!\is_array($aColnames) && self::call()->isTrue($aColnames)) { $aColnames = \array_keys(\array_shift($aData)); }
 			foreach($aColnames as $mColumnKey => $sColumn) {
@@ -419,11 +211,11 @@ class nglShift extends nglTrunk {
 				$sColumn = \str_replace($sJoiner, $sEscaped.$sJoiner, $sColumn);
 				$aColnames[$mColumnKey] = $sEnclosed.$sColumn.$sEnclosed;
 			}
-			
+
 			$sCSV .= \implode($sJoiner, $aColnames).$sEOL;
 		}
-		
-		if(self::call()->isarrayarray($aData, $bArrayArray)) {
+
+		if(self::call()->isarrayarray($aData, $sArrayArray)) {
 			\reset($aData);
 			foreach($aData as $mLineKey => $aLine) {
 				foreach($aLine as $mColumnKey => $sColumn) {
@@ -441,26 +233,13 @@ class nglShift extends nglTrunk {
 				$sColumn = \str_replace($sJoiner, $sEscaped.$sJoiner, $sColumn);
 				$aData[$mColumnKey] = $sEnclosed.$sColumn.$sEnclosed;
 			}
-			
+
 			$sCSV .= \implode($sJoiner, $aData);
 		}
-		
+
 		return $sCSV;
 	}
 
-	/** FUNCTION {
-		"name" : "CSVParseLine",
-		"type" : "private",
-		"description" : "auxiliar del método nglShift::csvToArray. convierte una linea CSV en un array",
-		"parameters" : {
-			"$sSplitter" : ["string", "caracter separador de campos", ","],
-			"$sEnclosed" : ["string", "caracter utilizado para encerrar los valores de los campos", "&quot;"],
-			"$sEscaped" : ["string", "caracter para escapar los caracteres especiales", "\\"],
-			"$sEOL" : ["string", "fin de línea", "\\r\\n"]
-		},
-		"seealso" : ["nglShift::csvToArray"],
-		"return" : "array"
-	} **/
 	private function CSVParseLine($sSplitter, $sEnclosed, $sEscaped, $sEOL) {
 		$aLine			= [];
 		$sData			= "";
@@ -473,7 +252,7 @@ class nglShift extends nglTrunk {
 			$this->vCSV["pointer"]++;
 			if($this->vCSV["length"]<=$this->vCSV["pointer"]) { break; }
 			$sChar = $this->vCSV["source"][$this->vCSV["pointer"]];
-			
+
 			$this->vCSV["chk_enclosed"] = ($this->vCSV["enclosed"]) ? $sChar : self::call()->strBoxAppend($this->vCSV["chk_enclosed"], $sChar);
 			if($this->vCSV["chk_enclosed"]===$sEnclosed) {
 				if($bEnclosed) {
@@ -484,7 +263,7 @@ class nglShift extends nglTrunk {
 					continue;
 				}
 			}
-			
+
 			$this->vCSV["chk_splitter"] = ($this->vCSV["splitter"]) ? $sChar : self::call()->strBoxAppend($this->vCSV["chk_splitter"], $sChar);
 			$this->vCSV["chk_escaped"]	= ($this->vCSV["chk_enclosed"]) ? $sLastChar : self::call()->strBoxAppend($this->vCSV["chk_escaped"], $sLastChar);
 			$this->vCSV["chk_eol"]		= ($this->vCSV["eol"]) ? $sChar : self::call()->strBoxAppend($this->vCSV["chk_eol"], $sChar);
@@ -519,44 +298,20 @@ class nglShift extends nglTrunk {
 			$aLine[] = $sData;
 			return $aLine;
 		}
-		
+
 		return null;
 	}
 
-	/** FUNCTION {
-		"name" : "csvToArray",
-		"type" : "public",
-		"description" : "convierte un texto CSV (una línea o conjunto de ellas) en un array bidimensional",
-		"parameters" : {
-			"$aData" : ["array", "Array de datos"],
-			"$vOptions" : ["array", "
-				Array de opciones del método:<br />
-				<ul>
-					<li><b>use_colnames:</b> en combinación con <strong>colnames</strong>, establece los índices del array. 
-						Con valor true y colnames = null, se utilizarán como índices los valores de la primera fila.
-						(false)
-					</li>
-					<li><b>columns:</b> array con los nombres de las columnas (null)</li>
-					<li><b>splitter:</b> caracter separador de campos (,)</li>
-					<li><b>enclosed:</b> caracter utilizado para encerrar los valores de los campos (&quot;)</li>
-					<li><b>escaped:</b> caracter para escapar los caracteres especiales (\)</li>
-					<li><b>eol:</b> fin de línea (\\r\\n)</li>
-				</ul>
-			", null]
-		},
-		"seealso" : ["nglShift::convert","nglShift::csvEncode"],
-		"return" : "string"
-	} **/
 	public function csvToArray($sSource, $vOptions=[]) {
 		$bColnames		= (isset($vOptions["use_colnames"])) ? self::call()->isTrue($vOptions["use_colnames"]) : false;
 		$aColnames		= (isset($vOptions["colnames"])) ? $vOptions["colnames"] : [];
 		$sSplitter	 	= (isset($vOptions["splitter"])) ? $vOptions["splitter"] : ",";
 		$sEnclosed		= (isset($vOptions["enclosed"])) ? $vOptions["enclosed"] : "\"";
 		$sEscaped	 	= (isset($vOptions["escaped"])) ? $vOptions["escaped"] : "\\";
-		$sEOL			= (isset($vOptions["eol"])) ? $vOptions["eol"] : "\r\n";
+		$sEOL			= (isset($vOptions["eol"])) ? $vOptions["eol"] : "\n";
 
 		if(\is_array($aColnames) && \count($aColnames)) { $bColnames = true; }
-		
+
 		$this->vCSV["use_colnames"]		= $bColnames;
 		$this->vCSV["colnames"]			= $aColnames;
 		$this->vCSV["chk_splitter"]		= \str_pad("", \strlen($sSplitter), "\x0B");
@@ -588,57 +343,11 @@ class nglShift extends nglTrunk {
 		return $aCSV;
 	}
 
-	/** FUNCTION {
-		"name" : "fixedExplode",
-		"type" : "public",
-		"description" : "Convierte una cadena en Array separando sus partes por caracter fijo",
-		"parameters" : {
-			"$sString" : ["string", "Cadena de datos"],
-			"$vOptions" : ["array", "
-				Array de opciones del método:<br />
-				<ul>
-					<li><b>positions:</b> posiciones de corte (null)</li>
-					<li><b>trim:</b> determina si debe aplicarse el método trim a cada valor obtenido (false)</li>
-					<li><b>eol:</b> determina si debe tratarse a $sString como una cadena multilinea (false)</li>
-				</ul>
-			", null]
-		},
-		"examples" : {
-			"sin TRIM" : "
-				$data = "John            Doe       Director    36";
-				$options = array("positions" => array(16,10,12,2));
-				print_r($ngl("shift")->fixedExplode($data, $options));
-				
-				# salida
-				Array (
-					[0] => "John            "
-					[1] => "Doe       "
-					[2] => "Director    "
-					[3] => 36
-				)
-			",
-			"con TRIM" : "
-				$data = "John            Doe       Director    36";
-				$options = array("positions" => array(16,10,12,2), "trim" => true);
-				print_r($ngl("shift")->fixedExplode($data, $options));
-				
-				# salida
-				Array (
-					[0] => "John"
-					[1] => "Doe"
-					[2] => "Director"
-					[3] => 36
-				)
-			"
-		},
-		"seealso" : ["nglShift::convert","nglShift::fixedImplode"],
-		"return" : "array"
-	} **/
 	public function fixedExplode($sString, $vOptions=null) {
 		if(!isset($vOptions["positions"]) || !\is_array($vOptions["positions"]) || !\count($vOptions["positions"])) {
 			return [$sString];
 		}
-		
+
 		$sEOL = (isset($vOptions["eol"])) ? $vOptions["eol"] : false;
 		$aString = ($sEOL) ? self::call()->strToArray($sString, $sEOL) : array($sString);
 
@@ -651,59 +360,22 @@ class nglShift extends nglTrunk {
 				$aLine[] = ($bTrim) ? \trim(\substr($sLine, $nLen, $nIndex)) : \substr($sLine, $nLen, $nIndex);
 				$nLen += $nIndex;
 			}
-			
+
 			$aExplode[] = $aLine;
 		}
 
 		return ($sEOL) ? $aExplode : $aExplode[0];
 	}
 
-	/** FUNCTION {
-		"name" : "fixedImplode",
-		"type" : "public",
-		"description" : "Convierte un Array en una cadena respetando las logitudes de <b>positions</b>. Si la longuitud de la cadena es superior al valor de <b>positions</b>, el valor será truncado.",
-		"parameters" : {
-			"$aString" : ["array", "Array de datos"],
-			"$vOptions" : ["array", "
-				Array de opciones del método:<br />
-				<ul>
-					<li><b>positions:</b> posiciones de unión (null)</li>
-					<li><b>fill:</b> caracter de relleno ( espacio )</li>
-					<li><b>joiner:</b> caracter por el que se unirán los campos ( null ). Si es distinto de NULL su longuitud sera incluida como parte del dato y se forzara su aparcion cortanto, de ser necesario, el valor del campo</li>
-					<li><b>eol:</b> fin de línea (\\r\\n)</li>
-				</ul>
-			"]
-		},
-		"examples" : {
-			"ejemplo #1" : "
-				$data = array("John", "Doe", "Director", "36");
-				$options = array("positions" => array(16,10,12,2), "fill" => ".");
-				echo $ngl("shift")->fixedImplode($data, $options);
-				
-				# salida
-				John............Doe.......Director....36
-			",
-			"ejemplo #2" : "
-				$data = array("ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO");
-				$options = array("positions" => array(5,5,5,5,5,5), "fill" => "-");
-				echo $ngl("shift")->fixedImplode($data, $options);
-				
-				# salida
-				ENEROFEBREMARZOABRILMAYO-JUNIO
-			"
-		},
-		"seealso" : ["nglShift::convert","nglShift::fixedExplode"],
-		"return" : "array"
-	} **/
 	public function fixedImplode($aString, $vOptions=null) {
 		$sFill			= (isset($vOptions["fill"])) ? $vOptions["fill"] : " ";
 		$sJoiner		= (isset($vOptions["joiner"])) ? $vOptions["joiner"] : null;
 		$nJoiner		= (isset($vOptions["joiner"])) ? \strlen($sJoiner) : 0;
 		$sEOL			= (isset($vOptions["eol"])) ? $vOptions["eol"] : "\n";
-		$bArrayArray	= (isset($vOptions["arrayarray"])) ? $vOptions["arrayarray"] : null;
+		$sArrayArray	= (isset($vOptions["arrayarray"])) ? $vOptions["arrayarray"] : "any";
 
-		$bRecursive = self::call()->isarrayarray($aString, $bArrayArray);
-		
+		$bRecursive = self::call()->isarrayarray($aString, $sArrayArray);
+
 		if(!isset($vOptions["positions"]) || !\is_array($vOptions["positions"]) || !\count($vOptions["positions"])) {
 			if($bRecursive) {
 				$aCurrent = \current($aString);
@@ -716,10 +388,10 @@ class nglShift extends nglTrunk {
 			foreach($aCurrent as $mValue) {
 				$aPositions[] = self::call("unicode")->strlen($mValue);
 			}
-			
+
 			$vOptions["positions"] = $aPositions;
 		}
-		
+
 		$sString = "";
 		if($bRecursive) {
 			foreach($aString as $aLine) {
@@ -736,13 +408,13 @@ class nglShift extends nglTrunk {
 				$sString .= $sValue;
 			}
 		}
-		
+
 		return $sString;
 	}
 
-	public function jsObject($aData, $bArrayArray=null) {
+	public function jsObject($aData, $sArrayArray="any") {
 		$aValues = [];
-		if(\is_array($aData) && \count($aData) && self::call()->isarrayarray($aData, $bArrayArray)) {
+		if(\is_array($aData) && \count($aData) && self::call()->isarrayarray($aData, $sArrayArray)) {
 			$aFirst = \current($aData);
 			$aColnames = array_keys($aFirst);
 			$aRegexs = self::call("sysvar")->REGEX;
@@ -789,140 +461,49 @@ class nglShift extends nglTrunk {
 				$aValues[] = $aNewData;
 			}
 		}
-	
+
 		foreach($aTypes as $k => $sType) {
-			
+
 		}
 
-		$sTypes = \json_encode($aTypes); 
+		$sTypes = \json_encode($aTypes);
 		$sValues = \json_encode($aValues, JSON_NUMERIC_CHECK);
 		$sValues = preg_replace("/\"(new Date\([0-9,]+\)|parseInt\([0-9]+\)|parseFloat\([0-9\.]+\)|null|true|false)\"/is", "\\1", $sValues);
 		return ["columns"=>$sTypes, "data"=>$sValues];
 	}
 
-	/** FUNCTION {
-		"name" : "html",
-		"type" : "public",
-		"description" : "Genera una salida HTML a partir de un Array",
-		"parameters" : {
-			"$aData" : ["array", "Array de datos"],
-			"$sFormat" : ["string", "
-				Tipo de salida HTML:<br />
-				<ul>
-					<li><b>table:</b> tabla HTML</li>
-					<li><b>div:</b> estructura de DIVs</li>
-					<li><b>list:</b> estructura de UL, LI y SPAN</li>
-				</ul>
-			", "table"],
-			"$sClassName" : ["string", "Nombre de la clase CSS que se asignara a la tabla, filas (*-head/*-row) y columnas (*-head-cell/*-cell)", "data"],
-			"$sClasses" : ["string", "Otras clasess asignadas a la tabla"],
-		},
-		"examples" : {
-			"TABLA" : "
-				$data = array(
-					array("firstName" => "John" , "lastName" => "Doe", "age"=>36),
-					array("firstName" => "Anna" , "lastName" => "Smith", "age"=>15),
-					array("firstName" => "Peter" , "lastName" => "Jones", "age"=>42)
-				);
-				echo $ngl("shift")->html($data, "table", "users");
-				
-				# salida
-				<table class="users">
-					<tr class="users-head">
-						<th class="users-cell">firstName</th>
-						<th class="users-cell">lastName</th>
-						<th class="users-cell">age</th>
-					</tr>
-					<tr class="users-row">
-						<td class="users-cell">John</td>
-						<td class="users-cell">Doe</td>
-						<td class="users-cell">36</td>
-					</tr>
-					<tr class="users-row">
-						<td class="users-cell">Anna</td>
-						<td class="users-cell">Smith</td>
-						<td class="users-cell">15</td>
-					</tr>
-					<tr class="users-row">
-						<td class="users-cell">Peter</td>
-						<td class="users-cell">Jones</td>
-						<td class="users-cell">42</td>
-					</tr>
-				</table>
-			",
-			"Estructura de DIVs" : "
-				$data = array(
-					array("firstName" => "John" , "lastName" => "Doe", "age"=>36),
-					array("firstName" => "Anna" , "lastName" => "Smith", "age"=>15),
-					array("firstName" => "Peter" , "lastName" => "Jones", "age"=>42)
-				);
-				echo $ngl("shift")->html($data, "div", "users");
-				
-				# salida
-				<div class="users">
-					<div class="users-head">
-						<div class="users-cell">firstName</div>
-						<div class="users-cell">lastName</div>
-						<div class="users-cell">age</div>
-					</div>
-					<div class="users-row">
-						<div class="users-cell">John</div>
-						<div class="users-cell">Doe</div>
-						<div class="users-cell">36</div>
-					</div>
-					<div class="users-row">
-						<div class="users-cell">Anna</div>
-						<div class="users-cell">Smith</div>
-						<div class="users-cell">15</div>
-					</div>
-					<div class="users-row">
-						<div class="users-cell">Peter</div>
-						<div class="users-cell">Jones</div>
-						<div class="users-cell">42</div>
-					</div>
-				</div>
-			",
-			"Estructura de UL, LI y SPAN" : "
-				$data = array(
-					array("firstName" => "John" , "lastName" => "Doe", "age"=>36),
-					array("firstName" => "Anna" , "lastName" => "Smith", "age"=>15),
-					array("firstName" => "Peter" , "lastName" => "Jones", "age"=>42)
-				);
-				echo $ngl("shift")->html($data, "list", "users");
-				
-				# salida
-				<ul class="users">
-					<li class="users-head">
-						<span class="users-cell">firstName</span>
-						<span class="users-cell">lastName</span>
-						<span class="users-cell">age</span>
-					</li>
-					<li class="users-row">
-						<span class="users-cell">John</span>
-						<span class="users-cell">Doe</span>
-						<span class="users-cell">36</span>
-					</li>
-					<li class="users-row">
-						<span class="users-cell">Anna</span>
-						<span class="users-cell">Smith</span>
-						<span class="users-cell">15</span>
-					</li>
-					<li class="users-row">
-						<span class="users-cell">Peter</span>
-						<span class="users-cell">Jones</span>
-						<span class="users-cell">42</span>
-					</li>
-				</ul>
-			",
-		},
-		"seealso" : ["nglShift::cast", "nglShift::convert"],
-		"return" : "string"
-	} **/
+	public function sql($sTable, $aData, $vOptions=[]) {
+		$sColQuote	= (isset($vOptions["sql_colquote"])) ? $vOptions["sql_colquote"] : "";
+		$sQuote	= (isset($vOptions["sql_quote"])) ? $vOptions["sql_quote"] : '"';
+		$nRowByInsert = (isset($vOptions["sql_inserts"])) ? $vOptions["sql_inserts"] : 1;
+
+		$sSQL = "";
+		$y = 0;
+		$x = 0;
+		foreach($aData as $aRow) {
+			if($x==0) {
+				$sSQL .= "INSERT INTO ".$sColQuote.$sTable.$sColQuote." (".$sColQuote.\implode($sColQuote.",".$sColQuote, \array_keys($aRow)).$sColQuote.") VALUES ";
+			}
+
+			$aValues[] = "(".$sQuote.\implode($sQuote.",".$sQuote, $aRow).$sQuote.")";
+			if(++$x==$nRowByInsert) {
+				$sSQL .= \implode(", ", $aValues).";\n";
+				$aValues = [];
+				$x = 0;
+			}
+		}
+		if(\count($aValues)) { $sSQL .= \implode(",", $aValues).";\n"; }
+
+		return $sSQL;
+	}
+
 	public function html($aData=null, $vOptions=[]) {
+		$bHTMLEntities	= (isset($vOptions["entities"])) ? $vOptions["entities"] : true;
 		$sFormat		= (isset($vOptions["format"])) ? $vOptions["format"] : "table";
 		$sClassName		= (isset($vOptions["class"])) ? $vOptions["class"] : "class";
 		$sClasses		= (isset($vOptions["classes"])) ? $vOptions["classes"] : "";
-		$bArrayArray	= (isset($vOptions["arrayarray"])) ? $vOptions["arrayarray"] : null;
+		$sArrayArray	= (isset($vOptions["arrayarray"])) ? $vOptions["arrayarray"] : "any";
+		$nBorder		= (isset($vOptions["border"])) ? $vOptions["border"] : 0;
 
 		$sFormat = \strtolower($sFormat);
 		switch($sFormat) {
@@ -939,7 +520,7 @@ class nglShift extends nglTrunk {
 				$sTagHeader	= "span";
 				$sTagCell 	= "span";
 				break;
-			
+
 			case "table":
 			default:
 				$sTagTable 	= "table";
@@ -949,16 +530,16 @@ class nglShift extends nglTrunk {
 				break;
 		}
 
-		$sHTML = "<".$sTagTable." class=\"".$sClassName." ".$sClasses."\">\n";
+		$sHTML = "<".$sTagTable." border=\"".$nBorder."\" class=\"".$sClassName." ".$sClasses."\">\n";
 
 		// contenido del bloque
-		if(self::call()->isarrayarray($aData, $bArrayArray)) {
+		if(self::call()->isarrayarray($aData, $sArrayArray)) {
 			// cabeceras
 			$aHeaders = [];
 			foreach($aData as $aRow) {
 				if(\is_array($aRow) && (\count($aRow) > \count($aHeaders))) { $aHeaders = $aRow; }
 			}
-			
+
 			$aColumns = \array_keys($aHeaders);
 			$nColumns = \count($aColumns);
 			$sHTML .= "\t<".$sTagRow." class=\"".$sClassName."-head\">\n";
@@ -966,16 +547,20 @@ class nglShift extends nglTrunk {
 				$sHTML .= "\t\t<".$sTagHeader." class=\"".$sClassName."-head-cell\">".$sColumn."</".$sTagHeader.">\n";
 			}
 			$sHTML .= "\t</".$sTagRow.">\n";
-			
+
 			// datos
 			foreach($aData as $mRow) {
 				$sHTML .= "\t<".$sTagRow." class=\"".$sClassName."-row\">\n";
 				if(is_array($mRow)) {
-					foreach($mRow as $r => $sValue) {
-						$sHTML .= (\strlen($sValue)) ? "\t\t<".$sTagCell." class=\"".$sClassName."-cell\">".$sValue."</".$sTagCell.">\n" : "\t\t<".$sTagCell." class=\"".$sClassName."-cell\">&nbsp;</".$sTagCell.">\n";
+					foreach($mRow as $r => $mValue) {
+						if(\is_array($mValue)) {
+							$sHTML .= "\t\t<".$sTagCell." class=\"".$sClassName."-cell\">".$this->html($mValue, $vOptions)."</".$sTagCell.">\n";
+						} else {
+							$sHTML .= "\t\t<".$sTagCell." class=\"".$sClassName."-cell\">".$this->HTMLPrint($mValue, $bHTMLEntities)."</".$sTagCell.">\n";
+						}
 					}
 				} else {
-					$sHTML .= (\strlen($mRow)) ? "\t\t<".$sTagCell." class=\"".$sClassName."-cell\" colspan='".$nColumns."'>".$mRow."</".$sTagCell.">\n" : "\t\t<".$sTagCell." class=\"".$sClassName."-cell\" colspan='".$nColumns."'>&nbsp;</".$sTagCell.">\n";
+					$sHTML .= "\t\t<".$sTagCell." class=\"".$sClassName."-cell\">".$this->HTMLPrint($mRow, $bHTMLEntities)."</".$sTagCell.">\n";
 				}
 				$sHTML .= "\t</".$sTagRow.">\n";
 			}
@@ -984,7 +569,11 @@ class nglShift extends nglTrunk {
 				foreach($aData as $sField => $mValue) {
 					$sHTML .= "\t<".$sTagRow." class=\"".$sClassName."-head\">\n";
 					$sHTML .= "\t\t<".$sTagHeader." class=\"".$sClassName."-head-cell\">".$sField."</".$sTagHeader.">\n";
-					$sHTML .= (\strlen($mValue)) ? "\t\t<".$sTagCell." class=\"".$sClassName."-cell\">".$mValue."</".$sTagCell.">\n" : "\t\t<".$sTagCell." class=\"".$sClassName."-cell\">&nbsp;</".$sTagCell.">\n";
+					if(\is_array($mValue)) {
+						$sHTML .= "\t\t<".$sTagCell." class=\"".$sClassName."-cell\">".$this->html($mValue, $vOptions)."</".$sTagCell.">\n";
+					} else {
+						$sHTML .= "\t\t<".$sTagCell." class=\"".$sClassName."-cell\">".$this->HTMLPrint($mValue, $bHTMLEntities)."</".$sTagCell.">\n";
+					}
 					$sHTML .= "\t</".$sTagRow.">\n";
 				}
 			} else {
@@ -1000,21 +589,15 @@ class nglShift extends nglTrunk {
 		return $sHTML;
 	}
 
-	/** FUNCTION {
-		"name" : "htmlToArray",
-		"type" : "public",
-		"description" : "
-			Convierte una Tabla HTML en un array, utilizando el objeto DOMDocument.
-			Las tablas pueden o no tener THEAD y TBODY. En el caso de tener THEAD los valores de los TH serán 
-			utilizados como indices alfanuméricos en el Array de salida.
-			El método soporta multiples tablas y anidamiento de tablas; en este último caso generará sub-arrays
-		",
-		"parameters" : {
-			"$sHTML" : ["string", "Código HTML que contiene la o las tablas"]
-		},
-		"seealso" : ["nglShift::convert","nglShift::HTMLTableParser","nglShift::html"],
-		"return" : "array"
-	} **/
+	private function HTMLPrint($sCode, $bHTMLEntities) {
+		if($sCode===null) { return "NULL"; }
+		if($sCode===false) { return "FALSE"; }
+		if($sCode===true) { return "TRUE"; }
+		$sCode = \trim($sCode);
+		if($sCode=="") { return "&nbsp;"; }
+		return $bHTMLEntities ? \htmlentities($sCode) : $sCode;
+	}
+
 	public function htmlToArray($sHTML) {
 		$doc = new \DOMDocument;
 		$doc->loadHTML($sHTML);
@@ -1024,20 +607,10 @@ class nglShift extends nglTrunk {
 		foreach($tables as $table) {
 			$aTables[] = $this->HTMLTableParser($table);
 		}
-	
+
 		return (\count($aTables)==1) ? \current($aTables) : $aTables;
 	}
 
-	/** FUNCTION {
-		"name" : "HTMLTableParser",
-		"type" : "private",
-		"description" : "Auxiliar del método htmlToArray",
-		"parameters" : {
-			"$table" : ["string", "Código HTML que contiene la o las tablas"]
-		},
-		"seealso" : ["nglShift::htmlToArray"],
-		"return" : "DOMNodeList"
-	} **/
 	private function HTMLTableParser($table) {
 		$aHeaders = null;
 		$thead = $this->xpath->query("thead", $table);
@@ -1050,10 +623,10 @@ class nglShift extends nglTrunk {
 				}
 			}
 		}
-	
+
 		$tbody = $this->xpath->query("tbody", $table);
 		if($tbody->length) { $table = $tbody->item(0); }
-	
+
 		$aTable = [];
 		foreach($this->xpath->query("tr", $table) as $row) {
 			$aRow = [];
@@ -1072,23 +645,10 @@ class nglShift extends nglTrunk {
 			}
 			$aTable[] = $aRow;
 		}
-		
+
 		return $aTable;
 	}
-	
-	/** FUNCTION {
-		"name" : "JSONChar",
-		"type" : "private",
-		"description" : "Auxiliar del método nglShift::jsonEncode encargado de codificar un caracter para que sea válido dentro de una cadena UTF-8",
-		"parameters" : {
-			"$sChar" : ["string", "Caracter a codificar", "&quot;"],
-			"$bUTF8" : ["boolean", "Determina si los caracteres UTF-8 deberán ser convertidos a formato UNICODE (\\uXXXX)", "false"],
-			"$bConverSpaces" : ["boolean", "Determina si deben convertirse los caracteres de espacio", "false"],
-			"$bAddSlashes" : ["boolean", "Determina si deben escaparse los caracteres (",\\,/)", "false"] 
-		},
-		"seealso" : ["nglShift::jsonEncode"],
-		"return" : "string"
-	} **/
+
 	private function JSONChar($sChar, $bUTF8=false, $bConverSpaces=false, $bAddSlashes=false) {
 		if($bConverSpaces) {
 			$nOrd = \ord($sChar);
@@ -1124,16 +684,6 @@ class nglShift extends nglTrunk {
 		}
 	}
 
-	/** FUNCTION {
-		"name" : "jsonDecode",
-		"type" : "public",
-		"description" : "Decodifica una cadena JSON de un Array",
-		"parameters" : {
-			"$sString" : ["string", "Cadena JSON"],
-		},
-		"seealso" : ["nglShift::jsonEncode"],
-		"return" : "array"
-	} **/
 	public function jsonDecode($sString) {
 		$sString = $this->JSONReduceString($sString);
 
@@ -1153,13 +703,13 @@ class nglShift extends nglTrunk {
 				switch(\strtolower($sString)) {
 					case "true":
 						return true;
-		
+
 					case "false":
 						return false;
-		
+
 					case "null":
 						return null;
-		
+
 					default:
 						$aDecoded = [];
 						if(\is_numeric($sString)) {
@@ -1169,7 +719,7 @@ class nglShift extends nglTrunk {
 							$sString = \substr($sString, 1, -1);
 							$sString = self::call("unicode")->unescape($sString);
 							$nString = \strlen($sString);
-		
+
 							$sUTF8 = "";
 							for($x=0; $x<$nString; $x++) {
 								$sSub2Chars = \substr($sString, $x, 2);
@@ -1194,7 +744,7 @@ class nglShift extends nglTrunk {
 										$sUTF8 .= \chr(0x0D);
 										$x++;
 										break;
-		
+
 									case $sSub2Chars == "\\\"":
 									case $sSub2Chars == "\\'":
 									case $sSub2Chars == "\\\\":
@@ -1203,15 +753,15 @@ class nglShift extends nglTrunk {
 											$sUTF8 .= $sString[++$x];
 										}
 										break;
-		
+
 									default:
 										$sUTF8 .= $sString[$x];
 										break;
 								}
 							}
-		
+
 							return $sUTF8;
-		
+
 						} else if(\preg_match("/^\[.*\]$/s", $sString) || \preg_match("/^\{.*\}$/s", $sString)) {
 							if(!empty($sString) && $sString[0]=="[") {
 								$aStakeState = [3];
@@ -1220,16 +770,16 @@ class nglShift extends nglTrunk {
 								$aStakeState = [4];
 								$aDecoded = [];
 							}
-		
+
 							$aStakeState[] = [0=>1, 1=>0, 2=>false];
-		
+
 							$sString = \substr($sString, 1, -1);
 							$sString = $this->JSONReduceString($sString);
-		
+
 							if($sString=="") {
 								return $aDecoded;
 							}
-		
+
 							$nString = \strlen($sString);
 							for($x=0; $x <= $nString; ++$x) {
 								$aStakeTop = \end($aStakeState);
@@ -1237,7 +787,7 @@ class nglShift extends nglTrunk {
 								if(($x==$nString) || (($sString[$x]==",") && ($aStakeTop[0]==1))) {
 									$sSlice = \substr($sString, $aStakeTop[1], ($x - $aStakeTop[1]));
 									$aStakeState[] = [0=>1, 1=>($x + 1), 2=>false];
-		
+
 									if(\reset($aStakeState)==3) {
 										$aDecoded[] = $this->jsonDecode($sSlice);
 									} else if(\reset($aStakeState)==4) {
@@ -1270,39 +820,21 @@ class nglShift extends nglTrunk {
 								} else if(($sSub2Chars=="*/") && ($aStakeTop[0]==5)) {
 									\array_pop($aStakeState);
 									$x++;
-		
+
 									for($y=$aStakeTop[1]; $y<=$x; ++$y) {
 										$sString = \substr_replace($sString, " ", $y, 1);
 									}
 								}
 							}
-		
+
 							if(\reset($aStakeState)==3 || \reset($aStakeState)==4) {
 								return $aDecoded;
 							}
 						}
-				}	
+				}
 		}
 	}
 
-	/** FUNCTION {
-		"name" : "jsonEncode",
-		"type" : "public",
-		"description" : "Codifica un valor en una cadena JSON",
-		"parameters" : {
-			"$mValue" : ["mixed", "Valor a codificar. Puede ser de cualquier tipo menos un resource"],
-			"$vOptions" : ["array", "
-				Array de opciones del método:<br />
-				<ul>
-					<li><b>convert_unicode:</b> Determina si los caracteres UTF-8 deberán ser convertidos a formato UNICODE (\\uXXXX), default TRUE</li>
-					<li><b>convert_spaces:</b> Determina si deben convertirse los caracteres de espacio, default TRUE</li>
-					<li><b>add_slashes:</b> Determina si deben escaparse los caracteres (',",\\,/), default TRUE</li>
-				</ul>
-			", null]
-		},
-		"seealso" : ["nglShift::jsonDecode"],
-		"return" : "string"
-	} **/
 	public function jsonEncode($mValue, $vOptions=null) {
 		$bConverUTF8 = (isset($vOptions["convert_unicode"])) ? self::call()->isTrue($vOptions["convert_unicode"]) : true;
 		$bConverSpaces = (isset($vOptions["convert_spaces"])) ? self::call()->isTrue($vOptions["convert_spaces"]) : true;
@@ -1365,24 +897,10 @@ class nglShift extends nglTrunk {
 		}
 	}
 
-	/** FUNCTION {
-		"name" : "jsonFormat",
-		"type" : "public",
-		"description" : "Auxiliar del método nglShift::jsonEncode encargado generar un par ordenado NOMBRE:VALOR válido",
-		"parameters" : {
-			"$sJson" : ["string", "Cadena JSON"],
-			"$bCompress" : ["boolean", "Cuando es TRUE, se retorna la cadena original sin saltos de líneas ni tabulaciones", false],
-			"$bHTML" : ["boolean", "Determina si el resultado debe ser tratado con htmlentities", false],
-			"$sTab" : ["string", "Tabulador", "\\t"],
-			"$sEOL" : ["string", "Salto de línea", "\\n"]
-		},
-		"seealso" : ["nglShift::jsonEncode"],
-		"return" : "string"
-	} **/
 	public function jsonFormat($sJson, $bCompress=false, $bHTML=false, $sTab="\t", $sEOL="\n") {
 		$sJson = \preg_replace("/[\n\r\t]/is", "", $sJson);
 		if($bCompress) { return $sJson; }
-		
+
 		$sResult = "";
 		for($x=$y=$z=0;isset($sJson[$x]);$x++) {
 			if($sJson[$x]=='"' && ($x>0 ? $sJson[$x-1] : "")!="\\" && $y=!$y) {
@@ -1392,7 +910,7 @@ class nglShift extends nglTrunk {
 			if(\strchr("}]", $sJson[$x]) && !$y && $z--) {
 				if(!\strchr("{[", $sJson[$x-1])) { $sResult .= $sEOL.\str_repeat($sTab, $z); }
 			}
-			
+
 			$sResult .= ($bHTML) ? \htmlentities($sJson[$x]) : $sJson[$x];
 			if(\strchr(",{[", $sJson[$x]) && !$y) {
 				$z += (\strchr("{[", $sJson[$x])===false) ? 0 : 1;
@@ -1402,47 +920,18 @@ class nglShift extends nglTrunk {
 
 		return $sResult;
 	}
-	
-	/** FUNCTION {
-		"name" : "JSONNameValuePair",
-		"type" : "private",
-		"description" : "Auxiliar del método nglShift::jsonEncode encargado generar un par ordenado NOMBRE:VALOR válido",
-		"parameters" : {
-			"$sName" : ["string", "Nombre del índice"],
-			"$mValue" : ["mixed", "Valor"]
-		},
-		"seealso" : ["nglShift::jsonEncode"],
-		"return" : "string"
-	} **/
+
 	private function JSONNameValuePair($sName, $mValue) {
 		$sName = $this->jsonEncode(\strval($sName));
 		$sEncoded = $this->jsonEncode($mValue);
 		return $sName.":".$sEncoded;
-	}	
+	}
 
-	/** FUNCTION {
-		"name" : "JSONReduceString",
-		"type" : "private",
-		"description" : "Auxiliar del método nglShift::jsonDecode encargado limpiar el código antes de ser parseado",
-		"parameters" : {
-			"$sString" : ["string", "Cadena JSON"] 
-		},
-		"seealso" : ["nglShift::jsonDecode"],
-		"return" : "string"
-	} **/
 	private function JSONReduceString($sString) {
 		$sString = \preg_replace(["/^\s*\/\/(.+)$/m", "/^\s*\/\*(.+)\*\//Us", "/\/\*(.+)\*\/\s*$/Us"], "", $sString);
 		return \trim($sString);
 	}
-	
-	/** FUNCTION {
-		"name" : "objToArray", 
-		"type" : "public",
-		"description" : "Convierte un objeto en un array asosiativo de manera recursiva",
-		"parameters" : { "$mObject" : ["object", "Objeto a convertir"] },
-		"seealso" : ["nglShift::convert", "nglShift::objFromArray"],
-		"return" : "array"
-	} **/
+
 	public function objToArray($mObject) {
 		if(\is_object($mObject)) { $mObject = \get_object_vars($mObject); }
 
@@ -1453,18 +942,10 @@ class nglShift extends nglTrunk {
 				$aArray[$mKey] = $mValue;
 			}
 		}
-	
+
 		return $aArray;
 	}
 
-	/** FUNCTION {
-		"name" : "objFromArray", 
-		"type" : "public",
-		"description" : "Convierte un Array en un Objeto de manera recursiva",
-		"parameters" : { "$mObject" : ["array", "Array a convertir"] },
-		"seealso" : ["nglShift::convert", "nglShift::objToArray"],
-		"return" : "object"
-	} **/
 	public function objFromArray($aArray) {
 		$oObject = new \stdClass();
 		if(\is_array($aArray) && \count($aArray)) {
@@ -1472,22 +953,10 @@ class nglShift extends nglTrunk {
 				$oObject->{$mKey} = (\is_array($mValue) || \is_object($mValue)) ? $this->objFromArray($mValue) : $mValue;
 			}
 		}
-	
+
 		return $oObject;
 	}
 
-	/** FUNCTION {
-		"name" : "XMLChildren", 
-		"type" : "private",
-		"description" : "Auxiliar del método ngl:Babel::xmlToArray utilizado para recorrer el objeto XML de manera recursiva",
-		"parameters" : {
-			"$vXML" : ["object", "Objecto XML"],
-			"$bAttributes" : ["boolean", "Determina si se deben procesar o no los atributos de las etiquetas XML"],
-			"$x" : ["int", "Contador interno"]
-		},
-		"seealso" : ["nglShift::xmlToArray"],
-		"return" : "array"
-	} **/
 	private function XMLChildren($vXML, $bAttributes=false, &$x) {
 		$aWithChildren = [];
 		$vChildren = [];
@@ -1520,7 +989,7 @@ class nglShift extends nglTrunk {
 						$vChildren[$sTagName] = $vNode;
 					}
 
-					
+
 					break;
 
 				case "open":
@@ -1532,7 +1001,7 @@ class nglShift extends nglTrunk {
 					}
 
 					$vChildren[$sTagName][] = $vNode;
-	
+
 					break;
 
 				case "close":
@@ -1543,31 +1012,14 @@ class nglShift extends nglTrunk {
 		return $vChildren;
 	}
 
-	/** FUNCTION {
-		"name" : "xmlEncode", 
-		"type" : "public",
-		"description" : "Convierte un array en una estructura XML",
-			"$aData" : ["array", "Array de datos"],
-			"$vOptions" : ["array", "
-				Array de opciones del método:<br />
-				<ul>
-					<li><b>tag:</b> nombre del siguiente tag XML (vacio)</li>
-					<li><b>level:</b> actual nivel de anidamiento (-1)</li>
-				</ul>
-			", null]
-		},
-		},
-		"seealso" : ["nglShift::convert", "nglShift::xmlToArray"],
-		"return" : "string"
-	} **/
 	public function xmlEncode($aData, $vOptions=null) {
 		$sTagName = (isset($vOptions["tag"])) ? $vOptions["tag"] : "";
 		$nLevel = (isset($vOptions["level"])) ? $vOptions["level"] : -1;
-	
+
 		if(!empty($sTagName)) { $nLevel++; }
 
 		$sTab = ($nLevel>=0) ? \str_repeat("\t", $nLevel) : "";
-		
+
 		$sXML = ($sTagName) ? $sTab."<".$sTagName." level=\"".$nLevel."\">\n" : "";
 		foreach($aData as $mKey => $mValue) {
 			if(\is_array($mValue)) {
@@ -1585,26 +1037,10 @@ class nglShift extends nglTrunk {
 
 		return $sXML;
 	}
-	
-	/** FUNCTION {
-		"name" : "xmlToArray", 
-		"type" : "public",
-		"description" : "Vuelca el contenido de un texto XML en un array asosiativo de manera recursiva",
-		"parameters" : {
-			"$sXML" : ["string", "Estructura XML"],
-			"$vOptions" : ["array", "
-				Array de opciones del método:<br />
-				<ul>
-					<li><b>xml_attributes:</b> determina si se deben procesar o no los atributos de las etiquetas XML (falso)</li>
-				</ul>
-			", null]
-		},
-		"seealso" : ["nglShift::convert", "nglShift::objFromArray"],
-		"return" : "array"
-	} **/
+
 	public function xmlToArray($sXML, $vOptions=null) {
 		$bAttributes = (isset($vOptions["xml_attributes"])) ? self::call()->isTrue($vOptions["xml_attributes"]) : false;
-	
+
 		$hXML = \xml_parser_create();
 		\xml_parser_set_option($hXML, XML_OPTION_CASE_FOLDING, 0);
 		\xml_parser_set_option($hXML, XML_OPTION_SKIP_WHITE, 0);
@@ -1618,13 +1054,13 @@ class nglShift extends nglTrunk {
 	}
 
 	public function textTable($aData, $vOptions=[]) {
-		$bArrayArray	= (isset($vOptions["arrayarray"])) ? $vOptions["arrayarray"] : null;
+		$sArrayArray	= (isset($vOptions["arrayarray"])) ? $vOptions["arrayarray"] : "any";
 		$sHeaderAlign	= (isset($vOptions["tthalign"])) ? \strtolower($vOptions["tthalign"]) : "center";
 		$sBodyAlign		= (isset($vOptions["ttdalign"])) ? \strtolower($vOptions["ttdalign"]) : "left";
 		$nHeaderAlign	= ($sHeaderAlign=="left") ? STR_PAD_RIGHT : ($sHeaderAlign=="right" ? STR_PAD_LEFT : STR_PAD_BOTH);
 		$nBodyAlign		= ($sBodyAlign=="left") ? STR_PAD_RIGHT : ($sBodyAlign=="right" ? STR_PAD_LEFT : STR_PAD_BOTH);
-		
-		if(!self::call()->isarrayarray($aData, $bArrayArray)) { return ""; }
+
+		if(!self::call()->isarrayarray($aData, $sArrayArray)) { return ""; }
 
 		$aCells = \array_fill_keys(\array_keys(\current($aData)), 0);
 		$nCells = \count($aCells);
@@ -1632,13 +1068,19 @@ class nglShift extends nglTrunk {
 			$aCells[$sColname] = self::call("unicode")->strlen(\trim($sColname, "\t"));
 		}
 		foreach($aData as $i => $aRow) {
-			foreach($aRow as $sColname=>$sCell) {
-				$sCell = \str_replace("\t", "\\t", $sCell);
+			foreach($aRow as $sColname=>$mCell) {
+				if(\is_object($mCell)) {
+					$sCell = "OBJECT: ".\json_encode($mCell);
+				} else if(\is_array($mCell)) {
+					$sCell = "ARRAY: ".\json_encode($mCell);
+				} else {
+					$sCell = \str_replace("\t", "\\t", $mCell);
+				}
 				$aCells[$sColname] = \max($aCells[$sColname], self::call("unicode")->strlen($sCell));
 				$aData[$i][$sColname] = $sCell;
 			}
 		}
-		
+
 		$sBar = "+";
 		$sHeader = "|";
 		foreach($aCells as $sColname => $nLength) {
@@ -1671,7 +1113,7 @@ class nglShift extends nglTrunk {
 			$sTable .= "\n";
 		}
 		$sTable .= $sBar."\n";
-		
+
 		return $sTable;
 	}
 

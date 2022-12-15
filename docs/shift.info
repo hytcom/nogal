@@ -1,9 +1,18 @@
-[checksum]
-md5 = "993b3aaf49851d5427d474a79909a2df"
-sha1 = "e75f503596a1d51796fc9857df5ebfdbb95ea4da"
-
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/shift.md"
+[info]
+_help = "### shift\
+Objeto CORE\
+Métodos de conversión de datos entre las siguientes escructuras.\
+	- array: Array de datos\
+	- csv: Texto inline o multilinea de valores separados por comas\
+	- fixed: Texto inline o multilinea de valores separados ancho fijo\
+	- html: Tablas html, soporta tablas anidadas. Si se especifican thead se utilizarán como claves\
+	- json: Documento JSON\
+	- object: Objecto de datos o un objeto del tipo iNglDataObjet\
+	- serialize: valor serializado\
+	- xml: Documento XML\
+\
+https://github.com/hytcom/wiki/blob/master/nogal/docs/shift.md\
+"
 
 [errors]
 1001 = "No se pudo encontrar la extención PECL YAML. Ver https://www.php.net/manual/es/yaml.installation.php"

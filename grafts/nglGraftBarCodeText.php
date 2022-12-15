@@ -2,10 +2,10 @@
 namespace Picqer\Barcode {
 	class BarcodeGeneratorText extends BarcodeGenerator {
 		public function getBarcode($sCode, $sType) {
-			$aCode = $this->getBarcodeData($sCode, $sType);
+			$barcode = $this->getBarcodeData($sCode, $sType,2,100);
 			$sCode = "";
-			foreach($aCode["bars"] as $aBar) {
-				$sCode .= \str_repeat(($aBar["drawBar"]) ? 1 : 0, $aBar["width"]);
+			foreach($barcode->getBars() as $bar) {
+				$sCode .= \str_repeat($bar->isBar() ? 1 : 0, $bar->getWidth());
 			}
 			return $sCode;
 		}

@@ -1,21 +1,19 @@
 <?php
 /*
-# Nogal
+# nogal
 *the most simple PHP Framework* by hytcom.net
-GitHub @hytcom
+GitHub @hytcom/nogal
 ___
-  
-# crypt
-## nglCrypt *extends* nglBranch [instanciable] [2018-08-12]
-Implementa la clase 'barcode-generator', para generar Códigos de Barras
 
-https://github.com/hytcom/wiki/blob/master/nogal/docs/barcode.md
+# s3 (beta)
+Implementa la clase '\Aws\S3\S3Client', para gestionar buckets S3
 
+https://hytcom.net/nogal/docs/objects/s3.md
 */
 namespace nogal {
 
 	class nglGraftAWSS3 extends nglScion {
-		
+
 		public $s3;
 		private $sBucket;
 		private $response;
@@ -29,7 +27,7 @@ namespace nogal {
 			$vArguments["region"]		= ['(string)$mValue', "us-east-1"];
 			$vArguments["source"]		= ['(string)$mValue', null];
 			$vArguments["version"]		= ['(string)$mValue', "latest"];
-		
+
 			return $vArguments;
 		}
 
@@ -43,8 +41,7 @@ namespace nogal {
 
 		final public function __init__() {
 			if(!\class_exists("\Aws\S3\S3Client")) {
-				$this->__errorMode__("die");
-				self::errorMessage($this->object, 1000);
+				$this->installPackage("aws/aws-sdk-php", "^3.183");
 			}
 		}
 
@@ -61,7 +58,7 @@ namespace nogal {
 
 		public function buckets() {
 			$this->IsConnected();
-			
+
 			try {
 				$this->response = $this->s3->listBuckets();
 			} catch (\Aws\s3\Exception\S3Exception $e) {
@@ -88,7 +85,7 @@ namespace nogal {
 					$aFile["type"] 		= $bIsDir ? "dir" : "file";
 					$aFile["path"] 		= $aItem["Key"];
 					$aFile["basename"]	= \basename($aItem["Key"]);
-					
+
 					$aBasename = $bIsDir ? [] : \explode(".", $aFile["basename"]);
 					if(\count($aBasename)>1) {
 						$aFile["extension"] = \array_pop($aBasename);

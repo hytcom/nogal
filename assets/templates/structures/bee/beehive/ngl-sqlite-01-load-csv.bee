@@ -1,0 +1,50 @@
+# creacion de la DB
+sqlite base {@NGL_PATH_TMP}/demo.sqlite
+-$: pass demo
+-$: connect
+-$: error_description true
+-$: error_query true
+@set db -$:
+
+# tabla estaciones
+{$db} query "CREATE TABLE IF NOT EXISTS estaciones (\
+	id INTEGER PRIMARY KEY,\
+	linea TEXT NULL,\
+	ramal TEXT NULL,\
+	estacion TEXT NOT NULL,\
+	latitud DECIMAL NULL,\
+	longitud DECIMAL NULL\
+)"
+
+# lectura de datos desde CSV y carga masiva
+file load {@NGL_PATH_DATA}/estaciones.csv
+-$: read
+shift convert ["-$:", "csv-sql", {"use_colnames":true, "table":"estaciones", "sql_colquote":"`", "sql_inserts":100}]
+{$db} mquery -$:
+@php count -$:
+@set c -$:
+
+@print " "
+@color success
+@print "Proceso finalizado"
+@print "Se ejecutaron {$c} consultas"
+@print " "
+
+# consulta de estructura de la tabla
+@color warning
+@print "Estructura de Datos"
+{$db} describe estaciones
+shift texttable -$:
+@color default
+@print -$:
+
+@print " "
+
+# datos
+@color warning
+@print "Primeros 15 registros"
+{$db} query "SELECT * FROM estaciones LIMIT 15"
+-$: getall
+shift texttable -$:
+@color default
+@print -$:

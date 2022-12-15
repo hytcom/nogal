@@ -1,9 +1,11 @@
-[checksum]
-md5 = "8b70926352267b8fb97fa53c732ad0be"
-sha1 = "0051ebdc549d3721403828c42cd1c69473b0f005"
-
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/nut.md"
+[info]
+_help = "### nut\
+Objeto CORE\
+Gestor de los nuts del sistema\
+\
+https://github.com/hytcom/wiki/blob/master/nogal/docs/nut.md\
+https://github.com/hytcom/wiki/blob/master/nogal/docs/nuts.md\
+"
 
 [errors]
 1001 = "El NUT no existe"

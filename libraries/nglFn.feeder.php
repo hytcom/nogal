@@ -1,32 +1,16 @@
 <?php
+/*
+# nogal
+*the most simple PHP Framework* by hytcom.net
+GitHub @hytcom/nogal
+___
 
+# fn
+https://hytcom.net/nogal/docs/objects/fn.md
+*/
 namespace nogal;
-
-/** CLASS {
-	"name" : "nglFn",
-	"object" : "fn",
-	"type" : "main",
-	"revision" : "20160201",
-	"extends" : "nglTrunk",
-	"description" : "
-		Compendio de métodos utilizados para resolver tareas rutinarias vinculadas a:
-		<ul>
-			<li>arrays</li>
-			<li>cadenas</li>
-			<li>comprovacion de tipos de datos</li>
-			<li>colores</li>
-			<li>fechas</li>
-			<li>etc</li>
-		</ul>
-		
-		nglFn construye el objeto $fn dentro del framework, el cual es accedido a través del método <b>$ngl("fn")->NOMBRE_DE_METODO(...)</b>
-	",
-	"variables" : {
-		"$vMimeTypes" : ["private", "MimeTypes obtenidos con nglFn::apacheMimeTypes"]
-	}
-} **/
 class nglFn extends nglTrunk {
-	
+
 	protected $class			= "nglFn";
 	protected $me				= "fn";
 	protected $object			= "fn";
@@ -36,10 +20,10 @@ class nglFn extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "apacheMimeTypes", 
+		"name" : "apacheMimeTypes",
 		"type" : "public",
 		"description" : "
-			Retorna los Internet media types indexados por extención proporcionados por el sitio 
+			Retorna los Internet media types indexados por extención proporcionados por el sitio
 			http://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types
 			Los datos pueden ser leídos la base interna o directamente desde le sitio oficial.
 			Si la lectura local falla, el método intentará optenerlos desde el sitio oficial y guardarlos localmente.
@@ -61,7 +45,7 @@ class nglFn extends nglTrunk {
 		} else {
 			$sURL = "http://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types";
 			if(!$sBuffer = @\file_get_contents($sURL)) {
-				self::errorMessage("NOGAL", 1016, "URL: ".$sURL, "die");
+				self::errorMessage($this->object, 1002, $sURL, "die");
 			} else {
 				$aBuffer = \explode("\n", $sBuffer);
 				$vMimeTypes = [];
@@ -77,7 +61,7 @@ class nglFn extends nglTrunk {
 						}
 					}
 				}
-				
+
 				$sContent = "";
 				\ksort($vMimeTypes);
 				foreach($vMimeTypes as $sGroup => $aGroup) {
@@ -132,7 +116,7 @@ class nglFn extends nglTrunk {
 		"return" : "array"
 	} **/
 	public function arrange($mSource, $aArrange) {
-		if(!\is_array($aArrange)) { self::errorMessage("fn", null, '$aArrange must be of the type array', "die"); }
+		if(!\is_array($aArrange)) { self::errorMessage($this->object, 1003, $aArrange, "die"); }
 		if(\is_string($mSource)) {
 			$aDisarrange = self::call("unicode")->str_split($mSource);
 		} else {
@@ -169,7 +153,7 @@ class nglFn extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "arrayAppend", 
+		"name" : "arrayAppend",
 		"type" : "public",
 		"description" : "
 			Añade los indices de 1 o mas arrays al array principal, sin importar el tipo de dato y sin sobreescribir indices.
@@ -210,7 +194,7 @@ class nglFn extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "arrayConcat", 
+		"name" : "arrayConcat",
 		"type" : "public",
 		"description" : "
 			Similar a \array_sum, solo que concatena los valores de los arrays de entrada en lugar de sumarlos algebraicamente
@@ -235,7 +219,7 @@ class nglFn extends nglTrunk {
 	}
 
 	public function arrayArrayCombine($aKeys, $aArrayArray) {
-		if(!\is_array($aKeys) || !$this->isArrayArray($aArrayArray)) { return $aArrayArray; }
+		if(!\is_array($aKeys) || !$this->isArrayArray($aArrayArray, "edges")) { return $aArrayArray; }
 		if(\count($aKeys)!=\count(\current($aArrayArray))) { return $aArrayArray; }
 		foreach($aArrayArray as &$aArray) {
 			$aArray = \array_combine($aKeys, $aArray);
@@ -245,11 +229,11 @@ class nglFn extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "arrayColumn", 
+		"name" : "arrayColumn",
 		"type" : "public",
 		"description" : "
 			Devuelve los valores de una sola columna de $aSource, identificado por la clave de columna $mColumnKey
-			Opcionalmente, se puede proporcionar una clave de índice, $mIndexKey, para indexar los valores del array devuelto 
+			Opcionalmente, se puede proporcionar una clave de índice, $mIndexKey, para indexar los valores del array devuelto
 		",
 		"parameters" : {
 			"$aSource" : ["array", "array de datos"],
@@ -259,7 +243,7 @@ class nglFn extends nglTrunk {
 		"return" : "array"
 	} **/
 	public function arrayColumn($aSource, $mColumnKey, $mIndexKey=null) {
-		if(!$this->isArrayArray($aSource)) { $aSource = array($aSource); }
+		if(!$this->isArrayArray($aSource, "edges")) { $aSource = array($aSource); }
 		$aReturn = \array_map(function($aInput) use ($mColumnKey, $mIndexKey) {
 			if(!\is_array($mColumnKey)) {
 				if(!isset($aInput[$mColumnKey])) { return null; }
@@ -286,9 +270,9 @@ class nglFn extends nglTrunk {
 		}
 		return $aReturn;
 	}
-	
+
 	/** FUNCTION {
-		"name" : "arrayFlatIndex", 
+		"name" : "arrayFlatIndex",
 		"type" : "public",
 		"description" : "Retorna el subindice de un array desde una cadena separada por un caracter",
 		"parameters" : {
@@ -337,8 +321,19 @@ class nglFn extends nglTrunk {
 		return $aKeys;
 	}
 
+	public function arrayKeysExists($aKeys, $aArray, $bAll=true) {
+		$aExists = [];
+		foreach($aKeys as $sKey) {
+			$bExists = \array_key_exists($sKey, $aArray);
+			if(!$bExists && !$bAll) { return false; }
+			if($bExists) { $aExists[] = $sKey; }
+		}
+
+		return \count($aExists) ? $aExists : false;
+	}
+
 	/** FUNCTION {
-		"name" : "arrayGoto", 
+		"name" : "arrayGoto",
 		"type" : "public",
 		"description" : "Avanza el puntero del array hasta el índice indicado por $mKey y retorna los datos",
 		"parameters" : {
@@ -352,12 +347,12 @@ class nglFn extends nglTrunk {
 		while($aCurrent = \each($aSource)) {
 			if($aCurrent[0]===$mKey) { return $aCurrent; }
 		}
-		
+
 		return $aSource;
 	}
 
 	/** FUNCTION {
-		"name" : "arrayGroup", 
+		"name" : "arrayGroup",
 		"type" : "public",
 		"description" : "
 			Agrupa un array bidimensional.
@@ -369,7 +364,7 @@ class nglFn extends nglTrunk {
 			"$aStructure" : ["mixed", "
 				Campo principal de agrupamiento o Array con la estructura de sub-agrupamientos.
 				En la estructura se determinan cuales serán los diferentes grupos y los indices estarán presentes en cada uno.
-				
+
 				Estrucutra:
 					array(
 						"MAIN" => array(
@@ -381,7 +376,7 @@ class nglFn extends nglTrunk {
 							array("campo4", "campo5", "campo6")
 						),
 						"subgrupo2" => array(
-							"campo_de_agrupamiento", 
+							"campo_de_agrupamiento",
 							array("campo9", "campo10", array(
 								"subgrupo2.1" => array(
 									"campo_de_agrupamiento",
@@ -390,7 +385,7 @@ class nglFn extends nglTrunk {
 							))
 						)
 					);
-				
+
 				La directiva MAIN debe estar expresada en mayusculas.
 				Si es necesario determinar una estructura de sub-grupos, pero no redefinir el grupo principal, MAIN deberá ser un array
 				que sólo contenga el campo_principal_de_agrupamiento
@@ -406,10 +401,10 @@ class nglFn extends nglTrunk {
 					array("id"=>2,"date"=>"2015-11-24","name"=>"Ravelli S.A.","cuit"=>"33-58796321-8","product"=>2,"quantity"=>13,"price"=>16),
 					array("id"=>2,"date"=>"2015-11-24","name"=>"Ravelli S.A.","cuit"=>"33-58796321-8","product"=>3,"quantity"=>8,"price"=>20)
 				);
-				
+
 				# ejecución
 				$ngl()->arrayGroup($aSource);
-				
+
 				# resultado del agrupamiento
 				array(
 					"1" => array(
@@ -432,7 +427,7 @@ class nglFn extends nglTrunk {
 					)
 				)
 			",
-			
+
 			"sub-agrupamientos" : "
 				# origen de datos
 				$aSource = array(
@@ -442,14 +437,14 @@ class nglFn extends nglTrunk {
 					array("id"=>2,"date"=>"2015-11-24","name"=>"Ravelli S.A.","cuit"=>"33-58796321-8","product"=>2,"quantity"=>13,"price"=>16),
 					array("id"=>2,"date"=>"2015-11-24","name"=>"Ravelli S.A.","cuit"=>"33-58796321-8","product"=>3,"quantity"=>8,"price"=>20)
 				);
-				
+
 				# ejecución
 				$aStructure = array(
 					"MAIN" => array("id"),
 					"details" => array("product", array("product", "quantity", "price"))
 				);
 				$ngl()->arrayGroup($aSource, $aStructure);
-				
+
 				# resultado del agrupamiento
 				array(
 					"1" => array(
@@ -481,7 +476,7 @@ class nglFn extends nglTrunk {
 					)
 				)
 			",
-			
+
 			"grupo principal" : "
 				# origen de datos
 				$aSource = array(
@@ -491,7 +486,7 @@ class nglFn extends nglTrunk {
 					array("id"=>2,"date"=>"2015-11-24","name"=>"Ravelli S.A.","cuit"=>"33-58796321-8","product"=>2,"quantity"=>13,"price"=>16),
 					array("id"=>2,"date"=>"2015-11-24","name"=>"Ravelli S.A.","cuit"=>"33-58796321-8","product"=>3,"quantity"=>8,"price"=>20)
 				);
-				
+
 				# ejecución
 				$aStructure = array(
 					"MAIN" => array("id", array("name", "cuit", "date")),
@@ -499,7 +494,7 @@ class nglFn extends nglTrunk {
 					"details" => array("product", array("product", "quantity", "price"))
 				);
 				$ngl()->arrayGroup($aSource, $aStructure);
-				
+
 				# resultado del agrupamiento
 				array(
 					"1" => array(
@@ -576,7 +571,7 @@ class nglFn extends nglTrunk {
 						}
 					}
 				} else {
-					// agrupa los valores de acuerdo a la escructura 
+					// agrupa los valores de acuerdo a la escructura
 					if(!$this->ArrayGrouper($aGrouped[$mKey], $mValue, $aStructure)) {
 						$aGrouped[$mKey][key($aStructure)] = null;
 					}
@@ -591,12 +586,12 @@ class nglFn extends nglTrunk {
 		"name" : "ArrayGrouper",
 		"type" : "private",
 		"description" : "Método axuliar de nglFn::arrayGroup",
-		"parameters" : { 
+		"parameters" : {
 			"$aGrouped" : ["string", "Patron de búsqueda"],
 			"$mValue" : ["array", "Origen de datos"],
 			"$aStructure" : ["boolean", "Habilita la búsqueda por expresiones regulares, donde $sNeedle es tratado como un patron regex", "false"]
 		},
-		"seealso" : ["nglFn::arrayGroup"], 
+		"seealso" : ["nglFn::arrayGroup"],
 		"return" : "boolean"
 	} **/
 	private function ArrayGrouper(&$aGrouped, $mValue, $aStructure) {
@@ -631,7 +626,7 @@ class nglFn extends nglTrunk {
 				unset($aGrouped[$sSubGroup][$nIdex]);
 			}
 		}
-		
+
 		return true;
 	}
 
@@ -639,18 +634,18 @@ class nglFn extends nglTrunk {
 		"name" : "arrayIn",
 		"type" : "public",
 		"description" : "
-			Comprueba si un valor se encuentra en un array utilizando in_array o 
-			chequeando valor por valor utilizando expresiones regulares. en este último caso 
+			Comprueba si un valor se encuentra en un array utilizando in_array o
+			chequeando valor por valor utilizando expresiones regulares. en este último caso
 			los patrones de búsqueda serán tratados con \preg_quote()
 		",
-		"parameters" : { 
+		"parameters" : {
 			"$sNeedle" : ["string", "Patron de búsqueda"],
 			"$aHayStack" : ["array", "Origen de datos"],
 			"$bRegex" : ["boolean", "Habilita la búsqueda por expresiones regulares, donde $sNeedle es tratado como un patron regex", "false"],
 			"$sRegexFlags" : ["string", "Flags utilizados en el patron de expresiones regulares", "s"],
 			"$bInverseMode" : ["boolean", "Activa el modo inverso, donde cada valor del array es tratado como un patron regex y comparadon contra $sNeedle", "false"]
 		},
-		"seealso" : ["nglFn::tokenEncode"], 
+		"seealso" : ["nglFn::tokenEncode"],
 		"return" : "boolean"
 	} **/
 	public function arrayIn($sNeedle, $aHayStack, $bRegex=false, $sRegexFlags="s", $bInverseMode=false) {
@@ -679,7 +674,7 @@ class nglFn extends nglTrunk {
 		"name" : "arrayInsert",
 		"type" : "public",
 		"description" : "Añade un elemento al Array en la posición determinada",
-		"parameters" : { 
+		"parameters" : {
 			"$aArray" : ["array", "Origen de datos"],
 			"$mPosition" : ["mixed", "Posición alfanúmerica de referencia en la que se insertará el nuevo valor"],
 			"$aInsert" : ["mixed", "Valor a insertar"],
@@ -736,7 +731,7 @@ class nglFn extends nglTrunk {
 
 		return $aMerge;
 	}
-	
+
 	/** FUNCTION {
 		"name" : "arrayMultiSort",
 		"type" : "public",
@@ -774,7 +769,7 @@ class nglFn extends nglTrunk {
 				→array("name"=>"orange", "color"=>"orange"),
 				→array("name"=>"apple", "color"=>"red")
 				);
-				
+
 				arrayMultiSort($aFruits, array(
 				→array("field"=>"name", "order"=>"desc", "type"=>2),
 				→array("field"=>"color", "type"=>3)
@@ -789,7 +784,7 @@ class nglFn extends nglTrunk {
 
 			$bOrder = true;
 			if(isset($vArgs["order"])) { $bOrder = (\strtolower($vArgs["order"])=="asc") ? true : false; }
-			
+
 			$nType = 0;
 			if(isset($vArgs["type"])) { $nType = (int)$vArgs["type"]; }
 
@@ -820,11 +815,11 @@ class nglFn extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "arrayRebuilder", 
+		"name" : "arrayRebuilder",
 		"type" : "public",
 		"description" : "
 			Agrupa los índices <b>$aIndexes</b> combinandolos por sus claves. Con la opción de reenombrar estas últimas.
-			Si $aIndexes = null y $mNewIndexes es una cadena, el método retornará un array bidimensional donde cada subarray tendrá como 
+			Si $aIndexes = null y $mNewIndexes es una cadena, el método retornará un array bidimensional donde cada subarray tendrá como
 			único indice a $mNewIndexes y cuyo valor será el valor del indice actual de $aSource.
 		",
 		"parameters" : {
@@ -852,7 +847,7 @@ class nglFn extends nglTrunk {
 
 				# llamada
 				$output = $ngl()->arrayRebuilder($input, array("contact_surname", "contact_firstname"));
-				
+
 				#array de salida
 				Array (
 					[0] => Array(
@@ -872,7 +867,7 @@ class nglFn extends nglTrunk {
 			"Ejemplo anterior renombrando claves" : "
 				# llamada
 				$output = $ngl()->arrayRebuilder($input, array("contact_surname", "contact_firstname"), array("surname", "firstname"));
-				
+
 				#array de salida
 				Array (
 					[0] => Array(
@@ -899,7 +894,7 @@ class nglFn extends nglTrunk {
 
 				# llamada
 				$output = $ngl()->arrayRebuilder($input, null, array("contact"));
-				
+
 				#array de salida
 				Array (
 					[0] => Array(
@@ -933,12 +928,12 @@ class nglFn extends nglTrunk {
 				if(isset($aSource[$mIndex]) && \is_array($aSource[$mIndex])) { $aKeys = $aKeys + \array_keys($aSource[$mIndex]); }
 			}
 			if($aKeys===null) { return null; }
-			
+
 			$aNewData = [];
 			foreach($aKeys as $mKey) {
 				foreach($mIndexes as $nKey => $mIndex) {
 					if(\array_key_exists($mIndex, $aSource) && \array_key_exists($mKey, $aSource[$mIndex])) {
-						$mValue = (isset($aSource[$mIndex], $aSource[$mIndex][$mKey])) ? $aSource[$mIndex][$mKey] : null; 
+						$mValue = (isset($aSource[$mIndex], $aSource[$mIndex][$mKey])) ? $aSource[$mIndex][$mKey] : null;
 						$aNewData[$mKey][$mNewIndexes[$nKey]] = $mValue;
 					}
 				}
@@ -957,14 +952,14 @@ class nglFn extends nglTrunk {
 
 	// en un array multidimensional, cambia el valor del indice primario alguno de los valores
 	public function arrayReIndex($aArrayArray, $sNewKey, $sOldKey="__old_key__") {
-		if(!$this->isArrayArray($aArrayArray)) { return $aArrayArray; }
+		if(!$this->isArrayArray($aArrayArray, "edges")) { return $aArrayArray; }
 		$aReIndex = [];
 		foreach($aArrayArray as $sKey => $aArray) {
 			$aArray[$sOldKey] = $sKey;
 			$sKey = (isset($aArray[$sNewKey])) ? $aArray[$sNewKey] : $sKey;
 			$aReIndex[$sKey] = $aArray;
 		}
-	
+
 		return $aReIndex;
 	}
 
@@ -996,7 +991,7 @@ class nglFn extends nglTrunk {
 					[7] => B
 					[8] => C
 				)
-			", 
+			",
 			"array asociativo" : "
 				#array original
 				$input = array("A"=>"ANANA", "B"=>"BANANA", "C"=>"CIRUELA");
@@ -1023,7 +1018,7 @@ class nglFn extends nglTrunk {
 		for($x=0; $x<$nMultiplier ;$x++) {
 			$aOutput = \array_merge($aOutput, $aInput);
 		}
-		
+
 		return $aOutput;
 	}
 
@@ -1070,7 +1065,7 @@ class nglFn extends nglTrunk {
 				$v[$sChildren] = $this->listToTreeCreator($aList, $aList[$v[$sId]], $sId, $sChildren);
 			}
 			$aTree[] = $v;
-		} 
+		}
 		return $aTree;
 	}
 
@@ -1085,13 +1080,31 @@ class nglFn extends nglTrunk {
 		return \preg_replace("/[^a-zA-Z0-9\+\/\=]/", "", $sString);
 	}
 
+	public function base64URLEncode($sString) {
+		$sString = \base64_encode($sString);
+		return \str_replace(["+", "/", "="], ["-", "_", ""], $sString);
+	}
+
+	public function base64URLDecode($sString) {
+		$sString = \str_replace(["-", "_"], ["+", "/"], $sString);
+		while(true) {
+			if(\strlen($sString)%4 !== 0) {
+				$sString .= "=";
+			} else {
+				break;
+			}
+		}
+
+		return \base64_decode($sString);
+	}
+
 	/** FUNCTION {
 		"name" : "between",
 		"type" : "public",
 		"description" : "
 			Verifica si un valor en relación a un rango de valores.
 			between tambien puede ser utilizado para conocer si un valor es mayor o menor a otro, ya que si no se especifica un valor para $sMaxValue distinto de null, se asume que $sMaxValue es igual a $sMinValue.
-			
+
 			Los posibles valores retornados por between son:
 			<ul>
 				<li><b>0:</b> cuando $mValue es menor a $sMinValue</li>
@@ -1112,15 +1125,15 @@ class nglFn extends nglTrunk {
 		$aBetween[]	= $this->unaccented($sMinValue);
 		$aBetween[]	= ($sMaxValue!==null) ? $this->unaccented($sMaxValue) : $aBetween[0];
 		$aBetween[] = $mValue = $this->unaccented($mValue);
-		
+
 		if($bCaseInsensitive) {
 			foreach($aBetween as $nKey => $sValue) {
 				$aBetween[$nKey] = \strtolower($sValue);
 			}
 		}
-		
+
 		\sort($aBetween, SORT_NATURAL);
-		
+
 		if($aBetween[0]==$mValue) {
 			return 0;
 		} else if($aBetween[1]==$mValue) {
@@ -1157,7 +1170,7 @@ class nglFn extends nglTrunk {
 
 		$sPath = \str_replace($sHash, "://", $sPath);
 		if($sScheme==="url") { $sPath = \substr($sPath, 1); }
-		
+
 		if($bRealPath) {
 			$sPath = \realpath($sPath);
 			if(!$sScheme && NGL_WINDOWS) {
@@ -1187,7 +1200,7 @@ class nglFn extends nglTrunk {
 		$sSafePath = self::call("files")->absPath($sFilePath);
 
 		if(\substr($sSafePath, 0, \strlen($sSandboxPath)) != $sSandboxPath) {
-			$sSafePath = $sSandboxPath.NGL_DIR_SLASH.self::call("files")->absPath($sFilePath);
+			$sSafePath = $sSandboxPath.NGL_DIR_SLASH.$sSafePath;
 		}
 
 		return self::call()->clearPath($sSafePath);
@@ -1226,18 +1239,8 @@ class nglFn extends nglTrunk {
 		$vRGB["green"]	= $nGreen;
 		$vRGB["blue"]	= $nBlue;
 		$vRGB["alpha"]	= $nAlpha;
-		
-		return $vRGB;
-	}
 
-	public function conf($sObjectName, $sKey=null, $sValue=null) {
-		if($obj = self::call($sObjectName)) {
-			if($sKey!==null) {
-				return $obj->__configFileValue__($sKey, $sValue);
-			} else {
-				return $obj->__configFile__();
-			}
-		}
+		return $vRGB;
 	}
 
 	/** FUNCTION {
@@ -1275,30 +1278,47 @@ class nglFn extends nglTrunk {
 		}
 	}
 
-	public function dataFileLoad($sFilePath) {
+	public function fileLoad($sFilePath, $sMethod=null) {
 		$sFilePath = $this->sandboxPath($sFilePath);
-		$aData = [];
-		if(\file_exists($sFilePath)) {
-			$sData = \file_get_contents($sFilePath);
-			$aData = \unserialize($sData);
+		if(!\is_readable($sFilePath)) {
+			self::errorMessage($this->object, 1004, $sFilePath, "log");
+			return null;
 		}
 
-		return $aData;
+		$mData = \file_get_contents($sFilePath);
+		if($sMethod!==null) {
+			switch(\strtolower($sMethod)) {
+				case "serialize": $mData = \unserialize($mData); break;
+				case "base64": $mData = \base64_decode($mData); break;
+				case "json": $mData = \json_decode($mData, true); break;
+			}
+		}
+		return $mData;
 	}
 
-	public function dataFileSave($sFilePath, $aData) {
+	public function fileSave($sFilePath, $mData, $sMethod=null) {
 		$sFilePath = $this->sandboxPath($sFilePath);
 		$sDirPath = \pathinfo($sFilePath, PATHINFO_DIRNAME);
-		if(\is_writable($sDirPath)) {
-			\file_put_contents($sFilePath, \serialize($aData));
+		if(\is_writable($sDirPath) && (!\file_exists($sFilePath) || \is_readable($sFilePath))) {
+			if($sMethod!==null) {
+				switch(\strtolower($sMethod)) {
+					case "serialize": $mData = \serialize($mData); break;
+					case "base64": $mData = \base64_encode($mData); break;
+					case "json": $mData = \json_encode($mData, JSON_INVALID_UTF8_SUBSTITUTE); break;
+				}
+			}
+			if(!\is_string($mData)) { $mData = \json_encode($mData); }
+			\file_put_contents($sFilePath, $mData);
 			return true;
+		} else {
+			self::errorMessage($this->object, 1004, $sFilePath, "die");
 		}
 		return false;
 	}
 
 
 	/** FUNCTION {
-		"name" : "dec2hex", 
+		"name" : "dec2hex",
 		"type" : "public",
 		"description" : "Transforma un decimal en hexadecimal sin límite de tamaño y con la posibilidad de rellenar con 0 por delante",
 		"parameters" : {
@@ -1347,7 +1367,7 @@ class nglFn extends nglTrunk {
 					[2] => primero
 					[3] => tercero
 				)
-				
+
 				#explicación
 				Array( primero, segundo, tercero, cuarto )
 					cuenta "2" posiciones y retorna "segundo"
@@ -1357,7 +1377,7 @@ class nglFn extends nglTrunk {
 
 				Array( primero, tercero )
 					cuenta "7" posiciones y retorna "primero"
-			
+
 				por último retorna "tercero"
 			"
 		},
@@ -1409,8 +1429,8 @@ class nglFn extends nglTrunk {
 
 		return (\is_string($mSource)) ? \implode($aDisarrange) : $aDisarrange;
 	}
-	
-	
+
+
 	public function dump() {
 		$sOutPut = "";
 		if(\func_num_args()) {
@@ -1450,6 +1470,8 @@ class nglFn extends nglTrunk {
 				$sDump .= "\n$sPrefix $k -> ";
 				$sDump .= $this->Dumper($mValue, $nIndent);
 			}
+		} elseif(\is_resource($mData)) {
+			$sDump .= "Resource(".\get_resource_type($mData).")";
 		}
 
 		return $sDump;
@@ -1476,10 +1498,10 @@ class nglFn extends nglTrunk {
 		}
 		$sConsole .= "\r\n//]]>\r\n</script>";
 		return $sConsole;
-	} 
+	}
 
 	/** FUNCTION {
-		"name" : "emptyToNull", 
+		"name" : "emptyToNull",
 		"type" : "public",
 		"description" : "
 			Establece como NULL los valores de $aData, cuyo indice se encuentre en $aKeys, que retornen TRUE a la funcion empty.
@@ -1501,7 +1523,7 @@ class nglFn extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "emptyToZero", 
+		"name" : "emptyToZero",
 		"type" : "public",
 		"description" : "
 			Establece como NULL los valores de $aData, cuyo indice se encuentre en $aKeys, que retornen TRUE a la funcion empty.
@@ -1523,7 +1545,7 @@ class nglFn extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "nullToEmpty", 
+		"name" : "nullToEmpty",
 		"type" : "public",
 		"description" : "
 			Establece como vacio los valores de $aData, cuyo indice se encuentre en $aKeys y valor sea NULL o FALSE.
@@ -1545,13 +1567,13 @@ class nglFn extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "encoding", 
+		"name" : "encoding",
 		"type" : "public",
 		"description" : "
 			Verifica si la cadena <b>$sString</b> se encuentra codificada en <b>$mEncoding</b>
 			<b>$mEncoding</b> debe ser el nombre de una codificación válida o un array de nombres.
 			Si no se especifica un <b>$mEncoding</b> se chequerá la cadena con las codificaciones mas frecuentes.
-			
+
 			Una lista completa de las codificaciones soportadas se encuentra en:
 			https://www.gnu.org/software/libiconv
 		",
@@ -1606,7 +1628,7 @@ class nglFn extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "ensureVar", 
+		"name" : "ensureVar",
 		"type" : "public",
 		"description" : "Retorna el valor de $mSure cuanto $mVar no esta seteada o es NULL",
 		"parameters" : {
@@ -1620,7 +1642,7 @@ class nglFn extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "\exploder", 
+		"name" : "\exploder",
 		"type" : "public",
 		"description" : "Ejecuta la función <b>\explode</b> de PHP de manera recursiva, utilizando los delimitadores para armar un array multi-dimensional",
 		"parameters" : {
@@ -1645,9 +1667,9 @@ class nglFn extends nglTrunk {
 
 		return  $aReturn;
 	}
-	
+
 	/** FUNCTION {
-		"name" : "\explodeTrim", 
+		"name" : "\explodeTrim",
 		"type" : "public",
 		"description" : "Ejecuta la función <b>\explode</b> de PHP y a continuación trata a cada uno de los valores con la función <b>trim</b>",
 		"parameters" : {
@@ -1667,7 +1689,7 @@ class nglFn extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "headers", 
+		"name" : "headers",
 		"type" : "public",
 		"description" : "Retorna un array con todas las cabeceras recibidas en la ultima peticion",
 		"parameters" : { "$sCase" : ["string", "Determina si los nombres de los headers deben ser retornados en mayúsculas, minúsculas"] },
@@ -1680,8 +1702,14 @@ class nglFn extends nglTrunk {
 		return \array_combine($aHeadersKeys, $aHeaders);
 	}
 
+
+	public function gmTime($sStringTime=null) {
+		$nTime = ($sStringTime!==null) ? \strtotime($sStringTime) : \time();
+		return ($nTime - \date("Z"));
+	}
+
 	/** FUNCTION {
-		"name" : "headers", 
+		"name" : "headers",
 		"type" : "public",
 		"description" : "Retorna un array con todas las cabeceras enviadas hasta el momento, un una cadena o false para cuando se especifique $sHeader",
 		"parameters" : { "$sHeader" : ["string", "Chequea que esta cabecera haya sido enviada, retornando su valor o FALSE"] },
@@ -1696,12 +1724,12 @@ class nglFn extends nglTrunk {
 				$aHeaders[$aHeader[0]] = $aHeadersLcase[\strtolower($aHeader[0])] = $aHeader[1];
 			}
 		}
-		
+
 		if($sHeader!==null) {
 			$sHeader = strtolower($sHeader);
 			return (\array_key_exists($aHeadersLcase, $sHeader)) ? $aHeadersLcase[$sHeader] : false;
 		}
-		
+
 		return $aHeaders;
 	}
 
@@ -1726,9 +1754,8 @@ class nglFn extends nglTrunk {
 		return $aProperties;
 	}
 
-
 	/** FUNCTION {
-		"name" : "hex2dec", 
+		"name" : "hex2dec",
 		"type" : "public",
 		"description" : "Transforma un hexadecimal en decimal sin límite de tamaño",
 		"parameters" : { "$sDecimal" : ["string", "Número hexadecimal"] },
@@ -1758,11 +1785,11 @@ class nglFn extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "imploder", 
+		"name" : "imploder",
 		"type" : "public",
 		"description" : "
 			Une elementos de un array multi dimensional en una cadena.
-			Cuando <b>$mGlue</b> sea declarado como un array, el primer índice será utilizado para unir los valores 
+			Cuando <b>$mGlue</b> sea declarado como un array, el primer índice será utilizado para unir los valores
 			y el segundo para unir los distintos niveles del array.
 			Para mantener una relación con <b>\implode</b>, si <b>$mGlue</b> no es especificado se asumirá que el único valor pasado es <b>$aSource</b>.
 		",
@@ -1777,13 +1804,13 @@ class nglFn extends nglTrunk {
 			$aSource = $mGlue;
 			$mGlue = "";
 		}
-		
+
 		$sGlue1 = $sGlue2 = $mGlue;
 		if(\is_array($mGlue)) {
 			$sGlue1 = $mGlue[0];
 			$sGlue2 = $mGlue[1];
 		}
-		
+
 		$sImplode = "";
 		foreach($aSource as $mValue) {
 			if(\is_array($mValue)) {
@@ -1793,7 +1820,7 @@ class nglFn extends nglTrunk {
 				$sImplode .= $mValue.$sGlue1;
 			}
 		}
-		
+
 		$sImplode = \trim($sImplode, $sGlue1);
 		return $sImplode;
 	}
@@ -1864,31 +1891,39 @@ class nglFn extends nglTrunk {
 		"name" : "isArrayArray",
 		"type" : "public",
 		"description" : "
-			Comprueba si <b>$aArray</b> es un Array de Arrays. 
+			Comprueba si <b>$aArray</b> es un Array de Arrays.
 			<b>$bCheckMode</b>
+				any = chequeará que al menos 1 de los valores de array, sea un array
+				edges = chequeará que el primer y ultimo valor de <b>$aArray</b> sean un arrays
+				edgeskeys = chequeará que el primer y ultimo valor de <b>$aArray</b> sean un arrays y tengan las mismas claves.
+				strict = verificará que todos los valores sean del tipo array y tengan las mismas claves
+
 				NULL = chequeará que el primer y ultimo valor de <b>$aArray</b> sean un arrays
 				FALSE = chequeará que el primer y ultimo valor de <b>$aArray</b> sean un arrays y tengan las mismas claves.
 				TRUE = verificará que todos los valores sean del tipo array y tengan las mismas claves
 		",
-		"parameters" : { 
-			"$aArray" : ["array", "Array a comprobar"], 
+		"parameters" : {
+			"$aArray" : ["array", "Array a comprobar"],
 			"$bCheckMode" : ["boolean", "modo de chequeo", "false"]
 		},
 		"return" : "boolean"
 	} **/
-	public function isArrayArray($aArray, $bCheckMode=false) {
+	public function isArrayArray($aArray, $sMode="any") {
 		if(\is_array($aArray)) {
 			\reset($aArray);
-			if(!$bCheckMode) {
-				$aFirst = \current($aArray);
-				$aLast = \end($aArray);
-				if($bCheckMode===null) { return (\is_array($aFirst) && \is_array($aLast)); }
+
+			$sMode = \strtolower($sMode);
+			if(!\in_array($sMode, ["any","edges","edgeskeys","strict"])) { $sMode = "any"; }
+
+			$aFirst = \current($aArray);
+			$aLast = \end($aArray);
+			if($sMode=="edges" || $sMode=="edgeskeys") {
+				if($sMode==="edges") { return (\is_array($aFirst) && \is_array($aLast)); }
 				return (\is_array($aFirst) && \is_array($aLast) && (\array_keys($aFirst)==\array_keys($aLast)));
 			}
 
-			$aFirst = \current($aArray);
-			$aFirstKeys = \array_keys($aFirst);
 			foreach($aArray as $mValue) {
+				if($sMode=="any" && \is_array($mValue)) { return true; }
 				if(!\is_array($mValue) || $aFirstKeys!=\array_keys($mValue)) { return false; }
 			}
 
@@ -1924,7 +1959,7 @@ class nglFn extends nglTrunk {
 		"name" : "isEmpty",
 		"type" : "public",
 		"description" : "
-			Comprueba si <b>$mValue</b> esta vacío. en el caso de que 
+			Comprueba si <b>$mValue</b> esta vacío. en el caso de que
 			$mValue sea del tipo Array, isEmpty devolverá FALSE si al menos
 			uno de sus índices está vacío. Los arrays son examinados de manera recursiva
 		",
@@ -2004,11 +2039,11 @@ class nglFn extends nglTrunk {
 		} else {
 			$json = @\json_decode($sString);
 		}
-		
+
 		if(\json_last_error()==JSON_ERROR_NONE) {
 			return ($bType!==null) ? $json : true;
 		}
-		
+
 		return false;
 	}
 
@@ -2016,8 +2051,8 @@ class nglFn extends nglTrunk {
 		"name" : "isLowerCase",
 		"type" : "public",
 		"description" : "
-			Comprueba si <b>$sString</b> son sólo letras minúsculas. En el caso de que 
-			$mValue sea del tipo Array, isLowerCase devolverá FALSE si al menos en 
+			Comprueba si <b>$sString</b> son sólo letras minúsculas. En el caso de que
+			$mValue sea del tipo Array, isLowerCase devolverá FALSE si al menos en
 			uno de sus índices existen catacteres que no esten en minúsculas.
 			Los arrays son examinados de manera recursiva
 		",
@@ -2035,6 +2070,17 @@ class nglFn extends nglTrunk {
 			return false;
 		}
 
+		return true;
+	}
+
+	// retorna true cuando el request_method esta en al lista, o error
+	public function isMethod($mMethod, $sMsgError="") {
+		$aMethods = \is_array($mMethod) ? $mMethod : [$mMethod];
+		$aMethods = \array_map("\strtoupper",$aMethods);
+		$sRequestMethod = \defined("NGL_GARDENS_PLACE") ? NGL_GARDENS_PLACE["METHOD"] : $_SERVER["REQUEST_METHOD"];
+		if(!\in_array(\strtoupper($sRequestMethod), $aMethods)) {
+			self::call()->errorHTTP(405, $sMsgError);
+		}
 		return true;
 	}
 
@@ -2075,7 +2121,7 @@ class nglFn extends nglTrunk {
 	public function isNumber($mNumber) {
 		$nDot = \strpos($mNumber, ".");
 		$nComma = \strpos($mNumber, ",");
-		
+
 		if($nDot!==false && $nComma!==false) {
 			if($nDot<$nComma) {
 				$mNumber = \str_replace(".", "", $mNumber);
@@ -2086,11 +2132,11 @@ class nglFn extends nglTrunk {
 		} else if($nComma!==false) {
 			$mNumber = \str_replace(",", ".", $mNumber);
 		}
-		
+
 		if(\substr_count($mNumber, ".")>1) {
 			$mNumber = \str_replace(".", "", $mNumber);
 		}
-		
+
 		$nNumber = null;
 		if(\is_numeric($mNumber)) {
 			$nNumber = $mNumber * 1;
@@ -2102,6 +2148,36 @@ class nglFn extends nglTrunk {
 		}
 
 		return $nNumber;
+	}
+
+	/**
+	modos admitidos:
+		r = lectura
+		w = escritura
+		x = ejecucion
+		d = directorio
+		f = archivo
+
+	retorna el path o false
+	*/
+	public function isPath($sPath, $sMode="f") {
+		$sPath = self::call()->sandboxPath($sPath);
+		$sMode = \strtolower($sMode);
+		$aModes = preg_split('//', $sMode, -1, PREG_SPLIT_NO_EMPTY);
+		$bReturn = true;
+		foreach($aModes as $sMode) {
+			switch($sMode) {
+				case "f": $bReturn = \is_file($sPath); break;
+				case "d": $bReturn = \is_dir($sPath); break;
+				case "r": $bReturn = \is_readable($sPath); break;
+				case "w": $bReturn = \is_writable($sPath); break;
+				case "x": $bReturn = \is_executable($sPath); break;
+				default:  $bReturn = false; break;
+			}
+			if($bReturn===false) { break; }
+		}
+
+		return $bReturn ? $sPath : false;
 	}
 
 	/** FUNCTION {
@@ -2145,8 +2221,8 @@ class nglFn extends nglTrunk {
 		if($aResult===false) { return false; }
 
 		return ($bResult) ? $aResult : true;
-	}	
-	
+	}
+
 	/** FUNCTION {
 		"name" : "isTrue",
 		"type" : "public",
@@ -2168,10 +2244,10 @@ class nglFn extends nglTrunk {
 				$bValue = false;
 			}
 		}
-		
+
 		return $bValue;
 	}
-	
+
 	/** FUNCTION {
 		"name" : "isUpperCase",
 		"type" : "public",
@@ -2195,7 +2271,7 @@ class nglFn extends nglTrunk {
 
 		return true;
 	}
-	
+
 	/** FUNCTION {
 		"name" : "isURL",
 		"type" : "public",
@@ -2218,9 +2294,9 @@ class nglFn extends nglTrunk {
 		} else {
 			return false;
 		}
-		
+
 	}
-	
+
 	/** FUNCTION {
 		"name" : "isUTF8",
 		"type" : "public",
@@ -2233,7 +2309,7 @@ class nglFn extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "memory", 
+		"name" : "memory",
 		"type" : "public",
 		"description" : "Devuelve el valor de la cantidad de memoria asignada a PHP, formateado con strSizeEncode()",
 		"parameters" : {
@@ -2272,7 +2348,7 @@ class nglFn extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "mimeType", 
+		"name" : "mimeType",
 		"type" : "public",
 		"description" : "Retorna el Mime Type de la extensión proporcionada.",
 		"parameters" : { "$sExtension" : ["string", "Extensión."] },
@@ -2286,7 +2362,7 @@ class nglFn extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "secureName", 
+		"name" : "secureName",
 		"type" : "public",
 		"description" : "Limpia una cadena para que pueda ser utilizada como nombre de archivo, carpeta, tabla o campo de una base de datos",
 		"parameters" : {
@@ -2317,14 +2393,14 @@ class nglFn extends nglTrunk {
 	} **/
 	public function once($sCode=null) {
 		if(!isset($_SESSION[NGL_SESSION_INDEX]["ONCECODES"])) { $_SESSION[NGL_SESSION_INDEX]["ONCECODES"] = []; }
-		
+
 		$nNow = \time();
 		foreach($_SESSION[NGL_SESSION_INDEX]["ONCECODES"] as $sOnceCode => $nTime) {
 			if($nNow > ($nTime + NGL_ONCECODE_TIMELIFE)) {
 				unset($_SESSION[NGL_SESSION_INDEX]["ONCECODES"][$sOnceCode]);
 			}
 		}
-		
+
 		if($sCode===null) {
 			$sCode = $this->unique(64);
 			$_SESSION[NGL_SESSION_INDEX]["ONCECODES"][$sCode] = $nNow;
@@ -2345,7 +2421,7 @@ class nglFn extends nglTrunk {
 		"description" : "
 			Redondea un número al entero o punto medio mas cercano.
 			El parámetro $nPrecition permite controlar la distancia del redondeo al punto medio
-			Según la presición el redondeo dará con .5 cuando: 
+			Según la presición el redondeo dará con .5 cuando:
 			<ul>
 				<li><b>0:</b> cuando sea x.5</li>
 				<li><b>1:</b> cuando se encuentre entre x.4 y x.6</li>
@@ -2375,11 +2451,11 @@ class nglFn extends nglTrunk {
 		$nPrecition = \abs((int)$nPrecition/10);
 		return ($nNumber<($nFloor+(.5-$nPrecition))) ? $nFloor : (($nNumber>($nFloor+(.5+$nPrecition))) ? \ceil($nNumber) : $nFloor+.5);
 	}
-	
+
 	public function settings() {
 		global $ngl;
-		if(file_exists(NGL_PATH_PROJECT."/settings.php")) {
-			include(NGL_PATH_PROJECT."/settings.php");
+		if(file_exists(NGL_PATH_GARDEN."/settings.php")) {
+			include(NGL_PATH_GARDEN."/settings.php");
 		}
 
 		$aSettings = \get_defined_vars();
@@ -2393,66 +2469,6 @@ class nglFn extends nglTrunk {
 		\ksort($aConstants["user"]);
 
 		return ["constants"=>$aConstants["user"], "variables"=>$aSettings];
-	}
-
-	public static function sow($sName, $sNewName) {
-		$sName = \strtolower(\preg_replace("/[^a-z0-9\_\-]+/", "", $sName));
-		$sNewName = \strtolower(\preg_replace("/[^a-zA-Z0-9\_\-\/]+/", "", $sNewName));
-		$sFolder = "components";
-		switch($sName) {
-			case "nut": $sName = "nut.php"; $sDestine = NGL_PATH_NUTS.NGL_DIR_SLASH.$sNewName.".php"; break;
-			case "tutor": $sName = "tutor.php"; $sDestine = NGL_PATH_TUTORS.NGL_DIR_SLASH.$sNewName.".php"; break;
-			case "owltutor": $sName = "owltutor.php"; $sDestine = NGL_PATH_TUTORS.NGL_DIR_SLASH.$sNewName.".php"; break;
-			default:
-				$sFolder = "structures";
-				$sDestine = $sNewName;
-		}
-
-		$sSource = NGL_PATH_FRAMEWORK.NGL_DIR_SLASH."assets".NGL_DIR_SLASH."templates".NGL_DIR_SLASH.$sFolder.NGL_DIR_SLASH.$sName;
-		if(\file_exists($sSource)) {
-			if(\is_dir($sSource)) { $sNewName = null; }
-			if($sNewName===null) {
-				if(!\file_exists($sDestine)) {
-					if(!@\mkdir($sNewName, NGL_CHMOD_FOLDER)) {
-						self::errorMessage("fn", null, $sDestine." doesn't exists and cannot be created", "die");
-						return false;
-					}
-				}
-				$source = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($sSource, \RecursiveDirectoryIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST);
-				foreach($source as $item) {
-					$sDestinePath = $sDestine.NGL_DIR_SLASH.$source->getSubPathname();
-					if(!\file_exists($sDestinePath)) {
-						if($item->isDir()) {
-							\mkdir($sDestinePath, NGL_CHMOD_FOLDER);
-						} else {
-							\copy($item, $sDestinePath);
-							\chmod($sDestinePath, NGL_CHMOD_FILE);
-						}
-					}
-				}
-				if(\file_exists($sDestine.NGL_DIR_SLASH."aftersow")) {
-					include_once($sDestine.NGL_DIR_SLASH."aftersow");
-				}
-			} else {
-				if(!\file_exists($sDestine) && NGL_PATH_PROJECT!=NGL_PATH_FRAMEWORK) {
-					if(!\is_dir(NGL_PATH_NUTS)) { \mkdir(NGL_PATH_NUTS, NGL_CHMOD_FOLDER); }
-					if(!\is_dir(NGL_PATH_TUTORS)) { \mkdir(NGL_PATH_TUTORS, NGL_CHMOD_FOLDER); }
-					$sCamelName = \ucwords($sNewName);
-					$sBuffer = \file_get_contents($sSource);
-					$sBuffer = \str_replace(
-						["<{=LOWERNAME=}>", "<{=UPPERNAME=}>", "<{=CAMELNAME=}>", "<{=LOWERCAMELNAME=}>"],
-						[$sNewName, \strtoupper($sNewName), $sCamelName, \lcfirst($sCamelName)],
-						$sBuffer
-					);
-					\file_put_contents($sDestine, $sBuffer);
-					\chmod($sDestine, NGL_CHMOD_FILE);
-					return true;
-				}
-				return false;
-			}
-			return true;
-		}
-		return false;
 	}
 
 	/** FUNCTION {
@@ -2471,14 +2487,14 @@ class nglFn extends nglTrunk {
 				$sString = "lorem";
 				$sAppend = "sit";
 				# emsit
-				
+
 			",
 
 			"$sString = $sAppend" : "
 				$sString = "lorem";
 				$sAppend = "ipsum";
 				# ipsum
-				
+
 			",
 
 			"$sString < $sAppend" : "
@@ -2509,14 +2525,14 @@ class nglFn extends nglTrunk {
 				$sString = "lorem";
 				$sPrepend = "sit";
 				sitlo
-				
+
 			",
 
 			"$sString = $sPrepend" : "
 				$sString = "lorem";
 				$sPrepend = "ipsum";
 				ipsum
-				
+
 			",
 
 			"$sString < $sPrepend" : "
@@ -2532,10 +2548,10 @@ class nglFn extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "strCommon", 
+		"name" : "strCommon",
 		"type" : "public",
 		"description" : "Compara dos cadenas desde el inicio y retorna la subcadena en común",
-		"parameters" : { 
+		"parameters" : {
 			"$sString1" : ["string", "Primer cadena para la comparación"],
 			"$sString2" : ["string", "Segunda cadena para la comparación"]
 		},
@@ -2544,7 +2560,7 @@ class nglFn extends nglTrunk {
 	public function strCommon($sString1, $sString2) {
 		$aString1 = \str_split($sString1);
 		$aString2 = \str_split($sString2);
-	
+
 		$aCommon	= [];
 		$nString1	= \count($aString1);
 		$nString2	= \count($aString2);
@@ -2553,12 +2569,12 @@ class nglFn extends nglTrunk {
 			if($aString1[$x]!=$aString2[$x]) { break; }
 			$aCommon[] = $aString1[$x];
 		}
-		
+
 		return \implode($aCommon);
 	}
 
 	/** FUNCTION {
-		"name" : "strOperator", 
+		"name" : "strOperator",
 		"type" : "public",
 		"description" : "
 			Retorna un operador válido en función su codificación:
@@ -2614,12 +2630,12 @@ class nglFn extends nglTrunk {
 				return (!$bEmpty) ? "=" : "";
 			}
 		}
-		
+
 		return $vSigns;
 	}
 
 	/** FUNCTION {
-		"name" : "strSizeDecode", 
+		"name" : "strSizeDecode",
 		"type" : "public",
 		"description" : "Retorna el valor $sSize en bytes. Cuando existan decimales se redondeará el resultado",
 		"parameters" : {
@@ -2641,7 +2657,7 @@ class nglFn extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "strSizeEncode", 
+		"name" : "strSizeEncode",
 		"type" : "public",
 		"description" : "Retorna el valor $nBytes con el formato KB o MB o GB etc",
 		"parameters" : {
@@ -2657,7 +2673,7 @@ class nglFn extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "strToFloat", 
+		"name" : "strToFloat",
 		"type" : "public",
 		"description" : "Intenta retornar un número decimal a partir de una cadena",
 		"parameters" : {
@@ -2669,18 +2685,18 @@ class nglFn extends nglTrunk {
 	public function strToFloat($sNumber, $sDecimal=",") {
 		$sDecimal = \preg_quote($sDecimal);
 		$sNumber = \preg_replace("/[^0-9".$sDecimal."]/", "", $sNumber);
-	
+
 		$aNumber = \preg_split("/".$sDecimal."(?=[^".$sDecimal."]*$)/", $sNumber);
 		if(isset($aNumber[1])) {
 			$aNumber[0] = \preg_replace("/[\.,]/", "", $aNumber[0]);
 			$sNumber = \implode(".", $aNumber);
 		}
-	
+
 		return floatval($sNumber);
 	}
 
 	/** FUNCTION {
-		"name" : "strToVars", 
+		"name" : "strToVars",
 		"type" : "public",
 		"description" : "Busca cadenas del tipo {:cadena:} e intenta reemplazarlas por los valores de $aVars",
 		"parameters" : {
@@ -2692,16 +2708,17 @@ class nglFn extends nglTrunk {
 				$sString = "Hola {:login.username:}";
 				$aVars = array("login"=>array("username"=>"John"));
 				sitlo
-				
+
 			"
 		},
 		"return" : "string"
 	} **/
 	function strToVars($sString, $aVars) {
-		\preg_match_all("/\{:([a-z][a-z0-9_\.]*):\}/is", $sString, $aMatchs, PREG_SET_ORDER);
-		foreach($aMatchs as $aColon) {
+		\preg_match_all("/(\{:)?([a-z][a-z0-9_\.]*)(:\})?/is", $sString, $aMatchs, PREG_SET_ORDER);
+
+		if(!empty($aMatchs[0][2])) {
 			$mValue = $aVars;
-			$aVar = \explode(".", $aColon[1]);
+			$aVar = \explode(".", $aMatchs[0][2]);
 			foreach($aVar as $sIndex) {
 				if(\key_exists($sIndex, $mValue)) {
 					$mValue = $mValue[$sIndex];
@@ -2709,24 +2726,24 @@ class nglFn extends nglTrunk {
 					break;
 				}
 			}
-	
+
 			if(!\is_array($mValue) && !\is_object($mValue)) {
-				$sString = \str_replace($aColon[0], $mValue, $sString);
+				$sString = \str_replace($aMatchs[0][0], $mValue, $sString);
 			}
 		}
-	
+
 		return $sString;
 	}
 
 	/** FUNCTION {
-		"name" : "tokenDecode", 
+		"name" : "tokenDecode",
 		"type" : "public",
 		"description" : "Decodifica una cadena codificada con <b>tokenEncode</b>. Si el token esta en una sola linea se lo tratara como un token corto",
 		"parameters" : {
 			"$sToken" : ["string", "Cadena codificada"],
 			"$sKey" : ["string", "Código se seguridad"]
 		},
-		"seealso" : ["nglFn::tokenEncode"], 
+		"seealso" : ["nglFn::tokenEncode"],
 		"return" : "string"
 	} **/
 	public function tokenDecode($sToken, $sKey) {
@@ -2754,7 +2771,7 @@ class nglFn extends nglTrunk {
 
 		// token
 		$sToken = \substr($sToken, 0, -64);
-		
+
 		// secure arrange
 		$sSignKey = self::call()->hex2dec($sSign);
 		$sToken	= self::call()->arrange($sToken, self::call("unicode")->str_split($sSignKey, 2));
@@ -2787,17 +2804,17 @@ class nglFn extends nglTrunk {
 
 		// arrange
 		$aSource = self::call()->arrange($aClear, $aKey);
-		
+
 		// source to dec
 		foreach($aSource as &$sChar) {
 			$sChar = \chr(self::call()->hex2dec($sChar, 2));
 		}
-		
+
 		return \implode($aSource);
 	}
 
 	/** FUNCTION {
-		"name" : "tokenEncode", 
+		"name" : "tokenEncode",
 		"type" : "public",
 		"description" : "Codifica el valor de <b>$sSource</b> en un token aplicando el código de seguridad <b>$sKey</b>",
 		"parameters" : {
@@ -2845,10 +2862,10 @@ class nglFn extends nglTrunk {
 				$aToken[] = $sChars[\rand(0,61)];
 			}
 		}
-		
+
 		// token data
 		$sTokenData	= \implode("", $aToken);
-		
+
 		// length
 		$sLength = $sChars[\rand(22,61)].self::call()->dec2hex(\count($aSource)).$sChars[\rand(22,61)];
 
@@ -2876,7 +2893,7 @@ class nglFn extends nglTrunk {
 			$sToken = $sTokenData.$sLastLine;
 		} else {
 			$sTokenData	= \implode("\n", self::call("unicode")->str_split($sTokenData, 64));
-			$sTokenTitle = \substr($sTokenTitle, 0, 58); 
+			$sTokenTitle = \substr($sTokenTitle, 0, 58);
 			$sToken	 = "/-- ".\str_pad($sTokenTitle." ", 58, "-")."-/\n";
 			$sToken	.= $sTokenData."\n";
 			$sToken	.= $sLastLine."\n";
@@ -2887,7 +2904,7 @@ class nglFn extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "treeWalk", 
+		"name" : "treeWalk",
 		"type" : "public",
 		"description" : "
 			Aplica una función de usuario recursivamente a cada miembro del arbol,
@@ -2898,7 +2915,7 @@ class nglFn extends nglTrunk {
 				<li>$vEvents[nodeOpen]</li>
 				<li>$vEvents[nodeClose]</li>
 				<li>$vEvents[branchClose]</li>
-			</ul>	
+			</ul>
 		",
 		"parameters" : {
 			"$aData" : ["array", "Array de datos"],
@@ -2923,7 +2940,7 @@ class nglFn extends nglTrunk {
 				</ul>
 			", "null"],
 		},
-		
+
 		"examples" : {
 			"Formato de árbol #1" : "
 				$aFamily = array(
@@ -2983,7 +3000,7 @@ class nglFn extends nglTrunk {
 				→ )
 				);
 			",
-			
+
 			"Ejemplo de función del usuario" : "
 				$aLs = $ngl("files")->ls("mydocuments", "*", "info", true);
 
@@ -2999,7 +3016,7 @@ class nglFn extends nglTrunk {
 				);
 				echo \implode($aList);
 				echo "</pre>";
-				
+
 				# salida
 				mydocuments/
 				├── excel/
@@ -3021,14 +3038,14 @@ class nglFn extends nglTrunk {
 		$fBranchClose 	= (isset($vEvents["branchClose"])) ? $vEvents["branchClose"] : null;
 		$fNodeOpen		= (isset($vEvents["nodeOpen"])) ? $vEvents["nodeOpen"] : null;
 		$fNodeClose		= (isset($vEvents["nodeClose"])) ? $vEvents["nodeClose"] : null;
-		
+
 		if(empty($sChildrenNode)) { $sChildrenNode = "_children"; }
 
 		$nData = \count($aData);
 		$aKeys = \array_keys($aData);
 		$nData = \count($aKeys);
 		$aTreeIndex = [];
-		
+
 		if($fBranchOpen!==null) { $mOutput[] = $fBranchOpen($aData[$aKeys[0]], 0); }
 		for($x=0; $x<$nData; $x+=1) {
 			if(!isset($aData[$aKeys[$x]])) { continue; }
@@ -3037,7 +3054,7 @@ class nglFn extends nglTrunk {
 			$nDeep = \count($aTreeIndex);
 			if($fNodeOpen!==null) { $mOutput[] = $fNodeOpen($aRow, $nDeep); }
 			$mOutput[] = $fFunction($aRow, $nDeep, ($x==0), ($x==$nData-1));
-			
+
 			if(isset($aRow[$sChildrenNode]) && \is_array($aRow[$sChildrenNode])) {
 				if($fBranchOpen!==null) { $mOutput[] = $fBranchOpen($aRow, \count($aTreeIndex)); }
 				if(\count($aRow[$sChildrenNode])) {
@@ -3048,13 +3065,13 @@ class nglFn extends nglTrunk {
 					$x = -1;
 					continue;
 				}
-				
+
 				// rama vacia
 				if($fBranchClose!==null) { $mOutput[] = $fBranchClose($aRow, \count($aTreeIndex)); }
 			}
 
 			if($fNodeClose!==null) { $mOutput[] = $fNodeClose($aRow, $nDeep); }
-			
+
 			if($x==$nData-1) {
 				while(!($nData>$x+1) && \count($aTreeIndex)) {
 					$sTreeTmp = \array_pop($aTreeIndex);
@@ -3062,7 +3079,7 @@ class nglFn extends nglTrunk {
 					$aKeys = \array_keys($aData);
 					$nData = \count($aData);
 					$x = $sTreeTmp[1];
-					
+
 					$nDeep = \count($aTreeIndex);
 					if($fBranchClose!==null) { $mOutput[] = $fBranchClose($aRow, $nDeep); }
 					if($fNodeClose!==null) { $mOutput[] = $fNodeClose($aRow, $nDeep); }
@@ -3071,7 +3088,7 @@ class nglFn extends nglTrunk {
 			}
 		}
 		if($fBranchClose!==null) { $mOutput[] = $fBranchClose($aRow, 0); }
-		
+
 		return $mOutput;
 	}
 
@@ -3081,7 +3098,7 @@ class nglFn extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "truelize", 
+		"name" : "truelize",
 		"type" : "public",
 		"description" : "Crea un nuevo Array combinando los valores de $aSource como claves y el booleano TRUE como valor de cada uno.",
 		"parameters" : {
@@ -3112,9 +3129,9 @@ class nglFn extends nglTrunk {
 		$aReturn = [];
 		foreach($aSource as $mValue) {
 			$mValue = ($bTrim) ? \trim($mValue) : $mValue;
-			$aReturn[$mValue] = true; 
+			$aReturn[$mValue] = true;
 		}
-		
+
 		return $aReturn;
 	}
 
@@ -3150,7 +3167,7 @@ class nglFn extends nglTrunk {
 		$aUnescaped = ["'", '"', "\\", "\n", "\r", "\t"];
 		return \str_replace($aEscaped, $aUnescaped, $sEscaped);
 	}
-	
+
 	/** FUNCTION {
 		"name" : "unique",
 		"type" : "public",
@@ -3171,7 +3188,7 @@ class nglFn extends nglTrunk {
 			$sHash		= \crypt($sHash, '$6$rounds='.$nRounds.'$'.$sSalt.'$');
 			$nDollar	= \strrpos($sHash, '$');
 			$sHash		= \substr($sHash, $nDollar+1);
-			
+
 			$sUnique.= $sHash;
 		}
 
@@ -3191,7 +3208,7 @@ class nglFn extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "uriDecode", 
+		"name" : "uriDecode",
 		"type" : "public",
 		"description" : "
 			Decodifica una cadena codificada con <b>uriEncode</b>.
@@ -3210,12 +3227,12 @@ class nglFn extends nglTrunk {
 				}
 			}
 		}
-		
+
 		return false;
 	}
 
 	/** FUNCTION {
-		"name" : "uriEncode", 
+		"name" : "uriEncode",
 		"type" : "public",
 		"description" : "Codifica una cadena o array para que pueda ser enviado de manera segura por GET o POST",
 		"parameters" : { "$mValue" : ["mixed", "Cadena o array que se quiere codificar"] },
@@ -3227,15 +3244,15 @@ class nglFn extends nglTrunk {
 		$sString = \addslashes($sString);
 		$sString = \base64_encode($sString);
 		$sString = \strtr($sString, "+/=", "-._");
-		
+
 		return $sString;
 	}
 
 	/** FUNCTION {
-		"name" : "urlExists", 
+		"name" : "urlExists",
 		"type" : "public",
 		"description" : "
-			Comprueba si existe una URL. El chequeo se intenta hacer mediante <b>get_headers</b> o <b>curl_init</b>, 
+			Comprueba si existe una URL. El chequeo se intenta hacer mediante <b>get_headers</b> o <b>curl_init</b>,
 			si no pueden llevarse a cabo retorna <b>NULL</b>
 		",
 		"parameters" : { "$sURL" : ["string", "URL a chequear"] },
@@ -3253,6 +3270,13 @@ class nglFn extends nglTrunk {
 		return $bExists;
 	}
 
+	public function uuid() {
+		$sSeed = \random_bytes(16);
+		$sSeed[6] = \chr(\ord($sSeed[6]) & 0x0f | 0x40);
+		$sSeed[8] = \chr(\ord($sSeed[8]) & 0x3f | 0x80);
+		return \vsprintf('%s%s-%s-%s-%s-%s%s%s', \str_split(\bin2hex($sSeed), 4));
+	}
+
 	public function naming($sString, $sNotation="hungarian", $sType="m") {
 		/* Notations
 			sHungarianNotation = variables. La primer letra indica el tipo de dato en inglés
@@ -3261,6 +3285,8 @@ class nglFn extends nglTrunk {
 			snake_case = tablas y campos en una base de datos
 			SCREAMING_SNAKE_CASE = constantes
 			kebab-case = URLs
+			lower = cadena en minúsculas sin caracter para la separación de palabras
+			upper = cadena en mayúsculas sin caracter para la separación de palabras
 		*/
 		/* Types
 			a = array
@@ -3270,6 +3296,9 @@ class nglFn extends nglTrunk {
 			s = string
 			v = vector
 		*/
+		$sString = \trim($sString);
+		$sString = $this->unaccented($sString);
+
 		if(\strpos($sString, "_")) {
 			$aWords = \explode("_", $sString);
 		} else if(\strpos($sString, "-")) {
@@ -3295,6 +3324,8 @@ class nglFn extends nglTrunk {
 			case "snake": return \preg_replace("/\_+/s", "_", \implode("_", $aWords));
 			case "ssnake": return \preg_replace("/\_+/s", "_", \strtoupper(\implode("_", $aWords)));
 			case "kebab": return \preg_replace("/\-+/s", "-", \implode("-", $aWords));
+			case "lower": return \strtolower(\implode("", $aWords));
+			case "upper": return \strtoupper(\implode("", $aWords));
 		}
 	}
 }

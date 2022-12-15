@@ -1,22 +1,10 @@
 <?php
-
+/*
+# nogal
+*the most simple PHP Framework* by hytcom.net
+GitHub @hytcom/nogal
+*/
 namespace nogal;
-
-/** CLASS {
-	"name" : "nglBranch",
-	"revision" : "20140126",
-	"extends" : "nglTrunk",
-	"description" : "Contenedor de objetos",
-	"variables": {
-		"$class" : ["string", "Clase a la que pertenece el objeto"],
-		"$aArguments" : ["array", "Argumentos del objeto seteados por el usuario"],
-		"$aArgumentsSettings" : ["array", "Valores por defecto de los argumentos del objeto"],
-		"$aAttributes" : ["array", "Atributos del objeto resultado de la ejecución de sus métodos"],
-		"$aAttributesSettings" : ["array", "Valores por defecto de los atributos del objeto"],
-		"$me" : ["string", "Nombre Real del objeto"],
-		"$object" : ["string", "Nombre del objeto"]
-	}
-} **/
 abstract class nglBranch extends nglTrunk {
 
 	protected $class;
@@ -27,7 +15,7 @@ abstract class nglBranch extends nglTrunk {
 	protected $aArgumentsSettings;
 	protected $aAttributes;
 	protected $aAttributesSettings;
-	
+
 	public $CONFIG;
 
 	final public function __builder__($vArguments) {
@@ -40,13 +28,19 @@ abstract class nglBranch extends nglTrunk {
 		$this->aAttributes			= [];
 		$this->aAttributesSettings	= [];
 	}
-	
+
 	final public function __call($sProperty, $aArgs) {
 		if(\is_array($aArgs) && \count($aArgs)) {
 			$mValue = $aArgs[0];
 			if(\array_key_exists($sProperty, $this->aArgumentsSettings)) {
 				if(\is_array($this->aArgumentsSettings[$sProperty])) {
-					$this->aArguments[$sProperty] = eval("return ".$this->aArgumentsSettings[$sProperty][0].";");
+					$mValue = eval("return ".$this->aArgumentsSettings[$sProperty][0].";");
+					if(!empty($this->aArgumentsSettings[$sProperty][2]) && \is_array($this->aArgumentsSettings[$sProperty][2])) {
+						if(!\in_array($mValue, $this->aArgumentsSettings[$sProperty][2])) {
+							$mValue = $this->aArgumentsSettings[$sProperty][1];
+						}
+					}
+					$this->aArguments[$sProperty] = $mValue;
 				}
 			}
 			return $this;
@@ -54,23 +48,22 @@ abstract class nglBranch extends nglTrunk {
 
 		if(isset($this->aArguments[$sProperty])) {
 			return $this->aArguments[$sProperty];
-			// return eval("return ".$this->aArguments[$sProperty].";");
 		}
 
 		return $this;
 	}
 
 	/** FUNCTION {
-		"name" : "__get", 
+		"name" : "__get",
 		"type" : "public",
 		"description" : "
 			Método mágico encargado de retornar los valores de los argumentos y atributos de los objetos.
-			cuando existan un argumento y un atributo con el mismo nombre __get retornará el valor de  
+			cuando existan un argumento y un atributo con el mismo nombre __get retornará el valor de
 			este último.
 
-			Por ser un método mágico __get se invocará automaticamente cuando se solicita el valor 
+			Por ser un método mágico __get se invocará automaticamente cuando se solicita el valor
 			de algun argumento o atributo.
-			
+
 			__get no retorna el valor de atributos privados.
 		",
 		"parameters" : { "$sProperty" : ["string", "Nombre del agumento o atributo", "3"] },
@@ -91,18 +84,23 @@ abstract class nglBranch extends nglTrunk {
 				return (\array_key_exists($sProperty, $this->aArguments)) ? $this->aArguments[$sProperty] : "";
 			}
 		}
-		
+
 		return null;
 	}
 
+	// alias de __get
+	final public function getprop($sProperty) {
+		return $this->__get($sProperty);
+	}
+
 	/** FUNCTION {
-		"name" : "__set", 
+		"name" : "__set",
 		"type" : "public",
 		"description" : "
 			Método mágico encargado de asignar los valores de los argumentos de los objetos.<br />
 			Por ser un método mágico __set se invocará automaticamente cuando se asigne un valor a un argumento.
 		",
-		"parameters" : { 
+		"parameters" : {
 			"$sProperty" : ["string", "Nombre del agumento"],
 			"$mValue" : ["mixed", "Nuevo valor del argumento"]
 		},
@@ -120,7 +118,7 @@ abstract class nglBranch extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "__toString", 
+		"name" : "__toString",
 		"type" : "public",
 		"description" : "Método mágico que retorna el nombre del objeto y el de la clase a la que instancia, separados por dos puntos (:).",
 		"return" : "string"
@@ -130,7 +128,7 @@ abstract class nglBranch extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "__unset", 
+		"name" : "__unset",
 		"type" : "public",
 		"description" : "Método mágico que restaura el valor por defecto de un argumento del objeto",
 		"parameters" : { "$sProperty" : ["string", "Nombre del agumento"] },
@@ -146,16 +144,17 @@ abstract class nglBranch extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "__arguments__", 
+		"name" : "__arguments__",
 		"type" : "public",
 		"description" : "Equivalente a __set. Una vez seteado el argumento retorna el objeto $this",
-		"parameters" : { 
+		"parameters" : {
 			"$mArguments" : ["mixed", "Array asociativo de argumentos (argumento=>valor) o una cadena con el nombre de uno"]
 			"$mValue" : ["mixed", "valor del argumento, cuando $aArguments es un string"]
+			"$aList" : ["array", "Lista de posible valores. Si no esta en la lista, devolverá $mValue"]
 		},
 		"return" : "this"
 	} **/
-	final public function __arguments__($mArguments, $mValue=null) {
+	final public function __arguments__($mArguments, $mValue=null, $aList=null) {
 		if(\is_string($mArguments)) {
 			$this->__set($mArguments, $mValue);
 		} else {
@@ -166,12 +165,12 @@ abstract class nglBranch extends nglTrunk {
 
 		return $this;
 	}
-	
+
 	/** FUNCTION {
-		"name" : "args", 
+		"name" : "args",
 		"type" : "public",
 		"description" : "Alias de __arguments__",
-		"parameters" : { 
+		"parameters" : {
 			"$mArguments" : ["mixed", "Array asociativo de argumentos (argumento=>valor), objeto, cadena json o una cadena con el nombre de uno"]
 			"$mValue" : ["mixed", "valor del argumento, cuando $aArguments es un string"]
 		},
@@ -192,7 +191,7 @@ abstract class nglBranch extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "Argument", 
+		"name" : "Argument",
 		"type" : "protected",
 		"description" : "Retorna el valor de un argumento ó $mDefault en caso de NULL",
 		"parameters" : { "$sProperty" : ["string", "Nombre del agumento"] },
@@ -208,10 +207,10 @@ abstract class nglBranch extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "Attribute", 
+		"name" : "Attribute",
 		"type" : "protected",
 		"description" : "Setea y/o retorna el valor de un atributo del objeto",
-		"parameters" : { 
+		"parameters" : {
 			"$sAttribute" : ["string", "Nombre del atributo"],
 			"$mValue" : ["mixed", "Nuevo valor del atributo"]
 		},
@@ -228,7 +227,7 @@ abstract class nglBranch extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "__config__", 
+		"name" : "__config__",
 		"type" : "public",
 		"description" : "
 			Procesa la información contenida en un archivo de configuración y la aplica al objeto.
@@ -241,7 +240,7 @@ abstract class nglBranch extends nglTrunk {
 		if($sConfigFile===null && !\count($this->CONFIG)) { return null; }
 
 		if($sConfigFile!==null) {
-			if(!($sConfig = \file_get_contents($sConfigFile))) { return false; }
+			if(!$sConfig = self::call()->fileLoad($sConfigFile)) { return false; }
 			$vConfig = self::parseConfigString($sConfig, true);
 		} else {
 			$vConfig = $this->CONFIG;
@@ -249,9 +248,9 @@ abstract class nglBranch extends nglTrunk {
 
 		if(isset($vConfig["arguments"])) { $this->args($vConfig["arguments"]); }
 		if(isset($vConfig["errors"])) { self::errorSetCodes($this->object, $vConfig["errors"]); }
-		
+
 		$this->CONFIG = $vConfig;
-		return $vConfig;
+		return $this;
 	}
 
 	final public function __defaults__() {
@@ -266,7 +265,7 @@ abstract class nglBranch extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "__destroy", 
+		"name" : "__destroy",
 		"type" : "public",
 		"description" : "Elimina el objeto utilizando el método kill del framework",
 		"return" : "boolean"
@@ -276,7 +275,7 @@ abstract class nglBranch extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "GetArguments", 
+		"name" : "GetArguments",
 		"type" : "protected",
 		"description" : "
 			Captura los valores pasados por <b>$aPassedArgs()</b> utilizando como guía los nombres de argumentos <b>$sArgs</b>
@@ -302,9 +301,9 @@ abstract class nglBranch extends nglTrunk {
 
 		return $aArguments;
 	}
-	
+
 	/** FUNCTION {
-		"name" : "info", 
+		"name" : "info",
 		"type" : "public",
 		"description" : "Devuelve todos los argumentos y/o atributos del objeto",
 		"parameters" : {
@@ -333,14 +332,14 @@ abstract class nglBranch extends nglTrunk {
 				$vInfo["attributes"][$sAttribute] = $mValue;
 			}
 		}
-		
+
 		if($sMode=="arguments") { return $vInfo["arguments"]; }
 		if($sMode=="attributes") { return $vInfo["attributes"]; }
 		return $vInfo;
 	}
 
 	/** FUNCTION {
-		"name" : "isArgument", 
+		"name" : "isArgument",
 		"type" : "public",
 		"description" : "Verifica la existencia del argumento <b>$sArgument</b>",
 		"parameters" : { "$sArgument" : ["string", "Nombre del argumento"] },
@@ -351,7 +350,7 @@ abstract class nglBranch extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "isAttribute", 
+		"name" : "isAttribute",
 		"type" : "public",
 		"description" : "Verifica la existencia del atributo <b>$sAttribute</b>",
 		"parameters" : { "$sAttribute" : ["string", "Nombre del atributo"] },
@@ -362,7 +361,7 @@ abstract class nglBranch extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "__reset__", 
+		"name" : "__reset__",
 		"type" : "public",
 		"description" : "Restaura los valores de todos los atributos y argumentos del objeto",
 		"return" : "void"
@@ -375,10 +374,10 @@ abstract class nglBranch extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "__SetupArguments__", 
+		"name" : "__SetupArguments__",
 		"type" : "protected",
 		"description" : "Establece e inicializa los argumentos con los valores por defecto",
-		"parameters" : { 
+		"parameters" : {
 			"$aArgumentsSettings" : ["array", "
 				Lista de argumentos permitidos y sus valores por defecto.
 				Todos los nombres de argumentos serán tratados con <b>strtolower<b>
@@ -406,10 +405,10 @@ abstract class nglBranch extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "__SetupAttributes__", 
+		"name" : "__SetupAttributes__",
 		"type" : "protected",
 		"description" : "Establece e inicializa los argumentos con los valores por defecto",
-		"parameters" : { 
+		"parameters" : {
 			"$aArgumentsSettings" : ["array", "
 				Lista de argumentos permitidos y sus valores por defecto
 				Todos los nombres de argumentos serán tratados con <b>strtolower<b>
@@ -428,7 +427,7 @@ abstract class nglBranch extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "__whoami__", 
+		"name" : "__whoami__",
 		"type" : "public",
 		"description" : "
 			Retorna los argumentos, atributos y metodos del objeto.
@@ -448,7 +447,7 @@ abstract class nglBranch extends nglTrunk {
 		}
 		\sort($aMethods);
 		$vDescribe["methods"] = $aMethods;
-		
+
 		return $vDescribe;
 	}
 }

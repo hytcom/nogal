@@ -1,9 +1,9 @@
-[checksum]
-md5 = "f4bb17cc5a7f4029f8c4f1061dd8b9ff"
-sha1 = "6aa133a6b63a635c76a37ddb4bda0fa02f05d2c0"
-
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/zip.md"
+[info]
+_help = "### zip\
+Gestiona archivos ZIP\
+\
+https://github.com/hytcom/wiki/blob/master/nogal/docs/zip.md\
+"
 
 [arguments]
 content = "Contenido dinámico para filepath"

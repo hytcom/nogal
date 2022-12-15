@@ -1,0 +1,45 @@
+# ==============================================================================
+# IMPORTANTE
+# antes de ejecutar, se debe ejecutar el ejemplo ngl-alvin-02-grants.bee,
+# ya que este crea la estructura de permisos
+# ==============================================================================
+
+# se intenta cargar los grants actuales
+alvin grantsLoad
+
+# establece la valivez del token en 1 dia
+-$: tokenExpireTime "1 day"
+
+# owl
+@set owl {"sign": "sales_chief", "access":["seller_a", "seller_b", "seller_c"]}
+
+# carga la clave privada
+alvin setkey true
+
+# crea un token ----------------------------------------------------------------
+-$: tokenCreate ["ned", ["sales_chief","seller"], {"owl":"{$owl}", "employee": { "office_name":""}}]
+
+
+# ------------------------------------------
+# desescapar los bloques de a uno a la vez
+# ------------------------------------------
+
+# muestra el token generado ----------------------------------------------------
+# alvin load -$:
+# -$: token
+
+# carga el token y evalua persimos ---------------------------------------------
+# alvin load -$:
+# -$: setkey
+
+# true cuando exite budgets.view
+# -$: check "budgets.view"
+
+# true cuando exite banks.view
+# -$: check "banks.view"
+
+# true cuando NO exite banks.view
+# -$: check "!|banks.view"
+
+# true cuando exite budgets.view o banks.view
+# -$: check "?|budgets.view,banks.view"

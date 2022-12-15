@@ -1,18 +1,23 @@
-[checksum]
-md5 = "0757e0736b4977b479778b93e26c254a"
-sha1 = "01b7b185bf2863ce59fbf484395ec8169e13b314"
-
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/excel.md"
+[info]
+_help = "### excel\
+Implementa la clase \PhpOffice\PhpSpreadsheet\
+\
+https://github.com/hytcom/wiki/blob/master/nogal/docs/excel.md\
+"
 
 [arguments]
 calculate = "Activa y desactiva el cálculo de fórmulas"
-colnames = "Habilita el uso de la primer fila del rango como claves del array en el método getall"
+cellval = "Tipo de valor de la celda [value* | calculated | formatted]"
+colnames = "Habilita el uso de la primer fila del rango como:\
+	getall: claves del array\
+	get: nombre de los indices\
+	set: titulos de las columnas\
+"
 colref = "Indica si debe utilizarse la letra de la columna como índice"
 content = "Contenido para un nuevo documento Excel"
 csv_enclosed = "Caracter entre el que se encierran los valores de los campos"
-csv_splitter = "Separador de campos"
 csv_eol = "Caracter de fin de línea"
+csv_splitter = "Separador de campos"
 empty = "Valor utilizado en las celdas nulas"
 filename = "Nombre del archivo relativo a NGL_SANDBOX"
 fontfamily = "Nombre de la tipografía en un nuevo archivo"
@@ -25,5 +30,6 @@ title = "Nombre de la hoga activa"
 unmergefill = "Descombina las celdas agrupadas, colocando el mismo valor en todas"
 
 [errors]
-1000 = "No se pudo hallar la librería \PhpOffice\PhpSpreadsheet\Spreadsheet. Ejecutar 'compose update' en la carpeta grafts/composer"
-1001 = "Error en el formato de los datos. Se espera un Array bidimensional con el mismo número de columnas"
+1000 = "Falta librería. Ejecutar 'composer update' en la carpeta NOGAL/grafts/composer"
+1001 = "Falta librería. Ejecutar 'composer update' en la carpeta NOGAL/grafts/composer luego de agregar a composer.json el paquete:"
+1002 = "Error en el formato de los datos. Se espera un Array bidimensional con el mismo número de columnas"

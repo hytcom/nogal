@@ -1,0 +1,30 @@
+ants method get
+-$: url https://petstore.swagger.io/v2/pet/findByStatus?status=pending
+-$: request
+@set response -$:
+shift convert ["{$response.header}", "vector-ttable"]
+@print -$:
+
+tree source_type json
+-$: load {$response.body}
+-$: show name
+
+
+# TOKEN
+# ants method post
+# -$: url http://test.local/api/token
+# -$: request
+# @get -$: body
+# ants toarray -$:
+# @set body -$:
+# ants anthill /home/test/tmp
+# -$: savekey {$body.access-token}
+
+# ants authtype digest
+# -$: anthill /home/test/tmp
+# -$: key bcef0cee-f892-4db6-b960-eec835f7d287
+
+# -$: token [{"username":"ariel", "realm":"dev", "algorithm":"MD5-sess", "nonce":"nonce", "cnonce":"cnonce", "password":"asd123", "qop":"auth-int", "nc":""}]
+# -$: body [{"q":"q"}]
+# -$: method get
+# -$: url http://test.local/api/get

@@ -1,32 +1,26 @@
 <?php
-
+/*
+# nogal
+*the most simple PHP Framework* by hytcom.net
+GitHub @hytcom/nogal
+___
+Contenedor de objetos globales
+*/
 namespace nogal;
-
-/** CLASS {
-	"name" : "nglFeeder",
-	"revision" : "20140127",
-	"extends" : "nglTrunk",
-	"description" : "Contenedor de objetos globales",
-	"variables": {
-		"$class" : ["string", "Clase a la que pertenece el objeto"],
-		"$me" : ["string", "Nombre Real del objeto"],
-		"$object" : ["string", "Nombre del objeto"]
-	}
-} **/
 abstract class nglFeeder extends nglTrunk {
 
-	protected $class;
-	protected $me;
-	protected $object;
+	protected $class; // clase a la que pertenece el objeto
+	protected $me; // nombre Real del objeto
+	protected $object; // nombre del objeto
 
 	final public function __builder__($vArguments) {
 		$this->class	= $vArguments[0];
 		$this->me		= $vArguments[1];
-		$this->object	= $vArguments[1]; 
+		$this->object	= $vArguments[1];
 	}
 
 	/** FUNCTION {
-		"name" : "__toString", 
+		"name" : "__toString",
 		"type" : "public",
 		"description" : "Método mágico que retorna el nombre del objeto y el de la clase a la que instancia, separados por dos puntos (:).",
 		"return" : "string"
@@ -36,7 +30,7 @@ abstract class nglFeeder extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "__destroy__", 
+		"name" : "__destroy__",
 		"type" : "public",
 		"description" : "Elimina el objeto utilizando el método kill del framework",
 		"return" : "boolean"
@@ -46,7 +40,7 @@ abstract class nglFeeder extends nglTrunk {
 	}
 
 	/** FUNCTION {
-		"name" : "__Whoami__", 
+		"name" : "__Whoami__",
 		"type" : "protected",
 		"description" : "
 			Retorna metodos del objeto.

@@ -1,9 +1,8 @@
-[checksum]
-md5 = "6f7510907def895e44909608dbf74ca9"
-sha1 = "ac431be8c928951044b0b23b25c991022e3e49eb"
-
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/image.md"
+[info]
+_help = "### image\
+Gestor de imágenes
+https://github.com/hytcom/wiki/blob/master/nogal/docs/image.md\
+"
 
 [arguments]
 alpha = "Determina si la siguiente copia tendra fondo transparente"

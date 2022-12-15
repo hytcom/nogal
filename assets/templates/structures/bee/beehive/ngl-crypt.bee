@@ -1,0 +1,75 @@
+# configuraciones --------------------------------------------------------------
+@set cipher aes-128-cbc
+#@set cipher DES-EDE3-CBC
+@set key 00000000000000000000000000000000
+@set iv 1111111111111111
+@set txt anita lava la tina
+
+
+# ------------------------------------------
+# desescapar los bloques de a uno a la vez
+# ------------------------------------------
+
+# tipos de cifrados soportados -------------------------------------------------
+crypt ciphers
+
+
+# test simetrico ---------------------------------------------------------------
+# crypt cipher {$cipher}
+# @set c -$:
+# -$: iv {$iv}
+# -$: key {$key}
+# -$: encrypt {$txt}
+# @set enc -$:
+# {$c} decrypt {$enc}
+# @set dec -$:
+# @print original: {$txt}
+# @print encrypted: {$enc}
+# @print decrypted: {$dec}
+
+
+# tests asimétricos ------------------------------------------------------------
+
+# generación y resguardo de claves ---------------------------------------------
+# crypt cipher RSA
+# @set c -$:
+# {$c} keylen 2048		
+# {$c} keygen
+# {$c} keypath {@NGL_PATH_TMP}
+# {$c} savekeys
+# encrypt / decrypt
+
+
+# generación y uso de claves ---------------------------------------------------
+# crypt cipher rsa
+# @set c -$:
+# {$c} keylen 2048		
+# {$c} keygen
+# @set keys -$:
+# {$c} key {$keys.public}
+# {$c} encrypt {$txt}
+# @set enc -$:
+# {$c} key {$keys.private}
+# {$c} decrypt {$enc}
+# @set dec -$:
+# @print original: {$txt}
+# @print encrypted: {$enc}
+# @print decrypted: {$dec}
+
+
+# firma y verificación ---------------------------------------------------------
+# crypt cipher rsa
+# @set c -$:
+# {$c} keylen 2048		
+# {$c} keygen
+# @set keys -$:
+# {$c} key {$keys.private}
+# {$c} sign {$txt}
+# @set sign -$:
+# {$c} key {$keys.public}
+# {$c} verify {$txt} {$sign}
+# @set verify -$:
+# @print texto: {$txt}
+# @print firma: {$sign}
+# @print verificacion: 
+# @dump {$verify}

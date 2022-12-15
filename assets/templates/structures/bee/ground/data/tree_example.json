@@ -1,0 +1,39 @@
+[
+	{
+		"id":"1",
+		"parent":"0",
+		"name":"caninos",
+		"_children": [
+			{ "id":"3", "parent":"1", "name":"perro" },
+			{
+				"id":"4",
+				"parent":"1",
+				"name":"lobo",
+				"_children": [
+					{ "id":"12", "parent":"4", "name":"blanco" },
+					{ "id":"13", "parent":"4", "name":"gris" }
+				]
+			},
+			{ "id":"5", "parent":"1", "name":"coyote" }
+		]
+	},
+	{
+		"id":"2",
+		"parent":"0",
+		"name":"felinos",
+		"_children": [
+			{ "id":"6", "parent":"2", "name":"gato" },
+			{ "id":"7", "parent":"2", "name":"le\u00f3n" },
+			{ "id":"8", "parent":"2", "name":"tigre" },
+			{
+				"id":"9",
+				"parent":"2",
+				"name":"pantera",
+				"_children": [
+					{ "id":"10", "parent":"9", "name":"negra" },
+					{ "id":"11", "parent":"9", "name":"blanca" }
+				]
+			}
+		]
+	}
+]

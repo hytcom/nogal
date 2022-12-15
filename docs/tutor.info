@@ -1,9 +1,10 @@
-[checksum]
-md5 = "2903e6ba063714783286daefb75ec3c6"
-sha1 = "2007ff463fdb759e1ab7cbe800a976306a99f9f6"
-
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/tutor.md"
+[info]
+_help = "### sysvar\
+Objeto CORE\
+Establece y almacena las variables de entorno\
+\
+https://github.com/hytcom/wiki/blob/master/nogal/docs/sysvar.md\
+"
 
 [errors]
 1001 = "Los tutores no pueden tener métodos públicos"

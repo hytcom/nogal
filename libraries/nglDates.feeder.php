@@ -1,20 +1,14 @@
 <?php
 /*
-# Nogal
+# nogal
 *the most simple PHP Framework* by hytcom.net
-GitHub @hytcom
+GitHub @hytcom/nogal
 ___
-  
+
 # date
-## nglDates *extends* nglFeeder [2018-08-15]
-Utilidades para operaciones con fechas y horas
-Generación de Calendarios
-
-https://github.com/hytcom/wiki/blob/master/nogal/docs/dates.md
-
+https://hytcom.net/nogal/docs/objects/dates.md
 */
 namespace nogal;
-
 class nglDates extends nglFeeder implements inglFeeder {
 
 	private $aSettings;
@@ -49,7 +43,7 @@ class nglDates extends nglFeeder implements inglFeeder {
 		$aSeconds["minute"] = 60;
 		$aSeconds["second"] = 1;
 		$this->aSeconds = $aSeconds;
-		
+
 	}
 
 	public function calendar($mDate=null, $bComplete=false, $aEvents=false) {
@@ -141,7 +135,7 @@ class nglDates extends nglFeeder implements inglFeeder {
 		$aDate["time"]					= \date("H:i:s", $nTime);
 		$aDate["minutes"]				= \date("i", $nTime);
 		$aDate["seconds"]				= \date("s", $nTime);
-		
+
 		return $aDate;
 	}
 
@@ -154,16 +148,16 @@ class nglDates extends nglFeeder implements inglFeeder {
 	public function monthsdiff($sDate1, $sDate2=null) {
 		$nDate1 = \strtotime($sDate1);
 		$nDate2 = ($sDate2===null) ? \time() : \strtotime($sDate2);
-		
+
 		$sMonth1 = \date("Y", $nDate1)*12 + \date("n", $nDate1);
-		$sMonth2 = \date("Y", $nDate2)*12 + \date("n", $nDate2);		
+		$sMonth2 = \date("Y", $nDate2)*12 + \date("n", $nDate2);
 		return \abs(\floor($sMonth1 - $sMonth2));
 	}
 
 	public function timesdiff($sTime1, $sTime2=null) {
 		$nTime1 = \strtotime($sTime1);
 		$nTime2 = ($sTime2===null) ? \time() : \strtotime($sTime2);
-		
+
 		if($nTime2 < $nTime1) {
 			$nTime2 += 86400;
 			return ($nTime2 - $nTime1);

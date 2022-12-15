@@ -1,0 +1,9 @@
+[info]
+_help = "### sow\
+Implementa estructuras de archivos de nogal\
+\
+https://github.com/hytcom/wiki/blob/master/nogal/docs/sow.md\
+"
+
+[errors]
+1001 = "El destino no existe y no pudo ser creado: "

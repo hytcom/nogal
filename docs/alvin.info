@@ -1,41 +1,46 @@
-[checksum]
-md5 = "4c7f541edafc9d1c8abd905f79a79daf"
-sha1 = "e8d3b5ce0f1f693b6de450dd58d484e1609a287f"
-
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/alvin.md"
+[info]
+_help = "### alvin\
+Alvin es el sistema de seguridad de **nogal**, encargado de gestionar los permisos de usuario.\
+Mas que un objeto es un concepto que atraviesa transversalmente todo el framework.\
+\
+https://github.com/hytcom/wiki/blob/master/nogal/docs/alvin.md\
+https://github.com/hytcom/wiki/blob/master/nogal/docs/alvinuso.md\
+"
 
 [errors]
-1001 = Clave de encriptación indefinida
-1002 = Token inválido o vacío
-1003 = Clave grants duplicada
-1004 = Clave grants indefinida
-1005 = No se pudieron salvar las claves. Permiso denegado
-1006 = Error en la ruta
-1007 = Clave pública indefinida
-1008 = Clave privada indefinida
-1009 = Nombre de usuario incorrecto para el TOKEN
-1010 = Passphrase indefinida
-1011 = Nombre de permiso inválido
-1012 = No se pudieron cargar los permisos
+1000 = "Alvin está desactivado"
+1001 = "La ruta del keystore no existe o está protegida contra lectura/escritura"
+1002 = "No se pudieron salvar las claves. Permiso denegado"
+1003 = "Clave privada indefinida"
+1004 = "Clave pública indefinida"
+1005 = "Nombre de claim inválido"
+1006 = "El claim ya existe:"
+1007 = "Claim inexistente:"
+1008 = "Falta el argumento TYPE o tiene un valor inválido:"
+1009 = "Falta el argumento VALUE"
+1010 = "El argumento RESOURCE no puede estar vacio"
+1011 = "El argumento SCOPES debe ser un ARRAY"
+1012 = "El método no soporta el argumento:"
+1013 = "Claim en uso:"
+1014 = "No hay un token cargado"
+1015 = "Token inválido o expirado"
+1016 = "No se pudo hallar el indice ALVIN en la sesion"
 
 [config]
-_help = "login: url del archivo para login. Default /login\
+_help = "firewall: activa/desactiva el firewall\
+login: url del archivo para login. Default /login\
 logout: url del archivo para logout. Default /logout
 "
 
-[firewall-ignore]
+[ignore]
 _help = "Archivos ignorados por ALVIN al momento de la carga\
 La URL de los archivos son relativas al valor de la constante NGL_URL y deben comenzar con /\
-	/folder/bar/filename = 1\
-	/folder/foo/ = 1\
-"
-
-[firewall-strict]
-_help = "Archivos para los que se requiere algun tipo de acceso ALVIN al momento de la carga\
-La URL de los archivos son relativas al valor de la constante NGL_URL y deben comenzar con /\
-	/mods/foobar/file1 = true #se requiere unicamente login activo\
-	/mods/foobar/file2 = FOO,BAR #se requieren los permisos FOO y BAR\
-	/mods/foobar/file3 = ?|FOO,BAR #se requieren los permisos FOO ó BAR\
-	/mods/foobar2/ = BAR #bloquea toda la carpeta, se requiere permiso BAR\
+	/folder/bar/filename\
+	/folder/foo/\
+Archivo ignorados por defecto\
+	/\
+	/gardener\
+	/index\
+	/login\
+	/logout
 "

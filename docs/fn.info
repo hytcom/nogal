@@ -1,9 +1,19 @@
-[checksum]
-md5 = "571cb18261dabb75712059dfab8a4eef"
-sha1 = "6a83dd18b1c4aaf474a2cbeafadf190b504ffed8"
-
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/fn.md"
+[info]
+_help = "### fn\
+Objeto CORE\
+Librería de funciones utilitarias relacionadas con:\
+	arrays\
+	cadenas\
+	comprovacion de tipos de datos\
+	colores\
+	fechas\
+	rutas\
+\
+https://github.com/hytcom/wiki/blob/master/nogal/docs/fn.md\
+"
 
 [errors]
 1001 = "Calculadora Binaria no instalada. Ver https://www.php.net/manual/es/bc.installation.php"
+1002 = "No se pudo leer la URL"
+1003 = "Se espera un array como segundo argumento"
+1004 = "El archivo no existe o está protegido contra lectura/escritura"

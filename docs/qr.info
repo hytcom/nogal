@@ -1,9 +1,9 @@
-[checksum]
-md5 = "478d866943b758ba350809fdca541e29"
-sha1 = "b9e04d1fcbacd3f72919d355579a59dbc02ae843"
-
-[documentation]
-url = "https://github.com/hytcom/wiki/blob/master/nogal/docs/qr.md"
+[info]
+_help = "### qr\
+Implementa https://github.com/aferrandini/PHPQRCode
+\
+https://github.com/hytcom/wiki/blob/master/nogal/docs/qr.md\
+"
 
 [arguments]
 content = "Contenido del código"
@@ -17,4 +17,5 @@ margin = "Margen entre el borde de la imagen y el contenido del código"
 size = "Cantidad de pixels por punto"
 
 [errors]
-1000 = "No se pudo hallar la librería \PHPQRCode\QRcode. Ejecutar 'compose update' en la carpeta grafts/composer"
+1000 = "Falta librería. Ejecutar 'composer update' en la carpeta NOGAL/grafts/composer"
+1001 = "Falta librería. Ejecutar 'composer update' en la carpeta NOGAL/grafts/composer luego de agregar a composer.json el paquete:"
