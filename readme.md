@@ -12,7 +12,7 @@ Queda pendiente la acutalización de toda la documentación y la publicación de
 &nbsp;
 
 ## Acerca de nogal
-**nogal** pretende ser un framework de PHP de código abierto pensado para que todos puedan desarrollar aplicaciones sin necesidad de tener grandes conocimientos de programación.
+**nogal** pretende ser un framework para PHP, de código abierto y pensado para que todos puedan desarrollar aplicaciones sin necesidad de tener grandes conocimientos de programación.
 
 Su estructura está pensada para que todo aquel que tenga conocimientos básicos de programación, como que es una **variable**, un **if** y un **bucle**, pueda desarrollar aplicaciones sin mayores dificultades. Esto es gracias, entre otras cosas, a su poderoso sistema de templates llamado [rind](https://github.com/hytcom/wiki/tree/master/rind) que permite al desarrollador comunicarse con cualquiera de los objetos del framework desde el HTML, utilizando una sintáxis basada en XML, JS y JSON.
 
