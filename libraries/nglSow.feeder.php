@@ -50,7 +50,7 @@ class nglSow extends nglFeeder implements inglFeeder {
 			$sName .= ".sample";
 		} else {
 			$sFolder = "structures";
-			$sDestine = $sNewName;
+			$sDestine = $sNewName!="." ? $sNewName : \getcwd();
 		}
 
 		$sSource = NGL_PATH_FRAMEWORK.NGL_DIR_SLASH."assets".NGL_DIR_SLASH."templates".NGL_DIR_SLASH.$sFolder.NGL_DIR_SLASH.$sName;
