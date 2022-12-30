@@ -34,6 +34,7 @@ docker exec -it --user "$(id -u):$(id -g)" nogal bash
 ```sh
 bee sow skel web .
 ```
+
 &nbsp;
 
 6) Ahora desde el navegador podemos ingresar a http://localhost
