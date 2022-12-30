@@ -14,7 +14,7 @@ class nglSow extends nglFeeder implements inglFeeder {
 	private $sSeedBed;
 
 	final public function __init__($mArguments=null) {
-		$this->sSeedBed = NGL_PATH_FRAMEWORK.NGL_DIR_SLASH."assets".NGL_DIR_SLASH."seedbed";
+		$this->sSeedBed = NGL_PATH_SEEDBED;
 	}
 
 	public function seedbed($sPath) {

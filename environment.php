@@ -43,6 +43,9 @@ nglRoot::defineConstant("NGL_RUN_ANYWAY", 										false);
 // document_root
 nglRoot::defineConstant("NGL_DOCUMENT_ROOT",									$TMP_DOCUMENT_ROOT);
 
+// directorio con estructuras de archivos
+nglRoot::defineConstant("NGL_PATH_SEEDBED",										NGL_PATH_FRAMEWORK."/assets/seedbed");
+
 // directorio project
 nglRoot::defineConstant("NGL_PATH_GARDEN",										NGL_DOCUMENT_ROOT);
 

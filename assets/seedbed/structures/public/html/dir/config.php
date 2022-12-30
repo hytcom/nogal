@@ -45,6 +45,9 @@ define("NGL_DOCUMENT_ROOT",														"<{=ROOTDIR=}>");
 // directorio nogal
 define("NGL_PATH_FRAMEWORK",													"/usr/share/nogal");
 
+// directorio con estructuras de archivos
+define("NGL_PATH_SEEDBED",														NGL_PATH_FRAMEWORK."/assets/seedbed");
+
 // directorio project
 define("NGL_PATH_GARDEN",														NGL_DOCUMENT_ROOT."/html");
 

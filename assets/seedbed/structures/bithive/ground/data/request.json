@@ -1,8 +1,0 @@
-{
-	"NGL_ONCECODE": { "type" : "string" },
-	"NGL_REDIRECT": { "type" : "file" },
-
-	"id": { "type" : "int" },
-	"imya": { "type" : "imya" },
-	"q": { "type" : "text" }
-}
