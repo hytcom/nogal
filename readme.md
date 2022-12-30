@@ -1,34 +1,43 @@
 <img src="https://cdn.upps.cloud/images/nogal/nogal-iso.svg" width="100" alt="nogal"/><br />
 
 ## Comenzar usando Docker
-Crear una carpeta local donde se guardará el proyecto.
-Situado en ella y desde una terminal:
+Desde una terminal:
 
-1) Creamos el condtenedor.
+1) Creamos la carpeta local donde se guardará el proyecto y nos situamos en ella.
+```sh
+mkdir myproyecto
+cd myproyecto
+```
+&nbsp;
+
+2) Creamos el contenedor.
 ```sh
 docker run -d -p 80:80 -v $(pwd):/var/www --name=nogal hytcom/nogal
 ```
+&nbsp;
 
-2) Configuramos nuestro usuario en el contenedor para que los archivos creados tengan los permisos correctos.
+3) Configuramos nuestro usuario en el contenedor para que los archivos creados tengan los permisos correctos.
 ```sh
 docker exec -it nogal groupadd -o -g $(id -g) $(whoami)
 docker exec -it nogal useradd -u $(id -u) -g $(id -g) $(whoami)
 ```
+&nbsp;
 
-
-3) Ingresamos a la terminal del contenedor con nuestro usuario
+4) Ingresamos a la terminal del contenedor con nuestro usuario
 ```sh
 docker exec -it --user "$(id -u):$(id -g)" nogal bash
 ```
+&nbsp;
 
-4) Una vez dentro del contenedor ejecutamos
+5) Una vez dentro del contenedor ejecutamos
 
 ```sh
 bee sow skel web .
 ```
+&nbsp;
 
-5) Ahora desde el navegador podemos ingresar a http://localhost
-
+6) Ahora desde el navegador podemos ingresar a http://localhost
+&nbsp;
 
 ## Versión 4.0.00
 Grandes cambios se han incorporado desde la ultima versión publicada, ver [changelog](changelog.md), entre los mas significativos se encuentran:
