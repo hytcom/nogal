@@ -11,10 +11,16 @@ https://hytcom.net/nogal/docs/objects/sow.md
 namespace nogal;
 class nglSow extends nglFeeder implements inglFeeder {
 
-	private $sTemplates;
+	private $sSeedBed;
 
 	final public function __init__($mArguments=null) {
-		$this->sTemplates = NGL_PATH_FRAMEWORK.NGL_DIR_SLASH."assets".NGL_DIR_SLASH."templates";
+		$this->sSeedBed = NGL_PATH_FRAMEWORK.NGL_DIR_SLASH."assets".NGL_DIR_SLASH."seedbed";
+	}
+
+	public function seedbed($sPath) {
+		if(\is_dir($sPath) && \is_readable($sPath)) {
+			$this->sSeedBed = $sPath;
+		}
 	}
 
 	public function conf($sObjectName, $sKey=null, $sValue=null) {
@@ -29,11 +35,11 @@ class nglSow extends nglFeeder implements inglFeeder {
 
 	public function skels() {
 		$aSkels = ["structures"=>[], "components"=>[]];
-		if(\is_dir($this->sTemplates) && \is_readable($this->sTemplates)) {
-			foreach(\glob($this->sTemplates.NGL_DIR_SLASH."structures".NGL_DIR_SLASH."*") as $sStructure) {
+		if(\is_dir($this->sSeedBed) && \is_readable($this->sSeedBed)) {
+			foreach(\glob($this->sSeedBed.NGL_DIR_SLASH."structures".NGL_DIR_SLASH."*") as $sStructure) {
 				$aSkels["structures"][] = \basename($sStructure);
 			}
-			$aSkels["components"] = self::call()->parseConfigFile($this->sTemplates.NGL_DIR_SLASH."components/.index");
+			$aSkels["components"] = self::call()->parseConfigFile($this->sSeedBed.NGL_DIR_SLASH."components/.index");
 		}
 		return $aSkels;
 	}
@@ -42,7 +48,7 @@ class nglSow extends nglFeeder implements inglFeeder {
 		if($sNewName===null) { $sNewName = $sName; }
 		$sNewName = \strtolower(\preg_replace("/[^a-zA-Z0-9\_\-\/\.]+/", "", $sNewName));
 		$sName = \strtolower(\preg_replace("/[^a-z0-9\_\-\.]+/", "", $sName));
-		$aComponents = self::call()->parseConfigFile($this->sTemplates.NGL_DIR_SLASH."components/.index");
+		$aComponents = self::call()->parseConfigFile($this->sSeedBed.NGL_DIR_SLASH."components/.index");
 
 		if(!empty($aComponents[$sName])) {
 			$sFolder = "components";
@@ -53,7 +59,7 @@ class nglSow extends nglFeeder implements inglFeeder {
 			$sDestine = $sNewName!="." ? $sNewName : \getcwd();
 		}
 
-		$sSource = NGL_PATH_FRAMEWORK.NGL_DIR_SLASH."assets".NGL_DIR_SLASH."templates".NGL_DIR_SLASH.$sFolder.NGL_DIR_SLASH.$sName;
+		$sSource = $this->sSeedBed.NGL_DIR_SLASH.$sFolder.NGL_DIR_SLASH.$sName;
 		if(\file_exists($sSource)) {
 			if(\is_dir($sSource)) { $sNewName = null; }
 			if($sNewName===null) {

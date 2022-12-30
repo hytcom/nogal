@@ -1,6 +1,5 @@
 .todo/
 .vscode/
+.editorconfig
 Dockerfile
 .dockerignore
-.editorconfig
-nogal.code-workspace

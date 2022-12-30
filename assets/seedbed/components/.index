@@ -1,5 +1,7 @@
 config={@NGL_PATH_GARDEN}/config.php
 env=={@NGL_PATH_GARDEN}/.env
+gardener=={@NGL_PATH_PUBLIC}/gardener.php
+gardener-journal=={@NGL_PATH_PUBLIC}/gardener-journal.php
 nut={@NGL_PATH_NUTS}/<NEWNAME>.php
 nut-ctrl={@NGL_PATH_GARDEN}/nut.php
 table={@NGL_PATH_GARDEN}/<NEWNAME>.html

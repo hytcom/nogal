@@ -135,9 +135,10 @@
 
 ## sow
 - nuevo objeto **sow**, Implementa estructuras de archivos de nogal
+	- conf
+	- seedbed
 	- skels
 	- skel
-	- conf
 
 ## sysvar
 - se añadió la variable **HTTP_CODES**
