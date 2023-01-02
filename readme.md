@@ -43,9 +43,9 @@ bee sow skel web .
 ## Versión 4.0.00
 Grandes cambios se han incorporado desde la ultima versión publicada, ver [changelog](changelog.md), entre los mas significativos se encuentran:
 - La supresión de todas las librerías de terceros en la versión por defecto, las mismas deben instalarse ejecutando ```composer update``` dentro de la carpeta ```NOGAL/grafts/composer```
-- Sembrar estructuras [pre-diseñadas](assets/templates/structures/) para el desarrollo de diferentes aplicaciones mediante el objeto **sow**. Consultar en la [Guía del usuario](https://github.com/hytcom/wiki/tree/master/nogal), como sembrar un **nogal.**
+- Sembrar estructuras [pre-diseñadas](assets/seedbed/structures/) para el desarrollo de diferentes aplicaciones mediante el objeto **sow**. Consultar en la [Guía del usuario](https://github.com/hytcom/wiki/tree/master/nogal), como sembrar un **nogal.**
 - Se extendieron, y mucho, las funcionalidades del interprete [Bee](https://github.com/hytcom/wiki/blob/master/nogal/docs/bee.md), ver ejemplos de la estructura pre-diseñada [bee](assets/templates/structures/bee)
-- Declarar rutas para el desarrollo de APIs mediante el objeto **ant** y la configuración **uproot.php**. Se recomienda el uso de la estructura pre-diseñada [api](assets/templates/structures/api)
+- Declarar rutas para el desarrollo de APIs mediante el objeto **ant** y la configuración **uproot.php**. Se recomienda el uso de la estructura pre-diseñada [api](assets/seedbed/structures/api)
 
 Queda pendiente la acutalización de toda la documentación y la publicación de la misma en un único repositorio [hytcom.net/nogal/docs](https://hytcom.net/nogal/docs)
 
@@ -63,7 +63,7 @@ Para instalarlo y aprender más, consultá la [Guía del usuario](https://github
 &nbsp;
 
 ## Licencia
-The MIT License (MIT) - Copyright (c)2016 [hytcom.net](https://hytcom.net/nogal)
+The MIT License (MIT) - Copyright (c) 2016-2023 [hytcom.net](https://hytcom.net/nogal)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -86,4 +86,4 @@ SOFTWARE.
 &nbsp;
 ___
 <sub><b>nogal</b> - <em>the most simple PHP Framework</em></sub><br />
-<sup>&copy; 2022 by <a href="https://hytcom.net">hytcom.net</a> - <a href="https://github.com/hytcom">@hytcom</a></sup><br />
+<sup>&copy; 2023 by <a href="https://hytcom.net">hytcom.net</a> - <a href="https://github.com/hytcom">@hytcom</a></sup><br />
